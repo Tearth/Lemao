@@ -1,0 +1,56 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "rust: cargo clean",
+            "type": "shell",
+            "command": "cargo clean",
+            "group": {
+                "kind": "build"
+            },
+        },
+        {
+            "label": "rust: cargo fmt",
+            "type": "shell",
+            "command": "cargo fmt -- --check",
+            "group": {
+                "kind": "build"
+            },
+        },
+        {
+            "label": "rust: cargo clippy",
+            "type": "shell",
+            "command": "cargo clippy -- -Dwarnings",
+            "group": {
+                "kind": "build"
+            },
+        },
+        {
+            "label": "build debug windows",
+            "type": "shell",
+            "command": "cargo build",
+            "group": {
+                "kind": "build"
+            },
+        },
+        {
+            "label": "build release windows",
+            "type": "shell",
+            "command": "cargo build --release",
+            "group": {
+                "kind": "build"
+            },
+        },
+        {
+            "label": "build and run release windows",
+            "type": "shell",
+            "command": "${workspaceFolder}/target/release/lemao-bin.exe",
+            "group": {
+                "kind": "build"
+            },
+            "dependsOn": [
+                "build release windows"
+            ]
+        }
+    ],
+}
