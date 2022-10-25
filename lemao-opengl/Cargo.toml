@@ -3,5 +3,8 @@ name = "lemao-opengl"
 version = "1.0.0"
 edition = "2021"
 
+[dependencies]
+lemao-winapi = { path = "../lemao-winapi" }
+
 [build-dependencies]
 lemao-bindgen = { path = "../lemao-bindgen" }
