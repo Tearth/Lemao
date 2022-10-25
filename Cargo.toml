@@ -1,4 +1,6 @@
 [workspace]
 members = [
     "lemao-bin",
+    "lemao-bindgen",
+    "lemao-winapi"
 ]

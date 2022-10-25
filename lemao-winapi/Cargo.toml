@@ -1,0 +1,7 @@
+[package]
+name = "lemao-winapi"
+version = "1.0.0"
+edition = "2021"
+
+[build-dependencies]
+lemao-bindgen = { path = "../lemao-bindgen" }
