@@ -20,11 +20,7 @@ where
         debug_assert!(index / 8 < self.storage.as_ref().len());
         let byte_index = index / 8;
         let byte = self.storage.as_ref()[byte_index];
-        let bit_index = if cfg!(target_endian = "big") {
-            7 - (index % 8)
-        } else {
-            index % 8
-        };
+        let bit_index = if cfg!(target_endian = "big") { 7 - (index % 8) } else { index % 8 };
         let mask = 1 << bit_index;
         byte & mask == mask
     }
@@ -33,11 +29,7 @@ where
         debug_assert!(index / 8 < self.storage.as_ref().len());
         let byte_index = index / 8;
         let byte = &mut self.storage.as_mut()[byte_index];
-        let bit_index = if cfg!(target_endian = "big") {
-            7 - (index % 8)
-        } else {
-            index % 8
-        };
+        let bit_index = if cfg!(target_endian = "big") { 7 - (index % 8) } else { index % 8 };
         let mask = 1 << bit_index;
         if val {
             *byte |= mask;
@@ -53,11 +45,7 @@ where
         let mut val = 0;
         for i in 0..(bit_width as usize) {
             if self.get_bit(i + bit_offset) {
-                let index = if cfg!(target_endian = "big") {
-                    bit_width as usize - 1 - i
-                } else {
-                    i
-                };
+                let index = if cfg!(target_endian = "big") { bit_width as usize - 1 - i } else { i };
                 val |= 1 << index;
             }
         }
@@ -71,11 +59,7 @@ where
         for i in 0..(bit_width as usize) {
             let mask = 1 << i;
             let val_bit_is_set = val & mask == mask;
-            let index = if cfg!(target_endian = "big") {
-                bit_width as usize - 1 - i
-            } else {
-                i
-            };
+            let index = if cfg!(target_endian = "big") { bit_width as usize - 1 - i } else { i };
             self.set_bit(index + bit_offset, val_bit_is_set);
         }
     }
@@ -1017,8 +1001,7 @@ pub const UNW_FLAG_CHAININFO: u32 = 4;
 pub const UNW_FLAG_NO_EPILOGUE: u32 = 2147483648;
 pub const UNWIND_CHAIN_LIMIT: u32 = 32;
 pub const UNWIND_HISTORY_TABLE_SIZE: u32 = 12;
-pub const OUT_OF_PROCESS_FUNCTION_TABLE_CALLBACK_EXPORT_NAME: &[u8; 34usize] =
-    b"OutOfProcessFunctionTableCallback\0";
+pub const OUT_OF_PROCESS_FUNCTION_TABLE_CALLBACK_EXPORT_NAME: &[u8; 34usize] = b"OutOfProcessFunctionTableCallback\0";
 pub const WOW64_CONTEXT_i386: u32 = 65536;
 pub const WOW64_CONTEXT_i486: u32 = 65536;
 pub const WOW64_CONTEXT_CONTROL: u32 = 65537;
@@ -2928,12 +2911,10 @@ pub const CREATE_BOUNDARY_DESCRIPTOR_ADD_APPCONTAINER_SID: u32 = 1;
 pub const PERFORMANCE_DATA_VERSION: u32 = 1;
 pub const READ_THREAD_PROFILING_FLAG_DISPATCHING: u32 = 1;
 pub const READ_THREAD_PROFILING_FLAG_HARDWARE_COUNTERS: u32 = 2;
-pub const UNIFIEDBUILDREVISION_KEY: &[u8; 63usize] =
-    b"\\Registry\\Machine\\Software\\Microsoft\\Windows NT\\CurrentVersion\0";
+pub const UNIFIEDBUILDREVISION_KEY: &[u8; 63usize] = b"\\Registry\\Machine\\Software\\Microsoft\\Windows NT\\CurrentVersion\0";
 pub const UNIFIEDBUILDREVISION_VALUE: &[u8; 4usize] = b"UBR\0";
 pub const UNIFIEDBUILDREVISION_MIN: u32 = 0;
-pub const DEVICEFAMILYDEVICEFORM_KEY: &[u8; 67usize] =
-    b"\\Registry\\Machine\\Software\\Microsoft\\Windows NT\\CurrentVersion\\OEM\0";
+pub const DEVICEFAMILYDEVICEFORM_KEY: &[u8; 67usize] = b"\\Registry\\Machine\\Software\\Microsoft\\Windows NT\\CurrentVersion\\OEM\0";
 pub const DEVICEFAMILYDEVICEFORM_VALUE: &[u8; 11usize] = b"DeviceForm\0";
 pub const DEVICEFAMILYINFOENUM_UAP: u32 = 0;
 pub const DEVICEFAMILYINFOENUM_WINDOWS_8X: u32 = 1;
@@ -7125,8 +7106,7 @@ pub const ERROR_UNSIGNED_PACKAGE_INVALID_CONTENT: u32 = 15659;
 pub const ERROR_UNSIGNED_PACKAGE_INVALID_PUBLISHER_NAMESPACE: u32 = 15660;
 pub const ERROR_SIGNED_PACKAGE_INVALID_PUBLISHER_NAMESPACE: u32 = 15661;
 pub const ERROR_PACKAGE_EXTERNAL_LOCATION_NOT_ALLOWED: u32 = 15662;
-pub const ERROR_INSTALL_FULLTRUST_HOSTRUNTIME_REQUIRES_MAIN_PACKAGE_FULLTRUST_CAPABILITY: u32 =
-    15663;
+pub const ERROR_INSTALL_FULLTRUST_HOSTRUNTIME_REQUIRES_MAIN_PACKAGE_FULLTRUST_CAPABILITY: u32 = 15663;
 pub const APPMODEL_ERROR_NO_PACKAGE: u32 = 15700;
 pub const APPMODEL_ERROR_PACKAGE_RUNTIME_CORRUPT: u32 = 15701;
 pub const APPMODEL_ERROR_PACKAGE_IDENTITY_CORRUPT: u32 = 15702;
@@ -12653,8 +12633,7 @@ pub const SERVICE_LAUNCH_PROTECTED_ANTIMALWARE_LIGHT: u32 = 3;
 pub const SERVICE_TRIGGER_ACTION_SERVICE_START: u32 = 1;
 pub const SERVICE_TRIGGER_ACTION_SERVICE_STOP: u32 = 2;
 pub const SERVICE_TRIGGER_STARTED_ARGUMENT: &[u8; 15usize] = b"TriggerStarted\0";
-pub const SC_AGGREGATE_STORAGE_KEY: &[u8; 57usize] =
-    b"System\\CurrentControlSet\\Control\\ServiceAggregatedEvents\0";
+pub const SC_AGGREGATE_STORAGE_KEY: &[u8; 57usize] = b"System\\CurrentControlSet\\Control\\ServiceAggregatedEvents\0";
 pub const DIALOPTION_BILLING: u32 = 64;
 pub const DIALOPTION_QUIET: u32 = 128;
 pub const DIALOPTION_DIALTONE: u32 = 256;
@@ -13236,17 +13215,10 @@ extern "C" {
     pub fn is_wctype(_C: wint_t, _Type: wctype_t) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn _isctype(
-        _C: ::std::os::raw::c_int,
-        _Type: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int;
+    pub fn _isctype(_C: ::std::os::raw::c_int, _Type: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn _isctype_l(
-        _C: ::std::os::raw::c_int,
-        _Type: ::std::os::raw::c_int,
-        _Locale: _locale_t,
-    ) -> ::std::os::raw::c_int;
+    pub fn _isctype_l(_C: ::std::os::raw::c_int, _Type: ::std::os::raw::c_int, _Locale: _locale_t) -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn isalpha(_C: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
@@ -13598,52 +13570,28 @@ pub type PLUID = *mut _LUID;
 pub type DWORDLONG = ULONGLONG;
 pub type PDWORDLONG = *mut DWORDLONG;
 extern "C" {
-    pub fn _rotl8(
-        Value: ::std::os::raw::c_uchar,
-        Shift: ::std::os::raw::c_uchar,
-    ) -> ::std::os::raw::c_uchar;
+    pub fn _rotl8(Value: ::std::os::raw::c_uchar, Shift: ::std::os::raw::c_uchar) -> ::std::os::raw::c_uchar;
 }
 extern "C" {
-    pub fn _rotl16(
-        Value: ::std::os::raw::c_ushort,
-        Shift: ::std::os::raw::c_uchar,
-    ) -> ::std::os::raw::c_ushort;
+    pub fn _rotl16(Value: ::std::os::raw::c_ushort, Shift: ::std::os::raw::c_uchar) -> ::std::os::raw::c_ushort;
 }
 extern "C" {
-    pub fn _rotr8(
-        Value: ::std::os::raw::c_uchar,
-        Shift: ::std::os::raw::c_uchar,
-    ) -> ::std::os::raw::c_uchar;
+    pub fn _rotr8(Value: ::std::os::raw::c_uchar, Shift: ::std::os::raw::c_uchar) -> ::std::os::raw::c_uchar;
 }
 extern "C" {
-    pub fn _rotr16(
-        Value: ::std::os::raw::c_ushort,
-        Shift: ::std::os::raw::c_uchar,
-    ) -> ::std::os::raw::c_ushort;
+    pub fn _rotr16(Value: ::std::os::raw::c_ushort, Shift: ::std::os::raw::c_uchar) -> ::std::os::raw::c_ushort;
 }
 extern "C" {
-    pub fn _rotl(
-        Value: ::std::os::raw::c_uint,
-        Shift: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_uint;
+    pub fn _rotl(Value: ::std::os::raw::c_uint, Shift: ::std::os::raw::c_int) -> ::std::os::raw::c_uint;
 }
 extern "C" {
-    pub fn _rotl64(
-        Value: ::std::os::raw::c_ulonglong,
-        Shift: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_ulonglong;
+    pub fn _rotl64(Value: ::std::os::raw::c_ulonglong, Shift: ::std::os::raw::c_int) -> ::std::os::raw::c_ulonglong;
 }
 extern "C" {
-    pub fn _rotr(
-        Value: ::std::os::raw::c_uint,
-        Shift: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_uint;
+    pub fn _rotr(Value: ::std::os::raw::c_uint, Shift: ::std::os::raw::c_int) -> ::std::os::raw::c_uint;
 }
 extern "C" {
-    pub fn _rotr64(
-        Value: ::std::os::raw::c_ulonglong,
-        Shift: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_ulonglong;
+    pub fn _rotr64(Value: ::std::os::raw::c_ulonglong, Shift: ::std::os::raw::c_int) -> ::std::os::raw::c_ulonglong;
 }
 pub type BOOLEAN = BYTE;
 pub type PBOOLEAN = *mut BOOLEAN;
@@ -13713,63 +13661,31 @@ extern "C" {
     pub fn _get_doserrno(_Value: *mut ::std::os::raw::c_ulong) -> errno_t;
 }
 extern "C" {
-    pub fn memchr(
-        _Buf: *const ::std::os::raw::c_void,
-        _Val: ::std::os::raw::c_int,
-        _MaxCount: ::std::os::raw::c_ulonglong,
-    ) -> *mut ::std::os::raw::c_void;
+    pub fn memchr(_Buf: *const ::std::os::raw::c_void, _Val: ::std::os::raw::c_int, _MaxCount: ::std::os::raw::c_ulonglong) -> *mut ::std::os::raw::c_void;
 }
 extern "C" {
-    pub fn memcmp(
-        _Buf1: *const ::std::os::raw::c_void,
-        _Buf2: *const ::std::os::raw::c_void,
-        _Size: ::std::os::raw::c_ulonglong,
-    ) -> ::std::os::raw::c_int;
+    pub fn memcmp(_Buf1: *const ::std::os::raw::c_void, _Buf2: *const ::std::os::raw::c_void, _Size: ::std::os::raw::c_ulonglong) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn memcpy(
-        _Dst: *mut ::std::os::raw::c_void,
-        _Src: *const ::std::os::raw::c_void,
-        _Size: ::std::os::raw::c_ulonglong,
-    ) -> *mut ::std::os::raw::c_void;
+    pub fn memcpy(_Dst: *mut ::std::os::raw::c_void, _Src: *const ::std::os::raw::c_void, _Size: ::std::os::raw::c_ulonglong) -> *mut ::std::os::raw::c_void;
 }
 extern "C" {
-    pub fn memmove(
-        _Dst: *mut ::std::os::raw::c_void,
-        _Src: *const ::std::os::raw::c_void,
-        _Size: ::std::os::raw::c_ulonglong,
-    ) -> *mut ::std::os::raw::c_void;
+    pub fn memmove(_Dst: *mut ::std::os::raw::c_void, _Src: *const ::std::os::raw::c_void, _Size: ::std::os::raw::c_ulonglong) -> *mut ::std::os::raw::c_void;
 }
 extern "C" {
-    pub fn memset(
-        _Dst: *mut ::std::os::raw::c_void,
-        _Val: ::std::os::raw::c_int,
-        _Size: ::std::os::raw::c_ulonglong,
-    ) -> *mut ::std::os::raw::c_void;
+    pub fn memset(_Dst: *mut ::std::os::raw::c_void, _Val: ::std::os::raw::c_int, _Size: ::std::os::raw::c_ulonglong) -> *mut ::std::os::raw::c_void;
 }
 extern "C" {
-    pub fn strchr(
-        _Str: *const ::std::os::raw::c_char,
-        _Val: ::std::os::raw::c_int,
-    ) -> *mut ::std::os::raw::c_char;
+    pub fn strchr(_Str: *const ::std::os::raw::c_char, _Val: ::std::os::raw::c_int) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    pub fn strrchr(
-        _Str: *const ::std::os::raw::c_char,
-        _Ch: ::std::os::raw::c_int,
-    ) -> *mut ::std::os::raw::c_char;
+    pub fn strrchr(_Str: *const ::std::os::raw::c_char, _Ch: ::std::os::raw::c_int) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    pub fn strstr(
-        _Str: *const ::std::os::raw::c_char,
-        _SubStr: *const ::std::os::raw::c_char,
-    ) -> *mut ::std::os::raw::c_char;
+    pub fn strstr(_Str: *const ::std::os::raw::c_char, _SubStr: *const ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    pub fn wcschr(
-        _Str: *const ::std::os::raw::c_ushort,
-        _Ch: ::std::os::raw::c_ushort,
-    ) -> *mut ::std::os::raw::c_ushort;
+    pub fn wcschr(_Str: *const ::std::os::raw::c_ushort, _Ch: ::std::os::raw::c_ushort) -> *mut ::std::os::raw::c_ushort;
 }
 extern "C" {
     pub fn wcsrchr(_Str: *const wchar_t, _Ch: wchar_t) -> *mut wchar_t;
@@ -13778,19 +13694,10 @@ extern "C" {
     pub fn wcsstr(_Str: *const wchar_t, _SubStr: *const wchar_t) -> *mut wchar_t;
 }
 extern "C" {
-    pub fn _memicmp(
-        _Buf1: *const ::std::os::raw::c_void,
-        _Buf2: *const ::std::os::raw::c_void,
-        _Size: usize,
-    ) -> ::std::os::raw::c_int;
+    pub fn _memicmp(_Buf1: *const ::std::os::raw::c_void, _Buf2: *const ::std::os::raw::c_void, _Size: usize) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn _memicmp_l(
-        _Buf1: *const ::std::os::raw::c_void,
-        _Buf2: *const ::std::os::raw::c_void,
-        _Size: usize,
-        _Locale: _locale_t,
-    ) -> ::std::os::raw::c_int;
+    pub fn _memicmp_l(_Buf1: *const ::std::os::raw::c_void, _Buf2: *const ::std::os::raw::c_void, _Size: usize, _Locale: _locale_t) -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn memccpy(
@@ -13801,48 +13708,22 @@ extern "C" {
     ) -> *mut ::std::os::raw::c_void;
 }
 extern "C" {
-    pub fn memicmp(
-        _Buf1: *const ::std::os::raw::c_void,
-        _Buf2: *const ::std::os::raw::c_void,
-        _Size: usize,
-    ) -> ::std::os::raw::c_int;
+    pub fn memicmp(_Buf1: *const ::std::os::raw::c_void, _Buf2: *const ::std::os::raw::c_void, _Size: usize) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn wcscat_s(
-        _Destination: *mut wchar_t,
-        _SizeInWords: rsize_t,
-        _Source: *const wchar_t,
-    ) -> errno_t;
+    pub fn wcscat_s(_Destination: *mut wchar_t, _SizeInWords: rsize_t, _Source: *const wchar_t) -> errno_t;
 }
 extern "C" {
-    pub fn wcscpy_s(
-        _Destination: *mut wchar_t,
-        _SizeInWords: rsize_t,
-        _Source: *const wchar_t,
-    ) -> errno_t;
+    pub fn wcscpy_s(_Destination: *mut wchar_t, _SizeInWords: rsize_t, _Source: *const wchar_t) -> errno_t;
 }
 extern "C" {
-    pub fn wcsncat_s(
-        _Destination: *mut wchar_t,
-        _SizeInWords: rsize_t,
-        _Source: *const wchar_t,
-        _MaxCount: rsize_t,
-    ) -> errno_t;
+    pub fn wcsncat_s(_Destination: *mut wchar_t, _SizeInWords: rsize_t, _Source: *const wchar_t, _MaxCount: rsize_t) -> errno_t;
 }
 extern "C" {
-    pub fn wcsncpy_s(
-        _Destination: *mut wchar_t,
-        _SizeInWords: rsize_t,
-        _Source: *const wchar_t,
-        _MaxCount: rsize_t,
-    ) -> errno_t;
+    pub fn wcsncpy_s(_Destination: *mut wchar_t, _SizeInWords: rsize_t, _Source: *const wchar_t, _MaxCount: rsize_t) -> errno_t;
 }
 extern "C" {
-    pub fn wcstok_s(
-        _String: *mut wchar_t,
-        _Delimiter: *const wchar_t,
-        _Context: *mut *mut wchar_t,
-    ) -> *mut wchar_t;
+    pub fn wcstok_s(_String: *mut wchar_t, _Delimiter: *const wchar_t, _Context: *mut *mut wchar_t) -> *mut wchar_t;
 }
 extern "C" {
     pub fn _wcsdup(_String: *const wchar_t) -> *mut wchar_t;
@@ -13851,10 +13732,7 @@ extern "C" {
     pub fn wcscat(_Destination: *mut wchar_t, _Source: *const wchar_t) -> *mut wchar_t;
 }
 extern "C" {
-    pub fn wcscmp(
-        _String1: *const ::std::os::raw::c_ushort,
-        _String2: *const ::std::os::raw::c_ushort,
-    ) -> ::std::os::raw::c_int;
+    pub fn wcscmp(_String1: *const ::std::os::raw::c_ushort, _String2: *const ::std::os::raw::c_ushort) -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn wcscpy(_Destination: *mut wchar_t, _Source: *const wchar_t) -> *mut wchar_t;
@@ -13869,11 +13747,7 @@ extern "C" {
     pub fn wcsnlen(_Source: *const wchar_t, _MaxCount: usize) -> usize;
 }
 extern "C" {
-    pub fn wcsncat(
-        _Destination: *mut wchar_t,
-        _Source: *const wchar_t,
-        _Count: usize,
-    ) -> *mut wchar_t;
+    pub fn wcsncat(_Destination: *mut wchar_t, _Source: *const wchar_t, _Count: usize) -> *mut wchar_t;
 }
 extern "C" {
     pub fn wcsncmp(
@@ -13883,11 +13757,7 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn wcsncpy(
-        _Destination: *mut wchar_t,
-        _Source: *const wchar_t,
-        _Count: usize,
-    ) -> *mut wchar_t;
+    pub fn wcsncpy(_Destination: *mut wchar_t, _Source: *const wchar_t, _Count: usize) -> *mut wchar_t;
 }
 extern "C" {
     pub fn wcspbrk(_String: *const wchar_t, _Control: *const wchar_t) -> *mut wchar_t;
@@ -13896,64 +13766,34 @@ extern "C" {
     pub fn wcsspn(_String: *const wchar_t, _Control: *const wchar_t) -> usize;
 }
 extern "C" {
-    pub fn wcstok(
-        _String: *mut wchar_t,
-        _Delimiter: *const wchar_t,
-        _Context: *mut *mut wchar_t,
-    ) -> *mut wchar_t;
+    pub fn wcstok(_String: *mut wchar_t, _Delimiter: *const wchar_t, _Context: *mut *mut wchar_t) -> *mut wchar_t;
 }
 extern "C" {
     pub fn _wcserror(_ErrorNumber: ::std::os::raw::c_int) -> *mut wchar_t;
 }
 extern "C" {
-    pub fn _wcserror_s(
-        _Buffer: *mut wchar_t,
-        _SizeInWords: usize,
-        _ErrorNumber: ::std::os::raw::c_int,
-    ) -> errno_t;
+    pub fn _wcserror_s(_Buffer: *mut wchar_t, _SizeInWords: usize, _ErrorNumber: ::std::os::raw::c_int) -> errno_t;
 }
 extern "C" {
     pub fn __wcserror(_String: *const wchar_t) -> *mut wchar_t;
 }
 extern "C" {
-    pub fn __wcserror_s(
-        _Buffer: *mut wchar_t,
-        _SizeInWords: usize,
-        _ErrorMessage: *const wchar_t,
-    ) -> errno_t;
+    pub fn __wcserror_s(_Buffer: *mut wchar_t, _SizeInWords: usize, _ErrorMessage: *const wchar_t) -> errno_t;
 }
 extern "C" {
     pub fn _wcsicmp(_String1: *const wchar_t, _String2: *const wchar_t) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn _wcsicmp_l(
-        _String1: *const wchar_t,
-        _String2: *const wchar_t,
-        _Locale: _locale_t,
-    ) -> ::std::os::raw::c_int;
+    pub fn _wcsicmp_l(_String1: *const wchar_t, _String2: *const wchar_t, _Locale: _locale_t) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn _wcsnicmp(
-        _String1: *const wchar_t,
-        _String2: *const wchar_t,
-        _MaxCount: usize,
-    ) -> ::std::os::raw::c_int;
+    pub fn _wcsnicmp(_String1: *const wchar_t, _String2: *const wchar_t, _MaxCount: usize) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn _wcsnicmp_l(
-        _String1: *const wchar_t,
-        _String2: *const wchar_t,
-        _MaxCount: usize,
-        _Locale: _locale_t,
-    ) -> ::std::os::raw::c_int;
+    pub fn _wcsnicmp_l(_String1: *const wchar_t, _String2: *const wchar_t, _MaxCount: usize, _Locale: _locale_t) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn _wcsnset_s(
-        _Destination: *mut wchar_t,
-        _SizeInWords: usize,
-        _Value: wchar_t,
-        _MaxCount: usize,
-    ) -> errno_t;
+    pub fn _wcsnset_s(_Destination: *mut wchar_t, _SizeInWords: usize, _Value: wchar_t, _MaxCount: usize) -> errno_t;
 }
 extern "C" {
     pub fn _wcsnset(_String: *mut wchar_t, _Value: wchar_t, _MaxCount: usize) -> *mut wchar_t;
@@ -13995,62 +13835,31 @@ extern "C" {
     pub fn wcsxfrm(_Destination: *mut wchar_t, _Source: *const wchar_t, _MaxCount: usize) -> usize;
 }
 extern "C" {
-    pub fn _wcsxfrm_l(
-        _Destination: *mut wchar_t,
-        _Source: *const wchar_t,
-        _MaxCount: usize,
-        _Locale: _locale_t,
-    ) -> usize;
+    pub fn _wcsxfrm_l(_Destination: *mut wchar_t, _Source: *const wchar_t, _MaxCount: usize, _Locale: _locale_t) -> usize;
 }
 extern "C" {
     pub fn wcscoll(_String1: *const wchar_t, _String2: *const wchar_t) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn _wcscoll_l(
-        _String1: *const wchar_t,
-        _String2: *const wchar_t,
-        _Locale: _locale_t,
-    ) -> ::std::os::raw::c_int;
+    pub fn _wcscoll_l(_String1: *const wchar_t, _String2: *const wchar_t, _Locale: _locale_t) -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn _wcsicoll(_String1: *const wchar_t, _String2: *const wchar_t) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn _wcsicoll_l(
-        _String1: *const wchar_t,
-        _String2: *const wchar_t,
-        _Locale: _locale_t,
-    ) -> ::std::os::raw::c_int;
+    pub fn _wcsicoll_l(_String1: *const wchar_t, _String2: *const wchar_t, _Locale: _locale_t) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn _wcsncoll(
-        _String1: *const wchar_t,
-        _String2: *const wchar_t,
-        _MaxCount: usize,
-    ) -> ::std::os::raw::c_int;
+    pub fn _wcsncoll(_String1: *const wchar_t, _String2: *const wchar_t, _MaxCount: usize) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn _wcsncoll_l(
-        _String1: *const wchar_t,
-        _String2: *const wchar_t,
-        _MaxCount: usize,
-        _Locale: _locale_t,
-    ) -> ::std::os::raw::c_int;
+    pub fn _wcsncoll_l(_String1: *const wchar_t, _String2: *const wchar_t, _MaxCount: usize, _Locale: _locale_t) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn _wcsnicoll(
-        _String1: *const wchar_t,
-        _String2: *const wchar_t,
-        _MaxCount: usize,
-    ) -> ::std::os::raw::c_int;
+    pub fn _wcsnicoll(_String1: *const wchar_t, _String2: *const wchar_t, _MaxCount: usize) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn _wcsnicoll_l(
-        _String1: *const wchar_t,
-        _String2: *const wchar_t,
-        _MaxCount: usize,
-        _Locale: _locale_t,
-    ) -> ::std::os::raw::c_int;
+    pub fn _wcsnicoll_l(_String1: *const wchar_t, _String2: *const wchar_t, _MaxCount: usize, _Locale: _locale_t) -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn wcsdup(_String: *const wchar_t) -> *mut wchar_t;
@@ -14059,11 +13868,7 @@ extern "C" {
     pub fn wcsicmp(_String1: *const wchar_t, _String2: *const wchar_t) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn wcsnicmp(
-        _String1: *const wchar_t,
-        _String2: *const wchar_t,
-        _MaxCount: usize,
-    ) -> ::std::os::raw::c_int;
+    pub fn wcsnicmp(_String1: *const wchar_t, _String2: *const wchar_t, _MaxCount: usize) -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn wcsnset(_String: *mut wchar_t, _Value: wchar_t, _MaxCount: usize) -> *mut wchar_t;
@@ -14084,41 +13889,19 @@ extern "C" {
     pub fn wcsicoll(_String1: *const wchar_t, _String2: *const wchar_t) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn strcpy_s(
-        _Destination: *mut ::std::os::raw::c_char,
-        _SizeInBytes: rsize_t,
-        _Source: *const ::std::os::raw::c_char,
-    ) -> errno_t;
+    pub fn strcpy_s(_Destination: *mut ::std::os::raw::c_char, _SizeInBytes: rsize_t, _Source: *const ::std::os::raw::c_char) -> errno_t;
 }
 extern "C" {
-    pub fn strcat_s(
-        _Destination: *mut ::std::os::raw::c_char,
-        _SizeInBytes: rsize_t,
-        _Source: *const ::std::os::raw::c_char,
-    ) -> errno_t;
+    pub fn strcat_s(_Destination: *mut ::std::os::raw::c_char, _SizeInBytes: rsize_t, _Source: *const ::std::os::raw::c_char) -> errno_t;
 }
 extern "C" {
-    pub fn strerror_s(
-        _Buffer: *mut ::std::os::raw::c_char,
-        _SizeInBytes: usize,
-        _ErrorNumber: ::std::os::raw::c_int,
-    ) -> errno_t;
+    pub fn strerror_s(_Buffer: *mut ::std::os::raw::c_char, _SizeInBytes: usize, _ErrorNumber: ::std::os::raw::c_int) -> errno_t;
 }
 extern "C" {
-    pub fn strncat_s(
-        _Destination: *mut ::std::os::raw::c_char,
-        _SizeInBytes: rsize_t,
-        _Source: *const ::std::os::raw::c_char,
-        _MaxCount: rsize_t,
-    ) -> errno_t;
+    pub fn strncat_s(_Destination: *mut ::std::os::raw::c_char, _SizeInBytes: rsize_t, _Source: *const ::std::os::raw::c_char, _MaxCount: rsize_t) -> errno_t;
 }
 extern "C" {
-    pub fn strncpy_s(
-        _Destination: *mut ::std::os::raw::c_char,
-        _SizeInBytes: rsize_t,
-        _Source: *const ::std::os::raw::c_char,
-        _MaxCount: rsize_t,
-    ) -> errno_t;
+    pub fn strncpy_s(_Destination: *mut ::std::os::raw::c_char, _SizeInBytes: rsize_t, _Source: *const ::std::os::raw::c_char, _MaxCount: rsize_t) -> errno_t;
 }
 extern "C" {
     pub fn strtok_s(
@@ -14136,47 +13919,25 @@ extern "C" {
     ) -> *mut ::std::os::raw::c_void;
 }
 extern "C" {
-    pub fn strcat(
-        _Destination: *mut ::std::os::raw::c_char,
-        _Source: *const ::std::os::raw::c_char,
-    ) -> *mut ::std::os::raw::c_char;
+    pub fn strcat(_Destination: *mut ::std::os::raw::c_char, _Source: *const ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    pub fn strcmp(
-        _Str1: *const ::std::os::raw::c_char,
-        _Str2: *const ::std::os::raw::c_char,
-    ) -> ::std::os::raw::c_int;
+    pub fn strcmp(_Str1: *const ::std::os::raw::c_char, _Str2: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn _strcmpi(
-        _String1: *const ::std::os::raw::c_char,
-        _String2: *const ::std::os::raw::c_char,
-    ) -> ::std::os::raw::c_int;
+    pub fn _strcmpi(_String1: *const ::std::os::raw::c_char, _String2: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn strcoll(
-        _String1: *const ::std::os::raw::c_char,
-        _String2: *const ::std::os::raw::c_char,
-    ) -> ::std::os::raw::c_int;
+    pub fn strcoll(_String1: *const ::std::os::raw::c_char, _String2: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn _strcoll_l(
-        _String1: *const ::std::os::raw::c_char,
-        _String2: *const ::std::os::raw::c_char,
-        _Locale: _locale_t,
-    ) -> ::std::os::raw::c_int;
+    pub fn _strcoll_l(_String1: *const ::std::os::raw::c_char, _String2: *const ::std::os::raw::c_char, _Locale: _locale_t) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn strcpy(
-        _Destination: *mut ::std::os::raw::c_char,
-        _Source: *const ::std::os::raw::c_char,
-    ) -> *mut ::std::os::raw::c_char;
+    pub fn strcpy(_Destination: *mut ::std::os::raw::c_char, _Source: *const ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    pub fn strcspn(
-        _Str: *const ::std::os::raw::c_char,
-        _Control: *const ::std::os::raw::c_char,
-    ) -> ::std::os::raw::c_ulonglong;
+    pub fn strcspn(_Str: *const ::std::os::raw::c_char, _Control: *const ::std::os::raw::c_char) -> ::std::os::raw::c_ulonglong;
 }
 extern "C" {
     pub fn _strdup(_Source: *const ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
@@ -14185,40 +13946,22 @@ extern "C" {
     pub fn _strerror(_ErrorMessage: *const ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    pub fn _strerror_s(
-        _Buffer: *mut ::std::os::raw::c_char,
-        _SizeInBytes: usize,
-        _ErrorMessage: *const ::std::os::raw::c_char,
-    ) -> errno_t;
+    pub fn _strerror_s(_Buffer: *mut ::std::os::raw::c_char, _SizeInBytes: usize, _ErrorMessage: *const ::std::os::raw::c_char) -> errno_t;
 }
 extern "C" {
     pub fn strerror(_ErrorMessage: ::std::os::raw::c_int) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    pub fn _stricmp(
-        _String1: *const ::std::os::raw::c_char,
-        _String2: *const ::std::os::raw::c_char,
-    ) -> ::std::os::raw::c_int;
+    pub fn _stricmp(_String1: *const ::std::os::raw::c_char, _String2: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn _stricoll(
-        _String1: *const ::std::os::raw::c_char,
-        _String2: *const ::std::os::raw::c_char,
-    ) -> ::std::os::raw::c_int;
+    pub fn _stricoll(_String1: *const ::std::os::raw::c_char, _String2: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn _stricoll_l(
-        _String1: *const ::std::os::raw::c_char,
-        _String2: *const ::std::os::raw::c_char,
-        _Locale: _locale_t,
-    ) -> ::std::os::raw::c_int;
+    pub fn _stricoll_l(_String1: *const ::std::os::raw::c_char, _String2: *const ::std::os::raw::c_char, _Locale: _locale_t) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn _stricmp_l(
-        _String1: *const ::std::os::raw::c_char,
-        _String2: *const ::std::os::raw::c_char,
-        _Locale: _locale_t,
-    ) -> ::std::os::raw::c_int;
+    pub fn _stricmp_l(_String1: *const ::std::os::raw::c_char, _String2: *const ::std::os::raw::c_char, _Locale: _locale_t) -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn strlen(_Str: *const ::std::os::raw::c_char) -> ::std::os::raw::c_ulonglong;
@@ -14230,17 +13973,10 @@ extern "C" {
     pub fn _strlwr(_String: *mut ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    pub fn _strlwr_s_l(
-        _String: *mut ::std::os::raw::c_char,
-        _Size: usize,
-        _Locale: _locale_t,
-    ) -> errno_t;
+    pub fn _strlwr_s_l(_String: *mut ::std::os::raw::c_char, _Size: usize, _Locale: _locale_t) -> errno_t;
 }
 extern "C" {
-    pub fn _strlwr_l(
-        _String: *mut ::std::os::raw::c_char,
-        _Locale: _locale_t,
-    ) -> *mut ::std::os::raw::c_char;
+    pub fn _strlwr_l(_String: *mut ::std::os::raw::c_char, _Locale: _locale_t) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
     pub fn strncat(
@@ -14250,18 +13986,11 @@ extern "C" {
     ) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    pub fn strncmp(
-        _Str1: *const ::std::os::raw::c_char,
-        _Str2: *const ::std::os::raw::c_char,
-        _MaxCount: ::std::os::raw::c_ulonglong,
-    ) -> ::std::os::raw::c_int;
+    pub fn strncmp(_Str1: *const ::std::os::raw::c_char, _Str2: *const ::std::os::raw::c_char, _MaxCount: ::std::os::raw::c_ulonglong)
+        -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn _strnicmp(
-        _String1: *const ::std::os::raw::c_char,
-        _String2: *const ::std::os::raw::c_char,
-        _MaxCount: usize,
-    ) -> ::std::os::raw::c_int;
+    pub fn _strnicmp(_String1: *const ::std::os::raw::c_char, _String2: *const ::std::os::raw::c_char, _MaxCount: usize) -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn _strnicmp_l(
@@ -14272,11 +14001,7 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn _strnicoll(
-        _String1: *const ::std::os::raw::c_char,
-        _String2: *const ::std::os::raw::c_char,
-        _MaxCount: usize,
-    ) -> ::std::os::raw::c_int;
+    pub fn _strnicoll(_String1: *const ::std::os::raw::c_char, _String2: *const ::std::os::raw::c_char, _MaxCount: usize) -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn _strnicoll_l(
@@ -14287,11 +14012,7 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn _strncoll(
-        _String1: *const ::std::os::raw::c_char,
-        _String2: *const ::std::os::raw::c_char,
-        _MaxCount: usize,
-    ) -> ::std::os::raw::c_int;
+    pub fn _strncoll(_String1: *const ::std::os::raw::c_char, _String2: *const ::std::os::raw::c_char, _MaxCount: usize) -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn _strncoll_l(
@@ -14315,53 +14036,28 @@ extern "C" {
     pub fn strnlen(_String: *const ::std::os::raw::c_char, _MaxCount: usize) -> usize;
 }
 extern "C" {
-    pub fn _strnset_s(
-        _String: *mut ::std::os::raw::c_char,
-        _SizeInBytes: usize,
-        _Value: ::std::os::raw::c_int,
-        _MaxCount: usize,
-    ) -> errno_t;
+    pub fn _strnset_s(_String: *mut ::std::os::raw::c_char, _SizeInBytes: usize, _Value: ::std::os::raw::c_int, _MaxCount: usize) -> errno_t;
 }
 extern "C" {
-    pub fn _strnset(
-        _Destination: *mut ::std::os::raw::c_char,
-        _Value: ::std::os::raw::c_int,
-        _Count: usize,
-    ) -> *mut ::std::os::raw::c_char;
+    pub fn _strnset(_Destination: *mut ::std::os::raw::c_char, _Value: ::std::os::raw::c_int, _Count: usize) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    pub fn strpbrk(
-        _Str: *const ::std::os::raw::c_char,
-        _Control: *const ::std::os::raw::c_char,
-    ) -> *mut ::std::os::raw::c_char;
+    pub fn strpbrk(_Str: *const ::std::os::raw::c_char, _Control: *const ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
     pub fn _strrev(_Str: *mut ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    pub fn _strset_s(
-        _Destination: *mut ::std::os::raw::c_char,
-        _DestinationSize: usize,
-        _Value: ::std::os::raw::c_int,
-    ) -> errno_t;
+    pub fn _strset_s(_Destination: *mut ::std::os::raw::c_char, _DestinationSize: usize, _Value: ::std::os::raw::c_int) -> errno_t;
 }
 extern "C" {
-    pub fn _strset(
-        _Destination: *mut ::std::os::raw::c_char,
-        _Value: ::std::os::raw::c_int,
-    ) -> *mut ::std::os::raw::c_char;
+    pub fn _strset(_Destination: *mut ::std::os::raw::c_char, _Value: ::std::os::raw::c_int) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    pub fn strspn(
-        _Str: *const ::std::os::raw::c_char,
-        _Control: *const ::std::os::raw::c_char,
-    ) -> ::std::os::raw::c_ulonglong;
+    pub fn strspn(_Str: *const ::std::os::raw::c_char, _Control: *const ::std::os::raw::c_char) -> ::std::os::raw::c_ulonglong;
 }
 extern "C" {
-    pub fn strtok(
-        _String: *mut ::std::os::raw::c_char,
-        _Delimiter: *const ::std::os::raw::c_char,
-    ) -> *mut ::std::os::raw::c_char;
+    pub fn strtok(_String: *mut ::std::os::raw::c_char, _Delimiter: *const ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
     pub fn _strupr_s(_String: *mut ::std::os::raw::c_char, _Size: usize) -> errno_t;
@@ -14370,17 +14066,10 @@ extern "C" {
     pub fn _strupr(_String: *mut ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    pub fn _strupr_s_l(
-        _String: *mut ::std::os::raw::c_char,
-        _Size: usize,
-        _Locale: _locale_t,
-    ) -> errno_t;
+    pub fn _strupr_s_l(_String: *mut ::std::os::raw::c_char, _Size: usize, _Locale: _locale_t) -> errno_t;
 }
 extern "C" {
-    pub fn _strupr_l(
-        _String: *mut ::std::os::raw::c_char,
-        _Locale: _locale_t,
-    ) -> *mut ::std::os::raw::c_char;
+    pub fn _strupr_l(_String: *mut ::std::os::raw::c_char, _Locale: _locale_t) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
     pub fn strxfrm(
@@ -14390,53 +14079,31 @@ extern "C" {
     ) -> ::std::os::raw::c_ulonglong;
 }
 extern "C" {
-    pub fn _strxfrm_l(
-        _Destination: *mut ::std::os::raw::c_char,
-        _Source: *const ::std::os::raw::c_char,
-        _MaxCount: usize,
-        _Locale: _locale_t,
-    ) -> usize;
+    pub fn _strxfrm_l(_Destination: *mut ::std::os::raw::c_char, _Source: *const ::std::os::raw::c_char, _MaxCount: usize, _Locale: _locale_t) -> usize;
 }
 extern "C" {
     pub fn strdup(_String: *const ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    pub fn strcmpi(
-        _String1: *const ::std::os::raw::c_char,
-        _String2: *const ::std::os::raw::c_char,
-    ) -> ::std::os::raw::c_int;
+    pub fn strcmpi(_String1: *const ::std::os::raw::c_char, _String2: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn stricmp(
-        _String1: *const ::std::os::raw::c_char,
-        _String2: *const ::std::os::raw::c_char,
-    ) -> ::std::os::raw::c_int;
+    pub fn stricmp(_String1: *const ::std::os::raw::c_char, _String2: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn strlwr(_String: *mut ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    pub fn strnicmp(
-        _String1: *const ::std::os::raw::c_char,
-        _String2: *const ::std::os::raw::c_char,
-        _MaxCount: usize,
-    ) -> ::std::os::raw::c_int;
+    pub fn strnicmp(_String1: *const ::std::os::raw::c_char, _String2: *const ::std::os::raw::c_char, _MaxCount: usize) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn strnset(
-        _String: *mut ::std::os::raw::c_char,
-        _Value: ::std::os::raw::c_int,
-        _MaxCount: usize,
-    ) -> *mut ::std::os::raw::c_char;
+    pub fn strnset(_String: *mut ::std::os::raw::c_char, _Value: ::std::os::raw::c_int, _MaxCount: usize) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
     pub fn strrev(_String: *mut ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    pub fn strset(
-        _String: *mut ::std::os::raw::c_char,
-        _Value: ::std::os::raw::c_int,
-    ) -> *mut ::std::os::raw::c_char;
+    pub fn strset(_String: *mut ::std::os::raw::c_char, _Value: ::std::os::raw::c_int) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
     pub fn strupr(_String: *mut ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
@@ -14448,12 +14115,7 @@ pub struct _OBJECTID {
     pub Uniquifier: DWORD,
 }
 pub type OBJECTID = _OBJECTID;
-pub type PEXCEPTION_ROUTINE = unsafe extern "C" fn(
-    arg1: *mut _EXCEPTION_RECORD,
-    arg2: PVOID,
-    arg3: *mut _CONTEXT,
-    arg4: PVOID,
-) -> EXCEPTION_DISPOSITION;
+pub type PEXCEPTION_ROUTINE = unsafe extern "C" fn(arg1: *mut _EXCEPTION_RECORD, arg2: PVOID, arg3: *mut _CONTEXT, arg4: PVOID) -> EXCEPTION_DISPOSITION;
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct _bindgen_ty_1 {
@@ -14549,108 +14211,58 @@ pub struct _SCOPE_TABLE_AMD64__bindgen_ty_1 {
 pub type SCOPE_TABLE_AMD64 = _SCOPE_TABLE_AMD64;
 pub type PSCOPE_TABLE_AMD64 = *mut _SCOPE_TABLE_AMD64;
 extern "C" {
-    pub fn _bittest(
-        Base: *const ::std::os::raw::c_long,
-        Offset: ::std::os::raw::c_long,
-    ) -> ::std::os::raw::c_uchar;
+    pub fn _bittest(Base: *const ::std::os::raw::c_long, Offset: ::std::os::raw::c_long) -> ::std::os::raw::c_uchar;
 }
 extern "C" {
-    pub fn _bittestandcomplement(
-        Base: *mut ::std::os::raw::c_long,
-        Offset: ::std::os::raw::c_long,
-    ) -> ::std::os::raw::c_uchar;
+    pub fn _bittestandcomplement(Base: *mut ::std::os::raw::c_long, Offset: ::std::os::raw::c_long) -> ::std::os::raw::c_uchar;
 }
 extern "C" {
-    pub fn _bittestandset(
-        Base: *mut ::std::os::raw::c_long,
-        Offset: ::std::os::raw::c_long,
-    ) -> ::std::os::raw::c_uchar;
+    pub fn _bittestandset(Base: *mut ::std::os::raw::c_long, Offset: ::std::os::raw::c_long) -> ::std::os::raw::c_uchar;
 }
 extern "C" {
-    pub fn _bittestandreset(
-        Base: *mut ::std::os::raw::c_long,
-        Offset: ::std::os::raw::c_long,
-    ) -> ::std::os::raw::c_uchar;
+    pub fn _bittestandreset(Base: *mut ::std::os::raw::c_long, Offset: ::std::os::raw::c_long) -> ::std::os::raw::c_uchar;
 }
 extern "C" {
-    pub fn _interlockedbittestandset(
-        Base: *mut ::std::os::raw::c_long,
-        Offset: ::std::os::raw::c_long,
-    ) -> ::std::os::raw::c_uchar;
+    pub fn _interlockedbittestandset(Base: *mut ::std::os::raw::c_long, Offset: ::std::os::raw::c_long) -> ::std::os::raw::c_uchar;
 }
 extern "C" {
-    pub fn _interlockedbittestandreset(
-        Base: *mut ::std::os::raw::c_long,
-        Offset: ::std::os::raw::c_long,
-    ) -> ::std::os::raw::c_uchar;
+    pub fn _interlockedbittestandreset(Base: *mut ::std::os::raw::c_long, Offset: ::std::os::raw::c_long) -> ::std::os::raw::c_uchar;
 }
 extern "C" {
-    pub fn _bittest64(
-        Base: *const ::std::os::raw::c_longlong,
-        Offset: ::std::os::raw::c_longlong,
-    ) -> ::std::os::raw::c_uchar;
+    pub fn _bittest64(Base: *const ::std::os::raw::c_longlong, Offset: ::std::os::raw::c_longlong) -> ::std::os::raw::c_uchar;
 }
 extern "C" {
-    pub fn _bittestandcomplement64(
-        Base: *mut ::std::os::raw::c_longlong,
-        Offset: ::std::os::raw::c_longlong,
-    ) -> ::std::os::raw::c_uchar;
+    pub fn _bittestandcomplement64(Base: *mut ::std::os::raw::c_longlong, Offset: ::std::os::raw::c_longlong) -> ::std::os::raw::c_uchar;
 }
 extern "C" {
-    pub fn _bittestandset64(
-        Base: *mut ::std::os::raw::c_longlong,
-        Offset: ::std::os::raw::c_longlong,
-    ) -> ::std::os::raw::c_uchar;
+    pub fn _bittestandset64(Base: *mut ::std::os::raw::c_longlong, Offset: ::std::os::raw::c_longlong) -> ::std::os::raw::c_uchar;
 }
 extern "C" {
-    pub fn _bittestandreset64(
-        Base: *mut ::std::os::raw::c_longlong,
-        Offset: ::std::os::raw::c_longlong,
-    ) -> ::std::os::raw::c_uchar;
+    pub fn _bittestandreset64(Base: *mut ::std::os::raw::c_longlong, Offset: ::std::os::raw::c_longlong) -> ::std::os::raw::c_uchar;
 }
 extern "C" {
-    pub fn _interlockedbittestandset64(
-        Base: *mut ::std::os::raw::c_longlong,
-        Offset: ::std::os::raw::c_longlong,
-    ) -> ::std::os::raw::c_uchar;
+    pub fn _interlockedbittestandset64(Base: *mut ::std::os::raw::c_longlong, Offset: ::std::os::raw::c_longlong) -> ::std::os::raw::c_uchar;
 }
 extern "C" {
-    pub fn _interlockedbittestandreset64(
-        Base: *mut ::std::os::raw::c_longlong,
-        Offset: ::std::os::raw::c_longlong,
-    ) -> ::std::os::raw::c_uchar;
+    pub fn _interlockedbittestandreset64(Base: *mut ::std::os::raw::c_longlong, Offset: ::std::os::raw::c_longlong) -> ::std::os::raw::c_uchar;
 }
 extern "C" {
-    pub fn _BitScanForward(
-        Index: *mut ::std::os::raw::c_ulong,
-        Mask: ::std::os::raw::c_ulong,
-    ) -> ::std::os::raw::c_uchar;
+    pub fn _BitScanForward(Index: *mut ::std::os::raw::c_ulong, Mask: ::std::os::raw::c_ulong) -> ::std::os::raw::c_uchar;
 }
 extern "C" {
-    pub fn _BitScanReverse(
-        Index: *mut ::std::os::raw::c_ulong,
-        Mask: ::std::os::raw::c_ulong,
-    ) -> ::std::os::raw::c_uchar;
+    pub fn _BitScanReverse(Index: *mut ::std::os::raw::c_ulong, Mask: ::std::os::raw::c_ulong) -> ::std::os::raw::c_uchar;
 }
 extern "C" {
-    pub fn _BitScanForward64(
-        Index: *mut ::std::os::raw::c_ulong,
-        Mask: ::std::os::raw::c_ulonglong,
-    ) -> ::std::os::raw::c_uchar;
+    pub fn _BitScanForward64(Index: *mut ::std::os::raw::c_ulong, Mask: ::std::os::raw::c_ulonglong) -> ::std::os::raw::c_uchar;
 }
 extern "C" {
-    pub fn _BitScanReverse64(
-        Index: *mut ::std::os::raw::c_ulong,
-        Mask: ::std::os::raw::c_ulonglong,
-    ) -> ::std::os::raw::c_uchar;
+    pub fn _BitScanReverse64(Index: *mut ::std::os::raw::c_ulong, Mask: ::std::os::raw::c_ulonglong) -> ::std::os::raw::c_uchar;
 }
 extern "C" {
-    pub fn _InterlockedIncrement16(Addend: *mut ::std::os::raw::c_short)
-        -> ::std::os::raw::c_short;
+    pub fn _InterlockedIncrement16(Addend: *mut ::std::os::raw::c_short) -> ::std::os::raw::c_short;
 }
 extern "C" {
-    pub fn _InterlockedDecrement16(Addend: *mut ::std::os::raw::c_short)
-        -> ::std::os::raw::c_short;
+    pub fn _InterlockedDecrement16(Addend: *mut ::std::os::raw::c_short) -> ::std::os::raw::c_short;
 }
 extern "C" {
     pub fn _InterlockedCompareExchange16(
@@ -14660,40 +14272,22 @@ extern "C" {
     ) -> ::std::os::raw::c_short;
 }
 extern "C" {
-    pub fn _InterlockedAnd(
-        Destination: *mut ::std::os::raw::c_long,
-        Value: ::std::os::raw::c_long,
-    ) -> ::std::os::raw::c_long;
+    pub fn _InterlockedAnd(Destination: *mut ::std::os::raw::c_long, Value: ::std::os::raw::c_long) -> ::std::os::raw::c_long;
 }
 extern "C" {
-    pub fn _InterlockedOr(
-        Destination: *mut ::std::os::raw::c_long,
-        Value: ::std::os::raw::c_long,
-    ) -> ::std::os::raw::c_long;
+    pub fn _InterlockedOr(Destination: *mut ::std::os::raw::c_long, Value: ::std::os::raw::c_long) -> ::std::os::raw::c_long;
 }
 extern "C" {
-    pub fn _InterlockedXor(
-        Destination: *mut ::std::os::raw::c_long,
-        Value: ::std::os::raw::c_long,
-    ) -> ::std::os::raw::c_long;
+    pub fn _InterlockedXor(Destination: *mut ::std::os::raw::c_long, Value: ::std::os::raw::c_long) -> ::std::os::raw::c_long;
 }
 extern "C" {
-    pub fn _InterlockedAnd64(
-        Destination: *mut ::std::os::raw::c_longlong,
-        Value: ::std::os::raw::c_longlong,
-    ) -> ::std::os::raw::c_longlong;
+    pub fn _InterlockedAnd64(Destination: *mut ::std::os::raw::c_longlong, Value: ::std::os::raw::c_longlong) -> ::std::os::raw::c_longlong;
 }
 extern "C" {
-    pub fn _InterlockedOr64(
-        Destination: *mut ::std::os::raw::c_longlong,
-        Value: ::std::os::raw::c_longlong,
-    ) -> ::std::os::raw::c_longlong;
+    pub fn _InterlockedOr64(Destination: *mut ::std::os::raw::c_longlong, Value: ::std::os::raw::c_longlong) -> ::std::os::raw::c_longlong;
 }
 extern "C" {
-    pub fn _InterlockedXor64(
-        Destination: *mut ::std::os::raw::c_longlong,
-        Value: ::std::os::raw::c_longlong,
-    ) -> ::std::os::raw::c_longlong;
+    pub fn _InterlockedXor64(Destination: *mut ::std::os::raw::c_longlong, Value: ::std::os::raw::c_longlong) -> ::std::os::raw::c_longlong;
 }
 extern "C" {
     pub fn _InterlockedIncrement(Addend: *mut ::std::os::raw::c_long) -> ::std::os::raw::c_long;
@@ -14702,16 +14296,10 @@ extern "C" {
     pub fn _InterlockedDecrement(Addend: *mut ::std::os::raw::c_long) -> ::std::os::raw::c_long;
 }
 extern "C" {
-    pub fn _InterlockedExchange(
-        Target: *mut ::std::os::raw::c_long,
-        Value: ::std::os::raw::c_long,
-    ) -> ::std::os::raw::c_long;
+    pub fn _InterlockedExchange(Target: *mut ::std::os::raw::c_long, Value: ::std::os::raw::c_long) -> ::std::os::raw::c_long;
 }
 extern "C" {
-    pub fn _InterlockedExchangeAdd(
-        Addend: *mut ::std::os::raw::c_long,
-        Value: ::std::os::raw::c_long,
-    ) -> ::std::os::raw::c_long;
+    pub fn _InterlockedExchangeAdd(Addend: *mut ::std::os::raw::c_long, Value: ::std::os::raw::c_long) -> ::std::os::raw::c_long;
 }
 extern "C" {
     pub fn _InterlockedCompareExchange(
@@ -14721,26 +14309,16 @@ extern "C" {
     ) -> ::std::os::raw::c_long;
 }
 extern "C" {
-    pub fn _InterlockedIncrement64(
-        Addend: *mut ::std::os::raw::c_longlong,
-    ) -> ::std::os::raw::c_longlong;
+    pub fn _InterlockedIncrement64(Addend: *mut ::std::os::raw::c_longlong) -> ::std::os::raw::c_longlong;
 }
 extern "C" {
-    pub fn _InterlockedDecrement64(
-        Addend: *mut ::std::os::raw::c_longlong,
-    ) -> ::std::os::raw::c_longlong;
+    pub fn _InterlockedDecrement64(Addend: *mut ::std::os::raw::c_longlong) -> ::std::os::raw::c_longlong;
 }
 extern "C" {
-    pub fn _InterlockedExchange64(
-        Target: *mut ::std::os::raw::c_longlong,
-        Value: ::std::os::raw::c_longlong,
-    ) -> ::std::os::raw::c_longlong;
+    pub fn _InterlockedExchange64(Target: *mut ::std::os::raw::c_longlong, Value: ::std::os::raw::c_longlong) -> ::std::os::raw::c_longlong;
 }
 extern "C" {
-    pub fn _InterlockedExchangeAdd64(
-        Addend: *mut ::std::os::raw::c_longlong,
-        Value: ::std::os::raw::c_longlong,
-    ) -> ::std::os::raw::c_longlong;
+    pub fn _InterlockedExchangeAdd64(Addend: *mut ::std::os::raw::c_longlong, Value: ::std::os::raw::c_longlong) -> ::std::os::raw::c_longlong;
 }
 extern "C" {
     pub fn _InterlockedCompareExchange64(
@@ -14765,71 +14343,37 @@ extern "C" {
     ) -> *mut ::std::os::raw::c_void;
 }
 extern "C" {
-    pub fn _InterlockedExchangePointer(
-        Target: *mut *mut ::std::os::raw::c_void,
-        Value: *mut ::std::os::raw::c_void,
-    ) -> *mut ::std::os::raw::c_void;
+    pub fn _InterlockedExchangePointer(Target: *mut *mut ::std::os::raw::c_void, Value: *mut ::std::os::raw::c_void) -> *mut ::std::os::raw::c_void;
 }
 extern "C" {
-    pub fn _InterlockedExchange8(
-        Target: *mut ::std::os::raw::c_char,
-        Value: ::std::os::raw::c_char,
-    ) -> ::std::os::raw::c_char;
+    pub fn _InterlockedExchange8(Target: *mut ::std::os::raw::c_char, Value: ::std::os::raw::c_char) -> ::std::os::raw::c_char;
 }
 extern "C" {
-    pub fn _InterlockedExchange16(
-        Destination: *mut ::std::os::raw::c_short,
-        ExChange: ::std::os::raw::c_short,
-    ) -> ::std::os::raw::c_short;
+    pub fn _InterlockedExchange16(Destination: *mut ::std::os::raw::c_short, ExChange: ::std::os::raw::c_short) -> ::std::os::raw::c_short;
 }
 extern "C" {
-    pub fn _InterlockedExchangeAdd8(
-        _Addend: *mut ::std::os::raw::c_char,
-        _Value: ::std::os::raw::c_char,
-    ) -> ::std::os::raw::c_char;
+    pub fn _InterlockedExchangeAdd8(_Addend: *mut ::std::os::raw::c_char, _Value: ::std::os::raw::c_char) -> ::std::os::raw::c_char;
 }
 extern "C" {
-    pub fn _InterlockedAnd8(
-        Destination: *mut ::std::os::raw::c_char,
-        Value: ::std::os::raw::c_char,
-    ) -> ::std::os::raw::c_char;
+    pub fn _InterlockedAnd8(Destination: *mut ::std::os::raw::c_char, Value: ::std::os::raw::c_char) -> ::std::os::raw::c_char;
 }
 extern "C" {
-    pub fn _InterlockedOr8(
-        Destination: *mut ::std::os::raw::c_char,
-        Value: ::std::os::raw::c_char,
-    ) -> ::std::os::raw::c_char;
+    pub fn _InterlockedOr8(Destination: *mut ::std::os::raw::c_char, Value: ::std::os::raw::c_char) -> ::std::os::raw::c_char;
 }
 extern "C" {
-    pub fn _InterlockedXor8(
-        Destination: *mut ::std::os::raw::c_char,
-        Value: ::std::os::raw::c_char,
-    ) -> ::std::os::raw::c_char;
+    pub fn _InterlockedXor8(Destination: *mut ::std::os::raw::c_char, Value: ::std::os::raw::c_char) -> ::std::os::raw::c_char;
 }
 extern "C" {
-    pub fn _InterlockedAnd16(
-        Destination: *mut ::std::os::raw::c_short,
-        Value: ::std::os::raw::c_short,
-    ) -> ::std::os::raw::c_short;
+    pub fn _InterlockedAnd16(Destination: *mut ::std::os::raw::c_short, Value: ::std::os::raw::c_short) -> ::std::os::raw::c_short;
 }
 extern "C" {
-    pub fn _InterlockedOr16(
-        Destination: *mut ::std::os::raw::c_short,
-        Value: ::std::os::raw::c_short,
-    ) -> ::std::os::raw::c_short;
+    pub fn _InterlockedOr16(Destination: *mut ::std::os::raw::c_short, Value: ::std::os::raw::c_short) -> ::std::os::raw::c_short;
 }
 extern "C" {
-    pub fn _InterlockedXor16(
-        Destination: *mut ::std::os::raw::c_short,
-        Value: ::std::os::raw::c_short,
-    ) -> ::std::os::raw::c_short;
+    pub fn _InterlockedXor16(Destination: *mut ::std::os::raw::c_short, Value: ::std::os::raw::c_short) -> ::std::os::raw::c_short;
 }
 extern "C" {
-    pub fn __cpuidex(
-        CPUInfo: *mut ::std::os::raw::c_int,
-        Function: ::std::os::raw::c_int,
-        SubLeaf: ::std::os::raw::c_int,
-    );
+    pub fn __cpuidex(CPUInfo: *mut ::std::os::raw::c_int, Function: ::std::os::raw::c_int, SubLeaf: ::std::os::raw::c_int);
 }
 extern "C" {
     pub fn _mm_clflush(Address: *const ::std::os::raw::c_void);
@@ -14889,11 +14433,7 @@ extern "C" {
     pub fn __movsq(Destination: PDWORD64, Source: *const DWORD64, Count: SIZE_T);
 }
 extern "C" {
-    pub fn __stosb(
-        Destination: *mut ::std::os::raw::c_uchar,
-        Value: ::std::os::raw::c_uchar,
-        Count: ::std::os::raw::c_ulonglong,
-    );
+    pub fn __stosb(Destination: *mut ::std::os::raw::c_uchar, Value: ::std::os::raw::c_uchar, Count: ::std::os::raw::c_ulonglong);
 }
 extern "C" {
     pub fn __stosw(Destination: PWORD, Value: WORD, Count: SIZE_T);
@@ -14905,16 +14445,10 @@ extern "C" {
     pub fn __stosq(Destination: PDWORD64, Value: DWORD64, Count: SIZE_T);
 }
 extern "C" {
-    pub fn __mulh(
-        Multiplier: ::std::os::raw::c_longlong,
-        Multiplicand: ::std::os::raw::c_longlong,
-    ) -> ::std::os::raw::c_longlong;
+    pub fn __mulh(Multiplier: ::std::os::raw::c_longlong, Multiplicand: ::std::os::raw::c_longlong) -> ::std::os::raw::c_longlong;
 }
 extern "C" {
-    pub fn __umulh(
-        Multiplier: ::std::os::raw::c_ulonglong,
-        Multiplicand: ::std::os::raw::c_ulonglong,
-    ) -> ::std::os::raw::c_ulonglong;
+    pub fn __umulh(Multiplier: ::std::os::raw::c_ulonglong, Multiplicand: ::std::os::raw::c_ulonglong) -> ::std::os::raw::c_ulonglong;
 }
 extern "C" {
     pub fn __popcnt64(operand: ::std::os::raw::c_ulonglong) -> ::std::os::raw::c_ulonglong;
@@ -15106,15 +14640,10 @@ pub struct _UNWIND_HISTORY_TABLE {
 }
 pub type UNWIND_HISTORY_TABLE = _UNWIND_HISTORY_TABLE;
 pub type PUNWIND_HISTORY_TABLE = *mut _UNWIND_HISTORY_TABLE;
-pub type GET_RUNTIME_FUNCTION_CALLBACK =
-    unsafe extern "C" fn(ControlPc: DWORD64, Context: PVOID) -> PRUNTIME_FUNCTION;
+pub type GET_RUNTIME_FUNCTION_CALLBACK = unsafe extern "C" fn(ControlPc: DWORD64, Context: PVOID) -> PRUNTIME_FUNCTION;
 pub type PGET_RUNTIME_FUNCTION_CALLBACK = GET_RUNTIME_FUNCTION_CALLBACK;
-pub type OUT_OF_PROCESS_FUNCTION_TABLE_CALLBACK = unsafe extern "C" fn(
-    Process: HANDLE,
-    TableAddress: PVOID,
-    Entries: PDWORD,
-    Functions: *mut PRUNTIME_FUNCTION,
-) -> DWORD;
+pub type OUT_OF_PROCESS_FUNCTION_TABLE_CALLBACK =
+    unsafe extern "C" fn(Process: HANDLE, TableAddress: PVOID, Entries: PDWORD, Functions: *mut PRUNTIME_FUNCTION) -> DWORD;
 pub type POUT_OF_PROCESS_FUNCTION_TABLE_CALLBACK = OUT_OF_PROCESS_FUNCTION_TABLE_CALLBACK;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -15133,12 +14662,8 @@ pub struct _DISPATCHER_CONTEXT {
 }
 pub type DISPATCHER_CONTEXT = _DISPATCHER_CONTEXT;
 pub type PDISPATCHER_CONTEXT = *mut _DISPATCHER_CONTEXT;
-pub type PEXCEPTION_FILTER = unsafe extern "C" fn(
-    ExceptionPointers: *mut _EXCEPTION_POINTERS,
-    EstablisherFrame: PVOID,
-) -> LONG;
-pub type PTERMINATION_HANDLER =
-    unsafe extern "C" fn(_abnormal_termination: BOOLEAN, EstablisherFrame: PVOID);
+pub type PEXCEPTION_FILTER = unsafe extern "C" fn(ExceptionPointers: *mut _EXCEPTION_POINTERS, EstablisherFrame: PVOID) -> LONG;
+pub type PTERMINATION_HANDLER = unsafe extern "C" fn(_abnormal_termination: BOOLEAN, EstablisherFrame: PVOID);
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct _KNONVOLATILE_CONTEXT_POINTERS {
@@ -15942,8 +15467,7 @@ pub const WELL_KNOWN_SID_TYPE_WinBuiltinRDSManagementServersSid: WELL_KNOWN_SID_
 pub const WELL_KNOWN_SID_TYPE_WinUserModeDriversSid: WELL_KNOWN_SID_TYPE = 98;
 pub const WELL_KNOWN_SID_TYPE_WinBuiltinHyperVAdminsSid: WELL_KNOWN_SID_TYPE = 99;
 pub const WELL_KNOWN_SID_TYPE_WinAccountCloneableControllersSid: WELL_KNOWN_SID_TYPE = 100;
-pub const WELL_KNOWN_SID_TYPE_WinBuiltinAccessControlAssistanceOperatorsSid: WELL_KNOWN_SID_TYPE =
-    101;
+pub const WELL_KNOWN_SID_TYPE_WinBuiltinAccessControlAssistanceOperatorsSid: WELL_KNOWN_SID_TYPE = 101;
 pub const WELL_KNOWN_SID_TYPE_WinBuiltinRemoteManagementUsersSid: WELL_KNOWN_SID_TYPE = 102;
 pub const WELL_KNOWN_SID_TYPE_WinAuthenticationAuthorityAssertedSid: WELL_KNOWN_SID_TYPE = 103;
 pub const WELL_KNOWN_SID_TYPE_WinAuthenticationServiceAssertedSid: WELL_KNOWN_SID_TYPE = 104;
@@ -16390,10 +15914,8 @@ pub const _TOKEN_INFORMATION_CLASS_TokenAppContainerSid: _TOKEN_INFORMATION_CLAS
 pub const _TOKEN_INFORMATION_CLASS_TokenAppContainerNumber: _TOKEN_INFORMATION_CLASS = 32;
 pub const _TOKEN_INFORMATION_CLASS_TokenUserClaimAttributes: _TOKEN_INFORMATION_CLASS = 33;
 pub const _TOKEN_INFORMATION_CLASS_TokenDeviceClaimAttributes: _TOKEN_INFORMATION_CLASS = 34;
-pub const _TOKEN_INFORMATION_CLASS_TokenRestrictedUserClaimAttributes: _TOKEN_INFORMATION_CLASS =
-    35;
-pub const _TOKEN_INFORMATION_CLASS_TokenRestrictedDeviceClaimAttributes: _TOKEN_INFORMATION_CLASS =
-    36;
+pub const _TOKEN_INFORMATION_CLASS_TokenRestrictedUserClaimAttributes: _TOKEN_INFORMATION_CLASS = 35;
+pub const _TOKEN_INFORMATION_CLASS_TokenRestrictedDeviceClaimAttributes: _TOKEN_INFORMATION_CLASS = 36;
 pub const _TOKEN_INFORMATION_CLASS_TokenDeviceGroups: _TOKEN_INFORMATION_CLASS = 37;
 pub const _TOKEN_INFORMATION_CLASS_TokenRestrictedDeviceGroups: _TOKEN_INFORMATION_CLASS = 38;
 pub const _TOKEN_INFORMATION_CLASS_TokenSecurityAttributes: _TOKEN_INFORMATION_CLASS = 39;
@@ -16647,8 +16169,7 @@ pub struct _CLAIM_SECURITY_ATTRIBUTE_OCTET_STRING_VALUE {
     pub ValueLength: DWORD,
 }
 pub type CLAIM_SECURITY_ATTRIBUTE_OCTET_STRING_VALUE = _CLAIM_SECURITY_ATTRIBUTE_OCTET_STRING_VALUE;
-pub type PCLAIM_SECURITY_ATTRIBUTE_OCTET_STRING_VALUE =
-    *mut _CLAIM_SECURITY_ATTRIBUTE_OCTET_STRING_VALUE;
+pub type PCLAIM_SECURITY_ATTRIBUTE_OCTET_STRING_VALUE = *mut _CLAIM_SECURITY_ATTRIBUTE_OCTET_STRING_VALUE;
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct _CLAIM_SECURITY_ATTRIBUTE_V1 {
@@ -16969,10 +16490,8 @@ pub struct _PROCESS_DYNAMIC_EH_CONTINUATION_TARGETS_INFORMATION {
     pub Reserved2: DWORD,
     pub Targets: PPROCESS_DYNAMIC_EH_CONTINUATION_TARGET,
 }
-pub type PROCESS_DYNAMIC_EH_CONTINUATION_TARGETS_INFORMATION =
-    _PROCESS_DYNAMIC_EH_CONTINUATION_TARGETS_INFORMATION;
-pub type PPROCESS_DYNAMIC_EH_CONTINUATION_TARGETS_INFORMATION =
-    *mut _PROCESS_DYNAMIC_EH_CONTINUATION_TARGETS_INFORMATION;
+pub type PROCESS_DYNAMIC_EH_CONTINUATION_TARGETS_INFORMATION = _PROCESS_DYNAMIC_EH_CONTINUATION_TARGETS_INFORMATION;
+pub type PPROCESS_DYNAMIC_EH_CONTINUATION_TARGETS_INFORMATION = *mut _PROCESS_DYNAMIC_EH_CONTINUATION_TARGETS_INFORMATION;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct _PROCESS_DYNAMIC_ENFORCED_ADDRESS_RANGE {
@@ -16990,10 +16509,8 @@ pub struct _PROCESS_DYNAMIC_ENFORCED_ADDRESS_RANGES_INFORMATION {
     pub Reserved2: DWORD,
     pub Ranges: PPROCESS_DYNAMIC_ENFORCED_ADDRESS_RANGE,
 }
-pub type PROCESS_DYNAMIC_ENFORCED_ADDRESS_RANGES_INFORMATION =
-    _PROCESS_DYNAMIC_ENFORCED_ADDRESS_RANGES_INFORMATION;
-pub type PPROCESS_DYNAMIC_ENFORCED_ADDRESS_RANGES_INFORMATION =
-    *mut _PROCESS_DYNAMIC_ENFORCED_ADDRESS_RANGES_INFORMATION;
+pub type PROCESS_DYNAMIC_ENFORCED_ADDRESS_RANGES_INFORMATION = _PROCESS_DYNAMIC_ENFORCED_ADDRESS_RANGES_INFORMATION;
+pub type PPROCESS_DYNAMIC_ENFORCED_ADDRESS_RANGES_INFORMATION = *mut _PROCESS_DYNAMIC_ENFORCED_ADDRESS_RANGES_INFORMATION;
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct _QUOTA_LIMITS {
@@ -17043,10 +16560,7 @@ impl _RATE_QUOTA_LIMIT__bindgen_ty_1 {
         }
     }
     #[inline]
-    pub fn new_bitfield_1(
-        RatePercent: DWORD,
-        Reserved0: DWORD,
-    ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
+    pub fn new_bitfield_1(RatePercent: DWORD, Reserved0: DWORD) -> __BindgenBitfieldUnit<[u8; 4usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 7u8, {
             let RatePercent: u32 = unsafe { ::std::mem::transmute(RatePercent) };
@@ -17102,18 +16616,15 @@ pub const _PROCESS_MITIGATION_POLICY_ProcessDynamicCodePolicy: _PROCESS_MITIGATI
 pub const _PROCESS_MITIGATION_POLICY_ProcessStrictHandleCheckPolicy: _PROCESS_MITIGATION_POLICY = 3;
 pub const _PROCESS_MITIGATION_POLICY_ProcessSystemCallDisablePolicy: _PROCESS_MITIGATION_POLICY = 4;
 pub const _PROCESS_MITIGATION_POLICY_ProcessMitigationOptionsMask: _PROCESS_MITIGATION_POLICY = 5;
-pub const _PROCESS_MITIGATION_POLICY_ProcessExtensionPointDisablePolicy:
-    _PROCESS_MITIGATION_POLICY = 6;
+pub const _PROCESS_MITIGATION_POLICY_ProcessExtensionPointDisablePolicy: _PROCESS_MITIGATION_POLICY = 6;
 pub const _PROCESS_MITIGATION_POLICY_ProcessControlFlowGuardPolicy: _PROCESS_MITIGATION_POLICY = 7;
 pub const _PROCESS_MITIGATION_POLICY_ProcessSignaturePolicy: _PROCESS_MITIGATION_POLICY = 8;
 pub const _PROCESS_MITIGATION_POLICY_ProcessFontDisablePolicy: _PROCESS_MITIGATION_POLICY = 9;
 pub const _PROCESS_MITIGATION_POLICY_ProcessImageLoadPolicy: _PROCESS_MITIGATION_POLICY = 10;
 pub const _PROCESS_MITIGATION_POLICY_ProcessSystemCallFilterPolicy: _PROCESS_MITIGATION_POLICY = 11;
-pub const _PROCESS_MITIGATION_POLICY_ProcessPayloadRestrictionPolicy: _PROCESS_MITIGATION_POLICY =
-    12;
+pub const _PROCESS_MITIGATION_POLICY_ProcessPayloadRestrictionPolicy: _PROCESS_MITIGATION_POLICY = 12;
 pub const _PROCESS_MITIGATION_POLICY_ProcessChildProcessPolicy: _PROCESS_MITIGATION_POLICY = 13;
-pub const _PROCESS_MITIGATION_POLICY_ProcessSideChannelIsolationPolicy: _PROCESS_MITIGATION_POLICY =
-    14;
+pub const _PROCESS_MITIGATION_POLICY_ProcessSideChannelIsolationPolicy: _PROCESS_MITIGATION_POLICY = 14;
 pub const _PROCESS_MITIGATION_POLICY_ProcessUserShadowStackPolicy: _PROCESS_MITIGATION_POLICY = 15;
 pub const _PROCESS_MITIGATION_POLICY_MaxProcessMitigationPolicy: _PROCESS_MITIGATION_POLICY = 16;
 pub type _PROCESS_MITIGATION_POLICY = ::std::os::raw::c_int;
@@ -17203,13 +16714,11 @@ impl _PROCESS_MITIGATION_ASLR_POLICY__bindgen_ty_1__bindgen_ty_1 {
     ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
-            let EnableBottomUpRandomization: u32 =
-                unsafe { ::std::mem::transmute(EnableBottomUpRandomization) };
+            let EnableBottomUpRandomization: u32 = unsafe { ::std::mem::transmute(EnableBottomUpRandomization) };
             EnableBottomUpRandomization as u64
         });
         __bindgen_bitfield_unit.set(1usize, 1u8, {
-            let EnableForceRelocateImages: u32 =
-                unsafe { ::std::mem::transmute(EnableForceRelocateImages) };
+            let EnableForceRelocateImages: u32 = unsafe { ::std::mem::transmute(EnableForceRelocateImages) };
             EnableForceRelocateImages as u64
         });
         __bindgen_bitfield_unit.set(2usize, 1u8, {
@@ -17217,8 +16726,7 @@ impl _PROCESS_MITIGATION_ASLR_POLICY__bindgen_ty_1__bindgen_ty_1 {
             EnableHighEntropy as u64
         });
         __bindgen_bitfield_unit.set(3usize, 1u8, {
-            let DisallowStrippedImages: u32 =
-                unsafe { ::std::mem::transmute(DisallowStrippedImages) };
+            let DisallowStrippedImages: u32 = unsafe { ::std::mem::transmute(DisallowStrippedImages) };
             DisallowStrippedImages as u64
         });
         __bindgen_bitfield_unit.set(4usize, 28u8, {
@@ -17284,19 +16792,14 @@ impl _PROCESS_MITIGATION_DEP_POLICY__bindgen_ty_1__bindgen_ty_1 {
         }
     }
     #[inline]
-    pub fn new_bitfield_1(
-        Enable: DWORD,
-        DisableAtlThunkEmulation: DWORD,
-        ReservedFlags: DWORD,
-    ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
+    pub fn new_bitfield_1(Enable: DWORD, DisableAtlThunkEmulation: DWORD, ReservedFlags: DWORD) -> __BindgenBitfieldUnit<[u8; 4usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
             let Enable: u32 = unsafe { ::std::mem::transmute(Enable) };
             Enable as u64
         });
         __bindgen_bitfield_unit.set(1usize, 1u8, {
-            let DisableAtlThunkEmulation: u32 =
-                unsafe { ::std::mem::transmute(DisableAtlThunkEmulation) };
+            let DisableAtlThunkEmulation: u32 = unsafe { ::std::mem::transmute(DisableAtlThunkEmulation) };
             DisableAtlThunkEmulation as u64
         });
         __bindgen_bitfield_unit.set(2usize, 30u8, {
@@ -17317,8 +16820,7 @@ pub struct _PROCESS_MITIGATION_STRICT_HANDLE_CHECK_POLICY {
 #[derive(Copy, Clone)]
 pub union _PROCESS_MITIGATION_STRICT_HANDLE_CHECK_POLICY__bindgen_ty_1 {
     pub Flags: DWORD,
-    pub __bindgen_anon_1:
-        _PROCESS_MITIGATION_STRICT_HANDLE_CHECK_POLICY__bindgen_ty_1__bindgen_ty_1,
+    pub __bindgen_anon_1: _PROCESS_MITIGATION_STRICT_HANDLE_CHECK_POLICY__bindgen_ty_1__bindgen_ty_1,
 }
 #[repr(C)]
 #[repr(align(4))]
@@ -17369,13 +16871,11 @@ impl _PROCESS_MITIGATION_STRICT_HANDLE_CHECK_POLICY__bindgen_ty_1__bindgen_ty_1 
     ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
-            let RaiseExceptionOnInvalidHandleReference: u32 =
-                unsafe { ::std::mem::transmute(RaiseExceptionOnInvalidHandleReference) };
+            let RaiseExceptionOnInvalidHandleReference: u32 = unsafe { ::std::mem::transmute(RaiseExceptionOnInvalidHandleReference) };
             RaiseExceptionOnInvalidHandleReference as u64
         });
         __bindgen_bitfield_unit.set(1usize, 1u8, {
-            let HandleExceptionsPermanentlyEnabled: u32 =
-                unsafe { ::std::mem::transmute(HandleExceptionsPermanentlyEnabled) };
+            let HandleExceptionsPermanentlyEnabled: u32 = unsafe { ::std::mem::transmute(HandleExceptionsPermanentlyEnabled) };
             HandleExceptionsPermanentlyEnabled as u64
         });
         __bindgen_bitfield_unit.set(2usize, 30u8, {
@@ -17385,10 +16885,8 @@ impl _PROCESS_MITIGATION_STRICT_HANDLE_CHECK_POLICY__bindgen_ty_1__bindgen_ty_1 
         __bindgen_bitfield_unit
     }
 }
-pub type PROCESS_MITIGATION_STRICT_HANDLE_CHECK_POLICY =
-    _PROCESS_MITIGATION_STRICT_HANDLE_CHECK_POLICY;
-pub type PPROCESS_MITIGATION_STRICT_HANDLE_CHECK_POLICY =
-    *mut _PROCESS_MITIGATION_STRICT_HANDLE_CHECK_POLICY;
+pub type PROCESS_MITIGATION_STRICT_HANDLE_CHECK_POLICY = _PROCESS_MITIGATION_STRICT_HANDLE_CHECK_POLICY;
+pub type PPROCESS_MITIGATION_STRICT_HANDLE_CHECK_POLICY = *mut _PROCESS_MITIGATION_STRICT_HANDLE_CHECK_POLICY;
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct _PROCESS_MITIGATION_SYSTEM_CALL_DISABLE_POLICY {
@@ -17398,8 +16896,7 @@ pub struct _PROCESS_MITIGATION_SYSTEM_CALL_DISABLE_POLICY {
 #[derive(Copy, Clone)]
 pub union _PROCESS_MITIGATION_SYSTEM_CALL_DISABLE_POLICY__bindgen_ty_1 {
     pub Flags: DWORD,
-    pub __bindgen_anon_1:
-        _PROCESS_MITIGATION_SYSTEM_CALL_DISABLE_POLICY__bindgen_ty_1__bindgen_ty_1,
+    pub __bindgen_anon_1: _PROCESS_MITIGATION_SYSTEM_CALL_DISABLE_POLICY__bindgen_ty_1__bindgen_ty_1,
 }
 #[repr(C)]
 #[repr(align(4))]
@@ -17450,13 +16947,11 @@ impl _PROCESS_MITIGATION_SYSTEM_CALL_DISABLE_POLICY__bindgen_ty_1__bindgen_ty_1 
     ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
-            let DisallowWin32kSystemCalls: u32 =
-                unsafe { ::std::mem::transmute(DisallowWin32kSystemCalls) };
+            let DisallowWin32kSystemCalls: u32 = unsafe { ::std::mem::transmute(DisallowWin32kSystemCalls) };
             DisallowWin32kSystemCalls as u64
         });
         __bindgen_bitfield_unit.set(1usize, 1u8, {
-            let AuditDisallowWin32kSystemCalls: u32 =
-                unsafe { ::std::mem::transmute(AuditDisallowWin32kSystemCalls) };
+            let AuditDisallowWin32kSystemCalls: u32 = unsafe { ::std::mem::transmute(AuditDisallowWin32kSystemCalls) };
             AuditDisallowWin32kSystemCalls as u64
         });
         __bindgen_bitfield_unit.set(2usize, 30u8, {
@@ -17466,10 +16961,8 @@ impl _PROCESS_MITIGATION_SYSTEM_CALL_DISABLE_POLICY__bindgen_ty_1__bindgen_ty_1 
         __bindgen_bitfield_unit
     }
 }
-pub type PROCESS_MITIGATION_SYSTEM_CALL_DISABLE_POLICY =
-    _PROCESS_MITIGATION_SYSTEM_CALL_DISABLE_POLICY;
-pub type PPROCESS_MITIGATION_SYSTEM_CALL_DISABLE_POLICY =
-    *mut _PROCESS_MITIGATION_SYSTEM_CALL_DISABLE_POLICY;
+pub type PROCESS_MITIGATION_SYSTEM_CALL_DISABLE_POLICY = _PROCESS_MITIGATION_SYSTEM_CALL_DISABLE_POLICY;
+pub type PPROCESS_MITIGATION_SYSTEM_CALL_DISABLE_POLICY = *mut _PROCESS_MITIGATION_SYSTEM_CALL_DISABLE_POLICY;
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct _PROCESS_MITIGATION_EXTENSION_POINT_DISABLE_POLICY {
@@ -17479,8 +16972,7 @@ pub struct _PROCESS_MITIGATION_EXTENSION_POINT_DISABLE_POLICY {
 #[derive(Copy, Clone)]
 pub union _PROCESS_MITIGATION_EXTENSION_POINT_DISABLE_POLICY__bindgen_ty_1 {
     pub Flags: DWORD,
-    pub __bindgen_anon_1:
-        _PROCESS_MITIGATION_EXTENSION_POINT_DISABLE_POLICY__bindgen_ty_1__bindgen_ty_1,
+    pub __bindgen_anon_1: _PROCESS_MITIGATION_EXTENSION_POINT_DISABLE_POLICY__bindgen_ty_1__bindgen_ty_1,
 }
 #[repr(C)]
 #[repr(align(4))]
@@ -17513,14 +17005,10 @@ impl _PROCESS_MITIGATION_EXTENSION_POINT_DISABLE_POLICY__bindgen_ty_1__bindgen_t
         }
     }
     #[inline]
-    pub fn new_bitfield_1(
-        DisableExtensionPoints: DWORD,
-        ReservedFlags: DWORD,
-    ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
+    pub fn new_bitfield_1(DisableExtensionPoints: DWORD, ReservedFlags: DWORD) -> __BindgenBitfieldUnit<[u8; 4usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
-            let DisableExtensionPoints: u32 =
-                unsafe { ::std::mem::transmute(DisableExtensionPoints) };
+            let DisableExtensionPoints: u32 = unsafe { ::std::mem::transmute(DisableExtensionPoints) };
             DisableExtensionPoints as u64
         });
         __bindgen_bitfield_unit.set(1usize, 31u8, {
@@ -17530,10 +17018,8 @@ impl _PROCESS_MITIGATION_EXTENSION_POINT_DISABLE_POLICY__bindgen_ty_1__bindgen_t
         __bindgen_bitfield_unit
     }
 }
-pub type PROCESS_MITIGATION_EXTENSION_POINT_DISABLE_POLICY =
-    _PROCESS_MITIGATION_EXTENSION_POINT_DISABLE_POLICY;
-pub type PPROCESS_MITIGATION_EXTENSION_POINT_DISABLE_POLICY =
-    *mut _PROCESS_MITIGATION_EXTENSION_POINT_DISABLE_POLICY;
+pub type PROCESS_MITIGATION_EXTENSION_POINT_DISABLE_POLICY = _PROCESS_MITIGATION_EXTENSION_POINT_DISABLE_POLICY;
+pub type PPROCESS_MITIGATION_EXTENSION_POINT_DISABLE_POLICY = *mut _PROCESS_MITIGATION_EXTENSION_POINT_DISABLE_POLICY;
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct _PROCESS_MITIGATION_DYNAMIC_CODE_POLICY {
@@ -17630,8 +17116,7 @@ impl _PROCESS_MITIGATION_DYNAMIC_CODE_POLICY__bindgen_ty_1__bindgen_ty_1 {
             AllowRemoteDowngrade as u64
         });
         __bindgen_bitfield_unit.set(3usize, 1u8, {
-            let AuditProhibitDynamicCode: u32 =
-                unsafe { ::std::mem::transmute(AuditProhibitDynamicCode) };
+            let AuditProhibitDynamicCode: u32 = unsafe { ::std::mem::transmute(AuditProhibitDynamicCode) };
             AuditProhibitDynamicCode as u64
         });
         __bindgen_bitfield_unit.set(4usize, 28u8, {
@@ -17715,13 +17200,11 @@ impl _PROCESS_MITIGATION_CONTROL_FLOW_GUARD_POLICY__bindgen_ty_1__bindgen_ty_1 {
     ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
-            let EnableControlFlowGuard: u32 =
-                unsafe { ::std::mem::transmute(EnableControlFlowGuard) };
+            let EnableControlFlowGuard: u32 = unsafe { ::std::mem::transmute(EnableControlFlowGuard) };
             EnableControlFlowGuard as u64
         });
         __bindgen_bitfield_unit.set(1usize, 1u8, {
-            let EnableExportSuppression: u32 =
-                unsafe { ::std::mem::transmute(EnableExportSuppression) };
+            let EnableExportSuppression: u32 = unsafe { ::std::mem::transmute(EnableExportSuppression) };
             EnableExportSuppression as u64
         });
         __bindgen_bitfield_unit.set(2usize, 1u8, {
@@ -17735,10 +17218,8 @@ impl _PROCESS_MITIGATION_CONTROL_FLOW_GUARD_POLICY__bindgen_ty_1__bindgen_ty_1 {
         __bindgen_bitfield_unit
     }
 }
-pub type PROCESS_MITIGATION_CONTROL_FLOW_GUARD_POLICY =
-    _PROCESS_MITIGATION_CONTROL_FLOW_GUARD_POLICY;
-pub type PPROCESS_MITIGATION_CONTROL_FLOW_GUARD_POLICY =
-    *mut _PROCESS_MITIGATION_CONTROL_FLOW_GUARD_POLICY;
+pub type PROCESS_MITIGATION_CONTROL_FLOW_GUARD_POLICY = _PROCESS_MITIGATION_CONTROL_FLOW_GUARD_POLICY;
+pub type PPROCESS_MITIGATION_CONTROL_FLOW_GUARD_POLICY = *mut _PROCESS_MITIGATION_CONTROL_FLOW_GUARD_POLICY;
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct _PROCESS_MITIGATION_BINARY_SIGNATURE_POLICY {
@@ -17847,8 +17328,7 @@ impl _PROCESS_MITIGATION_BINARY_SIGNATURE_POLICY__bindgen_ty_1__bindgen_ty_1 {
             MitigationOptIn as u64
         });
         __bindgen_bitfield_unit.set(3usize, 1u8, {
-            let AuditMicrosoftSignedOnly: u32 =
-                unsafe { ::std::mem::transmute(AuditMicrosoftSignedOnly) };
+            let AuditMicrosoftSignedOnly: u32 = unsafe { ::std::mem::transmute(AuditMicrosoftSignedOnly) };
             AuditMicrosoftSignedOnly as u64
         });
         __bindgen_bitfield_unit.set(4usize, 1u8, {
@@ -17863,8 +17343,7 @@ impl _PROCESS_MITIGATION_BINARY_SIGNATURE_POLICY__bindgen_ty_1__bindgen_ty_1 {
     }
 }
 pub type PROCESS_MITIGATION_BINARY_SIGNATURE_POLICY = _PROCESS_MITIGATION_BINARY_SIGNATURE_POLICY;
-pub type PPROCESS_MITIGATION_BINARY_SIGNATURE_POLICY =
-    *mut _PROCESS_MITIGATION_BINARY_SIGNATURE_POLICY;
+pub type PPROCESS_MITIGATION_BINARY_SIGNATURE_POLICY = *mut _PROCESS_MITIGATION_BINARY_SIGNATURE_POLICY;
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct _PROCESS_MITIGATION_FONT_DISABLE_POLICY {
@@ -17918,20 +17397,14 @@ impl _PROCESS_MITIGATION_FONT_DISABLE_POLICY__bindgen_ty_1__bindgen_ty_1 {
         }
     }
     #[inline]
-    pub fn new_bitfield_1(
-        DisableNonSystemFonts: DWORD,
-        AuditNonSystemFontLoading: DWORD,
-        ReservedFlags: DWORD,
-    ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
+    pub fn new_bitfield_1(DisableNonSystemFonts: DWORD, AuditNonSystemFontLoading: DWORD, ReservedFlags: DWORD) -> __BindgenBitfieldUnit<[u8; 4usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
-            let DisableNonSystemFonts: u32 =
-                unsafe { ::std::mem::transmute(DisableNonSystemFonts) };
+            let DisableNonSystemFonts: u32 = unsafe { ::std::mem::transmute(DisableNonSystemFonts) };
             DisableNonSystemFonts as u64
         });
         __bindgen_bitfield_unit.set(1usize, 1u8, {
-            let AuditNonSystemFontLoading: u32 =
-                unsafe { ::std::mem::transmute(AuditNonSystemFontLoading) };
+            let AuditNonSystemFontLoading: u32 = unsafe { ::std::mem::transmute(AuditNonSystemFontLoading) };
             AuditNonSystemFontLoading as u64
         });
         __bindgen_bitfield_unit.set(2usize, 30u8, {
@@ -18043,8 +17516,7 @@ impl _PROCESS_MITIGATION_IMAGE_LOAD_POLICY__bindgen_ty_1__bindgen_ty_1 {
             NoRemoteImages as u64
         });
         __bindgen_bitfield_unit.set(1usize, 1u8, {
-            let NoLowMandatoryLabelImages: u32 =
-                unsafe { ::std::mem::transmute(NoLowMandatoryLabelImages) };
+            let NoLowMandatoryLabelImages: u32 = unsafe { ::std::mem::transmute(NoLowMandatoryLabelImages) };
             NoLowMandatoryLabelImages as u64
         });
         __bindgen_bitfield_unit.set(2usize, 1u8, {
@@ -18056,8 +17528,7 @@ impl _PROCESS_MITIGATION_IMAGE_LOAD_POLICY__bindgen_ty_1__bindgen_ty_1 {
             AuditNoRemoteImages as u64
         });
         __bindgen_bitfield_unit.set(4usize, 1u8, {
-            let AuditNoLowMandatoryLabelImages: u32 =
-                unsafe { ::std::mem::transmute(AuditNoLowMandatoryLabelImages) };
+            let AuditNoLowMandatoryLabelImages: u32 = unsafe { ::std::mem::transmute(AuditNoLowMandatoryLabelImages) };
             AuditNoLowMandatoryLabelImages as u64
         });
         __bindgen_bitfield_unit.set(5usize, 27u8, {
@@ -18111,10 +17582,7 @@ impl _PROCESS_MITIGATION_SYSTEM_CALL_FILTER_POLICY__bindgen_ty_1__bindgen_ty_1 {
         }
     }
     #[inline]
-    pub fn new_bitfield_1(
-        FilterId: DWORD,
-        ReservedFlags: DWORD,
-    ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
+    pub fn new_bitfield_1(FilterId: DWORD, ReservedFlags: DWORD) -> __BindgenBitfieldUnit<[u8; 4usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 4u8, {
             let FilterId: u32 = unsafe { ::std::mem::transmute(FilterId) };
@@ -18127,10 +17595,8 @@ impl _PROCESS_MITIGATION_SYSTEM_CALL_FILTER_POLICY__bindgen_ty_1__bindgen_ty_1 {
         __bindgen_bitfield_unit
     }
 }
-pub type PROCESS_MITIGATION_SYSTEM_CALL_FILTER_POLICY =
-    _PROCESS_MITIGATION_SYSTEM_CALL_FILTER_POLICY;
-pub type PPROCESS_MITIGATION_SYSTEM_CALL_FILTER_POLICY =
-    *mut _PROCESS_MITIGATION_SYSTEM_CALL_FILTER_POLICY;
+pub type PROCESS_MITIGATION_SYSTEM_CALL_FILTER_POLICY = _PROCESS_MITIGATION_SYSTEM_CALL_FILTER_POLICY;
+pub type PPROCESS_MITIGATION_SYSTEM_CALL_FILTER_POLICY = *mut _PROCESS_MITIGATION_SYSTEM_CALL_FILTER_POLICY;
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct _PROCESS_MITIGATION_PAYLOAD_RESTRICTION_POLICY {
@@ -18140,8 +17606,7 @@ pub struct _PROCESS_MITIGATION_PAYLOAD_RESTRICTION_POLICY {
 #[derive(Copy, Clone)]
 pub union _PROCESS_MITIGATION_PAYLOAD_RESTRICTION_POLICY__bindgen_ty_1 {
     pub Flags: DWORD,
-    pub __bindgen_anon_1:
-        _PROCESS_MITIGATION_PAYLOAD_RESTRICTION_POLICY__bindgen_ty_1__bindgen_ty_1,
+    pub __bindgen_anon_1: _PROCESS_MITIGATION_PAYLOAD_RESTRICTION_POLICY__bindgen_ty_1__bindgen_ty_1,
 }
 #[repr(C)]
 #[repr(align(4))]
@@ -18312,33 +17777,27 @@ impl _PROCESS_MITIGATION_PAYLOAD_RESTRICTION_POLICY__bindgen_ty_1__bindgen_ty_1 
     ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
-            let EnableExportAddressFilter: u32 =
-                unsafe { ::std::mem::transmute(EnableExportAddressFilter) };
+            let EnableExportAddressFilter: u32 = unsafe { ::std::mem::transmute(EnableExportAddressFilter) };
             EnableExportAddressFilter as u64
         });
         __bindgen_bitfield_unit.set(1usize, 1u8, {
-            let AuditExportAddressFilter: u32 =
-                unsafe { ::std::mem::transmute(AuditExportAddressFilter) };
+            let AuditExportAddressFilter: u32 = unsafe { ::std::mem::transmute(AuditExportAddressFilter) };
             AuditExportAddressFilter as u64
         });
         __bindgen_bitfield_unit.set(2usize, 1u8, {
-            let EnableExportAddressFilterPlus: u32 =
-                unsafe { ::std::mem::transmute(EnableExportAddressFilterPlus) };
+            let EnableExportAddressFilterPlus: u32 = unsafe { ::std::mem::transmute(EnableExportAddressFilterPlus) };
             EnableExportAddressFilterPlus as u64
         });
         __bindgen_bitfield_unit.set(3usize, 1u8, {
-            let AuditExportAddressFilterPlus: u32 =
-                unsafe { ::std::mem::transmute(AuditExportAddressFilterPlus) };
+            let AuditExportAddressFilterPlus: u32 = unsafe { ::std::mem::transmute(AuditExportAddressFilterPlus) };
             AuditExportAddressFilterPlus as u64
         });
         __bindgen_bitfield_unit.set(4usize, 1u8, {
-            let EnableImportAddressFilter: u32 =
-                unsafe { ::std::mem::transmute(EnableImportAddressFilter) };
+            let EnableImportAddressFilter: u32 = unsafe { ::std::mem::transmute(EnableImportAddressFilter) };
             EnableImportAddressFilter as u64
         });
         __bindgen_bitfield_unit.set(5usize, 1u8, {
-            let AuditImportAddressFilter: u32 =
-                unsafe { ::std::mem::transmute(AuditImportAddressFilter) };
+            let AuditImportAddressFilter: u32 = unsafe { ::std::mem::transmute(AuditImportAddressFilter) };
             AuditImportAddressFilter as u64
         });
         __bindgen_bitfield_unit.set(6usize, 1u8, {
@@ -18372,10 +17831,8 @@ impl _PROCESS_MITIGATION_PAYLOAD_RESTRICTION_POLICY__bindgen_ty_1__bindgen_ty_1 
         __bindgen_bitfield_unit
     }
 }
-pub type PROCESS_MITIGATION_PAYLOAD_RESTRICTION_POLICY =
-    _PROCESS_MITIGATION_PAYLOAD_RESTRICTION_POLICY;
-pub type PPROCESS_MITIGATION_PAYLOAD_RESTRICTION_POLICY =
-    *mut _PROCESS_MITIGATION_PAYLOAD_RESTRICTION_POLICY;
+pub type PROCESS_MITIGATION_PAYLOAD_RESTRICTION_POLICY = _PROCESS_MITIGATION_PAYLOAD_RESTRICTION_POLICY;
+pub type PPROCESS_MITIGATION_PAYLOAD_RESTRICTION_POLICY = *mut _PROCESS_MITIGATION_PAYLOAD_RESTRICTION_POLICY;
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct _PROCESS_MITIGATION_CHILD_PROCESS_POLICY {
@@ -18448,18 +17905,15 @@ impl _PROCESS_MITIGATION_CHILD_PROCESS_POLICY__bindgen_ty_1__bindgen_ty_1 {
     ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
-            let NoChildProcessCreation: u32 =
-                unsafe { ::std::mem::transmute(NoChildProcessCreation) };
+            let NoChildProcessCreation: u32 = unsafe { ::std::mem::transmute(NoChildProcessCreation) };
             NoChildProcessCreation as u64
         });
         __bindgen_bitfield_unit.set(1usize, 1u8, {
-            let AuditNoChildProcessCreation: u32 =
-                unsafe { ::std::mem::transmute(AuditNoChildProcessCreation) };
+            let AuditNoChildProcessCreation: u32 = unsafe { ::std::mem::transmute(AuditNoChildProcessCreation) };
             AuditNoChildProcessCreation as u64
         });
         __bindgen_bitfield_unit.set(2usize, 1u8, {
-            let AllowSecureProcessCreation: u32 =
-                unsafe { ::std::mem::transmute(AllowSecureProcessCreation) };
+            let AllowSecureProcessCreation: u32 = unsafe { ::std::mem::transmute(AllowSecureProcessCreation) };
             AllowSecureProcessCreation as u64
         });
         __bindgen_bitfield_unit.set(3usize, 29u8, {
@@ -18480,8 +17934,7 @@ pub struct _PROCESS_MITIGATION_SIDE_CHANNEL_ISOLATION_POLICY {
 #[derive(Copy, Clone)]
 pub union _PROCESS_MITIGATION_SIDE_CHANNEL_ISOLATION_POLICY__bindgen_ty_1 {
     pub Flags: DWORD,
-    pub __bindgen_anon_1:
-        _PROCESS_MITIGATION_SIDE_CHANNEL_ISOLATION_POLICY__bindgen_ty_1__bindgen_ty_1,
+    pub __bindgen_anon_1: _PROCESS_MITIGATION_SIDE_CHANNEL_ISOLATION_POLICY__bindgen_ty_1__bindgen_ty_1,
 }
 #[repr(C)]
 #[repr(align(4))]
@@ -18556,13 +18009,11 @@ impl _PROCESS_MITIGATION_SIDE_CHANNEL_ISOLATION_POLICY__bindgen_ty_1__bindgen_ty
     ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
-            let SmtBranchTargetIsolation: u32 =
-                unsafe { ::std::mem::transmute(SmtBranchTargetIsolation) };
+            let SmtBranchTargetIsolation: u32 = unsafe { ::std::mem::transmute(SmtBranchTargetIsolation) };
             SmtBranchTargetIsolation as u64
         });
         __bindgen_bitfield_unit.set(1usize, 1u8, {
-            let IsolateSecurityDomain: u32 =
-                unsafe { ::std::mem::transmute(IsolateSecurityDomain) };
+            let IsolateSecurityDomain: u32 = unsafe { ::std::mem::transmute(IsolateSecurityDomain) };
             IsolateSecurityDomain as u64
         });
         __bindgen_bitfield_unit.set(2usize, 1u8, {
@@ -18570,8 +18021,7 @@ impl _PROCESS_MITIGATION_SIDE_CHANNEL_ISOLATION_POLICY__bindgen_ty_1__bindgen_ty
             DisablePageCombine as u64
         });
         __bindgen_bitfield_unit.set(3usize, 1u8, {
-            let SpeculativeStoreBypassDisable: u32 =
-                unsafe { ::std::mem::transmute(SpeculativeStoreBypassDisable) };
+            let SpeculativeStoreBypassDisable: u32 = unsafe { ::std::mem::transmute(SpeculativeStoreBypassDisable) };
             SpeculativeStoreBypassDisable as u64
         });
         __bindgen_bitfield_unit.set(4usize, 28u8, {
@@ -18581,10 +18031,8 @@ impl _PROCESS_MITIGATION_SIDE_CHANNEL_ISOLATION_POLICY__bindgen_ty_1__bindgen_ty
         __bindgen_bitfield_unit
     }
 }
-pub type PROCESS_MITIGATION_SIDE_CHANNEL_ISOLATION_POLICY =
-    _PROCESS_MITIGATION_SIDE_CHANNEL_ISOLATION_POLICY;
-pub type PPROCESS_MITIGATION_SIDE_CHANNEL_ISOLATION_POLICY =
-    *mut _PROCESS_MITIGATION_SIDE_CHANNEL_ISOLATION_POLICY;
+pub type PROCESS_MITIGATION_SIDE_CHANNEL_ISOLATION_POLICY = _PROCESS_MITIGATION_SIDE_CHANNEL_ISOLATION_POLICY;
+pub type PPROCESS_MITIGATION_SIDE_CHANNEL_ISOLATION_POLICY = *mut _PROCESS_MITIGATION_SIDE_CHANNEL_ISOLATION_POLICY;
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct _PROCESS_MITIGATION_USER_SHADOW_STACK_POLICY {
@@ -18741,8 +18189,7 @@ impl _PROCESS_MITIGATION_USER_SHADOW_STACK_POLICY__bindgen_ty_1__bindgen_ty_1 {
     ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
-            let EnableUserShadowStack: u32 =
-                unsafe { ::std::mem::transmute(EnableUserShadowStack) };
+            let EnableUserShadowStack: u32 = unsafe { ::std::mem::transmute(EnableUserShadowStack) };
             EnableUserShadowStack as u64
         });
         __bindgen_bitfield_unit.set(1usize, 1u8, {
@@ -18750,18 +18197,15 @@ impl _PROCESS_MITIGATION_USER_SHADOW_STACK_POLICY__bindgen_ty_1__bindgen_ty_1 {
             AuditUserShadowStack as u64
         });
         __bindgen_bitfield_unit.set(2usize, 1u8, {
-            let SetContextIpValidation: u32 =
-                unsafe { ::std::mem::transmute(SetContextIpValidation) };
+            let SetContextIpValidation: u32 = unsafe { ::std::mem::transmute(SetContextIpValidation) };
             SetContextIpValidation as u64
         });
         __bindgen_bitfield_unit.set(3usize, 1u8, {
-            let AuditSetContextIpValidation: u32 =
-                unsafe { ::std::mem::transmute(AuditSetContextIpValidation) };
+            let AuditSetContextIpValidation: u32 = unsafe { ::std::mem::transmute(AuditSetContextIpValidation) };
             AuditSetContextIpValidation as u64
         });
         __bindgen_bitfield_unit.set(4usize, 1u8, {
-            let EnableUserShadowStackStrictMode: u32 =
-                unsafe { ::std::mem::transmute(EnableUserShadowStackStrictMode) };
+            let EnableUserShadowStackStrictMode: u32 = unsafe { ::std::mem::transmute(EnableUserShadowStackStrictMode) };
             EnableUserShadowStackStrictMode as u64
         });
         __bindgen_bitfield_unit.set(5usize, 1u8, {
@@ -18769,23 +18213,19 @@ impl _PROCESS_MITIGATION_USER_SHADOW_STACK_POLICY__bindgen_ty_1__bindgen_ty_1 {
             BlockNonCetBinaries as u64
         });
         __bindgen_bitfield_unit.set(6usize, 1u8, {
-            let BlockNonCetBinariesNonEhcont: u32 =
-                unsafe { ::std::mem::transmute(BlockNonCetBinariesNonEhcont) };
+            let BlockNonCetBinariesNonEhcont: u32 = unsafe { ::std::mem::transmute(BlockNonCetBinariesNonEhcont) };
             BlockNonCetBinariesNonEhcont as u64
         });
         __bindgen_bitfield_unit.set(7usize, 1u8, {
-            let AuditBlockNonCetBinaries: u32 =
-                unsafe { ::std::mem::transmute(AuditBlockNonCetBinaries) };
+            let AuditBlockNonCetBinaries: u32 = unsafe { ::std::mem::transmute(AuditBlockNonCetBinaries) };
             AuditBlockNonCetBinaries as u64
         });
         __bindgen_bitfield_unit.set(8usize, 1u8, {
-            let CetDynamicApisOutOfProcOnly: u32 =
-                unsafe { ::std::mem::transmute(CetDynamicApisOutOfProcOnly) };
+            let CetDynamicApisOutOfProcOnly: u32 = unsafe { ::std::mem::transmute(CetDynamicApisOutOfProcOnly) };
             CetDynamicApisOutOfProcOnly as u64
         });
         __bindgen_bitfield_unit.set(9usize, 1u8, {
-            let SetContextIpValidationRelaxedMode: u32 =
-                unsafe { ::std::mem::transmute(SetContextIpValidationRelaxedMode) };
+            let SetContextIpValidationRelaxedMode: u32 = unsafe { ::std::mem::transmute(SetContextIpValidationRelaxedMode) };
             SetContextIpValidationRelaxedMode as u64
         });
         __bindgen_bitfield_unit.set(10usize, 22u8, {
@@ -18796,8 +18236,7 @@ impl _PROCESS_MITIGATION_USER_SHADOW_STACK_POLICY__bindgen_ty_1__bindgen_ty_1 {
     }
 }
 pub type PROCESS_MITIGATION_USER_SHADOW_STACK_POLICY = _PROCESS_MITIGATION_USER_SHADOW_STACK_POLICY;
-pub type PPROCESS_MITIGATION_USER_SHADOW_STACK_POLICY =
-    *mut _PROCESS_MITIGATION_USER_SHADOW_STACK_POLICY;
+pub type PPROCESS_MITIGATION_USER_SHADOW_STACK_POLICY = *mut _PROCESS_MITIGATION_USER_SHADOW_STACK_POLICY;
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct _JOBOBJECT_BASIC_ACCOUNTING_INFORMATION {
@@ -18887,10 +18326,8 @@ pub struct _JOBOBJECT_BASIC_AND_IO_ACCOUNTING_INFORMATION {
     pub BasicInfo: JOBOBJECT_BASIC_ACCOUNTING_INFORMATION,
     pub IoInfo: IO_COUNTERS,
 }
-pub type JOBOBJECT_BASIC_AND_IO_ACCOUNTING_INFORMATION =
-    _JOBOBJECT_BASIC_AND_IO_ACCOUNTING_INFORMATION;
-pub type PJOBOBJECT_BASIC_AND_IO_ACCOUNTING_INFORMATION =
-    *mut _JOBOBJECT_BASIC_AND_IO_ACCOUNTING_INFORMATION;
+pub type JOBOBJECT_BASIC_AND_IO_ACCOUNTING_INFORMATION = _JOBOBJECT_BASIC_AND_IO_ACCOUNTING_INFORMATION;
+pub type PJOBOBJECT_BASIC_AND_IO_ACCOUNTING_INFORMATION = *mut _JOBOBJECT_BASIC_AND_IO_ACCOUNTING_INFORMATION;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct _JOBOBJECT_JOBSET_INFORMATION {
@@ -18904,16 +18341,12 @@ pub const _JOBOBJECT_RATE_CONTROL_TOLERANCE_ToleranceHigh: _JOBOBJECT_RATE_CONTR
 pub type _JOBOBJECT_RATE_CONTROL_TOLERANCE = ::std::os::raw::c_int;
 pub use self::_JOBOBJECT_RATE_CONTROL_TOLERANCE as JOBOBJECT_RATE_CONTROL_TOLERANCE;
 pub type PJOBOBJECT_RATE_CONTROL_TOLERANCE = *mut _JOBOBJECT_RATE_CONTROL_TOLERANCE;
-pub const _JOBOBJECT_RATE_CONTROL_TOLERANCE_INTERVAL_ToleranceIntervalShort:
-    _JOBOBJECT_RATE_CONTROL_TOLERANCE_INTERVAL = 1;
-pub const _JOBOBJECT_RATE_CONTROL_TOLERANCE_INTERVAL_ToleranceIntervalMedium:
-    _JOBOBJECT_RATE_CONTROL_TOLERANCE_INTERVAL = 2;
-pub const _JOBOBJECT_RATE_CONTROL_TOLERANCE_INTERVAL_ToleranceIntervalLong:
-    _JOBOBJECT_RATE_CONTROL_TOLERANCE_INTERVAL = 3;
+pub const _JOBOBJECT_RATE_CONTROL_TOLERANCE_INTERVAL_ToleranceIntervalShort: _JOBOBJECT_RATE_CONTROL_TOLERANCE_INTERVAL = 1;
+pub const _JOBOBJECT_RATE_CONTROL_TOLERANCE_INTERVAL_ToleranceIntervalMedium: _JOBOBJECT_RATE_CONTROL_TOLERANCE_INTERVAL = 2;
+pub const _JOBOBJECT_RATE_CONTROL_TOLERANCE_INTERVAL_ToleranceIntervalLong: _JOBOBJECT_RATE_CONTROL_TOLERANCE_INTERVAL = 3;
 pub type _JOBOBJECT_RATE_CONTROL_TOLERANCE_INTERVAL = ::std::os::raw::c_int;
 pub use self::_JOBOBJECT_RATE_CONTROL_TOLERANCE_INTERVAL as JOBOBJECT_RATE_CONTROL_TOLERANCE_INTERVAL;
-pub type PJOBOBJECT_RATE_CONTROL_TOLERANCE_INTERVAL =
-    *mut _JOBOBJECT_RATE_CONTROL_TOLERANCE_INTERVAL;
+pub type PJOBOBJECT_RATE_CONTROL_TOLERANCE_INTERVAL = *mut _JOBOBJECT_RATE_CONTROL_TOLERANCE_INTERVAL;
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct _JOBOBJECT_NOTIFICATION_LIMIT_INFORMATION {
@@ -19039,14 +18472,10 @@ pub struct _JOBOBJECT_CPU_RATE_CONTROL_INFORMATION__bindgen_ty_1__bindgen_ty_1 {
 }
 pub type JOBOBJECT_CPU_RATE_CONTROL_INFORMATION = _JOBOBJECT_CPU_RATE_CONTROL_INFORMATION;
 pub type PJOBOBJECT_CPU_RATE_CONTROL_INFORMATION = *mut _JOBOBJECT_CPU_RATE_CONTROL_INFORMATION;
-pub const JOB_OBJECT_NET_RATE_CONTROL_FLAGS_JOB_OBJECT_NET_RATE_CONTROL_ENABLE:
-    JOB_OBJECT_NET_RATE_CONTROL_FLAGS = 1;
-pub const JOB_OBJECT_NET_RATE_CONTROL_FLAGS_JOB_OBJECT_NET_RATE_CONTROL_MAX_BANDWIDTH:
-    JOB_OBJECT_NET_RATE_CONTROL_FLAGS = 2;
-pub const JOB_OBJECT_NET_RATE_CONTROL_FLAGS_JOB_OBJECT_NET_RATE_CONTROL_DSCP_TAG:
-    JOB_OBJECT_NET_RATE_CONTROL_FLAGS = 4;
-pub const JOB_OBJECT_NET_RATE_CONTROL_FLAGS_JOB_OBJECT_NET_RATE_CONTROL_VALID_FLAGS:
-    JOB_OBJECT_NET_RATE_CONTROL_FLAGS = 7;
+pub const JOB_OBJECT_NET_RATE_CONTROL_FLAGS_JOB_OBJECT_NET_RATE_CONTROL_ENABLE: JOB_OBJECT_NET_RATE_CONTROL_FLAGS = 1;
+pub const JOB_OBJECT_NET_RATE_CONTROL_FLAGS_JOB_OBJECT_NET_RATE_CONTROL_MAX_BANDWIDTH: JOB_OBJECT_NET_RATE_CONTROL_FLAGS = 2;
+pub const JOB_OBJECT_NET_RATE_CONTROL_FLAGS_JOB_OBJECT_NET_RATE_CONTROL_DSCP_TAG: JOB_OBJECT_NET_RATE_CONTROL_FLAGS = 4;
+pub const JOB_OBJECT_NET_RATE_CONTROL_FLAGS_JOB_OBJECT_NET_RATE_CONTROL_VALID_FLAGS: JOB_OBJECT_NET_RATE_CONTROL_FLAGS = 7;
 pub type JOB_OBJECT_NET_RATE_CONTROL_FLAGS = ::std::os::raw::c_int;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -19055,15 +18484,11 @@ pub struct JOBOBJECT_NET_RATE_CONTROL_INFORMATION {
     pub ControlFlags: JOB_OBJECT_NET_RATE_CONTROL_FLAGS,
     pub DscpTag: BYTE,
 }
-pub const JOB_OBJECT_IO_RATE_CONTROL_FLAGS_JOB_OBJECT_IO_RATE_CONTROL_ENABLE:
-    JOB_OBJECT_IO_RATE_CONTROL_FLAGS = 1;
-pub const JOB_OBJECT_IO_RATE_CONTROL_FLAGS_JOB_OBJECT_IO_RATE_CONTROL_STANDALONE_VOLUME:
-    JOB_OBJECT_IO_RATE_CONTROL_FLAGS = 2;
-pub const JOB_OBJECT_IO_RATE_CONTROL_FLAGS_JOB_OBJECT_IO_RATE_CONTROL_FORCE_UNIT_ACCESS_ALL:
-    JOB_OBJECT_IO_RATE_CONTROL_FLAGS = 4;
-pub const JOB_OBJECT_IO_RATE_CONTROL_FLAGS_JOB_OBJECT_IO_RATE_CONTROL_FORCE_UNIT_ACCESS_ON_SOFT_CAP : JOB_OBJECT_IO_RATE_CONTROL_FLAGS = 8 ;
-pub const JOB_OBJECT_IO_RATE_CONTROL_FLAGS_JOB_OBJECT_IO_RATE_CONTROL_VALID_FLAGS:
-    JOB_OBJECT_IO_RATE_CONTROL_FLAGS = 15;
+pub const JOB_OBJECT_IO_RATE_CONTROL_FLAGS_JOB_OBJECT_IO_RATE_CONTROL_ENABLE: JOB_OBJECT_IO_RATE_CONTROL_FLAGS = 1;
+pub const JOB_OBJECT_IO_RATE_CONTROL_FLAGS_JOB_OBJECT_IO_RATE_CONTROL_STANDALONE_VOLUME: JOB_OBJECT_IO_RATE_CONTROL_FLAGS = 2;
+pub const JOB_OBJECT_IO_RATE_CONTROL_FLAGS_JOB_OBJECT_IO_RATE_CONTROL_FORCE_UNIT_ACCESS_ALL: JOB_OBJECT_IO_RATE_CONTROL_FLAGS = 4;
+pub const JOB_OBJECT_IO_RATE_CONTROL_FLAGS_JOB_OBJECT_IO_RATE_CONTROL_FORCE_UNIT_ACCESS_ON_SOFT_CAP: JOB_OBJECT_IO_RATE_CONTROL_FLAGS = 8;
+pub const JOB_OBJECT_IO_RATE_CONTROL_FLAGS_JOB_OBJECT_IO_RATE_CONTROL_VALID_FLAGS: JOB_OBJECT_IO_RATE_CONTROL_FLAGS = 15;
 pub type JOB_OBJECT_IO_RATE_CONTROL_FLAGS = ::std::os::raw::c_int;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -19076,8 +18501,7 @@ pub struct JOBOBJECT_IO_RATE_CONTROL_INFORMATION_NATIVE {
     pub ControlFlags: JOB_OBJECT_IO_RATE_CONTROL_FLAGS,
     pub VolumeNameLength: WORD,
 }
-pub type JOBOBJECT_IO_RATE_CONTROL_INFORMATION_NATIVE_V1 =
-    JOBOBJECT_IO_RATE_CONTROL_INFORMATION_NATIVE;
+pub type JOBOBJECT_IO_RATE_CONTROL_INFORMATION_NATIVE_V1 = JOBOBJECT_IO_RATE_CONTROL_INFORMATION_NATIVE;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct JOBOBJECT_IO_RATE_CONTROL_INFORMATION_NATIVE_V2 {
@@ -19118,12 +18542,9 @@ pub struct JOBOBJECT_IO_RATE_CONTROL_INFORMATION_NATIVE_V3 {
     pub LimitExcessNotifyBandwidth: LONG64,
     pub LimitExcessNotifyTimePercent: LONG64,
 }
-pub const JOBOBJECT_IO_ATTRIBUTION_CONTROL_FLAGS_JOBOBJECT_IO_ATTRIBUTION_CONTROL_ENABLE:
-    JOBOBJECT_IO_ATTRIBUTION_CONTROL_FLAGS = 1;
-pub const JOBOBJECT_IO_ATTRIBUTION_CONTROL_FLAGS_JOBOBJECT_IO_ATTRIBUTION_CONTROL_DISABLE:
-    JOBOBJECT_IO_ATTRIBUTION_CONTROL_FLAGS = 2;
-pub const JOBOBJECT_IO_ATTRIBUTION_CONTROL_FLAGS_JOBOBJECT_IO_ATTRIBUTION_CONTROL_VALID_FLAGS:
-    JOBOBJECT_IO_ATTRIBUTION_CONTROL_FLAGS = 3;
+pub const JOBOBJECT_IO_ATTRIBUTION_CONTROL_FLAGS_JOBOBJECT_IO_ATTRIBUTION_CONTROL_ENABLE: JOBOBJECT_IO_ATTRIBUTION_CONTROL_FLAGS = 1;
+pub const JOBOBJECT_IO_ATTRIBUTION_CONTROL_FLAGS_JOBOBJECT_IO_ATTRIBUTION_CONTROL_DISABLE: JOBOBJECT_IO_ATTRIBUTION_CONTROL_FLAGS = 2;
+pub const JOBOBJECT_IO_ATTRIBUTION_CONTROL_FLAGS_JOBOBJECT_IO_ATTRIBUTION_CONTROL_VALID_FLAGS: JOBOBJECT_IO_ATTRIBUTION_CONTROL_FLAGS = 3;
 pub type JOBOBJECT_IO_ATTRIBUTION_CONTROL_FLAGS = ::std::os::raw::c_int;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -19232,12 +18653,10 @@ pub const _FIRMWARE_TYPE_FirmwareTypeMax: _FIRMWARE_TYPE = 3;
 pub type _FIRMWARE_TYPE = ::std::os::raw::c_int;
 pub use self::_FIRMWARE_TYPE as FIRMWARE_TYPE;
 pub type PFIRMWARE_TYPE = *mut _FIRMWARE_TYPE;
-pub const _LOGICAL_PROCESSOR_RELATIONSHIP_RelationProcessorCore: _LOGICAL_PROCESSOR_RELATIONSHIP =
-    0;
+pub const _LOGICAL_PROCESSOR_RELATIONSHIP_RelationProcessorCore: _LOGICAL_PROCESSOR_RELATIONSHIP = 0;
 pub const _LOGICAL_PROCESSOR_RELATIONSHIP_RelationNumaNode: _LOGICAL_PROCESSOR_RELATIONSHIP = 1;
 pub const _LOGICAL_PROCESSOR_RELATIONSHIP_RelationCache: _LOGICAL_PROCESSOR_RELATIONSHIP = 2;
-pub const _LOGICAL_PROCESSOR_RELATIONSHIP_RelationProcessorPackage:
-    _LOGICAL_PROCESSOR_RELATIONSHIP = 3;
+pub const _LOGICAL_PROCESSOR_RELATIONSHIP_RelationProcessorPackage: _LOGICAL_PROCESSOR_RELATIONSHIP = 3;
 pub const _LOGICAL_PROCESSOR_RELATIONSHIP_RelationGroup: _LOGICAL_PROCESSOR_RELATIONSHIP = 4;
 pub const _LOGICAL_PROCESSOR_RELATIONSHIP_RelationAll: _LOGICAL_PROCESSOR_RELATIONSHIP = 65535;
 pub type _LOGICAL_PROCESSOR_RELATIONSHIP = ::std::os::raw::c_int;
@@ -19390,8 +18809,7 @@ pub struct _SYSTEM_CPU_SET_INFORMATION__bindgen_ty_1__bindgen_ty_1 {
 #[derive(Copy, Clone)]
 pub union _SYSTEM_CPU_SET_INFORMATION__bindgen_ty_1__bindgen_ty_1__bindgen_ty_1 {
     pub AllFlags: BYTE,
-    pub __bindgen_anon_1:
-        _SYSTEM_CPU_SET_INFORMATION__bindgen_ty_1__bindgen_ty_1__bindgen_ty_1__bindgen_ty_1,
+    pub __bindgen_anon_1: _SYSTEM_CPU_SET_INFORMATION__bindgen_ty_1__bindgen_ty_1__bindgen_ty_1__bindgen_ty_1,
 }
 #[repr(C, packed)]
 #[derive(Debug, Copy, Clone)]
@@ -19473,8 +18891,7 @@ impl _SYSTEM_CPU_SET_INFORMATION__bindgen_ty_1__bindgen_ty_1__bindgen_ty_1__bind
             Allocated as u64
         });
         __bindgen_bitfield_unit.set(2usize, 1u8, {
-            let AllocatedToTargetProcess: u8 =
-                unsafe { ::std::mem::transmute(AllocatedToTargetProcess) };
+            let AllocatedToTargetProcess: u8 = unsafe { ::std::mem::transmute(AllocatedToTargetProcess) };
             AllocatedToTargetProcess as u64
         });
         __bindgen_bitfield_unit.set(3usize, 1u8, {
@@ -19570,10 +18987,7 @@ impl _XSTATE_CONFIGURATION__bindgen_ty_1__bindgen_ty_1 {
         }
     }
     #[inline]
-    pub fn new_bitfield_1(
-        OptimizedSave: DWORD,
-        CompactionEnabled: DWORD,
-    ) -> __BindgenBitfieldUnit<[u8; 1usize]> {
+    pub fn new_bitfield_1(OptimizedSave: DWORD, CompactionEnabled: DWORD) -> __BindgenBitfieldUnit<[u8; 1usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
             let OptimizedSave: u32 = unsafe { ::std::mem::transmute(OptimizedSave) };
@@ -19648,17 +19062,12 @@ pub struct _MEM_ADDRESS_REQUIREMENTS {
 }
 pub type MEM_ADDRESS_REQUIREMENTS = _MEM_ADDRESS_REQUIREMENTS;
 pub type PMEM_ADDRESS_REQUIREMENTS = *mut _MEM_ADDRESS_REQUIREMENTS;
-pub const MEM_EXTENDED_PARAMETER_TYPE_MemExtendedParameterInvalidType: MEM_EXTENDED_PARAMETER_TYPE =
-    0;
-pub const MEM_EXTENDED_PARAMETER_TYPE_MemExtendedParameterAddressRequirements:
-    MEM_EXTENDED_PARAMETER_TYPE = 1;
+pub const MEM_EXTENDED_PARAMETER_TYPE_MemExtendedParameterInvalidType: MEM_EXTENDED_PARAMETER_TYPE = 0;
+pub const MEM_EXTENDED_PARAMETER_TYPE_MemExtendedParameterAddressRequirements: MEM_EXTENDED_PARAMETER_TYPE = 1;
 pub const MEM_EXTENDED_PARAMETER_TYPE_MemExtendedParameterNumaNode: MEM_EXTENDED_PARAMETER_TYPE = 2;
-pub const MEM_EXTENDED_PARAMETER_TYPE_MemExtendedParameterPartitionHandle:
-    MEM_EXTENDED_PARAMETER_TYPE = 3;
-pub const MEM_EXTENDED_PARAMETER_TYPE_MemExtendedParameterUserPhysicalHandle:
-    MEM_EXTENDED_PARAMETER_TYPE = 4;
-pub const MEM_EXTENDED_PARAMETER_TYPE_MemExtendedParameterAttributeFlags:
-    MEM_EXTENDED_PARAMETER_TYPE = 5;
+pub const MEM_EXTENDED_PARAMETER_TYPE_MemExtendedParameterPartitionHandle: MEM_EXTENDED_PARAMETER_TYPE = 3;
+pub const MEM_EXTENDED_PARAMETER_TYPE_MemExtendedParameterUserPhysicalHandle: MEM_EXTENDED_PARAMETER_TYPE = 4;
+pub const MEM_EXTENDED_PARAMETER_TYPE_MemExtendedParameterAttributeFlags: MEM_EXTENDED_PARAMETER_TYPE = 5;
 pub const MEM_EXTENDED_PARAMETER_TYPE_MemExtendedParameterMax: MEM_EXTENDED_PARAMETER_TYPE = 6;
 pub type MEM_EXTENDED_PARAMETER_TYPE = ::std::os::raw::c_int;
 pub type PMEM_EXTENDED_PARAMETER_TYPE = *mut MEM_EXTENDED_PARAMETER_TYPE;
@@ -19722,14 +19131,10 @@ pub union MEM_EXTENDED_PARAMETER__bindgen_ty_2 {
     pub ULong: DWORD,
 }
 pub type PMEM_EXTENDED_PARAMETER = *mut MEM_EXTENDED_PARAMETER;
-pub const MEM_SECTION_EXTENDED_PARAMETER_TYPE_MemSectionExtendedParameterInvalidType:
-    MEM_SECTION_EXTENDED_PARAMETER_TYPE = 0;
-pub const MEM_SECTION_EXTENDED_PARAMETER_TYPE_MemSectionExtendedParameterUserPhysicalFlags:
-    MEM_SECTION_EXTENDED_PARAMETER_TYPE = 1;
-pub const MEM_SECTION_EXTENDED_PARAMETER_TYPE_MemSectionExtendedParameterNumaNode:
-    MEM_SECTION_EXTENDED_PARAMETER_TYPE = 2;
-pub const MEM_SECTION_EXTENDED_PARAMETER_TYPE_MemSectionExtendedParameterMax:
-    MEM_SECTION_EXTENDED_PARAMETER_TYPE = 3;
+pub const MEM_SECTION_EXTENDED_PARAMETER_TYPE_MemSectionExtendedParameterInvalidType: MEM_SECTION_EXTENDED_PARAMETER_TYPE = 0;
+pub const MEM_SECTION_EXTENDED_PARAMETER_TYPE_MemSectionExtendedParameterUserPhysicalFlags: MEM_SECTION_EXTENDED_PARAMETER_TYPE = 1;
+pub const MEM_SECTION_EXTENDED_PARAMETER_TYPE_MemSectionExtendedParameterNumaNode: MEM_SECTION_EXTENDED_PARAMETER_TYPE = 2;
+pub const MEM_SECTION_EXTENDED_PARAMETER_TYPE_MemSectionExtendedParameterMax: MEM_SECTION_EXTENDED_PARAMETER_TYPE = 3;
 pub type MEM_SECTION_EXTENDED_PARAMETER_TYPE = ::std::os::raw::c_int;
 pub type PMEM_SECTION_EXTENDED_PARAMETER_TYPE = *mut MEM_SECTION_EXTENDED_PARAMETER_TYPE;
 #[repr(C)]
@@ -19915,22 +19320,15 @@ pub struct _SCRUB_DATA_OUTPUT {
 }
 pub type SCRUB_DATA_OUTPUT = _SCRUB_DATA_OUTPUT;
 pub type PSCRUB_DATA_OUTPUT = *mut _SCRUB_DATA_OUTPUT;
-pub const _SharedVirtualDiskSupportType_SharedVirtualDisksUnsupported:
-    _SharedVirtualDiskSupportType = 0;
-pub const _SharedVirtualDiskSupportType_SharedVirtualDisksSupported: _SharedVirtualDiskSupportType =
-    1;
-pub const _SharedVirtualDiskSupportType_SharedVirtualDiskSnapshotsSupported:
-    _SharedVirtualDiskSupportType = 3;
-pub const _SharedVirtualDiskSupportType_SharedVirtualDiskCDPSnapshotsSupported:
-    _SharedVirtualDiskSupportType = 7;
+pub const _SharedVirtualDiskSupportType_SharedVirtualDisksUnsupported: _SharedVirtualDiskSupportType = 0;
+pub const _SharedVirtualDiskSupportType_SharedVirtualDisksSupported: _SharedVirtualDiskSupportType = 1;
+pub const _SharedVirtualDiskSupportType_SharedVirtualDiskSnapshotsSupported: _SharedVirtualDiskSupportType = 3;
+pub const _SharedVirtualDiskSupportType_SharedVirtualDiskCDPSnapshotsSupported: _SharedVirtualDiskSupportType = 7;
 pub type _SharedVirtualDiskSupportType = ::std::os::raw::c_int;
 pub use self::_SharedVirtualDiskSupportType as SharedVirtualDiskSupportType;
-pub const _SharedVirtualDiskHandleState_SharedVirtualDiskHandleStateNone:
-    _SharedVirtualDiskHandleState = 0;
-pub const _SharedVirtualDiskHandleState_SharedVirtualDiskHandleStateFileShared:
-    _SharedVirtualDiskHandleState = 1;
-pub const _SharedVirtualDiskHandleState_SharedVirtualDiskHandleStateHandleShared:
-    _SharedVirtualDiskHandleState = 3;
+pub const _SharedVirtualDiskHandleState_SharedVirtualDiskHandleStateNone: _SharedVirtualDiskHandleState = 0;
+pub const _SharedVirtualDiskHandleState_SharedVirtualDiskHandleStateFileShared: _SharedVirtualDiskHandleState = 1;
+pub const _SharedVirtualDiskHandleState_SharedVirtualDiskHandleStateHandleShared: _SharedVirtualDiskHandleState = 3;
 pub type _SharedVirtualDiskHandleState = ::std::os::raw::c_int;
 pub use self::_SharedVirtualDiskHandleState as SharedVirtualDiskHandleState;
 #[repr(C)]
@@ -20809,108 +20207,61 @@ pub struct _POWER_IDLE_RESILIENCY {
 }
 pub type POWER_IDLE_RESILIENCY = _POWER_IDLE_RESILIENCY;
 pub type PPOWER_IDLE_RESILIENCY = *mut _POWER_IDLE_RESILIENCY;
-pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonUnknown: POWER_MONITOR_REQUEST_REASON =
-    0;
-pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonPowerButton:
-    POWER_MONITOR_REQUEST_REASON = 1;
-pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonRemoteConnection:
-    POWER_MONITOR_REQUEST_REASON = 2;
-pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonScMonitorpower:
-    POWER_MONITOR_REQUEST_REASON = 3;
-pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonUserInput: POWER_MONITOR_REQUEST_REASON =
-    4;
-pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonAcDcDisplayBurst:
-    POWER_MONITOR_REQUEST_REASON = 5;
-pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonUserDisplayBurst:
-    POWER_MONITOR_REQUEST_REASON = 6;
-pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonPoSetSystemState:
-    POWER_MONITOR_REQUEST_REASON = 7;
-pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonSetThreadExecutionState:
-    POWER_MONITOR_REQUEST_REASON = 8;
-pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonFullWake: POWER_MONITOR_REQUEST_REASON =
-    9;
-pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonSessionUnlock:
-    POWER_MONITOR_REQUEST_REASON = 10;
-pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonScreenOffRequest:
-    POWER_MONITOR_REQUEST_REASON = 11;
-pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonIdleTimeout:
-    POWER_MONITOR_REQUEST_REASON = 12;
-pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonPolicyChange:
-    POWER_MONITOR_REQUEST_REASON = 13;
-pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonSleepButton:
-    POWER_MONITOR_REQUEST_REASON = 14;
+pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonUnknown: POWER_MONITOR_REQUEST_REASON = 0;
+pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonPowerButton: POWER_MONITOR_REQUEST_REASON = 1;
+pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonRemoteConnection: POWER_MONITOR_REQUEST_REASON = 2;
+pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonScMonitorpower: POWER_MONITOR_REQUEST_REASON = 3;
+pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonUserInput: POWER_MONITOR_REQUEST_REASON = 4;
+pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonAcDcDisplayBurst: POWER_MONITOR_REQUEST_REASON = 5;
+pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonUserDisplayBurst: POWER_MONITOR_REQUEST_REASON = 6;
+pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonPoSetSystemState: POWER_MONITOR_REQUEST_REASON = 7;
+pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonSetThreadExecutionState: POWER_MONITOR_REQUEST_REASON = 8;
+pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonFullWake: POWER_MONITOR_REQUEST_REASON = 9;
+pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonSessionUnlock: POWER_MONITOR_REQUEST_REASON = 10;
+pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonScreenOffRequest: POWER_MONITOR_REQUEST_REASON = 11;
+pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonIdleTimeout: POWER_MONITOR_REQUEST_REASON = 12;
+pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonPolicyChange: POWER_MONITOR_REQUEST_REASON = 13;
+pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonSleepButton: POWER_MONITOR_REQUEST_REASON = 14;
 pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonLid: POWER_MONITOR_REQUEST_REASON = 15;
-pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonBatteryCountChange:
-    POWER_MONITOR_REQUEST_REASON = 16;
-pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonGracePeriod:
-    POWER_MONITOR_REQUEST_REASON = 17;
+pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonBatteryCountChange: POWER_MONITOR_REQUEST_REASON = 16;
+pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonGracePeriod: POWER_MONITOR_REQUEST_REASON = 17;
 pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonPnP: POWER_MONITOR_REQUEST_REASON = 18;
 pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonDP: POWER_MONITOR_REQUEST_REASON = 19;
-pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonSxTransition:
-    POWER_MONITOR_REQUEST_REASON = 20;
-pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonSystemIdle:
-    POWER_MONITOR_REQUEST_REASON = 21;
-pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonNearProximity:
-    POWER_MONITOR_REQUEST_REASON = 22;
-pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonThermalStandby:
-    POWER_MONITOR_REQUEST_REASON = 23;
-pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonResumePdc: POWER_MONITOR_REQUEST_REASON =
-    24;
-pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonResumeS4: POWER_MONITOR_REQUEST_REASON =
-    25;
-pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonTerminal: POWER_MONITOR_REQUEST_REASON =
-    26;
-pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonPdcSignal: POWER_MONITOR_REQUEST_REASON =
-    27;
-pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonAcDcDisplayBurstSuppressed:
-    POWER_MONITOR_REQUEST_REASON = 28;
-pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonSystemStateEntered:
-    POWER_MONITOR_REQUEST_REASON = 29;
+pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonSxTransition: POWER_MONITOR_REQUEST_REASON = 20;
+pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonSystemIdle: POWER_MONITOR_REQUEST_REASON = 21;
+pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonNearProximity: POWER_MONITOR_REQUEST_REASON = 22;
+pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonThermalStandby: POWER_MONITOR_REQUEST_REASON = 23;
+pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonResumePdc: POWER_MONITOR_REQUEST_REASON = 24;
+pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonResumeS4: POWER_MONITOR_REQUEST_REASON = 25;
+pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonTerminal: POWER_MONITOR_REQUEST_REASON = 26;
+pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonPdcSignal: POWER_MONITOR_REQUEST_REASON = 27;
+pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonAcDcDisplayBurstSuppressed: POWER_MONITOR_REQUEST_REASON = 28;
+pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonSystemStateEntered: POWER_MONITOR_REQUEST_REASON = 29;
 pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonWinrt: POWER_MONITOR_REQUEST_REASON = 30;
-pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonUserInputKeyboard:
-    POWER_MONITOR_REQUEST_REASON = 31;
-pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonUserInputMouse:
-    POWER_MONITOR_REQUEST_REASON = 32;
-pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonUserInputTouch:
-    POWER_MONITOR_REQUEST_REASON = 33;
-pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonUserInputPen:
-    POWER_MONITOR_REQUEST_REASON = 34;
-pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonUserInputAccelerometer:
-    POWER_MONITOR_REQUEST_REASON = 35;
-pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonUserInputHid:
-    POWER_MONITOR_REQUEST_REASON = 36;
-pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonUserInputPoUserPresent:
-    POWER_MONITOR_REQUEST_REASON = 37;
-pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonUserInputSessionSwitch:
-    POWER_MONITOR_REQUEST_REASON = 38;
-pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonUserInputInitialization:
-    POWER_MONITOR_REQUEST_REASON = 39;
-pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonPdcSignalWindowsMobilePwrNotif:
-    POWER_MONITOR_REQUEST_REASON = 40;
-pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonPdcSignalWindowsMobileShell:
-    POWER_MONITOR_REQUEST_REASON = 41;
-pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonPdcSignalHeyCortana:
-    POWER_MONITOR_REQUEST_REASON = 42;
-pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonPdcSignalHolographicShell:
-    POWER_MONITOR_REQUEST_REASON = 43;
-pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonPdcSignalFingerprint:
-    POWER_MONITOR_REQUEST_REASON = 44;
-pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonDirectedDrips:
-    POWER_MONITOR_REQUEST_REASON = 45;
+pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonUserInputKeyboard: POWER_MONITOR_REQUEST_REASON = 31;
+pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonUserInputMouse: POWER_MONITOR_REQUEST_REASON = 32;
+pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonUserInputTouch: POWER_MONITOR_REQUEST_REASON = 33;
+pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonUserInputPen: POWER_MONITOR_REQUEST_REASON = 34;
+pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonUserInputAccelerometer: POWER_MONITOR_REQUEST_REASON = 35;
+pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonUserInputHid: POWER_MONITOR_REQUEST_REASON = 36;
+pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonUserInputPoUserPresent: POWER_MONITOR_REQUEST_REASON = 37;
+pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonUserInputSessionSwitch: POWER_MONITOR_REQUEST_REASON = 38;
+pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonUserInputInitialization: POWER_MONITOR_REQUEST_REASON = 39;
+pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonPdcSignalWindowsMobilePwrNotif: POWER_MONITOR_REQUEST_REASON = 40;
+pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonPdcSignalWindowsMobileShell: POWER_MONITOR_REQUEST_REASON = 41;
+pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonPdcSignalHeyCortana: POWER_MONITOR_REQUEST_REASON = 42;
+pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonPdcSignalHolographicShell: POWER_MONITOR_REQUEST_REASON = 43;
+pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonPdcSignalFingerprint: POWER_MONITOR_REQUEST_REASON = 44;
+pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonDirectedDrips: POWER_MONITOR_REQUEST_REASON = 45;
 pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonDim: POWER_MONITOR_REQUEST_REASON = 46;
-pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonBuiltinPanel:
-    POWER_MONITOR_REQUEST_REASON = 47;
-pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonDisplayRequiredUnDim:
-    POWER_MONITOR_REQUEST_REASON = 48;
-pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonBatteryCountChangeSuppressed:
-    POWER_MONITOR_REQUEST_REASON = 49;
-pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonResumeModernStandby:
-    POWER_MONITOR_REQUEST_REASON = 50;
+pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonBuiltinPanel: POWER_MONITOR_REQUEST_REASON = 47;
+pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonDisplayRequiredUnDim: POWER_MONITOR_REQUEST_REASON = 48;
+pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonBatteryCountChangeSuppressed: POWER_MONITOR_REQUEST_REASON = 49;
+pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonResumeModernStandby: POWER_MONITOR_REQUEST_REASON = 50;
 pub const POWER_MONITOR_REQUEST_REASON_MonitorRequestReasonMax: POWER_MONITOR_REQUEST_REASON = 51;
 pub type POWER_MONITOR_REQUEST_REASON = ::std::os::raw::c_int;
 pub const _POWER_MONITOR_REQUEST_TYPE_MonitorRequestTypeOff: _POWER_MONITOR_REQUEST_TYPE = 0;
-pub const _POWER_MONITOR_REQUEST_TYPE_MonitorRequestTypeOnAndPresent: _POWER_MONITOR_REQUEST_TYPE =
-    1;
+pub const _POWER_MONITOR_REQUEST_TYPE_MonitorRequestTypeOnAndPresent: _POWER_MONITOR_REQUEST_TYPE = 1;
 pub const _POWER_MONITOR_REQUEST_TYPE_MonitorRequestTypeToggleOn: _POWER_MONITOR_REQUEST_TYPE = 2;
 pub type _POWER_MONITOR_REQUEST_TYPE = ::std::os::raw::c_int;
 pub use self::_POWER_MONITOR_REQUEST_TYPE as POWER_MONITOR_REQUEST_TYPE;
@@ -21346,11 +20697,7 @@ impl PROCESSOR_IDLESTATE_POLICY__bindgen_ty_1__bindgen_ty_1 {
         }
     }
     #[inline]
-    pub fn new_bitfield_1(
-        AllowScaling: WORD,
-        Disabled: WORD,
-        Reserved: WORD,
-    ) -> __BindgenBitfieldUnit<[u8; 2usize]> {
+    pub fn new_bitfield_1(AllowScaling: WORD, Disabled: WORD, Reserved: WORD) -> __BindgenBitfieldUnit<[u8; 2usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 2usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
             let AllowScaling: u16 = unsafe { ::std::mem::transmute(AllowScaling) };
@@ -21415,11 +20762,7 @@ impl _PROCESSOR_POWER_POLICY_INFO {
         }
     }
     #[inline]
-    pub fn new_bitfield_1(
-        AllowDemotion: DWORD,
-        AllowPromotion: DWORD,
-        Reserved: DWORD,
-    ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
+    pub fn new_bitfield_1(AllowDemotion: DWORD, AllowPromotion: DWORD, Reserved: DWORD) -> __BindgenBitfieldUnit<[u8; 4usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
             let AllowDemotion: u32 = unsafe { ::std::mem::transmute(AllowDemotion) };
@@ -21473,10 +20816,7 @@ impl _PROCESSOR_POWER_POLICY {
         }
     }
     #[inline]
-    pub fn new_bitfield_1(
-        DisableCStates: DWORD,
-        Reserved: DWORD,
-    ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
+    pub fn new_bitfield_1(DisableCStates: DWORD, Reserved: DWORD) -> __BindgenBitfieldUnit<[u8; 4usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
             let DisableCStates: u32 = unsafe { ::std::mem::transmute(DisableCStates) };
@@ -21569,12 +20909,7 @@ impl PROCESSOR_PERFSTATE_POLICY__bindgen_ty_1__bindgen_ty_1__bindgen_ty_1 {
         }
     }
     #[inline]
-    pub fn new_bitfield_1(
-        NoDomainAccounting: BYTE,
-        IncreasePolicy: BYTE,
-        DecreasePolicy: BYTE,
-        Reserved: BYTE,
-    ) -> __BindgenBitfieldUnit<[u8; 1usize]> {
+    pub fn new_bitfield_1(NoDomainAccounting: BYTE, IncreasePolicy: BYTE, DecreasePolicy: BYTE, Reserved: BYTE) -> __BindgenBitfieldUnit<[u8; 1usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
             let NoDomainAccounting: u8 = unsafe { ::std::mem::transmute(NoDomainAccounting) };
@@ -22292,8 +21627,7 @@ pub union _IMAGE_THUNK_DATA32__bindgen_ty_1 {
 }
 pub type IMAGE_THUNK_DATA32 = _IMAGE_THUNK_DATA32;
 pub type PIMAGE_THUNK_DATA32 = *mut IMAGE_THUNK_DATA32;
-pub type PIMAGE_TLS_CALLBACK =
-    unsafe extern "C" fn(DllHandle: PVOID, Reason: DWORD, Reserved: PVOID);
+pub type PIMAGE_TLS_CALLBACK = unsafe extern "C" fn(DllHandle: PVOID, Reason: DWORD, Reserved: PVOID);
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub union _IMAGE_TLS_DIRECTORY64__bindgen_ty_1 {
@@ -22342,11 +21676,7 @@ impl _IMAGE_TLS_DIRECTORY64__bindgen_ty_1__bindgen_ty_1 {
         }
     }
     #[inline]
-    pub fn new_bitfield_1(
-        Reserved0: DWORD,
-        Alignment: DWORD,
-        Reserved1: DWORD,
-    ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
+    pub fn new_bitfield_1(Reserved0: DWORD, Alignment: DWORD, Reserved1: DWORD) -> __BindgenBitfieldUnit<[u8; 4usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 20u8, {
             let Reserved0: u32 = unsafe { ::std::mem::transmute(Reserved0) };
@@ -22421,11 +21751,7 @@ impl _IMAGE_TLS_DIRECTORY32__bindgen_ty_1__bindgen_ty_1 {
         }
     }
     #[inline]
-    pub fn new_bitfield_1(
-        Reserved0: DWORD,
-        Alignment: DWORD,
-        Reserved1: DWORD,
-    ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
+    pub fn new_bitfield_1(Reserved0: DWORD, Alignment: DWORD, Reserved1: DWORD) -> __BindgenBitfieldUnit<[u8; 4usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 20u8, {
             let Reserved0: u32 = unsafe { ::std::mem::transmute(Reserved0) };
@@ -22530,10 +21856,7 @@ impl _IMAGE_DELAYLOAD_DESCRIPTOR__bindgen_ty_1__bindgen_ty_1 {
         }
     }
     #[inline]
-    pub fn new_bitfield_1(
-        RvaBased: DWORD,
-        ReservedAttributes: DWORD,
-    ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
+    pub fn new_bitfield_1(RvaBased: DWORD, ReservedAttributes: DWORD) -> __BindgenBitfieldUnit<[u8; 4usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
             let RvaBased: u32 = unsafe { ::std::mem::transmute(RvaBased) };
@@ -22605,10 +21928,7 @@ impl _IMAGE_RESOURCE_DIRECTORY_ENTRY__bindgen_ty_1__bindgen_ty_1 {
         }
     }
     #[inline]
-    pub fn new_bitfield_1(
-        NameOffset: DWORD,
-        NameIsString: DWORD,
-    ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
+    pub fn new_bitfield_1(NameOffset: DWORD, NameIsString: DWORD) -> __BindgenBitfieldUnit<[u8; 4usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 31u8, {
             let NameOffset: u32 = unsafe { ::std::mem::transmute(NameOffset) };
@@ -22658,10 +21978,7 @@ impl _IMAGE_RESOURCE_DIRECTORY_ENTRY__bindgen_ty_2__bindgen_ty_1 {
         }
     }
     #[inline]
-    pub fn new_bitfield_1(
-        OffsetToDirectory: DWORD,
-        DataIsDirectory: DWORD,
-    ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
+    pub fn new_bitfield_1(OffsetToDirectory: DWORD, DataIsDirectory: DWORD) -> __BindgenBitfieldUnit<[u8; 4usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 31u8, {
             let OffsetToDirectory: u32 = unsafe { ::std::mem::transmute(OffsetToDirectory) };
@@ -22820,11 +22137,7 @@ impl _IMAGE_IMPORT_CONTROL_TRANSFER_DYNAMIC_RELOCATION {
         }
     }
     #[inline]
-    pub fn new_bitfield_1(
-        PageRelativeOffset: DWORD,
-        IndirectCall: DWORD,
-        IATIndex: DWORD,
-    ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
+    pub fn new_bitfield_1(PageRelativeOffset: DWORD, IndirectCall: DWORD, IATIndex: DWORD) -> __BindgenBitfieldUnit<[u8; 4usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 12u8, {
             let PageRelativeOffset: u32 = unsafe { ::std::mem::transmute(PageRelativeOffset) };
@@ -22841,10 +22154,8 @@ impl _IMAGE_IMPORT_CONTROL_TRANSFER_DYNAMIC_RELOCATION {
         __bindgen_bitfield_unit
     }
 }
-pub type IMAGE_IMPORT_CONTROL_TRANSFER_DYNAMIC_RELOCATION =
-    _IMAGE_IMPORT_CONTROL_TRANSFER_DYNAMIC_RELOCATION;
-pub type PIMAGE_IMPORT_CONTROL_TRANSFER_DYNAMIC_RELOCATION =
-    *mut IMAGE_IMPORT_CONTROL_TRANSFER_DYNAMIC_RELOCATION;
+pub type IMAGE_IMPORT_CONTROL_TRANSFER_DYNAMIC_RELOCATION = _IMAGE_IMPORT_CONTROL_TRANSFER_DYNAMIC_RELOCATION;
+pub type PIMAGE_IMPORT_CONTROL_TRANSFER_DYNAMIC_RELOCATION = *mut IMAGE_IMPORT_CONTROL_TRANSFER_DYNAMIC_RELOCATION;
 #[repr(C, packed)]
 #[derive(Debug, Copy, Clone)]
 pub struct _IMAGE_INDIR_CONTROL_TRANSFER_DYNAMIC_RELOCATION {
@@ -22939,10 +22250,8 @@ impl _IMAGE_INDIR_CONTROL_TRANSFER_DYNAMIC_RELOCATION {
         __bindgen_bitfield_unit
     }
 }
-pub type IMAGE_INDIR_CONTROL_TRANSFER_DYNAMIC_RELOCATION =
-    _IMAGE_INDIR_CONTROL_TRANSFER_DYNAMIC_RELOCATION;
-pub type PIMAGE_INDIR_CONTROL_TRANSFER_DYNAMIC_RELOCATION =
-    *mut IMAGE_INDIR_CONTROL_TRANSFER_DYNAMIC_RELOCATION;
+pub type IMAGE_INDIR_CONTROL_TRANSFER_DYNAMIC_RELOCATION = _IMAGE_INDIR_CONTROL_TRANSFER_DYNAMIC_RELOCATION;
+pub type PIMAGE_INDIR_CONTROL_TRANSFER_DYNAMIC_RELOCATION = *mut IMAGE_INDIR_CONTROL_TRANSFER_DYNAMIC_RELOCATION;
 #[repr(C, packed)]
 #[derive(Debug, Copy, Clone)]
 pub struct _IMAGE_SWITCHTABLE_BRANCH_DYNAMIC_RELOCATION {
@@ -22973,10 +22282,7 @@ impl _IMAGE_SWITCHTABLE_BRANCH_DYNAMIC_RELOCATION {
         }
     }
     #[inline]
-    pub fn new_bitfield_1(
-        PageRelativeOffset: WORD,
-        RegisterNumber: WORD,
-    ) -> __BindgenBitfieldUnit<[u8; 2usize]> {
+    pub fn new_bitfield_1(PageRelativeOffset: WORD, RegisterNumber: WORD) -> __BindgenBitfieldUnit<[u8; 2usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 2usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 12u8, {
             let PageRelativeOffset: u16 = unsafe { ::std::mem::transmute(PageRelativeOffset) };
@@ -22990,8 +22296,7 @@ impl _IMAGE_SWITCHTABLE_BRANCH_DYNAMIC_RELOCATION {
     }
 }
 pub type IMAGE_SWITCHTABLE_BRANCH_DYNAMIC_RELOCATION = _IMAGE_SWITCHTABLE_BRANCH_DYNAMIC_RELOCATION;
-pub type PIMAGE_SWITCHTABLE_BRANCH_DYNAMIC_RELOCATION =
-    *mut IMAGE_SWITCHTABLE_BRANCH_DYNAMIC_RELOCATION;
+pub type PIMAGE_SWITCHTABLE_BRANCH_DYNAMIC_RELOCATION = *mut IMAGE_SWITCHTABLE_BRANCH_DYNAMIC_RELOCATION;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct _IMAGE_LOAD_CONFIG_DIRECTORY32 {
@@ -23182,12 +22487,7 @@ impl _IMAGE_CE_RUNTIME_FUNCTION_ENTRY {
         }
     }
     #[inline]
-    pub fn new_bitfield_1(
-        PrologLen: DWORD,
-        FuncLen: DWORD,
-        ThirtyTwoBit: DWORD,
-        ExceptionFlag: DWORD,
-    ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
+    pub fn new_bitfield_1(PrologLen: DWORD, FuncLen: DWORD, ThirtyTwoBit: DWORD, ExceptionFlag: DWORD) -> __BindgenBitfieldUnit<[u8; 4usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 8u8, {
             let PrologLen: u32 = unsafe { ::std::mem::transmute(PrologLen) };
@@ -23849,14 +23149,7 @@ impl _FPO_DATA {
         }
     }
     #[inline]
-    pub fn new_bitfield_1(
-        cbProlog: WORD,
-        cbRegs: WORD,
-        fHasSEH: WORD,
-        fUseBP: WORD,
-        reserved: WORD,
-        cbFrame: WORD,
-    ) -> __BindgenBitfieldUnit<[u8; 2usize]> {
+    pub fn new_bitfield_1(cbProlog: WORD, cbRegs: WORD, fHasSEH: WORD, fUseBP: WORD, reserved: WORD, cbFrame: WORD) -> __BindgenBitfieldUnit<[u8; 2usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 2usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 8u8, {
             let cbProlog: u16 = unsafe { ::std::mem::transmute(cbProlog) };
@@ -23987,10 +23280,7 @@ impl _ImageArchitectureHeader {
         }
     }
     #[inline]
-    pub fn new_bitfield_1(
-        AmaskValue: ::std::os::raw::c_uint,
-        AmaskShift: ::std::os::raw::c_uint,
-    ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
+    pub fn new_bitfield_1(AmaskValue: ::std::os::raw::c_uint, AmaskShift: ::std::os::raw::c_uint) -> __BindgenBitfieldUnit<[u8; 4usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
             let AmaskValue: u32 = unsafe { ::std::mem::transmute(AmaskValue) };
@@ -24067,11 +23357,7 @@ impl IMPORT_OBJECT_HEADER {
         }
     }
     #[inline]
-    pub fn new_bitfield_1(
-        Type: WORD,
-        NameType: WORD,
-        Reserved: WORD,
-    ) -> __BindgenBitfieldUnit<[u8; 2usize]> {
+    pub fn new_bitfield_1(Type: WORD, NameType: WORD, Reserved: WORD) -> __BindgenBitfieldUnit<[u8; 2usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 2usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 2u8, {
             let Type: u16 = unsafe { ::std::mem::transmute(Type) };
@@ -24099,35 +23385,27 @@ pub const IMPORT_OBJECT_NAME_TYPE_IMPORT_OBJECT_NAME_UNDECORATE: IMPORT_OBJECT_N
 pub const IMPORT_OBJECT_NAME_TYPE_IMPORT_OBJECT_NAME_EXPORTAS: IMPORT_OBJECT_NAME_TYPE = 4;
 pub type IMPORT_OBJECT_NAME_TYPE = ::std::os::raw::c_int;
 pub const ReplacesCorHdrNumericDefines_COMIMAGE_FLAGS_ILONLY: ReplacesCorHdrNumericDefines = 1;
-pub const ReplacesCorHdrNumericDefines_COMIMAGE_FLAGS_32BITREQUIRED: ReplacesCorHdrNumericDefines =
-    2;
+pub const ReplacesCorHdrNumericDefines_COMIMAGE_FLAGS_32BITREQUIRED: ReplacesCorHdrNumericDefines = 2;
 pub const ReplacesCorHdrNumericDefines_COMIMAGE_FLAGS_IL_LIBRARY: ReplacesCorHdrNumericDefines = 4;
-pub const ReplacesCorHdrNumericDefines_COMIMAGE_FLAGS_STRONGNAMESIGNED:
-    ReplacesCorHdrNumericDefines = 8;
-pub const ReplacesCorHdrNumericDefines_COMIMAGE_FLAGS_NATIVE_ENTRYPOINT:
-    ReplacesCorHdrNumericDefines = 16;
-pub const ReplacesCorHdrNumericDefines_COMIMAGE_FLAGS_TRACKDEBUGDATA: ReplacesCorHdrNumericDefines =
-    65536;
-pub const ReplacesCorHdrNumericDefines_COMIMAGE_FLAGS_32BITPREFERRED: ReplacesCorHdrNumericDefines =
-    131072;
+pub const ReplacesCorHdrNumericDefines_COMIMAGE_FLAGS_STRONGNAMESIGNED: ReplacesCorHdrNumericDefines = 8;
+pub const ReplacesCorHdrNumericDefines_COMIMAGE_FLAGS_NATIVE_ENTRYPOINT: ReplacesCorHdrNumericDefines = 16;
+pub const ReplacesCorHdrNumericDefines_COMIMAGE_FLAGS_TRACKDEBUGDATA: ReplacesCorHdrNumericDefines = 65536;
+pub const ReplacesCorHdrNumericDefines_COMIMAGE_FLAGS_32BITPREFERRED: ReplacesCorHdrNumericDefines = 131072;
 pub const ReplacesCorHdrNumericDefines_COR_VERSION_MAJOR_V2: ReplacesCorHdrNumericDefines = 2;
 pub const ReplacesCorHdrNumericDefines_COR_VERSION_MAJOR: ReplacesCorHdrNumericDefines = 2;
 pub const ReplacesCorHdrNumericDefines_COR_VERSION_MINOR: ReplacesCorHdrNumericDefines = 5;
 pub const ReplacesCorHdrNumericDefines_COR_DELETED_NAME_LENGTH: ReplacesCorHdrNumericDefines = 8;
 pub const ReplacesCorHdrNumericDefines_COR_VTABLEGAP_NAME_LENGTH: ReplacesCorHdrNumericDefines = 8;
 pub const ReplacesCorHdrNumericDefines_NATIVE_TYPE_MAX_CB: ReplacesCorHdrNumericDefines = 1;
-pub const ReplacesCorHdrNumericDefines_COR_ILMETHOD_SECT_SMALL_MAX_DATASIZE:
-    ReplacesCorHdrNumericDefines = 255;
+pub const ReplacesCorHdrNumericDefines_COR_ILMETHOD_SECT_SMALL_MAX_DATASIZE: ReplacesCorHdrNumericDefines = 255;
 pub const ReplacesCorHdrNumericDefines_IMAGE_COR_MIH_METHODRVA: ReplacesCorHdrNumericDefines = 1;
 pub const ReplacesCorHdrNumericDefines_IMAGE_COR_MIH_EHRVA: ReplacesCorHdrNumericDefines = 2;
 pub const ReplacesCorHdrNumericDefines_IMAGE_COR_MIH_BASICBLOCK: ReplacesCorHdrNumericDefines = 8;
 pub const ReplacesCorHdrNumericDefines_COR_VTABLE_32BIT: ReplacesCorHdrNumericDefines = 1;
 pub const ReplacesCorHdrNumericDefines_COR_VTABLE_64BIT: ReplacesCorHdrNumericDefines = 2;
 pub const ReplacesCorHdrNumericDefines_COR_VTABLE_FROM_UNMANAGED: ReplacesCorHdrNumericDefines = 4;
-pub const ReplacesCorHdrNumericDefines_COR_VTABLE_FROM_UNMANAGED_RETAIN_APPDOMAIN:
-    ReplacesCorHdrNumericDefines = 8;
-pub const ReplacesCorHdrNumericDefines_COR_VTABLE_CALL_MOST_DERIVED: ReplacesCorHdrNumericDefines =
-    16;
+pub const ReplacesCorHdrNumericDefines_COR_VTABLE_FROM_UNMANAGED_RETAIN_APPDOMAIN: ReplacesCorHdrNumericDefines = 8;
+pub const ReplacesCorHdrNumericDefines_COR_VTABLE_CALL_MOST_DERIVED: ReplacesCorHdrNumericDefines = 16;
 pub const ReplacesCorHdrNumericDefines_IMAGE_COR_EATJ_THUNK_SIZE: ReplacesCorHdrNumericDefines = 32;
 pub const ReplacesCorHdrNumericDefines_MAX_CLASS_NAME: ReplacesCorHdrNumericDefines = 1024;
 pub const ReplacesCorHdrNumericDefines_MAX_PACKAGE_NAME: ReplacesCorHdrNumericDefines = 1024;
@@ -24156,12 +23434,7 @@ pub union IMAGE_COR20_HEADER__bindgen_ty_1 {
 }
 pub type PIMAGE_COR20_HEADER = *mut IMAGE_COR20_HEADER;
 extern "C" {
-    pub fn RtlCaptureStackBackTrace(
-        FramesToSkip: DWORD,
-        FramesToCapture: DWORD,
-        BackTrace: *mut PVOID,
-        BackTraceHash: PDWORD,
-    ) -> WORD;
+    pub fn RtlCaptureStackBackTrace(FramesToSkip: DWORD, FramesToCapture: DWORD, BackTrace: *mut PVOID, BackTraceHash: PDWORD) -> WORD;
 }
 extern "C" {
     pub fn RtlCaptureContext(ContextRecord: PCONTEXT);
@@ -24170,19 +23443,10 @@ extern "C" {
     pub fn RtlCaptureContext2(ContextRecord: PCONTEXT);
 }
 extern "C" {
-    pub fn RtlUnwind(
-        TargetFrame: PVOID,
-        TargetIp: PVOID,
-        ExceptionRecord: PEXCEPTION_RECORD,
-        ReturnValue: PVOID,
-    );
+    pub fn RtlUnwind(TargetFrame: PVOID, TargetIp: PVOID, ExceptionRecord: PEXCEPTION_RECORD, ReturnValue: PVOID);
 }
 extern "C" {
-    pub fn RtlAddFunctionTable(
-        FunctionTable: PRUNTIME_FUNCTION,
-        EntryCount: DWORD,
-        BaseAddress: DWORD64,
-    ) -> BOOLEAN;
+    pub fn RtlAddFunctionTable(FunctionTable: PRUNTIME_FUNCTION, EntryCount: DWORD, BaseAddress: DWORD64) -> BOOLEAN;
 }
 extern "C" {
     pub fn RtlDeleteFunctionTable(FunctionTable: PRUNTIME_FUNCTION) -> BOOLEAN;
@@ -24214,11 +23478,7 @@ extern "C" {
     pub fn RtlDeleteGrowableFunctionTable(DynamicTable: PVOID);
 }
 extern "C" {
-    pub fn RtlLookupFunctionEntry(
-        ControlPc: DWORD64,
-        ImageBase: PDWORD64,
-        HistoryTable: PUNWIND_HISTORY_TABLE,
-    ) -> PRUNTIME_FUNCTION;
+    pub fn RtlLookupFunctionEntry(ControlPc: DWORD64, ImageBase: PDWORD64, HistoryTable: PUNWIND_HISTORY_TABLE) -> PRUNTIME_FUNCTION;
 }
 extern "C" {
     pub fn RtlRestoreContext(ContextRecord: PCONTEXT, ExceptionRecord: *mut _EXCEPTION_RECORD);
@@ -24252,11 +23512,7 @@ extern "C" {
     pub fn RtlPcToFileHeader(PcValue: PVOID, BaseOfImage: *mut PVOID) -> PVOID;
 }
 extern "C" {
-    pub fn RtlCompareMemory(
-        Source1: *const ::std::os::raw::c_void,
-        Source2: *const ::std::os::raw::c_void,
-        Length: SIZE_T,
-    ) -> SIZE_T;
+    pub fn RtlCompareMemory(Source1: *const ::std::os::raw::c_void, Source2: *const ::std::os::raw::c_void, Length: SIZE_T) -> SIZE_T;
 }
 #[repr(C)]
 #[repr(align(16))]
@@ -24332,12 +23588,7 @@ impl _SLIST_HEADER__bindgen_ty_2 {
         }
     }
     #[inline]
-    pub fn new_bitfield_1(
-        Depth: ULONGLONG,
-        Sequence: ULONGLONG,
-        Reserved: ULONGLONG,
-        NextEntry: ULONGLONG,
-    ) -> __BindgenBitfieldUnit<[u8; 16usize]> {
+    pub fn new_bitfield_1(Depth: ULONGLONG, Sequence: ULONGLONG, Reserved: ULONGLONG, NextEntry: ULONGLONG) -> __BindgenBitfieldUnit<[u8; 16usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 16usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 16u8, {
             let Depth: u64 = unsafe { ::std::mem::transmute(Depth) };
@@ -24370,18 +23621,10 @@ extern "C" {
     pub fn RtlInterlockedPopEntrySList(ListHead: PSLIST_HEADER) -> PSLIST_ENTRY;
 }
 extern "C" {
-    pub fn RtlInterlockedPushEntrySList(
-        ListHead: PSLIST_HEADER,
-        ListEntry: PSLIST_ENTRY,
-    ) -> PSLIST_ENTRY;
+    pub fn RtlInterlockedPushEntrySList(ListHead: PSLIST_HEADER, ListEntry: PSLIST_ENTRY) -> PSLIST_ENTRY;
 }
 extern "C" {
-    pub fn RtlInterlockedPushListSListEx(
-        ListHead: PSLIST_HEADER,
-        List: PSLIST_ENTRY,
-        ListEnd: PSLIST_ENTRY,
-        Count: DWORD,
-    ) -> PSLIST_ENTRY;
+    pub fn RtlInterlockedPushListSListEx(ListHead: PSLIST_HEADER, List: PSLIST_ENTRY, ListEnd: PSLIST_ENTRY, Count: DWORD) -> PSLIST_ENTRY;
 }
 extern "C" {
     pub fn RtlInterlockedFlushSList(ListHead: PSLIST_HEADER) -> PSLIST_ENTRY;
@@ -24512,11 +23755,7 @@ pub type OSVERSIONINFOEX = OSVERSIONINFOEXA;
 pub type POSVERSIONINFOEX = POSVERSIONINFOEXA;
 pub type LPOSVERSIONINFOEX = LPOSVERSIONINFOEXA;
 extern "C" {
-    pub fn VerSetConditionMask(
-        ConditionMask: ULONGLONG,
-        TypeMask: DWORD,
-        Condition: BYTE,
-    ) -> ULONGLONG;
+    pub fn VerSetConditionMask(ConditionMask: ULONGLONG, TypeMask: DWORD, Condition: BYTE) -> ULONGLONG;
 }
 extern "C" {
     pub fn RtlGetProductInfo(
@@ -24544,18 +23783,12 @@ pub const _RTL_UMS_SCHEDULER_REASON_UmsSchedulerThreadYield: _RTL_UMS_SCHEDULER_
 pub type _RTL_UMS_SCHEDULER_REASON = ::std::os::raw::c_int;
 pub use self::_RTL_UMS_SCHEDULER_REASON as RTL_UMS_SCHEDULER_REASON;
 pub type PRTL_UMS_SCHEDULER_REASON = *mut _RTL_UMS_SCHEDULER_REASON;
-pub type PRTL_UMS_SCHEDULER_ENTRY_POINT =
-    unsafe extern "C" fn(arg1: RTL_UMS_SCHEDULER_REASON, arg2: ULONG_PTR, arg3: PVOID);
+pub type PRTL_UMS_SCHEDULER_ENTRY_POINT = unsafe extern "C" fn(arg1: RTL_UMS_SCHEDULER_REASON, arg2: ULONG_PTR, arg3: PVOID);
 extern "C" {
-    pub fn RtlCrc32(Buffer: *const ::std::os::raw::c_void, Size: usize, InitialCrc: DWORD)
-        -> DWORD;
+    pub fn RtlCrc32(Buffer: *const ::std::os::raw::c_void, Size: usize, InitialCrc: DWORD) -> DWORD;
 }
 extern "C" {
-    pub fn RtlCrc64(
-        Buffer: *const ::std::os::raw::c_void,
-        Size: usize,
-        InitialCrc: ULONGLONG,
-    ) -> ULONGLONG;
+    pub fn RtlCrc64(Buffer: *const ::std::os::raw::c_void, Size: usize, InitialCrc: ULONGLONG) -> ULONGLONG;
 }
 pub const _OS_DEPLOYEMENT_STATE_VALUES_OS_DEPLOYMENT_STANDARD: _OS_DEPLOYEMENT_STATE_VALUES = 1;
 pub const _OS_DEPLOYEMENT_STATE_VALUES_OS_DEPLOYMENT_COMPACT: _OS_DEPLOYEMENT_STATE_VALUES = 2;
@@ -24579,12 +23812,7 @@ extern "C" {
     pub fn RtlFreeNonVolatileToken(NvToken: PVOID) -> DWORD;
 }
 extern "C" {
-    pub fn RtlFlushNonVolatileMemory(
-        NvToken: PVOID,
-        NvBuffer: PVOID,
-        Size: SIZE_T,
-        Flags: DWORD,
-    ) -> DWORD;
+    pub fn RtlFlushNonVolatileMemory(NvToken: PVOID, NvBuffer: PVOID, Size: SIZE_T, Flags: DWORD) -> DWORD;
 }
 extern "C" {
     pub fn RtlDrainNonVolatileFlush(NvToken: PVOID) -> DWORD;
@@ -24599,21 +23827,10 @@ extern "C" {
     ) -> DWORD;
 }
 extern "C" {
-    pub fn RtlFillNonVolatileMemory(
-        NvToken: PVOID,
-        NvDestination: *mut ::std::os::raw::c_void,
-        Size: SIZE_T,
-        Value: BYTE,
-        Flags: DWORD,
-    ) -> DWORD;
+    pub fn RtlFillNonVolatileMemory(NvToken: PVOID, NvDestination: *mut ::std::os::raw::c_void, Size: SIZE_T, Value: BYTE, Flags: DWORD) -> DWORD;
 }
 extern "C" {
-    pub fn RtlFlushNonVolatileMemoryRanges(
-        NvToken: PVOID,
-        NvRanges: PNV_MEMORY_RANGE,
-        NumRanges: SIZE_T,
-        Flags: DWORD,
-    ) -> DWORD;
+    pub fn RtlFlushNonVolatileMemoryRanges(NvToken: PVOID, NvRanges: PNV_MEMORY_RANGE, NumRanges: SIZE_T, Flags: DWORD) -> DWORD;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -24623,11 +23840,7 @@ pub struct CORRELATION_VECTOR {
 }
 pub type PCORRELATION_VECTOR = *mut CORRELATION_VECTOR;
 extern "C" {
-    pub fn RtlInitializeCorrelationVector(
-        CorrelationVector: PCORRELATION_VECTOR,
-        Version: ::std::os::raw::c_int,
-        Guid: *const GUID,
-    ) -> DWORD;
+    pub fn RtlInitializeCorrelationVector(CorrelationVector: PCORRELATION_VECTOR, Version: ::std::os::raw::c_int, Guid: *const GUID) -> DWORD;
 }
 extern "C" {
     pub fn RtlIncrementCorrelationVector(CorrelationVector: PCORRELATION_VECTOR) -> DWORD;
@@ -24647,9 +23860,7 @@ pub struct _CUSTOM_SYSTEM_EVENT_TRIGGER_CONFIG {
 pub type CUSTOM_SYSTEM_EVENT_TRIGGER_CONFIG = _CUSTOM_SYSTEM_EVENT_TRIGGER_CONFIG;
 pub type PCUSTOM_SYSTEM_EVENT_TRIGGER_CONFIG = *mut _CUSTOM_SYSTEM_EVENT_TRIGGER_CONFIG;
 extern "C" {
-    pub fn RtlRaiseCustomSystemEventTrigger(
-        TriggerConfig: PCUSTOM_SYSTEM_EVENT_TRIGGER_CONFIG,
-    ) -> DWORD;
+    pub fn RtlRaiseCustomSystemEventTrigger(TriggerConfig: PCUSTOM_SYSTEM_EVENT_TRIGGER_CONFIG) -> DWORD;
 }
 pub const _IMAGE_POLICY_ENTRY_TYPE_ImagePolicyEntryTypeNone: _IMAGE_POLICY_ENTRY_TYPE = 0;
 pub const _IMAGE_POLICY_ENTRY_TYPE_ImagePolicyEntryTypeBool: _IMAGE_POLICY_ENTRY_TYPE = 1;
@@ -24772,8 +23983,7 @@ pub struct _RTL_CONDITION_VARIABLE {
 pub type RTL_CONDITION_VARIABLE = _RTL_CONDITION_VARIABLE;
 pub type PRTL_CONDITION_VARIABLE = *mut _RTL_CONDITION_VARIABLE;
 pub type PAPCFUNC = unsafe extern "C" fn(Parameter: ULONG_PTR);
-pub type PVECTORED_EXCEPTION_HANDLER =
-    unsafe extern "C" fn(ExceptionInfo: *mut _EXCEPTION_POINTERS) -> LONG;
+pub type PVECTORED_EXCEPTION_HANDLER = unsafe extern "C" fn(ExceptionInfo: *mut _EXCEPTION_POINTERS) -> LONG;
 pub const _HEAP_INFORMATION_CLASS_HeapCompatibilityInformation: _HEAP_INFORMATION_CLASS = 0;
 pub const _HEAP_INFORMATION_CLASS_HeapEnableTerminationOnCorruption: _HEAP_INFORMATION_CLASS = 1;
 pub const _HEAP_INFORMATION_CLASS_HeapOptimizeResources: _HEAP_INFORMATION_CLASS = 3;
@@ -24792,28 +24002,17 @@ pub type WORKERCALLBACKFUNC = unsafe extern "C" fn(arg1: PVOID);
 pub type APC_CALLBACK_FUNCTION = unsafe extern "C" fn(arg1: DWORD, arg2: PVOID, arg3: PVOID);
 pub type WAITORTIMERCALLBACK = WAITORTIMERCALLBACKFUNC;
 pub type PFLS_CALLBACK_FUNCTION = unsafe extern "C" fn(lpFlsData: PVOID);
-pub type PSECURE_MEMORY_CACHE_CALLBACK =
-    unsafe extern "C" fn(Addr: PVOID, Range: SIZE_T) -> BOOLEAN;
-pub const _ACTIVATION_CONTEXT_INFO_CLASS_ActivationContextBasicInformation:
-    _ACTIVATION_CONTEXT_INFO_CLASS = 1;
-pub const _ACTIVATION_CONTEXT_INFO_CLASS_ActivationContextDetailedInformation:
-    _ACTIVATION_CONTEXT_INFO_CLASS = 2;
-pub const _ACTIVATION_CONTEXT_INFO_CLASS_AssemblyDetailedInformationInActivationContext:
-    _ACTIVATION_CONTEXT_INFO_CLASS = 3;
-pub const _ACTIVATION_CONTEXT_INFO_CLASS_FileInformationInAssemblyOfAssemblyInActivationContext:
-    _ACTIVATION_CONTEXT_INFO_CLASS = 4;
-pub const _ACTIVATION_CONTEXT_INFO_CLASS_RunlevelInformationInActivationContext:
-    _ACTIVATION_CONTEXT_INFO_CLASS = 5;
-pub const _ACTIVATION_CONTEXT_INFO_CLASS_CompatibilityInformationInActivationContext:
-    _ACTIVATION_CONTEXT_INFO_CLASS = 6;
-pub const _ACTIVATION_CONTEXT_INFO_CLASS_ActivationContextManifestResourceName:
-    _ACTIVATION_CONTEXT_INFO_CLASS = 7;
-pub const _ACTIVATION_CONTEXT_INFO_CLASS_MaxActivationContextInfoClass:
-    _ACTIVATION_CONTEXT_INFO_CLASS = 8;
-pub const _ACTIVATION_CONTEXT_INFO_CLASS_AssemblyDetailedInformationInActivationContxt:
-    _ACTIVATION_CONTEXT_INFO_CLASS = 3;
-pub const _ACTIVATION_CONTEXT_INFO_CLASS_FileInformationInAssemblyOfAssemblyInActivationContxt:
-    _ACTIVATION_CONTEXT_INFO_CLASS = 4;
+pub type PSECURE_MEMORY_CACHE_CALLBACK = unsafe extern "C" fn(Addr: PVOID, Range: SIZE_T) -> BOOLEAN;
+pub const _ACTIVATION_CONTEXT_INFO_CLASS_ActivationContextBasicInformation: _ACTIVATION_CONTEXT_INFO_CLASS = 1;
+pub const _ACTIVATION_CONTEXT_INFO_CLASS_ActivationContextDetailedInformation: _ACTIVATION_CONTEXT_INFO_CLASS = 2;
+pub const _ACTIVATION_CONTEXT_INFO_CLASS_AssemblyDetailedInformationInActivationContext: _ACTIVATION_CONTEXT_INFO_CLASS = 3;
+pub const _ACTIVATION_CONTEXT_INFO_CLASS_FileInformationInAssemblyOfAssemblyInActivationContext: _ACTIVATION_CONTEXT_INFO_CLASS = 4;
+pub const _ACTIVATION_CONTEXT_INFO_CLASS_RunlevelInformationInActivationContext: _ACTIVATION_CONTEXT_INFO_CLASS = 5;
+pub const _ACTIVATION_CONTEXT_INFO_CLASS_CompatibilityInformationInActivationContext: _ACTIVATION_CONTEXT_INFO_CLASS = 6;
+pub const _ACTIVATION_CONTEXT_INFO_CLASS_ActivationContextManifestResourceName: _ACTIVATION_CONTEXT_INFO_CLASS = 7;
+pub const _ACTIVATION_CONTEXT_INFO_CLASS_MaxActivationContextInfoClass: _ACTIVATION_CONTEXT_INFO_CLASS = 8;
+pub const _ACTIVATION_CONTEXT_INFO_CLASS_AssemblyDetailedInformationInActivationContxt: _ACTIVATION_CONTEXT_INFO_CLASS = 3;
+pub const _ACTIVATION_CONTEXT_INFO_CLASS_FileInformationInAssemblyOfAssemblyInActivationContxt: _ACTIVATION_CONTEXT_INFO_CLASS = 4;
 pub type _ACTIVATION_CONTEXT_INFO_CLASS = ::std::os::raw::c_int;
 pub use self::_ACTIVATION_CONTEXT_INFO_CLASS as ACTIVATION_CONTEXT_INFO_CLASS;
 #[repr(C)]
@@ -24860,16 +24059,12 @@ pub struct _ACTIVATION_CONTEXT_ASSEMBLY_DETAILED_INFORMATION {
     pub lpAssemblyDirectoryName: PCWSTR,
     pub ulFileCount: DWORD,
 }
-pub type ACTIVATION_CONTEXT_ASSEMBLY_DETAILED_INFORMATION =
-    _ACTIVATION_CONTEXT_ASSEMBLY_DETAILED_INFORMATION;
-pub type PACTIVATION_CONTEXT_ASSEMBLY_DETAILED_INFORMATION =
-    *mut _ACTIVATION_CONTEXT_ASSEMBLY_DETAILED_INFORMATION;
-pub type PCACTIVATION_CONTEXT_ASSEMBLY_DETAILED_INFORMATION =
-    *const _ACTIVATION_CONTEXT_ASSEMBLY_DETAILED_INFORMATION;
+pub type ACTIVATION_CONTEXT_ASSEMBLY_DETAILED_INFORMATION = _ACTIVATION_CONTEXT_ASSEMBLY_DETAILED_INFORMATION;
+pub type PACTIVATION_CONTEXT_ASSEMBLY_DETAILED_INFORMATION = *mut _ACTIVATION_CONTEXT_ASSEMBLY_DETAILED_INFORMATION;
+pub type PCACTIVATION_CONTEXT_ASSEMBLY_DETAILED_INFORMATION = *const _ACTIVATION_CONTEXT_ASSEMBLY_DETAILED_INFORMATION;
 pub const ACTCTX_REQUESTED_RUN_LEVEL_ACTCTX_RUN_LEVEL_UNSPECIFIED: ACTCTX_REQUESTED_RUN_LEVEL = 0;
 pub const ACTCTX_REQUESTED_RUN_LEVEL_ACTCTX_RUN_LEVEL_AS_INVOKER: ACTCTX_REQUESTED_RUN_LEVEL = 1;
-pub const ACTCTX_REQUESTED_RUN_LEVEL_ACTCTX_RUN_LEVEL_HIGHEST_AVAILABLE:
-    ACTCTX_REQUESTED_RUN_LEVEL = 2;
+pub const ACTCTX_REQUESTED_RUN_LEVEL_ACTCTX_RUN_LEVEL_HIGHEST_AVAILABLE: ACTCTX_REQUESTED_RUN_LEVEL = 2;
 pub const ACTCTX_REQUESTED_RUN_LEVEL_ACTCTX_RUN_LEVEL_REQUIRE_ADMIN: ACTCTX_REQUESTED_RUN_LEVEL = 3;
 pub const ACTCTX_REQUESTED_RUN_LEVEL_ACTCTX_RUN_LEVEL_NUMBERS: ACTCTX_REQUESTED_RUN_LEVEL = 4;
 pub type ACTCTX_REQUESTED_RUN_LEVEL = ::std::os::raw::c_int;
@@ -24882,16 +24077,11 @@ pub struct _ACTIVATION_CONTEXT_RUN_LEVEL_INFORMATION {
 }
 pub type ACTIVATION_CONTEXT_RUN_LEVEL_INFORMATION = _ACTIVATION_CONTEXT_RUN_LEVEL_INFORMATION;
 pub type PACTIVATION_CONTEXT_RUN_LEVEL_INFORMATION = *mut _ACTIVATION_CONTEXT_RUN_LEVEL_INFORMATION;
-pub type PCACTIVATION_CONTEXT_RUN_LEVEL_INFORMATION =
-    *const _ACTIVATION_CONTEXT_RUN_LEVEL_INFORMATION;
-pub const ACTCTX_COMPATIBILITY_ELEMENT_TYPE_ACTCTX_COMPATIBILITY_ELEMENT_TYPE_UNKNOWN:
-    ACTCTX_COMPATIBILITY_ELEMENT_TYPE = 0;
-pub const ACTCTX_COMPATIBILITY_ELEMENT_TYPE_ACTCTX_COMPATIBILITY_ELEMENT_TYPE_OS:
-    ACTCTX_COMPATIBILITY_ELEMENT_TYPE = 1;
-pub const ACTCTX_COMPATIBILITY_ELEMENT_TYPE_ACTCTX_COMPATIBILITY_ELEMENT_TYPE_MITIGATION:
-    ACTCTX_COMPATIBILITY_ELEMENT_TYPE = 2;
-pub const ACTCTX_COMPATIBILITY_ELEMENT_TYPE_ACTCTX_COMPATIBILITY_ELEMENT_TYPE_MAXVERSIONTESTED:
-    ACTCTX_COMPATIBILITY_ELEMENT_TYPE = 3;
+pub type PCACTIVATION_CONTEXT_RUN_LEVEL_INFORMATION = *const _ACTIVATION_CONTEXT_RUN_LEVEL_INFORMATION;
+pub const ACTCTX_COMPATIBILITY_ELEMENT_TYPE_ACTCTX_COMPATIBILITY_ELEMENT_TYPE_UNKNOWN: ACTCTX_COMPATIBILITY_ELEMENT_TYPE = 0;
+pub const ACTCTX_COMPATIBILITY_ELEMENT_TYPE_ACTCTX_COMPATIBILITY_ELEMENT_TYPE_OS: ACTCTX_COMPATIBILITY_ELEMENT_TYPE = 1;
+pub const ACTCTX_COMPATIBILITY_ELEMENT_TYPE_ACTCTX_COMPATIBILITY_ELEMENT_TYPE_MITIGATION: ACTCTX_COMPATIBILITY_ELEMENT_TYPE = 2;
+pub const ACTCTX_COMPATIBILITY_ELEMENT_TYPE_ACTCTX_COMPATIBILITY_ELEMENT_TYPE_MAXVERSIONTESTED: ACTCTX_COMPATIBILITY_ELEMENT_TYPE = 3;
 pub type ACTCTX_COMPATIBILITY_ELEMENT_TYPE = ::std::os::raw::c_int;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -24909,12 +24099,9 @@ pub struct _ACTIVATION_CONTEXT_COMPATIBILITY_INFORMATION {
     pub ElementCount: DWORD,
     pub Elements: __IncompleteArrayField<COMPATIBILITY_CONTEXT_ELEMENT>,
 }
-pub type ACTIVATION_CONTEXT_COMPATIBILITY_INFORMATION =
-    _ACTIVATION_CONTEXT_COMPATIBILITY_INFORMATION;
-pub type PACTIVATION_CONTEXT_COMPATIBILITY_INFORMATION =
-    *mut _ACTIVATION_CONTEXT_COMPATIBILITY_INFORMATION;
-pub type PCACTIVATION_CONTEXT_COMPATIBILITY_INFORMATION =
-    *const _ACTIVATION_CONTEXT_COMPATIBILITY_INFORMATION;
+pub type ACTIVATION_CONTEXT_COMPATIBILITY_INFORMATION = _ACTIVATION_CONTEXT_COMPATIBILITY_INFORMATION;
+pub type PACTIVATION_CONTEXT_COMPATIBILITY_INFORMATION = *mut _ACTIVATION_CONTEXT_COMPATIBILITY_INFORMATION;
+pub type PCACTIVATION_CONTEXT_COMPATIBILITY_INFORMATION = *const _ACTIVATION_CONTEXT_COMPATIBILITY_INFORMATION;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct _SUPPORTED_OS_INFO {
@@ -24948,8 +24135,7 @@ pub struct _ACTIVATION_CONTEXT_DETAILED_INFORMATION {
 }
 pub type ACTIVATION_CONTEXT_DETAILED_INFORMATION = _ACTIVATION_CONTEXT_DETAILED_INFORMATION;
 pub type PACTIVATION_CONTEXT_DETAILED_INFORMATION = *mut _ACTIVATION_CONTEXT_DETAILED_INFORMATION;
-pub type PCACTIVATION_CONTEXT_DETAILED_INFORMATION =
-    *const _ACTIVATION_CONTEXT_DETAILED_INFORMATION;
+pub type PCACTIVATION_CONTEXT_DETAILED_INFORMATION = *const _ACTIVATION_CONTEXT_DETAILED_INFORMATION;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct _HARDWARE_COUNTER_DATA {
@@ -24975,11 +24161,7 @@ pub struct _PERFORMANCE_DATA {
 pub type PERFORMANCE_DATA = _PERFORMANCE_DATA;
 pub type PPERFORMANCE_DATA = *mut _PERFORMANCE_DATA;
 extern "C" {
-    pub fn RtlGetDeviceFamilyInfoEnum(
-        pullUAPInfo: *mut ULONGLONG,
-        pulDeviceFamily: *mut DWORD,
-        pulDeviceForm: *mut DWORD,
-    );
+    pub fn RtlGetDeviceFamilyInfoEnum(pullUAPInfo: *mut ULONGLONG, pulDeviceFamily: *mut DWORD, pulDeviceForm: *mut DWORD);
 }
 extern "C" {
     pub fn RtlConvertDeviceFamilyInfoToString(
@@ -24990,11 +24172,7 @@ extern "C" {
     ) -> DWORD;
 }
 extern "C" {
-    pub fn RtlSwitchedVVI(
-        VersionInfo: PRTL_OSVERSIONINFOEXW,
-        TypeMask: DWORD,
-        ConditionMask: ULONGLONG,
-    ) -> DWORD;
+    pub fn RtlSwitchedVVI(VersionInfo: PRTL_OSVERSIONINFOEXW, TypeMask: DWORD, ConditionMask: ULONGLONG) -> DWORD;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -25204,8 +24382,7 @@ pub struct _TRANSACTION_NOTIFICATION_RECOVERY_ARGUMENT {
     pub UOW: UOW,
 }
 pub type TRANSACTION_NOTIFICATION_RECOVERY_ARGUMENT = _TRANSACTION_NOTIFICATION_RECOVERY_ARGUMENT;
-pub type PTRANSACTION_NOTIFICATION_RECOVERY_ARGUMENT =
-    *mut _TRANSACTION_NOTIFICATION_RECOVERY_ARGUMENT;
+pub type PTRANSACTION_NOTIFICATION_RECOVERY_ARGUMENT = *mut _TRANSACTION_NOTIFICATION_RECOVERY_ARGUMENT;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct _TRANSACTION_NOTIFICATION_TM_ONLINE_ARGUMENT {
@@ -25213,8 +24390,7 @@ pub struct _TRANSACTION_NOTIFICATION_TM_ONLINE_ARGUMENT {
     pub Flags: ULONG,
 }
 pub type TRANSACTION_NOTIFICATION_TM_ONLINE_ARGUMENT = _TRANSACTION_NOTIFICATION_TM_ONLINE_ARGUMENT;
-pub type PTRANSACTION_NOTIFICATION_TM_ONLINE_ARGUMENT =
-    *mut _TRANSACTION_NOTIFICATION_TM_ONLINE_ARGUMENT;
+pub type PTRANSACTION_NOTIFICATION_TM_ONLINE_ARGUMENT = *mut _TRANSACTION_NOTIFICATION_TM_ONLINE_ARGUMENT;
 pub type SAVEPOINT_ID = ULONG;
 pub type PSAVEPOINT_ID = *mut ULONG;
 #[repr(C)]
@@ -25223,8 +24399,7 @@ pub struct _TRANSACTION_NOTIFICATION_SAVEPOINT_ARGUMENT {
     pub SavepointId: SAVEPOINT_ID,
 }
 pub type TRANSACTION_NOTIFICATION_SAVEPOINT_ARGUMENT = _TRANSACTION_NOTIFICATION_SAVEPOINT_ARGUMENT;
-pub type PTRANSACTION_NOTIFICATION_SAVEPOINT_ARGUMENT =
-    *mut _TRANSACTION_NOTIFICATION_SAVEPOINT_ARGUMENT;
+pub type PTRANSACTION_NOTIFICATION_SAVEPOINT_ARGUMENT = *mut _TRANSACTION_NOTIFICATION_SAVEPOINT_ARGUMENT;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct _TRANSACTION_NOTIFICATION_PROPAGATE_ARGUMENT {
@@ -25234,8 +24409,7 @@ pub struct _TRANSACTION_NOTIFICATION_PROPAGATE_ARGUMENT {
     pub BufferLength: ULONG,
 }
 pub type TRANSACTION_NOTIFICATION_PROPAGATE_ARGUMENT = _TRANSACTION_NOTIFICATION_PROPAGATE_ARGUMENT;
-pub type PTRANSACTION_NOTIFICATION_PROPAGATE_ARGUMENT =
-    *mut _TRANSACTION_NOTIFICATION_PROPAGATE_ARGUMENT;
+pub type PTRANSACTION_NOTIFICATION_PROPAGATE_ARGUMENT = *mut _TRANSACTION_NOTIFICATION_PROPAGATE_ARGUMENT;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct _TRANSACTION_NOTIFICATION_MARSHAL_ARGUMENT {
@@ -25243,11 +24417,9 @@ pub struct _TRANSACTION_NOTIFICATION_MARSHAL_ARGUMENT {
     pub UOW: GUID,
 }
 pub type TRANSACTION_NOTIFICATION_MARSHAL_ARGUMENT = _TRANSACTION_NOTIFICATION_MARSHAL_ARGUMENT;
-pub type PTRANSACTION_NOTIFICATION_MARSHAL_ARGUMENT =
-    *mut _TRANSACTION_NOTIFICATION_MARSHAL_ARGUMENT;
+pub type PTRANSACTION_NOTIFICATION_MARSHAL_ARGUMENT = *mut _TRANSACTION_NOTIFICATION_MARSHAL_ARGUMENT;
 pub type TRANSACTION_NOTIFICATION_PROMOTE_ARGUMENT = TRANSACTION_NOTIFICATION_PROPAGATE_ARGUMENT;
-pub type PTRANSACTION_NOTIFICATION_PROMOTE_ARGUMENT =
-    *mut TRANSACTION_NOTIFICATION_PROPAGATE_ARGUMENT;
+pub type PTRANSACTION_NOTIFICATION_PROMOTE_ARGUMENT = *mut TRANSACTION_NOTIFICATION_PROPAGATE_ARGUMENT;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct _KCRM_MARSHAL_HEADER {
@@ -25381,8 +24553,7 @@ pub struct _TRANSACTION_SUPERIOR_ENLISTMENT_INFORMATION {
     pub SuperiorEnlistmentPair: TRANSACTION_ENLISTMENT_PAIR,
 }
 pub type TRANSACTION_SUPERIOR_ENLISTMENT_INFORMATION = _TRANSACTION_SUPERIOR_ENLISTMENT_INFORMATION;
-pub type PTRANSACTION_SUPERIOR_ENLISTMENT_INFORMATION =
-    *mut _TRANSACTION_SUPERIOR_ENLISTMENT_INFORMATION;
+pub type PTRANSACTION_SUPERIOR_ENLISTMENT_INFORMATION = *mut _TRANSACTION_SUPERIOR_ENLISTMENT_INFORMATION;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct _RESOURCEMANAGER_BASIC_INFORMATION {
@@ -25400,38 +24571,24 @@ pub struct _RESOURCEMANAGER_COMPLETION_INFORMATION {
 }
 pub type RESOURCEMANAGER_COMPLETION_INFORMATION = _RESOURCEMANAGER_COMPLETION_INFORMATION;
 pub type PRESOURCEMANAGER_COMPLETION_INFORMATION = *mut _RESOURCEMANAGER_COMPLETION_INFORMATION;
-pub const _TRANSACTION_INFORMATION_CLASS_TransactionBasicInformation:
-    _TRANSACTION_INFORMATION_CLASS = 0;
-pub const _TRANSACTION_INFORMATION_CLASS_TransactionPropertiesInformation:
-    _TRANSACTION_INFORMATION_CLASS = 1;
-pub const _TRANSACTION_INFORMATION_CLASS_TransactionEnlistmentInformation:
-    _TRANSACTION_INFORMATION_CLASS = 2;
-pub const _TRANSACTION_INFORMATION_CLASS_TransactionSuperiorEnlistmentInformation:
-    _TRANSACTION_INFORMATION_CLASS = 3;
-pub const _TRANSACTION_INFORMATION_CLASS_TransactionBindInformation:
-    _TRANSACTION_INFORMATION_CLASS = 4;
-pub const _TRANSACTION_INFORMATION_CLASS_TransactionDTCPrivateInformation:
-    _TRANSACTION_INFORMATION_CLASS = 5;
+pub const _TRANSACTION_INFORMATION_CLASS_TransactionBasicInformation: _TRANSACTION_INFORMATION_CLASS = 0;
+pub const _TRANSACTION_INFORMATION_CLASS_TransactionPropertiesInformation: _TRANSACTION_INFORMATION_CLASS = 1;
+pub const _TRANSACTION_INFORMATION_CLASS_TransactionEnlistmentInformation: _TRANSACTION_INFORMATION_CLASS = 2;
+pub const _TRANSACTION_INFORMATION_CLASS_TransactionSuperiorEnlistmentInformation: _TRANSACTION_INFORMATION_CLASS = 3;
+pub const _TRANSACTION_INFORMATION_CLASS_TransactionBindInformation: _TRANSACTION_INFORMATION_CLASS = 4;
+pub const _TRANSACTION_INFORMATION_CLASS_TransactionDTCPrivateInformation: _TRANSACTION_INFORMATION_CLASS = 5;
 pub type _TRANSACTION_INFORMATION_CLASS = ::std::os::raw::c_int;
 pub use self::_TRANSACTION_INFORMATION_CLASS as TRANSACTION_INFORMATION_CLASS;
-pub const _TRANSACTIONMANAGER_INFORMATION_CLASS_TransactionManagerBasicInformation:
-    _TRANSACTIONMANAGER_INFORMATION_CLASS = 0;
-pub const _TRANSACTIONMANAGER_INFORMATION_CLASS_TransactionManagerLogInformation:
-    _TRANSACTIONMANAGER_INFORMATION_CLASS = 1;
-pub const _TRANSACTIONMANAGER_INFORMATION_CLASS_TransactionManagerLogPathInformation:
-    _TRANSACTIONMANAGER_INFORMATION_CLASS = 2;
-pub const _TRANSACTIONMANAGER_INFORMATION_CLASS_TransactionManagerRecoveryInformation:
-    _TRANSACTIONMANAGER_INFORMATION_CLASS = 4;
-pub const _TRANSACTIONMANAGER_INFORMATION_CLASS_TransactionManagerOnlineProbeInformation:
-    _TRANSACTIONMANAGER_INFORMATION_CLASS = 3;
-pub const _TRANSACTIONMANAGER_INFORMATION_CLASS_TransactionManagerOldestTransactionInformation:
-    _TRANSACTIONMANAGER_INFORMATION_CLASS = 5;
+pub const _TRANSACTIONMANAGER_INFORMATION_CLASS_TransactionManagerBasicInformation: _TRANSACTIONMANAGER_INFORMATION_CLASS = 0;
+pub const _TRANSACTIONMANAGER_INFORMATION_CLASS_TransactionManagerLogInformation: _TRANSACTIONMANAGER_INFORMATION_CLASS = 1;
+pub const _TRANSACTIONMANAGER_INFORMATION_CLASS_TransactionManagerLogPathInformation: _TRANSACTIONMANAGER_INFORMATION_CLASS = 2;
+pub const _TRANSACTIONMANAGER_INFORMATION_CLASS_TransactionManagerRecoveryInformation: _TRANSACTIONMANAGER_INFORMATION_CLASS = 4;
+pub const _TRANSACTIONMANAGER_INFORMATION_CLASS_TransactionManagerOnlineProbeInformation: _TRANSACTIONMANAGER_INFORMATION_CLASS = 3;
+pub const _TRANSACTIONMANAGER_INFORMATION_CLASS_TransactionManagerOldestTransactionInformation: _TRANSACTIONMANAGER_INFORMATION_CLASS = 5;
 pub type _TRANSACTIONMANAGER_INFORMATION_CLASS = ::std::os::raw::c_int;
 pub use self::_TRANSACTIONMANAGER_INFORMATION_CLASS as TRANSACTIONMANAGER_INFORMATION_CLASS;
-pub const _RESOURCEMANAGER_INFORMATION_CLASS_ResourceManagerBasicInformation:
-    _RESOURCEMANAGER_INFORMATION_CLASS = 0;
-pub const _RESOURCEMANAGER_INFORMATION_CLASS_ResourceManagerCompletionInformation:
-    _RESOURCEMANAGER_INFORMATION_CLASS = 1;
+pub const _RESOURCEMANAGER_INFORMATION_CLASS_ResourceManagerBasicInformation: _RESOURCEMANAGER_INFORMATION_CLASS = 0;
+pub const _RESOURCEMANAGER_INFORMATION_CLASS_ResourceManagerCompletionInformation: _RESOURCEMANAGER_INFORMATION_CLASS = 1;
 pub type _RESOURCEMANAGER_INFORMATION_CLASS = ::std::os::raw::c_int;
 pub use self::_RESOURCEMANAGER_INFORMATION_CLASS as RESOURCEMANAGER_INFORMATION_CLASS;
 #[repr(C)]
@@ -25452,10 +24609,8 @@ pub struct _ENLISTMENT_CRM_INFORMATION {
 }
 pub type ENLISTMENT_CRM_INFORMATION = _ENLISTMENT_CRM_INFORMATION;
 pub type PENLISTMENT_CRM_INFORMATION = *mut _ENLISTMENT_CRM_INFORMATION;
-pub const _ENLISTMENT_INFORMATION_CLASS_EnlistmentBasicInformation: _ENLISTMENT_INFORMATION_CLASS =
-    0;
-pub const _ENLISTMENT_INFORMATION_CLASS_EnlistmentRecoveryInformation:
-    _ENLISTMENT_INFORMATION_CLASS = 1;
+pub const _ENLISTMENT_INFORMATION_CLASS_EnlistmentBasicInformation: _ENLISTMENT_INFORMATION_CLASS = 0;
+pub const _ENLISTMENT_INFORMATION_CLASS_EnlistmentRecoveryInformation: _ENLISTMENT_INFORMATION_CLASS = 1;
 pub const _ENLISTMENT_INFORMATION_CLASS_EnlistmentCrmInformation: _ENLISTMENT_INFORMATION_CLASS = 2;
 pub type _ENLISTMENT_INFORMATION_CLASS = ::std::os::raw::c_int;
 pub use self::_ENLISTMENT_INFORMATION_CLASS as ENLISTMENT_INFORMATION_CLASS;
@@ -25500,8 +24655,7 @@ pub struct _TP_CALLBACK_INSTANCE {
 }
 pub type TP_CALLBACK_INSTANCE = _TP_CALLBACK_INSTANCE;
 pub type PTP_CALLBACK_INSTANCE = *mut _TP_CALLBACK_INSTANCE;
-pub type PTP_SIMPLE_CALLBACK =
-    unsafe extern "C" fn(Instance: PTP_CALLBACK_INSTANCE, Context: PVOID);
+pub type PTP_SIMPLE_CALLBACK = unsafe extern "C" fn(Instance: PTP_CALLBACK_INSTANCE, Context: PVOID);
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct _TP_POOL {
@@ -25531,8 +24685,7 @@ pub struct _TP_CLEANUP_GROUP {
 }
 pub type TP_CLEANUP_GROUP = _TP_CLEANUP_GROUP;
 pub type PTP_CLEANUP_GROUP = *mut _TP_CLEANUP_GROUP;
-pub type PTP_CLEANUP_GROUP_CANCEL_CALLBACK =
-    unsafe extern "C" fn(ObjectContext: PVOID, CleanupContext: PVOID);
+pub type PTP_CLEANUP_GROUP_CANCEL_CALLBACK = unsafe extern "C" fn(ObjectContext: PVOID, CleanupContext: PVOID);
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct _TP_CALLBACK_ENVIRON_V3 {
@@ -25595,11 +24748,7 @@ impl _TP_CALLBACK_ENVIRON_V3__bindgen_ty_1__bindgen_ty_1 {
         }
     }
     #[inline]
-    pub fn new_bitfield_1(
-        LongFunction: DWORD,
-        Persistent: DWORD,
-        Private: DWORD,
-    ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
+    pub fn new_bitfield_1(LongFunction: DWORD, Persistent: DWORD, Private: DWORD) -> __BindgenBitfieldUnit<[u8; 4usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
             let LongFunction: u32 = unsafe { ::std::mem::transmute(LongFunction) };
@@ -25626,8 +24775,7 @@ pub struct _TP_WORK {
 }
 pub type TP_WORK = _TP_WORK;
 pub type PTP_WORK = *mut _TP_WORK;
-pub type PTP_WORK_CALLBACK =
-    unsafe extern "C" fn(Instance: PTP_CALLBACK_INSTANCE, Context: PVOID, Work: PTP_WORK);
+pub type PTP_WORK_CALLBACK = unsafe extern "C" fn(Instance: PTP_CALLBACK_INSTANCE, Context: PVOID, Work: PTP_WORK);
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct _TP_TIMER {
@@ -25635,8 +24783,7 @@ pub struct _TP_TIMER {
 }
 pub type TP_TIMER = _TP_TIMER;
 pub type PTP_TIMER = *mut _TP_TIMER;
-pub type PTP_TIMER_CALLBACK =
-    unsafe extern "C" fn(Instance: PTP_CALLBACK_INSTANCE, Context: PVOID, Timer: PTP_TIMER);
+pub type PTP_TIMER_CALLBACK = unsafe extern "C" fn(Instance: PTP_CALLBACK_INSTANCE, Context: PVOID, Timer: PTP_TIMER);
 pub type TP_WAIT_RESULT = DWORD;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -25645,12 +24792,7 @@ pub struct _TP_WAIT {
 }
 pub type TP_WAIT = _TP_WAIT;
 pub type PTP_WAIT = *mut _TP_WAIT;
-pub type PTP_WAIT_CALLBACK = unsafe extern "C" fn(
-    Instance: PTP_CALLBACK_INSTANCE,
-    Context: PVOID,
-    Wait: PTP_WAIT,
-    WaitResult: TP_WAIT_RESULT,
-);
+pub type PTP_WAIT_CALLBACK = unsafe extern "C" fn(Instance: PTP_CALLBACK_INSTANCE, Context: PVOID, Wait: PTP_WAIT, WaitResult: TP_WAIT_RESULT);
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct _TP_IO {
@@ -26055,10 +25197,8 @@ pub const _FINDEX_SEARCH_OPS_FindExSearchLimitToDevices: _FINDEX_SEARCH_OPS = 2;
 pub const _FINDEX_SEARCH_OPS_FindExSearchMaxSearchOp: _FINDEX_SEARCH_OPS = 3;
 pub type _FINDEX_SEARCH_OPS = ::std::os::raw::c_int;
 pub use self::_FINDEX_SEARCH_OPS as FINDEX_SEARCH_OPS;
-pub const _READ_DIRECTORY_NOTIFY_INFORMATION_CLASS_ReadDirectoryNotifyInformation:
-    _READ_DIRECTORY_NOTIFY_INFORMATION_CLASS = 1;
-pub const _READ_DIRECTORY_NOTIFY_INFORMATION_CLASS_ReadDirectoryNotifyExtendedInformation:
-    _READ_DIRECTORY_NOTIFY_INFORMATION_CLASS = 2;
+pub const _READ_DIRECTORY_NOTIFY_INFORMATION_CLASS_ReadDirectoryNotifyInformation: _READ_DIRECTORY_NOTIFY_INFORMATION_CLASS = 1;
+pub const _READ_DIRECTORY_NOTIFY_INFORMATION_CLASS_ReadDirectoryNotifyExtendedInformation: _READ_DIRECTORY_NOTIFY_INFORMATION_CLASS = 2;
 pub type _READ_DIRECTORY_NOTIFY_INFORMATION_CLASS = ::std::os::raw::c_int;
 pub use self::_READ_DIRECTORY_NOTIFY_INFORMATION_CLASS as READ_DIRECTORY_NOTIFY_INFORMATION_CLASS;
 pub type PREAD_DIRECTORY_NOTIFY_INFORMATION_CLASS = *mut _READ_DIRECTORY_NOTIFY_INFORMATION_CLASS;
@@ -26077,8 +25217,7 @@ pub const _FILE_INFO_BY_HANDLE_CLASS_FileStreamInfo: _FILE_INFO_BY_HANDLE_CLASS 
 pub const _FILE_INFO_BY_HANDLE_CLASS_FileCompressionInfo: _FILE_INFO_BY_HANDLE_CLASS = 8;
 pub const _FILE_INFO_BY_HANDLE_CLASS_FileAttributeTagInfo: _FILE_INFO_BY_HANDLE_CLASS = 9;
 pub const _FILE_INFO_BY_HANDLE_CLASS_FileIdBothDirectoryInfo: _FILE_INFO_BY_HANDLE_CLASS = 10;
-pub const _FILE_INFO_BY_HANDLE_CLASS_FileIdBothDirectoryRestartInfo: _FILE_INFO_BY_HANDLE_CLASS =
-    11;
+pub const _FILE_INFO_BY_HANDLE_CLASS_FileIdBothDirectoryRestartInfo: _FILE_INFO_BY_HANDLE_CLASS = 11;
 pub const _FILE_INFO_BY_HANDLE_CLASS_FileIoPriorityHintInfo: _FILE_INFO_BY_HANDLE_CLASS = 12;
 pub const _FILE_INFO_BY_HANDLE_CLASS_FileRemoteProtocolInfo: _FILE_INFO_BY_HANDLE_CLASS = 13;
 pub const _FILE_INFO_BY_HANDLE_CLASS_FileFullDirectoryInfo: _FILE_INFO_BY_HANDLE_CLASS = 14;
@@ -26087,8 +25226,7 @@ pub const _FILE_INFO_BY_HANDLE_CLASS_FileStorageInfo: _FILE_INFO_BY_HANDLE_CLASS
 pub const _FILE_INFO_BY_HANDLE_CLASS_FileAlignmentInfo: _FILE_INFO_BY_HANDLE_CLASS = 17;
 pub const _FILE_INFO_BY_HANDLE_CLASS_FileIdInfo: _FILE_INFO_BY_HANDLE_CLASS = 18;
 pub const _FILE_INFO_BY_HANDLE_CLASS_FileIdExtdDirectoryInfo: _FILE_INFO_BY_HANDLE_CLASS = 19;
-pub const _FILE_INFO_BY_HANDLE_CLASS_FileIdExtdDirectoryRestartInfo: _FILE_INFO_BY_HANDLE_CLASS =
-    20;
+pub const _FILE_INFO_BY_HANDLE_CLASS_FileIdExtdDirectoryRestartInfo: _FILE_INFO_BY_HANDLE_CLASS = 20;
 pub const _FILE_INFO_BY_HANDLE_CLASS_FileDispositionInfoEx: _FILE_INFO_BY_HANDLE_CLASS = 21;
 pub const _FILE_INFO_BY_HANDLE_CLASS_FileRenameInfoEx: _FILE_INFO_BY_HANDLE_CLASS = 22;
 pub const _FILE_INFO_BY_HANDLE_CLASS_FileCaseSensitiveInfo: _FILE_INFO_BY_HANDLE_CLASS = 23;
@@ -26103,11 +25241,7 @@ pub type LPCRITICAL_SECTION = PRTL_CRITICAL_SECTION;
 pub type CRITICAL_SECTION_DEBUG = RTL_CRITICAL_SECTION_DEBUG;
 pub type PCRITICAL_SECTION_DEBUG = PRTL_CRITICAL_SECTION_DEBUG;
 pub type LPCRITICAL_SECTION_DEBUG = PRTL_CRITICAL_SECTION_DEBUG;
-pub type LPOVERLAPPED_COMPLETION_ROUTINE = unsafe extern "C" fn(
-    dwErrorCode: DWORD,
-    dwNumberOfBytesTransfered: DWORD,
-    lpOverlapped: LPOVERLAPPED,
-);
+pub type LPOVERLAPPED_COMPLETION_ROUTINE = unsafe extern "C" fn(dwErrorCode: DWORD, dwNumberOfBytesTransfered: DWORD, lpOverlapped: LPOVERLAPPED);
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct _PROCESS_HEAP_ENTRY {
@@ -26339,24 +25473,10 @@ extern "C" {
     pub fn GetCurrentDirectoryW(nBufferLength: DWORD, lpBuffer: LPWSTR) -> DWORD;
 }
 extern "C" {
-    pub fn SearchPathW(
-        lpPath: LPCWSTR,
-        lpFileName: LPCWSTR,
-        lpExtension: LPCWSTR,
-        nBufferLength: DWORD,
-        lpBuffer: LPWSTR,
-        lpFilePart: *mut LPWSTR,
-    ) -> DWORD;
+    pub fn SearchPathW(lpPath: LPCWSTR, lpFileName: LPCWSTR, lpExtension: LPCWSTR, nBufferLength: DWORD, lpBuffer: LPWSTR, lpFilePart: *mut LPWSTR) -> DWORD;
 }
 extern "C" {
-    pub fn SearchPathA(
-        lpPath: LPCSTR,
-        lpFileName: LPCSTR,
-        lpExtension: LPCSTR,
-        nBufferLength: DWORD,
-        lpBuffer: LPSTR,
-        lpFilePart: *mut LPSTR,
-    ) -> DWORD;
+    pub fn SearchPathA(lpPath: LPCSTR, lpFileName: LPCSTR, lpExtension: LPCSTR, nBufferLength: DWORD, lpBuffer: LPSTR, lpFilePart: *mut LPSTR) -> DWORD;
 }
 extern "C" {
     pub fn NeedCurrentDirectoryForExePathA(ExeName: LPCSTR) -> BOOL;
@@ -26368,16 +25488,10 @@ extern "C" {
     pub fn CompareFileTime(lpFileTime1: *const FILETIME, lpFileTime2: *const FILETIME) -> LONG;
 }
 extern "C" {
-    pub fn CreateDirectoryA(
-        lpPathName: LPCSTR,
-        lpSecurityAttributes: LPSECURITY_ATTRIBUTES,
-    ) -> BOOL;
+    pub fn CreateDirectoryA(lpPathName: LPCSTR, lpSecurityAttributes: LPSECURITY_ATTRIBUTES) -> BOOL;
 }
 extern "C" {
-    pub fn CreateDirectoryW(
-        lpPathName: LPCWSTR,
-        lpSecurityAttributes: LPSECURITY_ATTRIBUTES,
-    ) -> BOOL;
+    pub fn CreateDirectoryW(lpPathName: LPCWSTR, lpSecurityAttributes: LPSECURITY_ATTRIBUTES) -> BOOL;
 }
 extern "C" {
     pub fn CreateFileA(
@@ -26414,10 +25528,7 @@ extern "C" {
     pub fn DeleteVolumeMountPointW(lpszVolumeMountPoint: LPCWSTR) -> BOOL;
 }
 extern "C" {
-    pub fn FileTimeToLocalFileTime(
-        lpFileTime: *const FILETIME,
-        lpLocalFileTime: LPFILETIME,
-    ) -> BOOL;
+    pub fn FileTimeToLocalFileTime(lpFileTime: *const FILETIME, lpLocalFileTime: LPFILETIME) -> BOOL;
 }
 extern "C" {
     pub fn FindClose(hFindFile: HANDLE) -> BOOL;
@@ -26426,18 +25537,10 @@ extern "C" {
     pub fn FindCloseChangeNotification(hChangeHandle: HANDLE) -> BOOL;
 }
 extern "C" {
-    pub fn FindFirstChangeNotificationA(
-        lpPathName: LPCSTR,
-        bWatchSubtree: BOOL,
-        dwNotifyFilter: DWORD,
-    ) -> HANDLE;
+    pub fn FindFirstChangeNotificationA(lpPathName: LPCSTR, bWatchSubtree: BOOL, dwNotifyFilter: DWORD) -> HANDLE;
 }
 extern "C" {
-    pub fn FindFirstChangeNotificationW(
-        lpPathName: LPCWSTR,
-        bWatchSubtree: BOOL,
-        dwNotifyFilter: DWORD,
-    ) -> HANDLE;
+    pub fn FindFirstChangeNotificationW(lpPathName: LPCWSTR, bWatchSubtree: BOOL, dwNotifyFilter: DWORD) -> HANDLE;
 }
 extern "C" {
     pub fn FindFirstFileA(lpFileName: LPCSTR, lpFindFileData: LPWIN32_FIND_DATAA) -> HANDLE;
@@ -26478,11 +25581,7 @@ extern "C" {
     pub fn FindNextFileW(hFindFile: HANDLE, lpFindFileData: LPWIN32_FIND_DATAW) -> BOOL;
 }
 extern "C" {
-    pub fn FindNextVolumeW(
-        hFindVolume: HANDLE,
-        lpszVolumeName: LPWSTR,
-        cchBufferLength: DWORD,
-    ) -> BOOL;
+    pub fn FindNextVolumeW(hFindVolume: HANDLE, lpszVolumeName: LPWSTR, cchBufferLength: DWORD) -> BOOL;
 }
 extern "C" {
     pub fn FindVolumeClose(hFindVolume: HANDLE) -> BOOL;
@@ -26542,16 +25641,10 @@ pub struct DISK_SPACE_INFORMATION {
     pub BytesPerSector: DWORD,
 }
 extern "C" {
-    pub fn GetDiskSpaceInformationA(
-        rootPath: LPCSTR,
-        diskSpaceInfo: *mut DISK_SPACE_INFORMATION,
-    ) -> HRESULT;
+    pub fn GetDiskSpaceInformationA(rootPath: LPCSTR, diskSpaceInfo: *mut DISK_SPACE_INFORMATION) -> HRESULT;
 }
 extern "C" {
-    pub fn GetDiskSpaceInformationW(
-        rootPath: LPCWSTR,
-        diskSpaceInfo: *mut DISK_SPACE_INFORMATION,
-    ) -> HRESULT;
+    pub fn GetDiskSpaceInformationW(rootPath: LPCWSTR, diskSpaceInfo: *mut DISK_SPACE_INFORMATION) -> HRESULT;
 }
 extern "C" {
     pub fn GetDriveTypeA(lpRootPathName: LPCSTR) -> UINT;
@@ -26578,18 +25671,10 @@ extern "C" {
     pub fn GetFileAttributesW(lpFileName: LPCWSTR) -> DWORD;
 }
 extern "C" {
-    pub fn GetFileAttributesExA(
-        lpFileName: LPCSTR,
-        fInfoLevelId: GET_FILEEX_INFO_LEVELS,
-        lpFileInformation: LPVOID,
-    ) -> BOOL;
+    pub fn GetFileAttributesExA(lpFileName: LPCSTR, fInfoLevelId: GET_FILEEX_INFO_LEVELS, lpFileInformation: LPVOID) -> BOOL;
 }
 extern "C" {
-    pub fn GetFileAttributesExW(
-        lpFileName: LPCWSTR,
-        fInfoLevelId: GET_FILEEX_INFO_LEVELS,
-        lpFileInformation: LPVOID,
-    ) -> BOOL;
+    pub fn GetFileAttributesExW(lpFileName: LPCWSTR, fInfoLevelId: GET_FILEEX_INFO_LEVELS, lpFileInformation: LPVOID) -> BOOL;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -26609,10 +25694,7 @@ pub type BY_HANDLE_FILE_INFORMATION = _BY_HANDLE_FILE_INFORMATION;
 pub type PBY_HANDLE_FILE_INFORMATION = *mut _BY_HANDLE_FILE_INFORMATION;
 pub type LPBY_HANDLE_FILE_INFORMATION = *mut _BY_HANDLE_FILE_INFORMATION;
 extern "C" {
-    pub fn GetFileInformationByHandle(
-        hFile: HANDLE,
-        lpFileInformation: LPBY_HANDLE_FILE_INFORMATION,
-    ) -> BOOL;
+    pub fn GetFileInformationByHandle(hFile: HANDLE, lpFileInformation: LPBY_HANDLE_FILE_INFORMATION) -> BOOL;
 }
 extern "C" {
     pub fn GetFileSize(hFile: HANDLE, lpFileSizeHigh: LPDWORD) -> DWORD;
@@ -26624,44 +25706,19 @@ extern "C" {
     pub fn GetFileType(hFile: HANDLE) -> DWORD;
 }
 extern "C" {
-    pub fn GetFinalPathNameByHandleA(
-        hFile: HANDLE,
-        lpszFilePath: LPSTR,
-        cchFilePath: DWORD,
-        dwFlags: DWORD,
-    ) -> DWORD;
+    pub fn GetFinalPathNameByHandleA(hFile: HANDLE, lpszFilePath: LPSTR, cchFilePath: DWORD, dwFlags: DWORD) -> DWORD;
 }
 extern "C" {
-    pub fn GetFinalPathNameByHandleW(
-        hFile: HANDLE,
-        lpszFilePath: LPWSTR,
-        cchFilePath: DWORD,
-        dwFlags: DWORD,
-    ) -> DWORD;
+    pub fn GetFinalPathNameByHandleW(hFile: HANDLE, lpszFilePath: LPWSTR, cchFilePath: DWORD, dwFlags: DWORD) -> DWORD;
 }
 extern "C" {
-    pub fn GetFileTime(
-        hFile: HANDLE,
-        lpCreationTime: LPFILETIME,
-        lpLastAccessTime: LPFILETIME,
-        lpLastWriteTime: LPFILETIME,
-    ) -> BOOL;
+    pub fn GetFileTime(hFile: HANDLE, lpCreationTime: LPFILETIME, lpLastAccessTime: LPFILETIME, lpLastWriteTime: LPFILETIME) -> BOOL;
 }
 extern "C" {
-    pub fn GetFullPathNameW(
-        lpFileName: LPCWSTR,
-        nBufferLength: DWORD,
-        lpBuffer: LPWSTR,
-        lpFilePart: *mut LPWSTR,
-    ) -> DWORD;
+    pub fn GetFullPathNameW(lpFileName: LPCWSTR, nBufferLength: DWORD, lpBuffer: LPWSTR, lpFilePart: *mut LPWSTR) -> DWORD;
 }
 extern "C" {
-    pub fn GetFullPathNameA(
-        lpFileName: LPCSTR,
-        nBufferLength: DWORD,
-        lpBuffer: LPSTR,
-        lpFilePart: *mut LPSTR,
-    ) -> DWORD;
+    pub fn GetFullPathNameA(lpFileName: LPCSTR, nBufferLength: DWORD, lpBuffer: LPSTR, lpFilePart: *mut LPSTR) -> DWORD;
 }
 extern "C" {
     pub fn GetLogicalDrives() -> DWORD;
@@ -26673,26 +25730,13 @@ extern "C" {
     pub fn GetLongPathNameA(lpszShortPath: LPCSTR, lpszLongPath: LPSTR, cchBuffer: DWORD) -> DWORD;
 }
 extern "C" {
-    pub fn GetLongPathNameW(
-        lpszShortPath: LPCWSTR,
-        lpszLongPath: LPWSTR,
-        cchBuffer: DWORD,
-    ) -> DWORD;
+    pub fn GetLongPathNameW(lpszShortPath: LPCWSTR, lpszLongPath: LPWSTR, cchBuffer: DWORD) -> DWORD;
 }
 extern "C" {
-    pub fn GetShortPathNameW(
-        lpszLongPath: LPCWSTR,
-        lpszShortPath: LPWSTR,
-        cchBuffer: DWORD,
-    ) -> DWORD;
+    pub fn GetShortPathNameW(lpszLongPath: LPCWSTR, lpszShortPath: LPWSTR, cchBuffer: DWORD) -> DWORD;
 }
 extern "C" {
-    pub fn GetTempFileNameW(
-        lpPathName: LPCWSTR,
-        lpPrefixString: LPCWSTR,
-        uUnique: UINT,
-        lpTempFileName: LPWSTR,
-    ) -> UINT;
+    pub fn GetTempFileNameW(lpPathName: LPCWSTR, lpPrefixString: LPCWSTR, uUnique: UINT, lpTempFileName: LPWSTR) -> UINT;
 }
 extern "C" {
     pub fn GetVolumeInformationByHandleW(
@@ -26719,26 +25763,13 @@ extern "C" {
     ) -> BOOL;
 }
 extern "C" {
-    pub fn GetVolumePathNameW(
-        lpszFileName: LPCWSTR,
-        lpszVolumePathName: LPWSTR,
-        cchBufferLength: DWORD,
-    ) -> BOOL;
+    pub fn GetVolumePathNameW(lpszFileName: LPCWSTR, lpszVolumePathName: LPWSTR, cchBufferLength: DWORD) -> BOOL;
 }
 extern "C" {
-    pub fn LocalFileTimeToFileTime(
-        lpLocalFileTime: *const FILETIME,
-        lpFileTime: LPFILETIME,
-    ) -> BOOL;
+    pub fn LocalFileTimeToFileTime(lpLocalFileTime: *const FILETIME, lpFileTime: LPFILETIME) -> BOOL;
 }
 extern "C" {
-    pub fn LockFile(
-        hFile: HANDLE,
-        dwFileOffsetLow: DWORD,
-        dwFileOffsetHigh: DWORD,
-        nNumberOfBytesToLockLow: DWORD,
-        nNumberOfBytesToLockHigh: DWORD,
-    ) -> BOOL;
+    pub fn LockFile(hFile: HANDLE, dwFileOffsetLow: DWORD, dwFileOffsetHigh: DWORD, nNumberOfBytesToLockLow: DWORD, nNumberOfBytesToLockHigh: DWORD) -> BOOL;
 }
 extern "C" {
     pub fn LockFileEx(
@@ -26754,13 +25785,7 @@ extern "C" {
     pub fn QueryDosDeviceW(lpDeviceName: LPCWSTR, lpTargetPath: LPWSTR, ucchMax: DWORD) -> DWORD;
 }
 extern "C" {
-    pub fn ReadFile(
-        hFile: HANDLE,
-        lpBuffer: LPVOID,
-        nNumberOfBytesToRead: DWORD,
-        lpNumberOfBytesRead: LPDWORD,
-        lpOverlapped: LPOVERLAPPED,
-    ) -> BOOL;
+    pub fn ReadFile(hFile: HANDLE, lpBuffer: LPVOID, nNumberOfBytesToRead: DWORD, lpNumberOfBytesRead: LPDWORD, lpOverlapped: LPOVERLAPPED) -> BOOL;
 }
 extern "C" {
     pub fn ReadFileEx(
@@ -26796,36 +25821,16 @@ extern "C" {
     pub fn SetFileAttributesW(lpFileName: LPCWSTR, dwFileAttributes: DWORD) -> BOOL;
 }
 extern "C" {
-    pub fn SetFileInformationByHandle(
-        hFile: HANDLE,
-        FileInformationClass: FILE_INFO_BY_HANDLE_CLASS,
-        lpFileInformation: LPVOID,
-        dwBufferSize: DWORD,
-    ) -> BOOL;
+    pub fn SetFileInformationByHandle(hFile: HANDLE, FileInformationClass: FILE_INFO_BY_HANDLE_CLASS, lpFileInformation: LPVOID, dwBufferSize: DWORD) -> BOOL;
 }
 extern "C" {
-    pub fn SetFilePointer(
-        hFile: HANDLE,
-        lDistanceToMove: LONG,
-        lpDistanceToMoveHigh: PLONG,
-        dwMoveMethod: DWORD,
-    ) -> DWORD;
+    pub fn SetFilePointer(hFile: HANDLE, lDistanceToMove: LONG, lpDistanceToMoveHigh: PLONG, dwMoveMethod: DWORD) -> DWORD;
 }
 extern "C" {
-    pub fn SetFilePointerEx(
-        hFile: HANDLE,
-        liDistanceToMove: LARGE_INTEGER,
-        lpNewFilePointer: PLARGE_INTEGER,
-        dwMoveMethod: DWORD,
-    ) -> BOOL;
+    pub fn SetFilePointerEx(hFile: HANDLE, liDistanceToMove: LARGE_INTEGER, lpNewFilePointer: PLARGE_INTEGER, dwMoveMethod: DWORD) -> BOOL;
 }
 extern "C" {
-    pub fn SetFileTime(
-        hFile: HANDLE,
-        lpCreationTime: *const FILETIME,
-        lpLastAccessTime: *const FILETIME,
-        lpLastWriteTime: *const FILETIME,
-    ) -> BOOL;
+    pub fn SetFileTime(hFile: HANDLE, lpCreationTime: *const FILETIME, lpLastAccessTime: *const FILETIME, lpLastWriteTime: *const FILETIME) -> BOOL;
 }
 extern "C" {
     pub fn SetFileValidData(hFile: HANDLE, ValidDataLength: LONGLONG) -> BOOL;
@@ -26849,13 +25854,7 @@ extern "C" {
     ) -> BOOL;
 }
 extern "C" {
-    pub fn WriteFile(
-        hFile: HANDLE,
-        lpBuffer: LPCVOID,
-        nNumberOfBytesToWrite: DWORD,
-        lpNumberOfBytesWritten: LPDWORD,
-        lpOverlapped: LPOVERLAPPED,
-    ) -> BOOL;
+    pub fn WriteFile(hFile: HANDLE, lpBuffer: LPCVOID, nNumberOfBytesToWrite: DWORD, lpNumberOfBytesWritten: LPDWORD, lpOverlapped: LPOVERLAPPED) -> BOOL;
 }
 extern "C" {
     pub fn WriteFileEx(
@@ -26879,19 +25878,10 @@ extern "C" {
     pub fn GetTempPathW(nBufferLength: DWORD, lpBuffer: LPWSTR) -> DWORD;
 }
 extern "C" {
-    pub fn GetVolumeNameForVolumeMountPointW(
-        lpszVolumeMountPoint: LPCWSTR,
-        lpszVolumeName: LPWSTR,
-        cchBufferLength: DWORD,
-    ) -> BOOL;
+    pub fn GetVolumeNameForVolumeMountPointW(lpszVolumeMountPoint: LPCWSTR, lpszVolumeName: LPWSTR, cchBufferLength: DWORD) -> BOOL;
 }
 extern "C" {
-    pub fn GetVolumePathNamesForVolumeNameW(
-        lpszVolumeName: LPCWSTR,
-        lpszVolumePathNames: LPWCH,
-        cchBufferLength: DWORD,
-        lpcchReturnLength: PDWORD,
-    ) -> BOOL;
+    pub fn GetVolumePathNamesForVolumeNameW(lpszVolumeName: LPCWSTR, lpszVolumePathNames: LPWCH, cchBufferLength: DWORD, lpcchReturnLength: PDWORD) -> BOOL;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -26916,11 +25906,7 @@ extern "C" {
     ) -> HANDLE;
 }
 extern "C" {
-    pub fn SetFileIoOverlappedRange(
-        FileHandle: HANDLE,
-        OverlappedRangeStart: PUCHAR,
-        Length: ULONG,
-    ) -> BOOL;
+    pub fn SetFileIoOverlappedRange(FileHandle: HANDLE, OverlappedRangeStart: PUCHAR, Length: ULONG) -> BOOL;
 }
 extern "C" {
     pub fn GetCompressedFileSizeA(lpFileName: LPCSTR, lpFileSizeHigh: LPDWORD) -> DWORD;
@@ -26941,12 +25927,7 @@ pub struct _WIN32_FIND_STREAM_DATA {
 pub type WIN32_FIND_STREAM_DATA = _WIN32_FIND_STREAM_DATA;
 pub type PWIN32_FIND_STREAM_DATA = *mut _WIN32_FIND_STREAM_DATA;
 extern "C" {
-    pub fn FindFirstStreamW(
-        lpFileName: LPCWSTR,
-        InfoLevel: STREAM_INFO_LEVELS,
-        lpFindStreamData: LPVOID,
-        dwFlags: DWORD,
-    ) -> HANDLE;
+    pub fn FindFirstStreamW(lpFileName: LPCWSTR, InfoLevel: STREAM_INFO_LEVELS, lpFindStreamData: LPVOID, dwFlags: DWORD) -> HANDLE;
 }
 extern "C" {
     pub fn FindNextStreamW(hFindStream: HANDLE, lpFindStreamData: LPVOID) -> BOOL;
@@ -26958,12 +25939,7 @@ extern "C" {
     pub fn GetTempPathA(nBufferLength: DWORD, lpBuffer: LPSTR) -> DWORD;
 }
 extern "C" {
-    pub fn FindFirstFileNameW(
-        lpFileName: LPCWSTR,
-        dwFlags: DWORD,
-        StringLength: LPDWORD,
-        LinkName: PWSTR,
-    ) -> HANDLE;
+    pub fn FindFirstFileNameW(lpFileName: LPCWSTR, dwFlags: DWORD, StringLength: LPDWORD, LinkName: PWSTR) -> HANDLE;
 }
 extern "C" {
     pub fn FindNextFileNameW(hFindStream: HANDLE, StringLength: LPDWORD, LinkName: PWSTR) -> BOOL;
@@ -26981,12 +25957,7 @@ extern "C" {
     ) -> BOOL;
 }
 extern "C" {
-    pub fn GetTempFileNameA(
-        lpPathName: LPCSTR,
-        lpPrefixString: LPCSTR,
-        uUnique: UINT,
-        lpTempFileName: LPSTR,
-    ) -> UINT;
+    pub fn GetTempFileNameA(lpPathName: LPCSTR, lpPrefixString: LPCSTR, uUnique: UINT, lpTempFileName: LPSTR) -> UINT;
 }
 extern "C" {
     pub fn SetFileApisToOEM();
@@ -26995,17 +25966,10 @@ extern "C" {
     pub fn SetFileApisToANSI();
 }
 extern "C" {
-    pub fn CopyFileFromAppW(
-        lpExistingFileName: LPCWSTR,
-        lpNewFileName: LPCWSTR,
-        bFailIfExists: BOOL,
-    ) -> BOOL;
+    pub fn CopyFileFromAppW(lpExistingFileName: LPCWSTR, lpNewFileName: LPCWSTR, bFailIfExists: BOOL) -> BOOL;
 }
 extern "C" {
-    pub fn CreateDirectoryFromAppW(
-        lpPathName: LPCWSTR,
-        lpSecurityAttributes: LPSECURITY_ATTRIBUTES,
-    ) -> BOOL;
+    pub fn CreateDirectoryFromAppW(lpPathName: LPCWSTR, lpSecurityAttributes: LPSECURITY_ATTRIBUTES) -> BOOL;
 }
 extern "C" {
     pub fn CreateFileFromAppW(
@@ -27041,11 +26005,7 @@ extern "C" {
     ) -> HANDLE;
 }
 extern "C" {
-    pub fn GetFileAttributesExFromAppW(
-        lpFileName: LPCWSTR,
-        fInfoLevelId: GET_FILEEX_INFO_LEVELS,
-        lpFileInformation: LPVOID,
-    ) -> BOOL;
+    pub fn GetFileAttributesExFromAppW(lpFileName: LPCWSTR, fInfoLevelId: GET_FILEEX_INFO_LEVELS, lpFileInformation: LPVOID) -> BOOL;
 }
 extern "C" {
     pub fn MoveFileFromAppW(lpExistingFileName: LPCWSTR, lpNewFileName: LPCWSTR) -> BOOL;
@@ -27079,11 +26039,7 @@ extern "C" {
     pub fn OutputDebugStringW(lpOutputString: LPCWSTR);
 }
 extern "C" {
-    pub fn ContinueDebugEvent(
-        dwProcessId: DWORD,
-        dwThreadId: DWORD,
-        dwContinueStatus: DWORD,
-    ) -> BOOL;
+    pub fn ContinueDebugEvent(dwProcessId: DWORD, dwThreadId: DWORD, dwContinueStatus: DWORD) -> BOOL;
 }
 extern "C" {
     pub fn WaitForDebugEvent(lpDebugEvent: LPDEBUG_EVENT, dwMilliseconds: DWORD) -> BOOL;
@@ -27113,18 +26069,10 @@ extern "C" {
     pub fn DecodeSystemPointer(Ptr: PVOID) -> PVOID;
 }
 extern "C" {
-    pub fn EncodeRemotePointer(
-        ProcessHandle: HANDLE,
-        Ptr: PVOID,
-        EncodedPtr: *mut PVOID,
-    ) -> HRESULT;
+    pub fn EncodeRemotePointer(ProcessHandle: HANDLE, Ptr: PVOID, EncodedPtr: *mut PVOID) -> HRESULT;
 }
 extern "C" {
-    pub fn DecodeRemotePointer(
-        ProcessHandle: HANDLE,
-        Ptr: PVOID,
-        DecodedPtr: *mut PVOID,
-    ) -> HRESULT;
+    pub fn DecodeRemotePointer(ProcessHandle: HANDLE, Ptr: PVOID, DecodedPtr: *mut PVOID) -> HRESULT;
 }
 extern "C" {
     pub fn Beep(dwFreq: DWORD, dwDuration: DWORD) -> BOOL;
@@ -27152,24 +26100,16 @@ extern "C" {
 extern "C" {
     pub fn SetHandleInformation(hObject: HANDLE, dwMask: DWORD, dwFlags: DWORD) -> BOOL;
 }
-pub type PTOP_LEVEL_EXCEPTION_FILTER =
-    unsafe extern "C" fn(ExceptionInfo: *mut _EXCEPTION_POINTERS) -> LONG;
+pub type PTOP_LEVEL_EXCEPTION_FILTER = unsafe extern "C" fn(ExceptionInfo: *mut _EXCEPTION_POINTERS) -> LONG;
 pub type LPTOP_LEVEL_EXCEPTION_FILTER = PTOP_LEVEL_EXCEPTION_FILTER;
 extern "C" {
-    pub fn RaiseException(
-        dwExceptionCode: DWORD,
-        dwExceptionFlags: DWORD,
-        nNumberOfArguments: DWORD,
-        lpArguments: *const ULONG_PTR,
-    );
+    pub fn RaiseException(dwExceptionCode: DWORD, dwExceptionFlags: DWORD, nNumberOfArguments: DWORD, lpArguments: *const ULONG_PTR);
 }
 extern "C" {
     pub fn UnhandledExceptionFilter(ExceptionInfo: *mut _EXCEPTION_POINTERS) -> LONG;
 }
 extern "C" {
-    pub fn SetUnhandledExceptionFilter(
-        lpTopLevelExceptionFilter: LPTOP_LEVEL_EXCEPTION_FILTER,
-    ) -> LPTOP_LEVEL_EXCEPTION_FILTER;
+    pub fn SetUnhandledExceptionFilter(lpTopLevelExceptionFilter: LPTOP_LEVEL_EXCEPTION_FILTER) -> LPTOP_LEVEL_EXCEPTION_FILTER;
 }
 extern "C" {
     pub fn GetLastError() -> DWORD;
@@ -27184,8 +26124,7 @@ extern "C" {
     pub fn SetErrorMode(uMode: UINT) -> UINT;
 }
 extern "C" {
-    pub fn AddVectoredExceptionHandler(First: ULONG, Handler: PVECTORED_EXCEPTION_HANDLER)
-        -> PVOID;
+    pub fn AddVectoredExceptionHandler(First: ULONG, Handler: PVECTORED_EXCEPTION_HANDLER) -> PVOID;
 }
 extern "C" {
     pub fn RemoveVectoredExceptionHandler(Handle: PVOID) -> ULONG;
@@ -27197,11 +26136,7 @@ extern "C" {
     pub fn RemoveVectoredContinueHandler(Handle: PVOID) -> ULONG;
 }
 extern "C" {
-    pub fn RaiseFailFastException(
-        pExceptionRecord: PEXCEPTION_RECORD,
-        pContextRecord: PCONTEXT,
-        dwFlags: DWORD,
-    );
+    pub fn RaiseFailFastException(pExceptionRecord: PEXCEPTION_RECORD, pContextRecord: PCONTEXT, dwFlags: DWORD);
 }
 extern "C" {
     pub fn FatalAppExitA(uAction: UINT, lpMessageText: LPCSTR);
@@ -27234,12 +26169,7 @@ extern "C" {
     pub fn IsThreadAFiber() -> BOOL;
 }
 extern "C" {
-    pub fn CreatePipe(
-        hReadPipe: PHANDLE,
-        hWritePipe: PHANDLE,
-        lpPipeAttributes: LPSECURITY_ATTRIBUTES,
-        nSize: DWORD,
-    ) -> BOOL;
+    pub fn CreatePipe(hReadPipe: PHANDLE, hWritePipe: PHANDLE, lpPipeAttributes: LPSECURITY_ATTRIBUTES, nSize: DWORD) -> BOOL;
 }
 extern "C" {
     pub fn ConnectNamedPipe(hNamedPipe: HANDLE, lpOverlapped: LPOVERLAPPED) -> BOOL;
@@ -27248,12 +26178,7 @@ extern "C" {
     pub fn DisconnectNamedPipe(hNamedPipe: HANDLE) -> BOOL;
 }
 extern "C" {
-    pub fn SetNamedPipeHandleState(
-        hNamedPipe: HANDLE,
-        lpMode: LPDWORD,
-        lpMaxCollectionCount: LPDWORD,
-        lpCollectDataTimeout: LPDWORD,
-    ) -> BOOL;
+    pub fn SetNamedPipeHandleState(hNamedPipe: HANDLE, lpMode: LPDWORD, lpMaxCollectionCount: LPDWORD, lpCollectDataTimeout: LPDWORD) -> BOOL;
 }
 extern "C" {
     pub fn PeekNamedPipe(
@@ -27292,23 +26217,13 @@ extern "C" {
     pub fn WaitNamedPipeW(lpNamedPipeName: LPCWSTR, nTimeOut: DWORD) -> BOOL;
 }
 extern "C" {
-    pub fn GetNamedPipeClientComputerNameW(
-        Pipe: HANDLE,
-        ClientComputerName: LPWSTR,
-        ClientComputerNameLength: ULONG,
-    ) -> BOOL;
+    pub fn GetNamedPipeClientComputerNameW(Pipe: HANDLE, ClientComputerName: LPWSTR, ClientComputerNameLength: ULONG) -> BOOL;
 }
 extern "C" {
     pub fn ImpersonateNamedPipeClient(hNamedPipe: HANDLE) -> BOOL;
 }
 extern "C" {
-    pub fn GetNamedPipeInfo(
-        hNamedPipe: HANDLE,
-        lpFlags: LPDWORD,
-        lpOutBufferSize: LPDWORD,
-        lpInBufferSize: LPDWORD,
-        lpMaxInstances: LPDWORD,
-    ) -> BOOL;
+    pub fn GetNamedPipeInfo(hNamedPipe: HANDLE, lpFlags: LPDWORD, lpOutBufferSize: LPDWORD, lpInBufferSize: LPDWORD, lpMaxInstances: LPDWORD) -> BOOL;
 }
 extern "C" {
     pub fn GetNamedPipeHandleStateW(
@@ -27375,12 +26290,7 @@ extern "C" {
     pub fn HeapCompact(hHeap: HANDLE, dwFlags: DWORD) -> SIZE_T;
 }
 extern "C" {
-    pub fn HeapSetInformation(
-        HeapHandle: HANDLE,
-        HeapInformationClass: HEAP_INFORMATION_CLASS,
-        HeapInformation: PVOID,
-        HeapInformationLength: SIZE_T,
-    ) -> BOOL;
+    pub fn HeapSetInformation(HeapHandle: HANDLE, HeapInformationClass: HEAP_INFORMATION_CLASS, HeapInformation: PVOID, HeapInformationLength: SIZE_T) -> BOOL;
 }
 extern "C" {
     pub fn HeapValidate(hHeap: HANDLE, dwFlags: DWORD, lpMem: LPCVOID) -> BOOL;
@@ -27410,12 +26320,7 @@ extern "C" {
     ) -> BOOL;
 }
 extern "C" {
-    pub fn CreateIoCompletionPort(
-        FileHandle: HANDLE,
-        ExistingCompletionPort: HANDLE,
-        CompletionKey: ULONG_PTR,
-        NumberOfConcurrentThreads: DWORD,
-    ) -> HANDLE;
+    pub fn CreateIoCompletionPort(FileHandle: HANDLE, ExistingCompletionPort: HANDLE, CompletionKey: ULONG_PTR, NumberOfConcurrentThreads: DWORD) -> HANDLE;
 }
 extern "C" {
     pub fn GetQueuedCompletionStatus(
@@ -27457,12 +26362,7 @@ extern "C" {
     ) -> BOOL;
 }
 extern "C" {
-    pub fn GetOverlappedResult(
-        hFile: HANDLE,
-        lpOverlapped: LPOVERLAPPED,
-        lpNumberOfBytesTransferred: LPDWORD,
-        bWait: BOOL,
-    ) -> BOOL;
+    pub fn GetOverlappedResult(hFile: HANDLE, lpOverlapped: LPOVERLAPPED, lpNumberOfBytesTransferred: LPDWORD, bWait: BOOL) -> BOOL;
 }
 extern "C" {
     pub fn CancelIoEx(hFile: HANDLE, lpOverlapped: LPOVERLAPPED) -> BOOL;
@@ -27515,23 +26415,13 @@ extern "C" {
     pub fn LeaveCriticalSection(lpCriticalSection: LPCRITICAL_SECTION);
 }
 extern "C" {
-    pub fn InitializeCriticalSectionAndSpinCount(
-        lpCriticalSection: LPCRITICAL_SECTION,
-        dwSpinCount: DWORD,
-    ) -> BOOL;
+    pub fn InitializeCriticalSectionAndSpinCount(lpCriticalSection: LPCRITICAL_SECTION, dwSpinCount: DWORD) -> BOOL;
 }
 extern "C" {
-    pub fn InitializeCriticalSectionEx(
-        lpCriticalSection: LPCRITICAL_SECTION,
-        dwSpinCount: DWORD,
-        Flags: DWORD,
-    ) -> BOOL;
+    pub fn InitializeCriticalSectionEx(lpCriticalSection: LPCRITICAL_SECTION, dwSpinCount: DWORD, Flags: DWORD) -> BOOL;
 }
 extern "C" {
-    pub fn SetCriticalSectionSpinCount(
-        lpCriticalSection: LPCRITICAL_SECTION,
-        dwSpinCount: DWORD,
-    ) -> DWORD;
+    pub fn SetCriticalSectionSpinCount(lpCriticalSection: LPCRITICAL_SECTION, dwSpinCount: DWORD) -> DWORD;
 }
 extern "C" {
     pub fn TryEnterCriticalSection(lpCriticalSection: LPCRITICAL_SECTION) -> BOOL;
@@ -27542,26 +26432,15 @@ extern "C" {
 pub type INIT_ONCE = RTL_RUN_ONCE;
 pub type PINIT_ONCE = PRTL_RUN_ONCE;
 pub type LPINIT_ONCE = PRTL_RUN_ONCE;
-pub type PINIT_ONCE_FN =
-    unsafe extern "C" fn(InitOnce: PINIT_ONCE, Parameter: PVOID, Context: *mut PVOID) -> BOOL;
+pub type PINIT_ONCE_FN = unsafe extern "C" fn(InitOnce: PINIT_ONCE, Parameter: PVOID, Context: *mut PVOID) -> BOOL;
 extern "C" {
     pub fn InitOnceInitialize(InitOnce: PINIT_ONCE);
 }
 extern "C" {
-    pub fn InitOnceExecuteOnce(
-        InitOnce: PINIT_ONCE,
-        InitFn: PINIT_ONCE_FN,
-        Parameter: PVOID,
-        Context: *mut LPVOID,
-    ) -> BOOL;
+    pub fn InitOnceExecuteOnce(InitOnce: PINIT_ONCE, InitFn: PINIT_ONCE_FN, Parameter: PVOID, Context: *mut LPVOID) -> BOOL;
 }
 extern "C" {
-    pub fn InitOnceBeginInitialize(
-        lpInitOnce: LPINIT_ONCE,
-        dwFlags: DWORD,
-        fPending: PBOOL,
-        lpContext: *mut LPVOID,
-    ) -> BOOL;
+    pub fn InitOnceBeginInitialize(lpInitOnce: LPINIT_ONCE, dwFlags: DWORD, fPending: PBOOL, lpContext: *mut LPVOID) -> BOOL;
 }
 extern "C" {
     pub fn InitOnceComplete(lpInitOnce: LPINIT_ONCE, dwFlags: DWORD, lpContext: LPVOID) -> BOOL;
@@ -27578,19 +26457,10 @@ extern "C" {
     pub fn WakeAllConditionVariable(ConditionVariable: PCONDITION_VARIABLE);
 }
 extern "C" {
-    pub fn SleepConditionVariableCS(
-        ConditionVariable: PCONDITION_VARIABLE,
-        CriticalSection: PCRITICAL_SECTION,
-        dwMilliseconds: DWORD,
-    ) -> BOOL;
+    pub fn SleepConditionVariableCS(ConditionVariable: PCONDITION_VARIABLE, CriticalSection: PCRITICAL_SECTION, dwMilliseconds: DWORD) -> BOOL;
 }
 extern "C" {
-    pub fn SleepConditionVariableSRW(
-        ConditionVariable: PCONDITION_VARIABLE,
-        SRWLock: PSRWLOCK,
-        dwMilliseconds: DWORD,
-        Flags: ULONG,
-    ) -> BOOL;
+    pub fn SleepConditionVariableSRW(ConditionVariable: PCONDITION_VARIABLE, SRWLock: PSRWLOCK, dwMilliseconds: DWORD, Flags: ULONG) -> BOOL;
 }
 extern "C" {
     pub fn SetEvent(hEvent: HANDLE) -> BOOL;
@@ -27599,11 +26469,7 @@ extern "C" {
     pub fn ResetEvent(hEvent: HANDLE) -> BOOL;
 }
 extern "C" {
-    pub fn ReleaseSemaphore(
-        hSemaphore: HANDLE,
-        lReleaseCount: LONG,
-        lpPreviousCount: LPLONG,
-    ) -> BOOL;
+    pub fn ReleaseSemaphore(hSemaphore: HANDLE, lReleaseCount: LONG, lpPreviousCount: LPLONG) -> BOOL;
 }
 extern "C" {
     pub fn ReleaseMutex(hMutex: HANDLE) -> BOOL;
@@ -27615,50 +26481,25 @@ extern "C" {
     pub fn SleepEx(dwMilliseconds: DWORD, bAlertable: BOOL) -> DWORD;
 }
 extern "C" {
-    pub fn WaitForSingleObjectEx(hHandle: HANDLE, dwMilliseconds: DWORD, bAlertable: BOOL)
-        -> DWORD;
+    pub fn WaitForSingleObjectEx(hHandle: HANDLE, dwMilliseconds: DWORD, bAlertable: BOOL) -> DWORD;
 }
 extern "C" {
-    pub fn WaitForMultipleObjectsEx(
-        nCount: DWORD,
-        lpHandles: *const HANDLE,
-        bWaitAll: BOOL,
-        dwMilliseconds: DWORD,
-        bAlertable: BOOL,
-    ) -> DWORD;
+    pub fn WaitForMultipleObjectsEx(nCount: DWORD, lpHandles: *const HANDLE, bWaitAll: BOOL, dwMilliseconds: DWORD, bAlertable: BOOL) -> DWORD;
 }
 extern "C" {
-    pub fn CreateMutexA(
-        lpMutexAttributes: LPSECURITY_ATTRIBUTES,
-        bInitialOwner: BOOL,
-        lpName: LPCSTR,
-    ) -> HANDLE;
+    pub fn CreateMutexA(lpMutexAttributes: LPSECURITY_ATTRIBUTES, bInitialOwner: BOOL, lpName: LPCSTR) -> HANDLE;
 }
 extern "C" {
-    pub fn CreateMutexW(
-        lpMutexAttributes: LPSECURITY_ATTRIBUTES,
-        bInitialOwner: BOOL,
-        lpName: LPCWSTR,
-    ) -> HANDLE;
+    pub fn CreateMutexW(lpMutexAttributes: LPSECURITY_ATTRIBUTES, bInitialOwner: BOOL, lpName: LPCWSTR) -> HANDLE;
 }
 extern "C" {
     pub fn OpenMutexW(dwDesiredAccess: DWORD, bInheritHandle: BOOL, lpName: LPCWSTR) -> HANDLE;
 }
 extern "C" {
-    pub fn CreateEventA(
-        lpEventAttributes: LPSECURITY_ATTRIBUTES,
-        bManualReset: BOOL,
-        bInitialState: BOOL,
-        lpName: LPCSTR,
-    ) -> HANDLE;
+    pub fn CreateEventA(lpEventAttributes: LPSECURITY_ATTRIBUTES, bManualReset: BOOL, bInitialState: BOOL, lpName: LPCSTR) -> HANDLE;
 }
 extern "C" {
-    pub fn CreateEventW(
-        lpEventAttributes: LPSECURITY_ATTRIBUTES,
-        bManualReset: BOOL,
-        bInitialState: BOOL,
-        lpName: LPCWSTR,
-    ) -> HANDLE;
+    pub fn CreateEventW(lpEventAttributes: LPSECURITY_ATTRIBUTES, bManualReset: BOOL, bInitialState: BOOL, lpName: LPCWSTR) -> HANDLE;
 }
 extern "C" {
     pub fn OpenEventA(dwDesiredAccess: DWORD, bInheritHandle: BOOL, lpName: LPCSTR) -> HANDLE;
@@ -27669,17 +26510,9 @@ extern "C" {
 extern "C" {
     pub fn OpenSemaphoreW(dwDesiredAccess: DWORD, bInheritHandle: BOOL, lpName: LPCWSTR) -> HANDLE;
 }
-pub type PTIMERAPCROUTINE = unsafe extern "C" fn(
-    lpArgToCompletionRoutine: LPVOID,
-    dwTimerLowValue: DWORD,
-    dwTimerHighValue: DWORD,
-);
+pub type PTIMERAPCROUTINE = unsafe extern "C" fn(lpArgToCompletionRoutine: LPVOID, dwTimerLowValue: DWORD, dwTimerHighValue: DWORD);
 extern "C" {
-    pub fn OpenWaitableTimerW(
-        dwDesiredAccess: DWORD,
-        bInheritHandle: BOOL,
-        lpTimerName: LPCWSTR,
-    ) -> HANDLE;
+    pub fn OpenWaitableTimerW(dwDesiredAccess: DWORD, bInheritHandle: BOOL, lpTimerName: LPCWSTR) -> HANDLE;
 }
 extern "C" {
     pub fn SetWaitableTimerEx(
@@ -27706,36 +26539,16 @@ extern "C" {
     pub fn CancelWaitableTimer(hTimer: HANDLE) -> BOOL;
 }
 extern "C" {
-    pub fn CreateMutexExA(
-        lpMutexAttributes: LPSECURITY_ATTRIBUTES,
-        lpName: LPCSTR,
-        dwFlags: DWORD,
-        dwDesiredAccess: DWORD,
-    ) -> HANDLE;
+    pub fn CreateMutexExA(lpMutexAttributes: LPSECURITY_ATTRIBUTES, lpName: LPCSTR, dwFlags: DWORD, dwDesiredAccess: DWORD) -> HANDLE;
 }
 extern "C" {
-    pub fn CreateMutexExW(
-        lpMutexAttributes: LPSECURITY_ATTRIBUTES,
-        lpName: LPCWSTR,
-        dwFlags: DWORD,
-        dwDesiredAccess: DWORD,
-    ) -> HANDLE;
+    pub fn CreateMutexExW(lpMutexAttributes: LPSECURITY_ATTRIBUTES, lpName: LPCWSTR, dwFlags: DWORD, dwDesiredAccess: DWORD) -> HANDLE;
 }
 extern "C" {
-    pub fn CreateEventExA(
-        lpEventAttributes: LPSECURITY_ATTRIBUTES,
-        lpName: LPCSTR,
-        dwFlags: DWORD,
-        dwDesiredAccess: DWORD,
-    ) -> HANDLE;
+    pub fn CreateEventExA(lpEventAttributes: LPSECURITY_ATTRIBUTES, lpName: LPCSTR, dwFlags: DWORD, dwDesiredAccess: DWORD) -> HANDLE;
 }
 extern "C" {
-    pub fn CreateEventExW(
-        lpEventAttributes: LPSECURITY_ATTRIBUTES,
-        lpName: LPCWSTR,
-        dwFlags: DWORD,
-        dwDesiredAccess: DWORD,
-    ) -> HANDLE;
+    pub fn CreateEventExW(lpEventAttributes: LPSECURITY_ATTRIBUTES, lpName: LPCWSTR, dwFlags: DWORD, dwDesiredAccess: DWORD) -> HANDLE;
 }
 extern "C" {
     pub fn CreateSemaphoreExW(
@@ -27748,28 +26561,16 @@ extern "C" {
     ) -> HANDLE;
 }
 extern "C" {
-    pub fn CreateWaitableTimerExW(
-        lpTimerAttributes: LPSECURITY_ATTRIBUTES,
-        lpTimerName: LPCWSTR,
-        dwFlags: DWORD,
-        dwDesiredAccess: DWORD,
-    ) -> HANDLE;
+    pub fn CreateWaitableTimerExW(lpTimerAttributes: LPSECURITY_ATTRIBUTES, lpTimerName: LPCWSTR, dwFlags: DWORD, dwDesiredAccess: DWORD) -> HANDLE;
 }
 pub type SYNCHRONIZATION_BARRIER = RTL_BARRIER;
 pub type PSYNCHRONIZATION_BARRIER = PRTL_BARRIER;
 pub type LPSYNCHRONIZATION_BARRIER = PRTL_BARRIER;
 extern "C" {
-    pub fn EnterSynchronizationBarrier(
-        lpBarrier: LPSYNCHRONIZATION_BARRIER,
-        dwFlags: DWORD,
-    ) -> BOOL;
+    pub fn EnterSynchronizationBarrier(lpBarrier: LPSYNCHRONIZATION_BARRIER, dwFlags: DWORD) -> BOOL;
 }
 extern "C" {
-    pub fn InitializeSynchronizationBarrier(
-        lpBarrier: LPSYNCHRONIZATION_BARRIER,
-        lTotalThreads: LONG,
-        lSpinCount: LONG,
-    ) -> BOOL;
+    pub fn InitializeSynchronizationBarrier(lpBarrier: LPSYNCHRONIZATION_BARRIER, lTotalThreads: LONG, lSpinCount: LONG) -> BOOL;
 }
 extern "C" {
     pub fn DeleteSynchronizationBarrier(lpBarrier: LPSYNCHRONIZATION_BARRIER) -> BOOL;
@@ -27778,12 +26579,7 @@ extern "C" {
     pub fn Sleep(dwMilliseconds: DWORD);
 }
 extern "C" {
-    pub fn WaitOnAddress(
-        Address: *mut ::std::os::raw::c_void,
-        CompareAddress: PVOID,
-        AddressSize: SIZE_T,
-        dwMilliseconds: DWORD,
-    ) -> BOOL;
+    pub fn WaitOnAddress(Address: *mut ::std::os::raw::c_void, CompareAddress: PVOID, AddressSize: SIZE_T, dwMilliseconds: DWORD) -> BOOL;
 }
 extern "C" {
     pub fn WakeByAddressSingle(Address: PVOID);
@@ -27792,35 +26588,16 @@ extern "C" {
     pub fn WakeByAddressAll(Address: PVOID);
 }
 extern "C" {
-    pub fn SignalObjectAndWait(
-        hObjectToSignal: HANDLE,
-        hObjectToWaitOn: HANDLE,
-        dwMilliseconds: DWORD,
-        bAlertable: BOOL,
-    ) -> DWORD;
+    pub fn SignalObjectAndWait(hObjectToSignal: HANDLE, hObjectToWaitOn: HANDLE, dwMilliseconds: DWORD, bAlertable: BOOL) -> DWORD;
 }
 extern "C" {
-    pub fn WaitForMultipleObjects(
-        nCount: DWORD,
-        lpHandles: *const HANDLE,
-        bWaitAll: BOOL,
-        dwMilliseconds: DWORD,
-    ) -> DWORD;
+    pub fn WaitForMultipleObjects(nCount: DWORD, lpHandles: *const HANDLE, bWaitAll: BOOL, dwMilliseconds: DWORD) -> DWORD;
 }
 extern "C" {
-    pub fn CreateSemaphoreW(
-        lpSemaphoreAttributes: LPSECURITY_ATTRIBUTES,
-        lInitialCount: LONG,
-        lMaximumCount: LONG,
-        lpName: LPCWSTR,
-    ) -> HANDLE;
+    pub fn CreateSemaphoreW(lpSemaphoreAttributes: LPSECURITY_ATTRIBUTES, lInitialCount: LONG, lMaximumCount: LONG, lpName: LPCWSTR) -> HANDLE;
 }
 extern "C" {
-    pub fn CreateWaitableTimerW(
-        lpTimerAttributes: LPSECURITY_ATTRIBUTES,
-        bManualReset: BOOL,
-        lpTimerName: LPCWSTR,
-    ) -> HANDLE;
+    pub fn CreateWaitableTimerW(lpTimerAttributes: LPSECURITY_ATTRIBUTES, bManualReset: BOOL, lpTimerName: LPCWSTR) -> HANDLE;
 }
 extern "C" {
     pub fn InitializeSListHead(ListHead: PSLIST_HEADER);
@@ -27829,18 +26606,10 @@ extern "C" {
     pub fn InterlockedPopEntrySList(ListHead: PSLIST_HEADER) -> PSLIST_ENTRY;
 }
 extern "C" {
-    pub fn InterlockedPushEntrySList(
-        ListHead: PSLIST_HEADER,
-        ListEntry: PSLIST_ENTRY,
-    ) -> PSLIST_ENTRY;
+    pub fn InterlockedPushEntrySList(ListHead: PSLIST_HEADER, ListEntry: PSLIST_ENTRY) -> PSLIST_ENTRY;
 }
 extern "C" {
-    pub fn InterlockedPushListSListEx(
-        ListHead: PSLIST_HEADER,
-        List: PSLIST_ENTRY,
-        ListEnd: PSLIST_ENTRY,
-        Count: ULONG,
-    ) -> PSLIST_ENTRY;
+    pub fn InterlockedPushListSListEx(ListHead: PSLIST_HEADER, List: PSLIST_ENTRY, ListEnd: PSLIST_ENTRY, Count: ULONG) -> PSLIST_ENTRY;
 }
 extern "C" {
     pub fn InterlockedFlushSList(ListHead: PSLIST_HEADER) -> PSLIST_ENTRY;
@@ -27913,13 +26682,7 @@ extern "C" {
     pub fn QueueUserAPC(pfnAPC: PAPCFUNC, hThread: HANDLE, dwData: ULONG_PTR) -> DWORD;
 }
 extern "C" {
-    pub fn GetProcessTimes(
-        hProcess: HANDLE,
-        lpCreationTime: LPFILETIME,
-        lpExitTime: LPFILETIME,
-        lpKernelTime: LPFILETIME,
-        lpUserTime: LPFILETIME,
-    ) -> BOOL;
+    pub fn GetProcessTimes(hProcess: HANDLE, lpCreationTime: LPFILETIME, lpExitTime: LPFILETIME, lpKernelTime: LPFILETIME, lpUserTime: LPFILETIME) -> BOOL;
 }
 extern "C" {
     pub fn GetCurrentProcess() -> HANDLE;
@@ -28064,19 +26827,10 @@ extern "C" {
     pub fn SetThreadToken(Thread: PHANDLE, Token: HANDLE) -> BOOL;
 }
 extern "C" {
-    pub fn OpenProcessToken(
-        ProcessHandle: HANDLE,
-        DesiredAccess: DWORD,
-        TokenHandle: PHANDLE,
-    ) -> BOOL;
+    pub fn OpenProcessToken(ProcessHandle: HANDLE, DesiredAccess: DWORD, TokenHandle: PHANDLE) -> BOOL;
 }
 extern "C" {
-    pub fn OpenThreadToken(
-        ThreadHandle: HANDLE,
-        DesiredAccess: DWORD,
-        OpenAsSelf: BOOL,
-        TokenHandle: PHANDLE,
-    ) -> BOOL;
+    pub fn OpenThreadToken(ThreadHandle: HANDLE, DesiredAccess: DWORD, OpenAsSelf: BOOL, TokenHandle: PHANDLE) -> BOOL;
 }
 extern "C" {
     pub fn SetPriorityClass(hProcess: HANDLE, dwPriorityClass: DWORD) -> BOOL;
@@ -28110,12 +26864,7 @@ extern "C" {
     pub fn GetProcessIdOfThread(Thread: HANDLE) -> DWORD;
 }
 extern "C" {
-    pub fn InitializeProcThreadAttributeList(
-        lpAttributeList: LPPROC_THREAD_ATTRIBUTE_LIST,
-        dwAttributeCount: DWORD,
-        dwFlags: DWORD,
-        lpSize: PSIZE_T,
-    ) -> BOOL;
+    pub fn InitializeProcThreadAttributeList(lpAttributeList: LPPROC_THREAD_ATTRIBUTE_LIST, dwAttributeCount: DWORD, dwFlags: DWORD, lpSize: PSIZE_T) -> BOOL;
 }
 extern "C" {
     pub fn DeleteProcThreadAttributeList(lpAttributeList: LPPROC_THREAD_ATTRIBUTE_LIST);
@@ -28132,18 +26881,10 @@ extern "C" {
     ) -> BOOL;
 }
 extern "C" {
-    pub fn SetProcessDynamicEHContinuationTargets(
-        Process: HANDLE,
-        NumberOfTargets: USHORT,
-        Targets: PPROCESS_DYNAMIC_EH_CONTINUATION_TARGET,
-    ) -> BOOL;
+    pub fn SetProcessDynamicEHContinuationTargets(Process: HANDLE, NumberOfTargets: USHORT, Targets: PPROCESS_DYNAMIC_EH_CONTINUATION_TARGET) -> BOOL;
 }
 extern "C" {
-    pub fn SetProcessDynamicEnforcedCetCompatibleRanges(
-        Process: HANDLE,
-        NumberOfRanges: USHORT,
-        Ranges: PPROCESS_DYNAMIC_ENFORCED_ADDRESS_RANGE,
-    ) -> BOOL;
+    pub fn SetProcessDynamicEnforcedCetCompatibleRanges(Process: HANDLE, NumberOfRanges: USHORT, Ranges: PPROCESS_DYNAMIC_ENFORCED_ADDRESS_RANGE) -> BOOL;
 }
 extern "C" {
     pub fn SetProcessAffinityUpdateMode(hProcess: HANDLE, dwFlags: DWORD) -> BOOL;
@@ -28170,34 +26911,19 @@ extern "C" {
     pub fn GetThreadContext(hThread: HANDLE, lpContext: LPCONTEXT) -> BOOL;
 }
 extern "C" {
-    pub fn GetProcessMitigationPolicy(
-        hProcess: HANDLE,
-        MitigationPolicy: PROCESS_MITIGATION_POLICY,
-        lpBuffer: PVOID,
-        dwLength: SIZE_T,
-    ) -> BOOL;
+    pub fn GetProcessMitigationPolicy(hProcess: HANDLE, MitigationPolicy: PROCESS_MITIGATION_POLICY, lpBuffer: PVOID, dwLength: SIZE_T) -> BOOL;
 }
 extern "C" {
     pub fn SetThreadContext(hThread: HANDLE, lpContext: *const CONTEXT) -> BOOL;
 }
 extern "C" {
-    pub fn SetProcessMitigationPolicy(
-        MitigationPolicy: PROCESS_MITIGATION_POLICY,
-        lpBuffer: PVOID,
-        dwLength: SIZE_T,
-    ) -> BOOL;
+    pub fn SetProcessMitigationPolicy(MitigationPolicy: PROCESS_MITIGATION_POLICY, lpBuffer: PVOID, dwLength: SIZE_T) -> BOOL;
 }
 extern "C" {
     pub fn FlushInstructionCache(hProcess: HANDLE, lpBaseAddress: LPCVOID, dwSize: SIZE_T) -> BOOL;
 }
 extern "C" {
-    pub fn GetThreadTimes(
-        hThread: HANDLE,
-        lpCreationTime: LPFILETIME,
-        lpExitTime: LPFILETIME,
-        lpKernelTime: LPFILETIME,
-        lpUserTime: LPFILETIME,
-    ) -> BOOL;
+    pub fn GetThreadTimes(hThread: HANDLE, lpCreationTime: LPFILETIME, lpExitTime: LPFILETIME, lpKernelTime: LPFILETIME, lpUserTime: LPFILETIME) -> BOOL;
 }
 extern "C" {
     pub fn OpenProcess(dwDesiredAccess: DWORD, bInheritHandle: BOOL, dwProcessId: DWORD) -> HANDLE;
@@ -28212,11 +26938,7 @@ extern "C" {
     pub fn GetCurrentProcessorNumber() -> DWORD;
 }
 extern "C" {
-    pub fn SetThreadIdealProcessorEx(
-        hThread: HANDLE,
-        lpIdealProcessor: PPROCESSOR_NUMBER,
-        lpPreviousIdealProcessor: PPROCESSOR_NUMBER,
-    ) -> BOOL;
+    pub fn SetThreadIdealProcessorEx(hThread: HANDLE, lpIdealProcessor: PPROCESSOR_NUMBER, lpPreviousIdealProcessor: PPROCESSOR_NUMBER) -> BOOL;
 }
 extern "C" {
     pub fn GetThreadIdealProcessorEx(hThread: HANDLE, lpIdealProcessor: PPROCESSOR_NUMBER) -> BOOL;
@@ -28234,11 +26956,7 @@ extern "C" {
     pub fn GetThreadIOPendingFlag(hThread: HANDLE, lpIOIsPending: PBOOL) -> BOOL;
 }
 extern "C" {
-    pub fn GetSystemTimes(
-        lpIdleTime: PFILETIME,
-        lpKernelTime: PFILETIME,
-        lpUserTime: PFILETIME,
-    ) -> BOOL;
+    pub fn GetSystemTimes(lpIdleTime: PFILETIME, lpKernelTime: PFILETIME, lpUserTime: PFILETIME) -> BOOL;
 }
 pub const _THREAD_INFORMATION_CLASS_ThreadMemoryPriority: _THREAD_INFORMATION_CLASS = 0;
 pub const _THREAD_INFORMATION_CLASS_ThreadAbsoluteCpuPriority: _THREAD_INFORMATION_CLASS = 1;
@@ -28282,11 +27000,7 @@ extern "C" {
     pub fn IsProcessCritical(hProcess: HANDLE, Critical: PBOOL) -> BOOL;
 }
 extern "C" {
-    pub fn SetProtectedPolicy(
-        PolicyGuid: LPCGUID,
-        PolicyValue: ULONG_PTR,
-        OldPolicyValue: PULONG_PTR,
-    ) -> BOOL;
+    pub fn SetProtectedPolicy(PolicyGuid: LPCGUID, PolicyValue: ULONG_PTR, OldPolicyValue: PULONG_PTR) -> BOOL;
 }
 extern "C" {
     pub fn QueryProtectedPolicy(PolicyGuid: LPCGUID, PolicyValue: PULONG_PTR) -> BOOL;
@@ -28316,8 +27030,7 @@ pub struct _APP_MEMORY_INFORMATION {
 }
 pub type APP_MEMORY_INFORMATION = _APP_MEMORY_INFORMATION;
 pub type PAPP_MEMORY_INFORMATION = *mut _APP_MEMORY_INFORMATION;
-pub const _PROCESS_MEMORY_EXHAUSTION_TYPE_PMETypeFailFastOnCommitFailure:
-    _PROCESS_MEMORY_EXHAUSTION_TYPE = 0;
+pub const _PROCESS_MEMORY_EXHAUSTION_TYPE_PMETypeFailFastOnCommitFailure: _PROCESS_MEMORY_EXHAUSTION_TYPE = 0;
 pub const _PROCESS_MEMORY_EXHAUSTION_TYPE_PMETypeMax: _PROCESS_MEMORY_EXHAUSTION_TYPE = 1;
 pub type _PROCESS_MEMORY_EXHAUSTION_TYPE = ::std::os::raw::c_int;
 pub use self::_PROCESS_MEMORY_EXHAUSTION_TYPE as PROCESS_MEMORY_EXHAUSTION_TYPE;
@@ -28380,34 +27093,16 @@ extern "C" {
     ) -> BOOL;
 }
 extern "C" {
-    pub fn GetProcessDefaultCpuSets(
-        Process: HANDLE,
-        CpuSetIds: PULONG,
-        CpuSetIdCount: ULONG,
-        RequiredIdCount: PULONG,
-    ) -> BOOL;
+    pub fn GetProcessDefaultCpuSets(Process: HANDLE, CpuSetIds: PULONG, CpuSetIdCount: ULONG, RequiredIdCount: PULONG) -> BOOL;
 }
 extern "C" {
-    pub fn SetProcessDefaultCpuSets(
-        Process: HANDLE,
-        CpuSetIds: *const ULONG,
-        CpuSetIdCount: ULONG,
-    ) -> BOOL;
+    pub fn SetProcessDefaultCpuSets(Process: HANDLE, CpuSetIds: *const ULONG, CpuSetIdCount: ULONG) -> BOOL;
 }
 extern "C" {
-    pub fn GetThreadSelectedCpuSets(
-        Thread: HANDLE,
-        CpuSetIds: PULONG,
-        CpuSetIdCount: ULONG,
-        RequiredIdCount: PULONG,
-    ) -> BOOL;
+    pub fn GetThreadSelectedCpuSets(Thread: HANDLE, CpuSetIds: PULONG, CpuSetIdCount: ULONG, RequiredIdCount: PULONG) -> BOOL;
 }
 extern "C" {
-    pub fn SetThreadSelectedCpuSets(
-        Thread: HANDLE,
-        CpuSetIds: *const ULONG,
-        CpuSetIdCount: ULONG,
-    ) -> BOOL;
+    pub fn SetThreadSelectedCpuSets(Thread: HANDLE, CpuSetIds: *const ULONG, CpuSetIdCount: ULONG) -> BOOL;
 }
 extern "C" {
     pub fn CreateProcessAsUserA(
@@ -28510,18 +27205,10 @@ extern "C" {
     pub fn GetTickCount64() -> ULONGLONG;
 }
 extern "C" {
-    pub fn GetSystemTimeAdjustment(
-        lpTimeAdjustment: PDWORD,
-        lpTimeIncrement: PDWORD,
-        lpTimeAdjustmentDisabled: PBOOL,
-    ) -> BOOL;
+    pub fn GetSystemTimeAdjustment(lpTimeAdjustment: PDWORD, lpTimeIncrement: PDWORD, lpTimeAdjustmentDisabled: PBOOL) -> BOOL;
 }
 extern "C" {
-    pub fn GetSystemTimeAdjustmentPrecise(
-        lpTimeAdjustment: PDWORD64,
-        lpTimeIncrement: PDWORD64,
-        lpTimeAdjustmentDisabled: PBOOL,
-    ) -> BOOL;
+    pub fn GetSystemTimeAdjustmentPrecise(lpTimeAdjustment: PDWORD64, lpTimeIncrement: PDWORD64, lpTimeAdjustmentDisabled: PBOOL) -> BOOL;
 }
 extern "C" {
     pub fn GetSystemDirectoryA(lpBuffer: LPSTR, uSize: UINT) -> UINT;
@@ -28553,18 +27240,10 @@ pub const _COMPUTER_NAME_FORMAT_ComputerNameMax: _COMPUTER_NAME_FORMAT = 8;
 pub type _COMPUTER_NAME_FORMAT = ::std::os::raw::c_int;
 pub use self::_COMPUTER_NAME_FORMAT as COMPUTER_NAME_FORMAT;
 extern "C" {
-    pub fn GetComputerNameExA(
-        NameType: COMPUTER_NAME_FORMAT,
-        lpBuffer: LPSTR,
-        nSize: LPDWORD,
-    ) -> BOOL;
+    pub fn GetComputerNameExA(NameType: COMPUTER_NAME_FORMAT, lpBuffer: LPSTR, nSize: LPDWORD) -> BOOL;
 }
 extern "C" {
-    pub fn GetComputerNameExW(
-        NameType: COMPUTER_NAME_FORMAT,
-        lpBuffer: LPWSTR,
-        nSize: LPDWORD,
-    ) -> BOOL;
+    pub fn GetComputerNameExW(NameType: COMPUTER_NAME_FORMAT, lpBuffer: LPWSTR, nSize: LPDWORD) -> BOOL;
 }
 extern "C" {
     pub fn SetComputerNameExW(NameType: COMPUTER_NAME_FORMAT, lpBuffer: LPCWSTR) -> BOOL;
@@ -28579,10 +27258,7 @@ extern "C" {
     pub fn GetVersionExW(lpVersionInformation: LPOSVERSIONINFOW) -> BOOL;
 }
 extern "C" {
-    pub fn GetLogicalProcessorInformation(
-        Buffer: PSYSTEM_LOGICAL_PROCESSOR_INFORMATION,
-        ReturnedLength: PDWORD,
-    ) -> BOOL;
+    pub fn GetLogicalProcessorInformation(Buffer: PSYSTEM_LOGICAL_PROCESSOR_INFORMATION, ReturnedLength: PDWORD) -> BOOL;
 }
 extern "C" {
     pub fn GetLogicalProcessorInformationEx(
@@ -28610,55 +27286,31 @@ extern "C" {
     pub fn GetOsSafeBootMode(Flags: PDWORD) -> BOOL;
 }
 extern "C" {
-    pub fn EnumSystemFirmwareTables(
-        FirmwareTableProviderSignature: DWORD,
-        pFirmwareTableEnumBuffer: PVOID,
-        BufferSize: DWORD,
-    ) -> UINT;
+    pub fn EnumSystemFirmwareTables(FirmwareTableProviderSignature: DWORD, pFirmwareTableEnumBuffer: PVOID, BufferSize: DWORD) -> UINT;
 }
 extern "C" {
-    pub fn GetSystemFirmwareTable(
-        FirmwareTableProviderSignature: DWORD,
-        FirmwareTableID: DWORD,
-        pFirmwareTableBuffer: PVOID,
-        BufferSize: DWORD,
-    ) -> UINT;
+    pub fn GetSystemFirmwareTable(FirmwareTableProviderSignature: DWORD, FirmwareTableID: DWORD, pFirmwareTableBuffer: PVOID, BufferSize: DWORD) -> UINT;
 }
 extern "C" {
-    pub fn DnsHostnameToComputerNameExW(
-        Hostname: LPCWSTR,
-        ComputerName: LPWSTR,
-        nSize: LPDWORD,
-    ) -> BOOL;
+    pub fn DnsHostnameToComputerNameExW(Hostname: LPCWSTR, ComputerName: LPWSTR, nSize: LPDWORD) -> BOOL;
 }
 extern "C" {
     pub fn GetPhysicallyInstalledSystemMemory(TotalMemoryInKilobytes: PULONGLONG) -> BOOL;
 }
 extern "C" {
-    pub fn SetComputerNameEx2W(
-        NameType: COMPUTER_NAME_FORMAT,
-        Flags: DWORD,
-        lpBuffer: LPCWSTR,
-    ) -> BOOL;
+    pub fn SetComputerNameEx2W(NameType: COMPUTER_NAME_FORMAT, Flags: DWORD, lpBuffer: LPCWSTR) -> BOOL;
 }
 extern "C" {
     pub fn SetSystemTimeAdjustment(dwTimeAdjustment: DWORD, bTimeAdjustmentDisabled: BOOL) -> BOOL;
 }
 extern "C" {
-    pub fn SetSystemTimeAdjustmentPrecise(
-        dwTimeAdjustment: DWORD64,
-        bTimeAdjustmentDisabled: BOOL,
-    ) -> BOOL;
+    pub fn SetSystemTimeAdjustmentPrecise(dwTimeAdjustment: DWORD64, bTimeAdjustmentDisabled: BOOL) -> BOOL;
 }
 extern "C" {
     pub fn InstallELAMCertificateInfo(ELAMFile: HANDLE) -> BOOL;
 }
 extern "C" {
-    pub fn GetProcessorSystemCycleTime(
-        Group: USHORT,
-        Buffer: PSYSTEM_PROCESSOR_CYCLE_TIME_INFORMATION,
-        ReturnedLength: PDWORD,
-    ) -> BOOL;
+    pub fn GetProcessorSystemCycleTime(Group: USHORT, Buffer: PSYSTEM_PROCESSOR_CYCLE_TIME_INFORMATION, ReturnedLength: PDWORD) -> BOOL;
 }
 extern "C" {
     pub fn GetOsManufacturingMode(pbEnabled: PBOOL) -> BOOL;
@@ -28676,74 +27328,31 @@ extern "C" {
     pub fn SetComputerNameExA(NameType: COMPUTER_NAME_FORMAT, lpBuffer: LPCSTR) -> BOOL;
 }
 extern "C" {
-    pub fn VirtualAlloc(
-        lpAddress: LPVOID,
-        dwSize: SIZE_T,
-        flAllocationType: DWORD,
-        flProtect: DWORD,
-    ) -> LPVOID;
+    pub fn VirtualAlloc(lpAddress: LPVOID, dwSize: SIZE_T, flAllocationType: DWORD, flProtect: DWORD) -> LPVOID;
 }
 extern "C" {
-    pub fn VirtualProtect(
-        lpAddress: LPVOID,
-        dwSize: SIZE_T,
-        flNewProtect: DWORD,
-        lpflOldProtect: PDWORD,
-    ) -> BOOL;
+    pub fn VirtualProtect(lpAddress: LPVOID, dwSize: SIZE_T, flNewProtect: DWORD, lpflOldProtect: PDWORD) -> BOOL;
 }
 extern "C" {
     pub fn VirtualFree(lpAddress: LPVOID, dwSize: SIZE_T, dwFreeType: DWORD) -> BOOL;
 }
 extern "C" {
-    pub fn VirtualQuery(
-        lpAddress: LPCVOID,
-        lpBuffer: PMEMORY_BASIC_INFORMATION,
-        dwLength: SIZE_T,
-    ) -> SIZE_T;
+    pub fn VirtualQuery(lpAddress: LPCVOID, lpBuffer: PMEMORY_BASIC_INFORMATION, dwLength: SIZE_T) -> SIZE_T;
 }
 extern "C" {
-    pub fn VirtualAllocEx(
-        hProcess: HANDLE,
-        lpAddress: LPVOID,
-        dwSize: SIZE_T,
-        flAllocationType: DWORD,
-        flProtect: DWORD,
-    ) -> LPVOID;
+    pub fn VirtualAllocEx(hProcess: HANDLE, lpAddress: LPVOID, dwSize: SIZE_T, flAllocationType: DWORD, flProtect: DWORD) -> LPVOID;
 }
 extern "C" {
-    pub fn VirtualProtectEx(
-        hProcess: HANDLE,
-        lpAddress: LPVOID,
-        dwSize: SIZE_T,
-        flNewProtect: DWORD,
-        lpflOldProtect: PDWORD,
-    ) -> BOOL;
+    pub fn VirtualProtectEx(hProcess: HANDLE, lpAddress: LPVOID, dwSize: SIZE_T, flNewProtect: DWORD, lpflOldProtect: PDWORD) -> BOOL;
 }
 extern "C" {
-    pub fn VirtualQueryEx(
-        hProcess: HANDLE,
-        lpAddress: LPCVOID,
-        lpBuffer: PMEMORY_BASIC_INFORMATION,
-        dwLength: SIZE_T,
-    ) -> SIZE_T;
+    pub fn VirtualQueryEx(hProcess: HANDLE, lpAddress: LPCVOID, lpBuffer: PMEMORY_BASIC_INFORMATION, dwLength: SIZE_T) -> SIZE_T;
 }
 extern "C" {
-    pub fn ReadProcessMemory(
-        hProcess: HANDLE,
-        lpBaseAddress: LPCVOID,
-        lpBuffer: LPVOID,
-        nSize: SIZE_T,
-        lpNumberOfBytesRead: *mut SIZE_T,
-    ) -> BOOL;
+    pub fn ReadProcessMemory(hProcess: HANDLE, lpBaseAddress: LPCVOID, lpBuffer: LPVOID, nSize: SIZE_T, lpNumberOfBytesRead: *mut SIZE_T) -> BOOL;
 }
 extern "C" {
-    pub fn WriteProcessMemory(
-        hProcess: HANDLE,
-        lpBaseAddress: LPVOID,
-        lpBuffer: LPCVOID,
-        nSize: SIZE_T,
-        lpNumberOfBytesWritten: *mut SIZE_T,
-    ) -> BOOL;
+    pub fn WriteProcessMemory(hProcess: HANDLE, lpBaseAddress: LPVOID, lpBuffer: LPCVOID, nSize: SIZE_T, lpNumberOfBytesWritten: *mut SIZE_T) -> BOOL;
 }
 extern "C" {
     pub fn CreateFileMappingW(
@@ -28756,11 +27365,7 @@ extern "C" {
     ) -> HANDLE;
 }
 extern "C" {
-    pub fn OpenFileMappingW(
-        dwDesiredAccess: DWORD,
-        bInheritHandle: BOOL,
-        lpName: LPCWSTR,
-    ) -> HANDLE;
+    pub fn OpenFileMappingW(dwDesiredAccess: DWORD, bInheritHandle: BOOL, lpName: LPCWSTR) -> HANDLE;
 }
 extern "C" {
     pub fn MapViewOfFile(
@@ -28782,12 +27387,7 @@ extern "C" {
     ) -> LPVOID;
 }
 extern "C" {
-    pub fn VirtualFreeEx(
-        hProcess: HANDLE,
-        lpAddress: LPVOID,
-        dwSize: SIZE_T,
-        dwFreeType: DWORD,
-    ) -> BOOL;
+    pub fn VirtualFreeEx(hProcess: HANDLE, lpAddress: LPVOID, dwSize: SIZE_T, dwFreeType: DWORD) -> BOOL;
 }
 extern "C" {
     pub fn FlushViewOfFile(lpBaseAddress: LPCVOID, dwNumberOfBytesToFlush: SIZE_T) -> BOOL;
@@ -28799,20 +27399,10 @@ extern "C" {
     pub fn GetLargePageMinimum() -> SIZE_T;
 }
 extern "C" {
-    pub fn GetProcessWorkingSetSizeEx(
-        hProcess: HANDLE,
-        lpMinimumWorkingSetSize: PSIZE_T,
-        lpMaximumWorkingSetSize: PSIZE_T,
-        Flags: PDWORD,
-    ) -> BOOL;
+    pub fn GetProcessWorkingSetSizeEx(hProcess: HANDLE, lpMinimumWorkingSetSize: PSIZE_T, lpMaximumWorkingSetSize: PSIZE_T, Flags: PDWORD) -> BOOL;
 }
 extern "C" {
-    pub fn SetProcessWorkingSetSizeEx(
-        hProcess: HANDLE,
-        dwMinimumWorkingSetSize: SIZE_T,
-        dwMaximumWorkingSetSize: SIZE_T,
-        Flags: DWORD,
-    ) -> BOOL;
+    pub fn SetProcessWorkingSetSizeEx(hProcess: HANDLE, dwMinimumWorkingSetSize: SIZE_T, dwMaximumWorkingSetSize: SIZE_T, Flags: DWORD) -> BOOL;
 }
 extern "C" {
     pub fn VirtualLock(lpAddress: LPVOID, dwSize: SIZE_T) -> BOOL;
@@ -28833,36 +27423,21 @@ extern "C" {
 extern "C" {
     pub fn ResetWriteWatch(lpBaseAddress: LPVOID, dwRegionSize: SIZE_T) -> UINT;
 }
-pub const _MEMORY_RESOURCE_NOTIFICATION_TYPE_LowMemoryResourceNotification:
-    _MEMORY_RESOURCE_NOTIFICATION_TYPE = 0;
-pub const _MEMORY_RESOURCE_NOTIFICATION_TYPE_HighMemoryResourceNotification:
-    _MEMORY_RESOURCE_NOTIFICATION_TYPE = 1;
+pub const _MEMORY_RESOURCE_NOTIFICATION_TYPE_LowMemoryResourceNotification: _MEMORY_RESOURCE_NOTIFICATION_TYPE = 0;
+pub const _MEMORY_RESOURCE_NOTIFICATION_TYPE_HighMemoryResourceNotification: _MEMORY_RESOURCE_NOTIFICATION_TYPE = 1;
 pub type _MEMORY_RESOURCE_NOTIFICATION_TYPE = ::std::os::raw::c_int;
 pub use self::_MEMORY_RESOURCE_NOTIFICATION_TYPE as MEMORY_RESOURCE_NOTIFICATION_TYPE;
 extern "C" {
-    pub fn CreateMemoryResourceNotification(
-        NotificationType: MEMORY_RESOURCE_NOTIFICATION_TYPE,
-    ) -> HANDLE;
+    pub fn CreateMemoryResourceNotification(NotificationType: MEMORY_RESOURCE_NOTIFICATION_TYPE) -> HANDLE;
 }
 extern "C" {
-    pub fn QueryMemoryResourceNotification(
-        ResourceNotificationHandle: HANDLE,
-        ResourceState: PBOOL,
-    ) -> BOOL;
+    pub fn QueryMemoryResourceNotification(ResourceNotificationHandle: HANDLE, ResourceState: PBOOL) -> BOOL;
 }
 extern "C" {
-    pub fn GetSystemFileCacheSize(
-        lpMinimumFileCacheSize: PSIZE_T,
-        lpMaximumFileCacheSize: PSIZE_T,
-        lpFlags: PDWORD,
-    ) -> BOOL;
+    pub fn GetSystemFileCacheSize(lpMinimumFileCacheSize: PSIZE_T, lpMaximumFileCacheSize: PSIZE_T, lpFlags: PDWORD) -> BOOL;
 }
 extern "C" {
-    pub fn SetSystemFileCacheSize(
-        MinimumFileCacheSize: SIZE_T,
-        MaximumFileCacheSize: SIZE_T,
-        Flags: DWORD,
-    ) -> BOOL;
+    pub fn SetSystemFileCacheSize(MinimumFileCacheSize: SIZE_T, MaximumFileCacheSize: SIZE_T, Flags: DWORD) -> BOOL;
 }
 extern "C" {
     pub fn CreateFileMappingNumaW(
@@ -28884,12 +27459,7 @@ pub struct _WIN32_MEMORY_RANGE_ENTRY {
 pub type WIN32_MEMORY_RANGE_ENTRY = _WIN32_MEMORY_RANGE_ENTRY;
 pub type PWIN32_MEMORY_RANGE_ENTRY = *mut _WIN32_MEMORY_RANGE_ENTRY;
 extern "C" {
-    pub fn PrefetchVirtualMemory(
-        hProcess: HANDLE,
-        NumberOfEntries: ULONG_PTR,
-        VirtualAddresses: PWIN32_MEMORY_RANGE_ENTRY,
-        Flags: ULONG,
-    ) -> BOOL;
+    pub fn PrefetchVirtualMemory(hProcess: HANDLE, NumberOfEntries: ULONG_PTR, VirtualAddresses: PWIN32_MEMORY_RANGE_ENTRY, Flags: ULONG) -> BOOL;
 }
 extern "C" {
     pub fn CreateFileMappingFromApp(
@@ -28901,54 +27471,25 @@ extern "C" {
     ) -> HANDLE;
 }
 extern "C" {
-    pub fn MapViewOfFileFromApp(
-        hFileMappingObject: HANDLE,
-        DesiredAccess: ULONG,
-        FileOffset: ULONG64,
-        NumberOfBytesToMap: SIZE_T,
-    ) -> PVOID;
+    pub fn MapViewOfFileFromApp(hFileMappingObject: HANDLE, DesiredAccess: ULONG, FileOffset: ULONG64, NumberOfBytesToMap: SIZE_T) -> PVOID;
 }
 extern "C" {
     pub fn UnmapViewOfFileEx(BaseAddress: PVOID, UnmapFlags: ULONG) -> BOOL;
 }
 extern "C" {
-    pub fn AllocateUserPhysicalPages(
-        hProcess: HANDLE,
-        NumberOfPages: PULONG_PTR,
-        PageArray: PULONG_PTR,
-    ) -> BOOL;
+    pub fn AllocateUserPhysicalPages(hProcess: HANDLE, NumberOfPages: PULONG_PTR, PageArray: PULONG_PTR) -> BOOL;
 }
 extern "C" {
-    pub fn FreeUserPhysicalPages(
-        hProcess: HANDLE,
-        NumberOfPages: PULONG_PTR,
-        PageArray: PULONG_PTR,
-    ) -> BOOL;
+    pub fn FreeUserPhysicalPages(hProcess: HANDLE, NumberOfPages: PULONG_PTR, PageArray: PULONG_PTR) -> BOOL;
 }
 extern "C" {
-    pub fn MapUserPhysicalPages(
-        VirtualAddress: PVOID,
-        NumberOfPages: ULONG_PTR,
-        PageArray: PULONG_PTR,
-    ) -> BOOL;
+    pub fn MapUserPhysicalPages(VirtualAddress: PVOID, NumberOfPages: ULONG_PTR, PageArray: PULONG_PTR) -> BOOL;
 }
 extern "C" {
-    pub fn AllocateUserPhysicalPagesNuma(
-        hProcess: HANDLE,
-        NumberOfPages: PULONG_PTR,
-        PageArray: PULONG_PTR,
-        nndPreferred: DWORD,
-    ) -> BOOL;
+    pub fn AllocateUserPhysicalPagesNuma(hProcess: HANDLE, NumberOfPages: PULONG_PTR, PageArray: PULONG_PTR, nndPreferred: DWORD) -> BOOL;
 }
 extern "C" {
-    pub fn VirtualAllocExNuma(
-        hProcess: HANDLE,
-        lpAddress: LPVOID,
-        dwSize: SIZE_T,
-        flAllocationType: DWORD,
-        flProtect: DWORD,
-        nndPreferred: DWORD,
-    ) -> LPVOID;
+    pub fn VirtualAllocExNuma(hProcess: HANDLE, lpAddress: LPVOID, dwSize: SIZE_T, flAllocationType: DWORD, flProtect: DWORD, nndPreferred: DWORD) -> LPVOID;
 }
 extern "C" {
     pub fn GetMemoryErrorHandlingCapabilities(Capabilities: PULONG) -> BOOL;
@@ -28966,17 +27507,10 @@ pub const OFFER_PRIORITY_VmOfferPriorityBelowNormal: OFFER_PRIORITY = 3;
 pub const OFFER_PRIORITY_VmOfferPriorityNormal: OFFER_PRIORITY = 4;
 pub type OFFER_PRIORITY = ::std::os::raw::c_int;
 extern "C" {
-    pub fn OfferVirtualMemory(
-        VirtualAddress: PVOID,
-        Size: SIZE_T,
-        Priority: OFFER_PRIORITY,
-    ) -> DWORD;
+    pub fn OfferVirtualMemory(VirtualAddress: PVOID, Size: SIZE_T, Priority: OFFER_PRIORITY) -> DWORD;
 }
 extern "C" {
-    pub fn ReclaimVirtualMemory(
-        VirtualAddress: *const ::std::os::raw::c_void,
-        Size: SIZE_T,
-    ) -> DWORD;
+    pub fn ReclaimVirtualMemory(VirtualAddress: *const ::std::os::raw::c_void, Size: SIZE_T) -> DWORD;
 }
 extern "C" {
     pub fn DiscardVirtualMemory(VirtualAddress: PVOID, Size: SIZE_T) -> DWORD;
@@ -29002,27 +27536,13 @@ extern "C" {
     ) -> BOOL;
 }
 extern "C" {
-    pub fn VirtualAllocFromApp(
-        BaseAddress: PVOID,
-        Size: SIZE_T,
-        AllocationType: ULONG,
-        Protection: ULONG,
-    ) -> PVOID;
+    pub fn VirtualAllocFromApp(BaseAddress: PVOID, Size: SIZE_T, AllocationType: ULONG, Protection: ULONG) -> PVOID;
 }
 extern "C" {
-    pub fn VirtualProtectFromApp(
-        Address: PVOID,
-        Size: SIZE_T,
-        NewProtection: ULONG,
-        OldProtection: PULONG,
-    ) -> BOOL;
+    pub fn VirtualProtectFromApp(Address: PVOID, Size: SIZE_T, NewProtection: ULONG, OldProtection: PULONG) -> BOOL;
 }
 extern "C" {
-    pub fn OpenFileMappingFromApp(
-        DesiredAccess: ULONG,
-        InheritHandle: BOOL,
-        Name: PCWSTR,
-    ) -> HANDLE;
+    pub fn OpenFileMappingFromApp(DesiredAccess: ULONG, InheritHandle: BOOL, Name: PCWSTR) -> HANDLE;
 }
 pub const WIN32_MEMORY_INFORMATION_CLASS_MemoryRegionInfo: WIN32_MEMORY_INFORMATION_CLASS = 0;
 pub type WIN32_MEMORY_INFORMATION_CLASS = ::std::os::raw::c_int;
@@ -29286,13 +27806,7 @@ extern "C" {
     ) -> BOOL;
 }
 extern "C" {
-    pub fn InitializeEnclave(
-        hProcess: HANDLE,
-        lpAddress: LPVOID,
-        lpEnclaveInformation: LPCVOID,
-        dwInfoLength: DWORD,
-        lpEnclaveError: LPDWORD,
-    ) -> BOOL;
+    pub fn InitializeEnclave(hProcess: HANDLE, lpAddress: LPVOID, lpEnclaveInformation: LPCVOID, dwInfoLength: DWORD, lpEnclaveError: LPDWORD) -> BOOL;
 }
 extern "C" {
     pub fn LoadEnclaveImageA(lpEnclaveAddress: LPVOID, lpImageName: LPCSTR) -> BOOL;
@@ -29301,12 +27815,7 @@ extern "C" {
     pub fn LoadEnclaveImageW(lpEnclaveAddress: LPVOID, lpImageName: LPCWSTR) -> BOOL;
 }
 extern "C" {
-    pub fn CallEnclave(
-        lpRoutine: LPENCLAVE_ROUTINE,
-        lpParameter: LPVOID,
-        fWaitForThread: BOOL,
-        lpReturnValue: *mut LPVOID,
-    ) -> BOOL;
+    pub fn CallEnclave(lpRoutine: LPENCLAVE_ROUTINE, lpParameter: LPVOID, fWaitForThread: BOOL, lpReturnValue: *mut LPVOID) -> BOOL;
 }
 extern "C" {
     pub fn TerminateEnclave(lpAddress: LPVOID, fWait: BOOL) -> BOOL;
@@ -29315,11 +27824,7 @@ extern "C" {
     pub fn DeleteEnclave(lpAddress: LPVOID) -> BOOL;
 }
 extern "C" {
-    pub fn QueueUserWorkItem(
-        Function: LPTHREAD_START_ROUTINE,
-        Context: PVOID,
-        Flags: ULONG,
-    ) -> BOOL;
+    pub fn QueueUserWorkItem(Function: LPTHREAD_START_ROUTINE, Context: PVOID, Flags: ULONG) -> BOOL;
 }
 extern "C" {
     pub fn UnregisterWaitEx(WaitHandle: HANDLE, CompletionEvent: HANDLE) -> BOOL;
@@ -29339,31 +27844,16 @@ extern "C" {
     ) -> BOOL;
 }
 extern "C" {
-    pub fn ChangeTimerQueueTimer(
-        TimerQueue: HANDLE,
-        Timer: HANDLE,
-        DueTime: ULONG,
-        Period: ULONG,
-    ) -> BOOL;
+    pub fn ChangeTimerQueueTimer(TimerQueue: HANDLE, Timer: HANDLE, DueTime: ULONG, Period: ULONG) -> BOOL;
 }
 extern "C" {
-    pub fn DeleteTimerQueueTimer(
-        TimerQueue: HANDLE,
-        Timer: HANDLE,
-        CompletionEvent: HANDLE,
-    ) -> BOOL;
+    pub fn DeleteTimerQueueTimer(TimerQueue: HANDLE, Timer: HANDLE, CompletionEvent: HANDLE) -> BOOL;
 }
 extern "C" {
     pub fn DeleteTimerQueueEx(TimerQueue: HANDLE, CompletionEvent: HANDLE) -> BOOL;
 }
-pub type PTP_WIN32_IO_CALLBACK = unsafe extern "C" fn(
-    Instance: PTP_CALLBACK_INSTANCE,
-    Context: PVOID,
-    Overlapped: PVOID,
-    IoResult: ULONG,
-    NumberOfBytesTransferred: ULONG_PTR,
-    Io: PTP_IO,
-);
+pub type PTP_WIN32_IO_CALLBACK =
+    unsafe extern "C" fn(Instance: PTP_CALLBACK_INSTANCE, Context: PVOID, Overlapped: PVOID, IoResult: ULONG, NumberOfBytesTransferred: ULONG_PTR, Io: PTP_IO);
 extern "C" {
     pub fn CreateThreadpool(reserved: PVOID) -> PTP_POOL;
 }
@@ -29374,14 +27864,10 @@ extern "C" {
     pub fn SetThreadpoolThreadMinimum(ptpp: PTP_POOL, cthrdMic: DWORD) -> BOOL;
 }
 extern "C" {
-    pub fn SetThreadpoolStackInformation(ptpp: PTP_POOL, ptpsi: PTP_POOL_STACK_INFORMATION)
-        -> BOOL;
+    pub fn SetThreadpoolStackInformation(ptpp: PTP_POOL, ptpsi: PTP_POOL_STACK_INFORMATION) -> BOOL;
 }
 extern "C" {
-    pub fn QueryThreadpoolStackInformation(
-        ptpp: PTP_POOL,
-        ptpsi: PTP_POOL_STACK_INFORMATION,
-    ) -> BOOL;
+    pub fn QueryThreadpoolStackInformation(ptpp: PTP_POOL, ptpsi: PTP_POOL_STACK_INFORMATION) -> BOOL;
 }
 extern "C" {
     pub fn CloseThreadpool(ptpp: PTP_POOL);
@@ -29390,11 +27876,7 @@ extern "C" {
     pub fn CreateThreadpoolCleanupGroup() -> PTP_CLEANUP_GROUP;
 }
 extern "C" {
-    pub fn CloseThreadpoolCleanupGroupMembers(
-        ptpcg: PTP_CLEANUP_GROUP,
-        fCancelPendingCallbacks: BOOL,
-        pvCleanupContext: PVOID,
-    );
+    pub fn CloseThreadpoolCleanupGroupMembers(ptpcg: PTP_CLEANUP_GROUP, fCancelPendingCallbacks: BOOL, pvCleanupContext: PVOID);
 }
 extern "C" {
     pub fn CloseThreadpoolCleanupGroup(ptpcg: PTP_CLEANUP_GROUP);
@@ -29403,20 +27885,13 @@ extern "C" {
     pub fn SetEventWhenCallbackReturns(pci: PTP_CALLBACK_INSTANCE, evt: HANDLE);
 }
 extern "C" {
-    pub fn ReleaseSemaphoreWhenCallbackReturns(
-        pci: PTP_CALLBACK_INSTANCE,
-        sem: HANDLE,
-        crel: DWORD,
-    );
+    pub fn ReleaseSemaphoreWhenCallbackReturns(pci: PTP_CALLBACK_INSTANCE, sem: HANDLE, crel: DWORD);
 }
 extern "C" {
     pub fn ReleaseMutexWhenCallbackReturns(pci: PTP_CALLBACK_INSTANCE, mut_: HANDLE);
 }
 extern "C" {
-    pub fn LeaveCriticalSectionWhenCallbackReturns(
-        pci: PTP_CALLBACK_INSTANCE,
-        pcs: PCRITICAL_SECTION,
-    );
+    pub fn LeaveCriticalSectionWhenCallbackReturns(pci: PTP_CALLBACK_INSTANCE, pcs: PCRITICAL_SECTION);
 }
 extern "C" {
     pub fn FreeLibraryWhenCallbackReturns(pci: PTP_CALLBACK_INSTANCE, mod_: HMODULE);
@@ -29428,18 +27903,10 @@ extern "C" {
     pub fn DisassociateCurrentThreadFromCallback(pci: PTP_CALLBACK_INSTANCE);
 }
 extern "C" {
-    pub fn TrySubmitThreadpoolCallback(
-        pfns: PTP_SIMPLE_CALLBACK,
-        pv: PVOID,
-        pcbe: PTP_CALLBACK_ENVIRON,
-    ) -> BOOL;
+    pub fn TrySubmitThreadpoolCallback(pfns: PTP_SIMPLE_CALLBACK, pv: PVOID, pcbe: PTP_CALLBACK_ENVIRON) -> BOOL;
 }
 extern "C" {
-    pub fn CreateThreadpoolWork(
-        pfnwk: PTP_WORK_CALLBACK,
-        pv: PVOID,
-        pcbe: PTP_CALLBACK_ENVIRON,
-    ) -> PTP_WORK;
+    pub fn CreateThreadpoolWork(pfnwk: PTP_WORK_CALLBACK, pv: PVOID, pcbe: PTP_CALLBACK_ENVIRON) -> PTP_WORK;
 }
 extern "C" {
     pub fn SubmitThreadpoolWork(pwk: PTP_WORK);
@@ -29451,19 +27918,10 @@ extern "C" {
     pub fn CloseThreadpoolWork(pwk: PTP_WORK);
 }
 extern "C" {
-    pub fn CreateThreadpoolTimer(
-        pfnti: PTP_TIMER_CALLBACK,
-        pv: PVOID,
-        pcbe: PTP_CALLBACK_ENVIRON,
-    ) -> PTP_TIMER;
+    pub fn CreateThreadpoolTimer(pfnti: PTP_TIMER_CALLBACK, pv: PVOID, pcbe: PTP_CALLBACK_ENVIRON) -> PTP_TIMER;
 }
 extern "C" {
-    pub fn SetThreadpoolTimer(
-        pti: PTP_TIMER,
-        pftDueTime: PFILETIME,
-        msPeriod: DWORD,
-        msWindowLength: DWORD,
-    );
+    pub fn SetThreadpoolTimer(pti: PTP_TIMER, pftDueTime: PFILETIME, msPeriod: DWORD, msWindowLength: DWORD);
 }
 extern "C" {
     pub fn IsThreadpoolTimerSet(pti: PTP_TIMER) -> BOOL;
@@ -29475,11 +27933,7 @@ extern "C" {
     pub fn CloseThreadpoolTimer(pti: PTP_TIMER);
 }
 extern "C" {
-    pub fn CreateThreadpoolWait(
-        pfnwa: PTP_WAIT_CALLBACK,
-        pv: PVOID,
-        pcbe: PTP_CALLBACK_ENVIRON,
-    ) -> PTP_WAIT;
+    pub fn CreateThreadpoolWait(pfnwa: PTP_WAIT_CALLBACK, pv: PVOID, pcbe: PTP_CALLBACK_ENVIRON) -> PTP_WAIT;
 }
 extern "C" {
     pub fn SetThreadpoolWait(pwa: PTP_WAIT, h: HANDLE, pftTimeout: PFILETIME);
@@ -29491,12 +27945,7 @@ extern "C" {
     pub fn CloseThreadpoolWait(pwa: PTP_WAIT);
 }
 extern "C" {
-    pub fn CreateThreadpoolIo(
-        fl: HANDLE,
-        pfnio: PTP_WIN32_IO_CALLBACK,
-        pv: PVOID,
-        pcbe: PTP_CALLBACK_ENVIRON,
-    ) -> PTP_IO;
+    pub fn CreateThreadpoolIo(fl: HANDLE, pfnio: PTP_WIN32_IO_CALLBACK, pv: PVOID, pcbe: PTP_CALLBACK_ENVIRON) -> PTP_IO;
 }
 extern "C" {
     pub fn StartThreadpoolIo(pio: PTP_IO);
@@ -29511,20 +27960,10 @@ extern "C" {
     pub fn CloseThreadpoolIo(pio: PTP_IO);
 }
 extern "C" {
-    pub fn SetThreadpoolTimerEx(
-        pti: PTP_TIMER,
-        pftDueTime: PFILETIME,
-        msPeriod: DWORD,
-        msWindowLength: DWORD,
-    ) -> BOOL;
+    pub fn SetThreadpoolTimerEx(pti: PTP_TIMER, pftDueTime: PFILETIME, msPeriod: DWORD, msWindowLength: DWORD) -> BOOL;
 }
 extern "C" {
-    pub fn SetThreadpoolWaitEx(
-        pwa: PTP_WAIT,
-        h: HANDLE,
-        pftTimeout: PFILETIME,
-        Reserved: PVOID,
-    ) -> BOOL;
+    pub fn SetThreadpoolWaitEx(pwa: PTP_WAIT, h: HANDLE, pftTimeout: PFILETIME, Reserved: PVOID) -> BOOL;
 }
 extern "C" {
     pub fn IsProcessInJob(ProcessHandle: HANDLE, JobHandle: HANDLE, Result: PBOOL) -> BOOL;
@@ -29563,10 +28002,7 @@ extern "C" {
     ) -> BOOL;
 }
 extern "C" {
-    pub fn SetIoRateControlInformationJobObject(
-        hJob: HANDLE,
-        IoRateControlInfo: *mut JOBOBJECT_IO_RATE_CONTROL_INFORMATION,
-    ) -> DWORD;
+    pub fn SetIoRateControlInformationJobObject(hJob: HANDLE, IoRateControlInfo: *mut JOBOBJECT_IO_RATE_CONTROL_INFORMATION) -> DWORD;
 }
 extern "C" {
     pub fn QueryInformationJobObject(
@@ -29604,31 +28040,16 @@ extern "C" {
     pub fn Wow64SetThreadDefaultGuestMachine(Machine: USHORT) -> USHORT;
 }
 extern "C" {
-    pub fn IsWow64Process2(
-        hProcess: HANDLE,
-        pProcessMachine: *mut USHORT,
-        pNativeMachine: *mut USHORT,
-    ) -> BOOL;
+    pub fn IsWow64Process2(hProcess: HANDLE, pProcessMachine: *mut USHORT, pNativeMachine: *mut USHORT) -> BOOL;
 }
 extern "C" {
-    pub fn GetSystemWow64Directory2A(
-        lpBuffer: LPSTR,
-        uSize: UINT,
-        ImageFileMachineType: WORD,
-    ) -> UINT;
+    pub fn GetSystemWow64Directory2A(lpBuffer: LPSTR, uSize: UINT, ImageFileMachineType: WORD) -> UINT;
 }
 extern "C" {
-    pub fn GetSystemWow64Directory2W(
-        lpBuffer: LPWSTR,
-        uSize: UINT,
-        ImageFileMachineType: WORD,
-    ) -> UINT;
+    pub fn GetSystemWow64Directory2W(lpBuffer: LPWSTR, uSize: UINT, ImageFileMachineType: WORD) -> UINT;
 }
 extern "C" {
-    pub fn IsWow64GuestMachineSupported(
-        WowGuestMachine: USHORT,
-        MachineIsSupported: *mut BOOL,
-    ) -> HRESULT;
+    pub fn IsWow64GuestMachineSupported(WowGuestMachine: USHORT, MachineIsSupported: *mut BOOL) -> HRESULT;
 }
 extern "C" {
     pub fn Wow64GetThreadContext(hThread: HANDLE, lpContext: PWOW64_CONTEXT) -> BOOL;
@@ -29648,42 +28069,17 @@ pub struct tagENUMUILANG {
 }
 pub type ENUMUILANG = tagENUMUILANG;
 pub type PENUMUILANG = *mut tagENUMUILANG;
-pub type ENUMRESLANGPROCA = unsafe extern "C" fn(
-    hModule: HMODULE,
-    lpType: LPCSTR,
-    lpName: LPCSTR,
-    wLanguage: WORD,
-    lParam: LONG_PTR,
-) -> BOOL;
-pub type ENUMRESLANGPROCW = unsafe extern "C" fn(
-    hModule: HMODULE,
-    lpType: LPCWSTR,
-    lpName: LPCWSTR,
-    wLanguage: WORD,
-    lParam: LONG_PTR,
-) -> BOOL;
-pub type ENUMRESNAMEPROCA =
-    unsafe extern "C" fn(hModule: HMODULE, lpType: LPCSTR, lpName: LPSTR, lParam: LONG_PTR) -> BOOL;
-pub type ENUMRESNAMEPROCW = unsafe extern "C" fn(
-    hModule: HMODULE,
-    lpType: LPCWSTR,
-    lpName: LPWSTR,
-    lParam: LONG_PTR,
-) -> BOOL;
-pub type ENUMRESTYPEPROCA =
-    unsafe extern "C" fn(hModule: HMODULE, lpType: LPSTR, lParam: LONG_PTR) -> BOOL;
-pub type ENUMRESTYPEPROCW =
-    unsafe extern "C" fn(hModule: HMODULE, lpType: LPWSTR, lParam: LONG_PTR) -> BOOL;
+pub type ENUMRESLANGPROCA = unsafe extern "C" fn(hModule: HMODULE, lpType: LPCSTR, lpName: LPCSTR, wLanguage: WORD, lParam: LONG_PTR) -> BOOL;
+pub type ENUMRESLANGPROCW = unsafe extern "C" fn(hModule: HMODULE, lpType: LPCWSTR, lpName: LPCWSTR, wLanguage: WORD, lParam: LONG_PTR) -> BOOL;
+pub type ENUMRESNAMEPROCA = unsafe extern "C" fn(hModule: HMODULE, lpType: LPCSTR, lpName: LPSTR, lParam: LONG_PTR) -> BOOL;
+pub type ENUMRESNAMEPROCW = unsafe extern "C" fn(hModule: HMODULE, lpType: LPCWSTR, lpName: LPWSTR, lParam: LONG_PTR) -> BOOL;
+pub type ENUMRESTYPEPROCA = unsafe extern "C" fn(hModule: HMODULE, lpType: LPSTR, lParam: LONG_PTR) -> BOOL;
+pub type ENUMRESTYPEPROCW = unsafe extern "C" fn(hModule: HMODULE, lpType: LPWSTR, lParam: LONG_PTR) -> BOOL;
 extern "C" {
     pub fn DisableThreadLibraryCalls(hLibModule: HMODULE) -> BOOL;
 }
 extern "C" {
-    pub fn FindResourceExW(
-        hModule: HMODULE,
-        lpType: LPCWSTR,
-        lpName: LPCWSTR,
-        wLanguage: WORD,
-    ) -> HRSRC;
+    pub fn FindResourceExW(hModule: HMODULE, lpType: LPCWSTR, lpName: LPCWSTR, wLanguage: WORD) -> HRSRC;
 }
 extern "C" {
     pub fn FindStringOrdinal(
@@ -29716,20 +28112,13 @@ extern "C" {
 extern "C" {
     pub fn GetModuleHandleW(lpModuleName: LPCWSTR) -> HMODULE;
 }
-pub type PGET_MODULE_HANDLE_EXA =
-    unsafe extern "C" fn(dwFlags: DWORD, lpModuleName: LPCSTR, phModule: *mut HMODULE) -> BOOL;
-pub type PGET_MODULE_HANDLE_EXW =
-    unsafe extern "C" fn(dwFlags: DWORD, lpModuleName: LPCWSTR, phModule: *mut HMODULE) -> BOOL;
+pub type PGET_MODULE_HANDLE_EXA = unsafe extern "C" fn(dwFlags: DWORD, lpModuleName: LPCSTR, phModule: *mut HMODULE) -> BOOL;
+pub type PGET_MODULE_HANDLE_EXW = unsafe extern "C" fn(dwFlags: DWORD, lpModuleName: LPCWSTR, phModule: *mut HMODULE) -> BOOL;
 extern "C" {
-    pub fn GetModuleHandleExA(dwFlags: DWORD, lpModuleName: LPCSTR, phModule: *mut HMODULE)
-        -> BOOL;
+    pub fn GetModuleHandleExA(dwFlags: DWORD, lpModuleName: LPCSTR, phModule: *mut HMODULE) -> BOOL;
 }
 extern "C" {
-    pub fn GetModuleHandleExW(
-        dwFlags: DWORD,
-        lpModuleName: LPCWSTR,
-        phModule: *mut HMODULE,
-    ) -> BOOL;
+    pub fn GetModuleHandleExW(dwFlags: DWORD, lpModuleName: LPCWSTR, phModule: *mut HMODULE) -> BOOL;
 }
 extern "C" {
     pub fn GetProcAddress(hModule: HMODULE, lpProcName: LPCSTR) -> FARPROC;
@@ -29764,20 +28153,10 @@ extern "C" {
     pub fn LoadResource(hModule: HMODULE, hResInfo: HRSRC) -> HGLOBAL;
 }
 extern "C" {
-    pub fn LoadStringA(
-        hInstance: HINSTANCE,
-        uID: UINT,
-        lpBuffer: LPSTR,
-        cchBufferMax: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int;
+    pub fn LoadStringA(hInstance: HINSTANCE, uID: UINT, lpBuffer: LPSTR, cchBufferMax: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn LoadStringW(
-        hInstance: HINSTANCE,
-        uID: UINT,
-        lpBuffer: LPWSTR,
-        cchBufferMax: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int;
+    pub fn LoadStringW(hInstance: HINSTANCE, uID: UINT, lpBuffer: LPWSTR, cchBufferMax: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn LockResource(hResData: HGLOBAL) -> LPVOID;
@@ -29819,42 +28198,16 @@ extern "C" {
     ) -> BOOL;
 }
 extern "C" {
-    pub fn EnumResourceNamesExA(
-        hModule: HMODULE,
-        lpType: LPCSTR,
-        lpEnumFunc: ENUMRESNAMEPROCA,
-        lParam: LONG_PTR,
-        dwFlags: DWORD,
-        LangId: LANGID,
-    ) -> BOOL;
+    pub fn EnumResourceNamesExA(hModule: HMODULE, lpType: LPCSTR, lpEnumFunc: ENUMRESNAMEPROCA, lParam: LONG_PTR, dwFlags: DWORD, LangId: LANGID) -> BOOL;
 }
 extern "C" {
-    pub fn EnumResourceNamesExW(
-        hModule: HMODULE,
-        lpType: LPCWSTR,
-        lpEnumFunc: ENUMRESNAMEPROCW,
-        lParam: LONG_PTR,
-        dwFlags: DWORD,
-        LangId: LANGID,
-    ) -> BOOL;
+    pub fn EnumResourceNamesExW(hModule: HMODULE, lpType: LPCWSTR, lpEnumFunc: ENUMRESNAMEPROCW, lParam: LONG_PTR, dwFlags: DWORD, LangId: LANGID) -> BOOL;
 }
 extern "C" {
-    pub fn EnumResourceTypesExA(
-        hModule: HMODULE,
-        lpEnumFunc: ENUMRESTYPEPROCA,
-        lParam: LONG_PTR,
-        dwFlags: DWORD,
-        LangId: LANGID,
-    ) -> BOOL;
+    pub fn EnumResourceTypesExA(hModule: HMODULE, lpEnumFunc: ENUMRESTYPEPROCA, lParam: LONG_PTR, dwFlags: DWORD, LangId: LANGID) -> BOOL;
 }
 extern "C" {
-    pub fn EnumResourceTypesExW(
-        hModule: HMODULE,
-        lpEnumFunc: ENUMRESTYPEPROCW,
-        lParam: LONG_PTR,
-        dwFlags: DWORD,
-        LangId: LANGID,
-    ) -> BOOL;
+    pub fn EnumResourceTypesExW(hModule: HMODULE, lpEnumFunc: ENUMRESTYPEPROCW, lParam: LONG_PTR, dwFlags: DWORD, LangId: LANGID) -> BOOL;
 }
 extern "C" {
     pub fn FindResourceW(hModule: HMODULE, lpName: LPCWSTR, lpType: LPCWSTR) -> HRSRC;
@@ -29866,12 +28219,7 @@ extern "C" {
     pub fn LoadLibraryW(lpLibFileName: LPCWSTR) -> HMODULE;
 }
 extern "C" {
-    pub fn EnumResourceNamesW(
-        hModule: HMODULE,
-        lpType: LPCWSTR,
-        lpEnumFunc: ENUMRESNAMEPROCW,
-        lParam: LONG_PTR,
-    ) -> BOOL;
+    pub fn EnumResourceNamesW(hModule: HMODULE, lpType: LPCWSTR, lpEnumFunc: ENUMRESNAMEPROCW, lParam: LONG_PTR) -> BOOL;
 }
 extern "C" {
     pub fn AccessCheck(
@@ -29992,21 +28340,10 @@ extern "C" {
     ) -> BOOL;
 }
 extern "C" {
-    pub fn AddAccessAllowedAce(
-        pAcl: PACL,
-        dwAceRevision: DWORD,
-        AccessMask: DWORD,
-        pSid: PSID,
-    ) -> BOOL;
+    pub fn AddAccessAllowedAce(pAcl: PACL, dwAceRevision: DWORD, AccessMask: DWORD, pSid: PSID) -> BOOL;
 }
 extern "C" {
-    pub fn AddAccessAllowedAceEx(
-        pAcl: PACL,
-        dwAceRevision: DWORD,
-        AceFlags: DWORD,
-        AccessMask: DWORD,
-        pSid: PSID,
-    ) -> BOOL;
+    pub fn AddAccessAllowedAceEx(pAcl: PACL, dwAceRevision: DWORD, AceFlags: DWORD, AccessMask: DWORD, pSid: PSID) -> BOOL;
 }
 extern "C" {
     pub fn AddAccessAllowedObjectAce(
@@ -30020,21 +28357,10 @@ extern "C" {
     ) -> BOOL;
 }
 extern "C" {
-    pub fn AddAccessDeniedAce(
-        pAcl: PACL,
-        dwAceRevision: DWORD,
-        AccessMask: DWORD,
-        pSid: PSID,
-    ) -> BOOL;
+    pub fn AddAccessDeniedAce(pAcl: PACL, dwAceRevision: DWORD, AccessMask: DWORD, pSid: PSID) -> BOOL;
 }
 extern "C" {
-    pub fn AddAccessDeniedAceEx(
-        pAcl: PACL,
-        dwAceRevision: DWORD,
-        AceFlags: DWORD,
-        AccessMask: DWORD,
-        pSid: PSID,
-    ) -> BOOL;
+    pub fn AddAccessDeniedAceEx(pAcl: PACL, dwAceRevision: DWORD, AceFlags: DWORD, AccessMask: DWORD, pSid: PSID) -> BOOL;
 }
 extern "C" {
     pub fn AddAccessDeniedObjectAce(
@@ -30048,23 +28374,10 @@ extern "C" {
     ) -> BOOL;
 }
 extern "C" {
-    pub fn AddAce(
-        pAcl: PACL,
-        dwAceRevision: DWORD,
-        dwStartingAceIndex: DWORD,
-        pAceList: LPVOID,
-        nAceListLength: DWORD,
-    ) -> BOOL;
+    pub fn AddAce(pAcl: PACL, dwAceRevision: DWORD, dwStartingAceIndex: DWORD, pAceList: LPVOID, nAceListLength: DWORD) -> BOOL;
 }
 extern "C" {
-    pub fn AddAuditAccessAce(
-        pAcl: PACL,
-        dwAceRevision: DWORD,
-        dwAccessMask: DWORD,
-        pSid: PSID,
-        bAuditSuccess: BOOL,
-        bAuditFailure: BOOL,
-    ) -> BOOL;
+    pub fn AddAuditAccessAce(pAcl: PACL, dwAceRevision: DWORD, dwAccessMask: DWORD, pSid: PSID, bAuditSuccess: BOOL, bAuditFailure: BOOL) -> BOOL;
 }
 extern "C" {
     pub fn AddAuditAccessAceEx(
@@ -30091,13 +28404,7 @@ extern "C" {
     ) -> BOOL;
 }
 extern "C" {
-    pub fn AddMandatoryAce(
-        pAcl: PACL,
-        dwAceRevision: DWORD,
-        AceFlags: DWORD,
-        MandatoryPolicy: DWORD,
-        pLabelSid: PSID,
-    ) -> BOOL;
+    pub fn AddMandatoryAce(pAcl: PACL, dwAceRevision: DWORD, AceFlags: DWORD, MandatoryPolicy: DWORD, pLabelSid: PSID) -> BOOL;
 }
 extern "C" {
     pub fn AddResourceAttributeAce(
@@ -30111,13 +28418,7 @@ extern "C" {
     ) -> BOOL;
 }
 extern "C" {
-    pub fn AddScopedPolicyIDAce(
-        pAcl: PACL,
-        dwAceRevision: DWORD,
-        AceFlags: DWORD,
-        AccessMask: DWORD,
-        pSid: PSID,
-    ) -> BOOL;
+    pub fn AddScopedPolicyIDAce(pAcl: PACL, dwAceRevision: DWORD, AceFlags: DWORD, AccessMask: DWORD, pSid: PSID) -> BOOL;
 }
 extern "C" {
     pub fn AdjustTokenGroups(
@@ -30167,27 +28468,13 @@ extern "C" {
     pub fn CheckTokenMembership(TokenHandle: HANDLE, SidToCheck: PSID, IsMember: PBOOL) -> BOOL;
 }
 extern "C" {
-    pub fn CheckTokenCapability(
-        TokenHandle: HANDLE,
-        CapabilitySidToCheck: PSID,
-        HasCapability: PBOOL,
-    ) -> BOOL;
+    pub fn CheckTokenCapability(TokenHandle: HANDLE, CapabilitySidToCheck: PSID, HasCapability: PBOOL) -> BOOL;
 }
 extern "C" {
-    pub fn GetAppContainerAce(
-        Acl: PACL,
-        StartingAceIndex: DWORD,
-        AppContainerAce: *mut PVOID,
-        AppContainerAceIndex: *mut DWORD,
-    ) -> BOOL;
+    pub fn GetAppContainerAce(Acl: PACL, StartingAceIndex: DWORD, AppContainerAce: *mut PVOID, AppContainerAceIndex: *mut DWORD) -> BOOL;
 }
 extern "C" {
-    pub fn CheckTokenMembershipEx(
-        TokenHandle: HANDLE,
-        SidToCheck: PSID,
-        Flags: DWORD,
-        IsMember: PBOOL,
-    ) -> BOOL;
+    pub fn CheckTokenMembershipEx(TokenHandle: HANDLE, SidToCheck: PSID, Flags: DWORD, IsMember: PBOOL) -> BOOL;
 }
 extern "C" {
     pub fn ConvertToAutoInheritPrivateObjectSecurity(
@@ -30251,12 +28538,7 @@ extern "C" {
     ) -> BOOL;
 }
 extern "C" {
-    pub fn CreateWellKnownSid(
-        WellKnownSidType: WELL_KNOWN_SID_TYPE,
-        DomainSid: PSID,
-        pSid: PSID,
-        cbSid: *mut DWORD,
-    ) -> BOOL;
+    pub fn CreateWellKnownSid(WellKnownSidType: WELL_KNOWN_SID_TYPE, DomainSid: PSID, pSid: PSID, cbSid: *mut DWORD) -> BOOL;
 }
 extern "C" {
     pub fn EqualDomainSid(pSid1: PSID, pSid2: PSID, pfEqual: *mut BOOL) -> BOOL;
@@ -30268,11 +28550,7 @@ extern "C" {
     pub fn DestroyPrivateObjectSecurity(ObjectDescriptor: *mut PSECURITY_DESCRIPTOR) -> BOOL;
 }
 extern "C" {
-    pub fn DuplicateToken(
-        ExistingTokenHandle: HANDLE,
-        ImpersonationLevel: SECURITY_IMPERSONATION_LEVEL,
-        DuplicateTokenHandle: PHANDLE,
-    ) -> BOOL;
+    pub fn DuplicateToken(ExistingTokenHandle: HANDLE, ImpersonationLevel: SECURITY_IMPERSONATION_LEVEL, DuplicateTokenHandle: PHANDLE) -> BOOL;
 }
 extern "C" {
     pub fn DuplicateTokenEx(
@@ -30300,12 +28578,7 @@ extern "C" {
     pub fn GetAce(pAcl: PACL, dwAceIndex: DWORD, pAce: *mut LPVOID) -> BOOL;
 }
 extern "C" {
-    pub fn GetAclInformation(
-        pAcl: PACL,
-        pAclInformation: LPVOID,
-        nAclInformationLength: DWORD,
-        dwAclInformationClass: ACL_INFORMATION_CLASS,
-    ) -> BOOL;
+    pub fn GetAclInformation(pAcl: PACL, pAclInformation: LPVOID, nAclInformationLength: DWORD, dwAclInformationClass: ACL_INFORMATION_CLASS) -> BOOL;
 }
 extern "C" {
     pub fn GetFileSecurityW(
@@ -30338,50 +28611,25 @@ extern "C" {
     ) -> BOOL;
 }
 extern "C" {
-    pub fn GetSecurityDescriptorControl(
-        pSecurityDescriptor: PSECURITY_DESCRIPTOR,
-        pControl: PSECURITY_DESCRIPTOR_CONTROL,
-        lpdwRevision: LPDWORD,
-    ) -> BOOL;
+    pub fn GetSecurityDescriptorControl(pSecurityDescriptor: PSECURITY_DESCRIPTOR, pControl: PSECURITY_DESCRIPTOR_CONTROL, lpdwRevision: LPDWORD) -> BOOL;
 }
 extern "C" {
-    pub fn GetSecurityDescriptorDacl(
-        pSecurityDescriptor: PSECURITY_DESCRIPTOR,
-        lpbDaclPresent: LPBOOL,
-        pDacl: *mut PACL,
-        lpbDaclDefaulted: LPBOOL,
-    ) -> BOOL;
+    pub fn GetSecurityDescriptorDacl(pSecurityDescriptor: PSECURITY_DESCRIPTOR, lpbDaclPresent: LPBOOL, pDacl: *mut PACL, lpbDaclDefaulted: LPBOOL) -> BOOL;
 }
 extern "C" {
-    pub fn GetSecurityDescriptorGroup(
-        pSecurityDescriptor: PSECURITY_DESCRIPTOR,
-        pGroup: *mut PSID,
-        lpbGroupDefaulted: LPBOOL,
-    ) -> BOOL;
+    pub fn GetSecurityDescriptorGroup(pSecurityDescriptor: PSECURITY_DESCRIPTOR, pGroup: *mut PSID, lpbGroupDefaulted: LPBOOL) -> BOOL;
 }
 extern "C" {
     pub fn GetSecurityDescriptorLength(pSecurityDescriptor: PSECURITY_DESCRIPTOR) -> DWORD;
 }
 extern "C" {
-    pub fn GetSecurityDescriptorOwner(
-        pSecurityDescriptor: PSECURITY_DESCRIPTOR,
-        pOwner: *mut PSID,
-        lpbOwnerDefaulted: LPBOOL,
-    ) -> BOOL;
+    pub fn GetSecurityDescriptorOwner(pSecurityDescriptor: PSECURITY_DESCRIPTOR, pOwner: *mut PSID, lpbOwnerDefaulted: LPBOOL) -> BOOL;
 }
 extern "C" {
-    pub fn GetSecurityDescriptorRMControl(
-        SecurityDescriptor: PSECURITY_DESCRIPTOR,
-        RMControl: PUCHAR,
-    ) -> DWORD;
+    pub fn GetSecurityDescriptorRMControl(SecurityDescriptor: PSECURITY_DESCRIPTOR, RMControl: PUCHAR) -> DWORD;
 }
 extern "C" {
-    pub fn GetSecurityDescriptorSacl(
-        pSecurityDescriptor: PSECURITY_DESCRIPTOR,
-        lpbSaclPresent: LPBOOL,
-        pSacl: *mut PACL,
-        lpbSaclDefaulted: LPBOOL,
-    ) -> BOOL;
+    pub fn GetSecurityDescriptorSacl(pSecurityDescriptor: PSECURITY_DESCRIPTOR, lpbSaclPresent: LPBOOL, pSacl: *mut PACL, lpbSaclDefaulted: LPBOOL) -> BOOL;
 }
 extern "C" {
     pub fn GetSidIdentifierAuthority(pSid: PSID) -> PSID_IDENTIFIER_AUTHORITY;
@@ -30405,11 +28653,7 @@ extern "C" {
     ) -> BOOL;
 }
 extern "C" {
-    pub fn GetWindowsAccountDomainSid(
-        pSid: PSID,
-        pDomainSid: PSID,
-        cbDomainSid: *mut DWORD,
-    ) -> BOOL;
+    pub fn GetWindowsAccountDomainSid(pSid: PSID, pDomainSid: PSID, cbDomainSid: *mut DWORD) -> BOOL;
 }
 extern "C" {
     pub fn ImpersonateAnonymousToken(ThreadHandle: HANDLE) -> BOOL;
@@ -30424,17 +28668,10 @@ extern "C" {
     pub fn InitializeAcl(pAcl: PACL, nAclLength: DWORD, dwAclRevision: DWORD) -> BOOL;
 }
 extern "C" {
-    pub fn InitializeSecurityDescriptor(
-        pSecurityDescriptor: PSECURITY_DESCRIPTOR,
-        dwRevision: DWORD,
-    ) -> BOOL;
+    pub fn InitializeSecurityDescriptor(pSecurityDescriptor: PSECURITY_DESCRIPTOR, dwRevision: DWORD) -> BOOL;
 }
 extern "C" {
-    pub fn InitializeSid(
-        Sid: PSID,
-        pIdentifierAuthority: PSID_IDENTIFIER_AUTHORITY,
-        nSubAuthorityCount: BYTE,
-    ) -> BOOL;
+    pub fn InitializeSid(Sid: PSID, pIdentifierAuthority: PSID_IDENTIFIER_AUTHORITY, nSubAuthorityCount: BYTE) -> BOOL;
 }
 extern "C" {
     pub fn IsTokenRestricted(TokenHandle: HANDLE) -> BOOL;
@@ -30477,18 +28714,10 @@ extern "C" {
     pub fn MapGenericMask(AccessMask: PDWORD, GenericMapping: PGENERIC_MAPPING);
 }
 extern "C" {
-    pub fn ObjectCloseAuditAlarmW(
-        SubsystemName: LPCWSTR,
-        HandleId: LPVOID,
-        GenerateOnClose: BOOL,
-    ) -> BOOL;
+    pub fn ObjectCloseAuditAlarmW(SubsystemName: LPCWSTR, HandleId: LPVOID, GenerateOnClose: BOOL) -> BOOL;
 }
 extern "C" {
-    pub fn ObjectDeleteAuditAlarmW(
-        SubsystemName: LPCWSTR,
-        HandleId: LPVOID,
-        GenerateOnClose: BOOL,
-    ) -> BOOL;
+    pub fn ObjectDeleteAuditAlarmW(SubsystemName: LPCWSTR, HandleId: LPVOID, GenerateOnClose: BOOL) -> BOOL;
 }
 extern "C" {
     pub fn ObjectOpenAuditAlarmW(
@@ -30517,11 +28746,7 @@ extern "C" {
     ) -> BOOL;
 }
 extern "C" {
-    pub fn PrivilegeCheck(
-        ClientToken: HANDLE,
-        RequiredPrivileges: PPRIVILEGE_SET,
-        pfResult: LPBOOL,
-    ) -> BOOL;
+    pub fn PrivilegeCheck(ClientToken: HANDLE, RequiredPrivileges: PPRIVILEGE_SET, pfResult: LPBOOL) -> BOOL;
 }
 extern "C" {
     pub fn PrivilegedServiceAuditAlarmW(
@@ -30533,35 +28758,19 @@ extern "C" {
     ) -> BOOL;
 }
 extern "C" {
-    pub fn QuerySecurityAccessMask(
-        SecurityInformation: SECURITY_INFORMATION,
-        DesiredAccess: LPDWORD,
-    );
+    pub fn QuerySecurityAccessMask(SecurityInformation: SECURITY_INFORMATION, DesiredAccess: LPDWORD);
 }
 extern "C" {
     pub fn RevertToSelf() -> BOOL;
 }
 extern "C" {
-    pub fn SetAclInformation(
-        pAcl: PACL,
-        pAclInformation: LPVOID,
-        nAclInformationLength: DWORD,
-        dwAclInformationClass: ACL_INFORMATION_CLASS,
-    ) -> BOOL;
+    pub fn SetAclInformation(pAcl: PACL, pAclInformation: LPVOID, nAclInformationLength: DWORD, dwAclInformationClass: ACL_INFORMATION_CLASS) -> BOOL;
 }
 extern "C" {
-    pub fn SetFileSecurityW(
-        lpFileName: LPCWSTR,
-        SecurityInformation: SECURITY_INFORMATION,
-        pSecurityDescriptor: PSECURITY_DESCRIPTOR,
-    ) -> BOOL;
+    pub fn SetFileSecurityW(lpFileName: LPCWSTR, SecurityInformation: SECURITY_INFORMATION, pSecurityDescriptor: PSECURITY_DESCRIPTOR) -> BOOL;
 }
 extern "C" {
-    pub fn SetKernelObjectSecurity(
-        Handle: HANDLE,
-        SecurityInformation: SECURITY_INFORMATION,
-        SecurityDescriptor: PSECURITY_DESCRIPTOR,
-    ) -> BOOL;
+    pub fn SetKernelObjectSecurity(Handle: HANDLE, SecurityInformation: SECURITY_INFORMATION, SecurityDescriptor: PSECURITY_DESCRIPTOR) -> BOOL;
 }
 extern "C" {
     pub fn SetPrivateObjectSecurity(
@@ -30593,40 +28802,19 @@ extern "C" {
     ) -> BOOL;
 }
 extern "C" {
-    pub fn SetSecurityDescriptorDacl(
-        pSecurityDescriptor: PSECURITY_DESCRIPTOR,
-        bDaclPresent: BOOL,
-        pDacl: PACL,
-        bDaclDefaulted: BOOL,
-    ) -> BOOL;
+    pub fn SetSecurityDescriptorDacl(pSecurityDescriptor: PSECURITY_DESCRIPTOR, bDaclPresent: BOOL, pDacl: PACL, bDaclDefaulted: BOOL) -> BOOL;
 }
 extern "C" {
-    pub fn SetSecurityDescriptorGroup(
-        pSecurityDescriptor: PSECURITY_DESCRIPTOR,
-        pGroup: PSID,
-        bGroupDefaulted: BOOL,
-    ) -> BOOL;
+    pub fn SetSecurityDescriptorGroup(pSecurityDescriptor: PSECURITY_DESCRIPTOR, pGroup: PSID, bGroupDefaulted: BOOL) -> BOOL;
 }
 extern "C" {
-    pub fn SetSecurityDescriptorOwner(
-        pSecurityDescriptor: PSECURITY_DESCRIPTOR,
-        pOwner: PSID,
-        bOwnerDefaulted: BOOL,
-    ) -> BOOL;
+    pub fn SetSecurityDescriptorOwner(pSecurityDescriptor: PSECURITY_DESCRIPTOR, pOwner: PSID, bOwnerDefaulted: BOOL) -> BOOL;
 }
 extern "C" {
-    pub fn SetSecurityDescriptorRMControl(
-        SecurityDescriptor: PSECURITY_DESCRIPTOR,
-        RMControl: PUCHAR,
-    ) -> DWORD;
+    pub fn SetSecurityDescriptorRMControl(SecurityDescriptor: PSECURITY_DESCRIPTOR, RMControl: PUCHAR) -> DWORD;
 }
 extern "C" {
-    pub fn SetSecurityDescriptorSacl(
-        pSecurityDescriptor: PSECURITY_DESCRIPTOR,
-        bSaclPresent: BOOL,
-        pSacl: PACL,
-        bSaclDefaulted: BOOL,
-    ) -> BOOL;
+    pub fn SetSecurityDescriptorSacl(pSecurityDescriptor: PSECURITY_DESCRIPTOR, bSaclPresent: BOOL, pSacl: PACL, bSaclDefaulted: BOOL) -> BOOL;
 }
 extern "C" {
     pub fn SetTokenInformation(
@@ -30637,12 +28825,7 @@ extern "C" {
     ) -> BOOL;
 }
 extern "C" {
-    pub fn SetCachedSigningLevel(
-        SourceFiles: PHANDLE,
-        SourceFileCount: ULONG,
-        Flags: ULONG,
-        TargetFile: HANDLE,
-    ) -> BOOL;
+    pub fn SetCachedSigningLevel(SourceFiles: PHANDLE, SourceFileCount: ULONG, Flags: ULONG, TargetFile: HANDLE) -> BOOL;
 }
 extern "C" {
     pub fn GetCachedSigningLevel(
@@ -30667,11 +28850,7 @@ extern "C" {
     ) -> BOOL;
 }
 extern "C" {
-    pub fn CreatePrivateNamespaceW(
-        lpPrivateNamespaceAttributes: LPSECURITY_ATTRIBUTES,
-        lpBoundaryDescriptor: LPVOID,
-        lpAliasPrefix: LPCWSTR,
-    ) -> HANDLE;
+    pub fn CreatePrivateNamespaceW(lpPrivateNamespaceAttributes: LPSECURITY_ATTRIBUTES, lpBoundaryDescriptor: LPVOID, lpAliasPrefix: LPCWSTR) -> HANDLE;
 }
 extern "C" {
     pub fn OpenPrivateNamespaceW(lpBoundaryDescriptor: LPVOID, lpAliasPrefix: LPCWSTR) -> HANDLE;
@@ -30698,30 +28877,16 @@ extern "C" {
     pub fn GetNumaProximityNodeEx(ProximityId: ULONG, NodeNumber: PUSHORT) -> BOOL;
 }
 extern "C" {
-    pub fn GetProcessGroupAffinity(
-        hProcess: HANDLE,
-        GroupCount: PUSHORT,
-        GroupArray: PUSHORT,
-    ) -> BOOL;
+    pub fn GetProcessGroupAffinity(hProcess: HANDLE, GroupCount: PUSHORT, GroupArray: PUSHORT) -> BOOL;
 }
 extern "C" {
     pub fn GetThreadGroupAffinity(hThread: HANDLE, GroupAffinity: PGROUP_AFFINITY) -> BOOL;
 }
 extern "C" {
-    pub fn SetThreadGroupAffinity(
-        hThread: HANDLE,
-        GroupAffinity: *const GROUP_AFFINITY,
-        PreviousGroupAffinity: PGROUP_AFFINITY,
-    ) -> BOOL;
+    pub fn SetThreadGroupAffinity(hThread: HANDLE, GroupAffinity: *const GROUP_AFFINITY, PreviousGroupAffinity: PGROUP_AFFINITY) -> BOOL;
 }
 extern "C" {
-    pub fn GetAppContainerNamedObjectPath(
-        Token: HANDLE,
-        AppContainerSid: PSID,
-        ObjectPathLength: ULONG,
-        ObjectPath: LPWSTR,
-        ReturnLength: PULONG,
-    ) -> BOOL;
+    pub fn GetAppContainerNamedObjectPath(Token: HANDLE, AppContainerSid: PSID, ObjectPathLength: ULONG, ObjectPath: LPWSTR, ReturnLength: PULONG) -> BOOL;
 }
 extern "C" {
     pub fn QueryThreadCycleTime(ThreadHandle: HANDLE, CycleTime: PULONG64) -> BOOL;
@@ -30730,17 +28895,10 @@ extern "C" {
     pub fn QueryProcessCycleTime(ProcessHandle: HANDLE, CycleTime: PULONG64) -> BOOL;
 }
 extern "C" {
-    pub fn QueryIdleProcessorCycleTime(
-        BufferLength: PULONG,
-        ProcessorIdleCycleTime: PULONG64,
-    ) -> BOOL;
+    pub fn QueryIdleProcessorCycleTime(BufferLength: PULONG, ProcessorIdleCycleTime: PULONG64) -> BOOL;
 }
 extern "C" {
-    pub fn QueryIdleProcessorCycleTimeEx(
-        Group: USHORT,
-        BufferLength: PULONG,
-        ProcessorIdleCycleTime: PULONG64,
-    ) -> BOOL;
+    pub fn QueryIdleProcessorCycleTimeEx(Group: USHORT, BufferLength: PULONG, ProcessorIdleCycleTime: PULONG64) -> BOOL;
 }
 extern "C" {
     pub fn QueryInterruptTimePrecise(lpInterruptTimePrecise: PULONGLONG);
@@ -31271,20 +29429,10 @@ pub type OFSTRUCT = _OFSTRUCT;
 pub type LPOFSTRUCT = *mut _OFSTRUCT;
 pub type POFSTRUCT = *mut _OFSTRUCT;
 extern "C" {
-    pub fn WinMain(
-        hInstance: HINSTANCE,
-        hPrevInstance: HINSTANCE,
-        lpCmdLine: LPSTR,
-        nShowCmd: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int;
+    pub fn WinMain(hInstance: HINSTANCE, hPrevInstance: HINSTANCE, lpCmdLine: LPSTR, nShowCmd: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn wWinMain(
-        hInstance: HINSTANCE,
-        hPrevInstance: HINSTANCE,
-        lpCmdLine: LPWSTR,
-        nShowCmd: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int;
+    pub fn wWinMain(hInstance: HINSTANCE, hPrevInstance: HINSTANCE, lpCmdLine: LPWSTR, nShowCmd: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn GlobalAlloc(uFlags: UINT, dwBytes: SIZE_T) -> HGLOBAL;
@@ -31365,31 +29513,16 @@ extern "C" {
     pub fn GetBinaryTypeW(lpApplicationName: LPCWSTR, lpBinaryType: LPDWORD) -> BOOL;
 }
 extern "C" {
-    pub fn GetShortPathNameA(lpszLongPath: LPCSTR, lpszShortPath: LPSTR, cchBuffer: DWORD)
-        -> DWORD;
+    pub fn GetShortPathNameA(lpszLongPath: LPCSTR, lpszShortPath: LPSTR, cchBuffer: DWORD) -> DWORD;
 }
 extern "C" {
-    pub fn GetLongPathNameTransactedA(
-        lpszShortPath: LPCSTR,
-        lpszLongPath: LPSTR,
-        cchBuffer: DWORD,
-        hTransaction: HANDLE,
-    ) -> DWORD;
+    pub fn GetLongPathNameTransactedA(lpszShortPath: LPCSTR, lpszLongPath: LPSTR, cchBuffer: DWORD, hTransaction: HANDLE) -> DWORD;
 }
 extern "C" {
-    pub fn GetLongPathNameTransactedW(
-        lpszShortPath: LPCWSTR,
-        lpszLongPath: LPWSTR,
-        cchBuffer: DWORD,
-        hTransaction: HANDLE,
-    ) -> DWORD;
+    pub fn GetLongPathNameTransactedW(lpszShortPath: LPCWSTR, lpszLongPath: LPWSTR, cchBuffer: DWORD, hTransaction: HANDLE) -> DWORD;
 }
 extern "C" {
-    pub fn GetProcessAffinityMask(
-        hProcess: HANDLE,
-        lpProcessAffinityMask: PDWORD_PTR,
-        lpSystemAffinityMask: PDWORD_PTR,
-    ) -> BOOL;
+    pub fn GetProcessAffinityMask(hProcess: HANDLE, lpProcessAffinityMask: PDWORD_PTR, lpSystemAffinityMask: PDWORD_PTR) -> BOOL;
 }
 extern "C" {
     pub fn SetProcessAffinityMask(hProcess: HANDLE, dwProcessAffinityMask: DWORD_PTR) -> BOOL;
@@ -31398,18 +29531,10 @@ extern "C" {
     pub fn GetProcessIoCounters(hProcess: HANDLE, lpIoCounters: PIO_COUNTERS) -> BOOL;
 }
 extern "C" {
-    pub fn GetProcessWorkingSetSize(
-        hProcess: HANDLE,
-        lpMinimumWorkingSetSize: PSIZE_T,
-        lpMaximumWorkingSetSize: PSIZE_T,
-    ) -> BOOL;
+    pub fn GetProcessWorkingSetSize(hProcess: HANDLE, lpMinimumWorkingSetSize: PSIZE_T, lpMaximumWorkingSetSize: PSIZE_T) -> BOOL;
 }
 extern "C" {
-    pub fn SetProcessWorkingSetSize(
-        hProcess: HANDLE,
-        dwMinimumWorkingSetSize: SIZE_T,
-        dwMaximumWorkingSetSize: SIZE_T,
-    ) -> BOOL;
+    pub fn SetProcessWorkingSetSize(hProcess: HANDLE, dwMinimumWorkingSetSize: SIZE_T, dwMaximumWorkingSetSize: SIZE_T) -> BOOL;
 }
 extern "C" {
     pub fn FatalExit(ExitCode: ::std::os::raw::c_int);
@@ -31439,11 +29564,7 @@ extern "C" {
     pub fn ConvertThreadToFiberEx(lpParameter: LPVOID, dwFlags: DWORD) -> LPVOID;
 }
 extern "C" {
-    pub fn CreateFiber(
-        dwStackSize: SIZE_T,
-        lpStartAddress: LPFIBER_START_ROUTINE,
-        lpParameter: LPVOID,
-    ) -> LPVOID;
+    pub fn CreateFiber(dwStackSize: SIZE_T, lpStartAddress: LPFIBER_START_ROUTINE, lpParameter: LPVOID) -> LPVOID;
 }
 extern "C" {
     pub fn ConvertThreadToFiber(lpParameter: LPVOID) -> LPVOID;
@@ -31508,10 +29629,7 @@ impl _UMS_SYSTEM_THREAD_INFORMATION__bindgen_ty_1__bindgen_ty_1 {
         }
     }
     #[inline]
-    pub fn new_bitfield_1(
-        IsUmsSchedulerThread: ULONG,
-        IsUmsWorkerThread: ULONG,
-    ) -> __BindgenBitfieldUnit<[u8; 1usize]> {
+    pub fn new_bitfield_1(IsUmsSchedulerThread: ULONG, IsUmsWorkerThread: ULONG) -> __BindgenBitfieldUnit<[u8; 1usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
             let IsUmsSchedulerThread: u32 = unsafe { ::std::mem::transmute(IsUmsSchedulerThread) };
@@ -31530,17 +29648,10 @@ extern "C" {
     pub fn CreateUmsCompletionList(UmsCompletionList: *mut PUMS_COMPLETION_LIST) -> BOOL;
 }
 extern "C" {
-    pub fn DequeueUmsCompletionListItems(
-        UmsCompletionList: PUMS_COMPLETION_LIST,
-        WaitTimeOut: DWORD,
-        UmsThreadList: *mut PUMS_CONTEXT,
-    ) -> BOOL;
+    pub fn DequeueUmsCompletionListItems(UmsCompletionList: PUMS_COMPLETION_LIST, WaitTimeOut: DWORD, UmsThreadList: *mut PUMS_CONTEXT) -> BOOL;
 }
 extern "C" {
-    pub fn GetUmsCompletionListEvent(
-        UmsCompletionList: PUMS_COMPLETION_LIST,
-        UmsCompletionEvent: PHANDLE,
-    ) -> BOOL;
+    pub fn GetUmsCompletionListEvent(UmsCompletionList: PUMS_COMPLETION_LIST, UmsCompletionEvent: PHANDLE) -> BOOL;
 }
 extern "C" {
     pub fn ExecuteUmsThread(UmsThread: PUMS_CONTEXT) -> BOOL;
@@ -31584,10 +29695,7 @@ extern "C" {
     pub fn EnterUmsSchedulingMode(SchedulerStartupInfo: PUMS_SCHEDULER_STARTUP_INFO) -> BOOL;
 }
 extern "C" {
-    pub fn GetUmsSystemThreadInformation(
-        ThreadHandle: HANDLE,
-        SystemThreadInfo: PUMS_SYSTEM_THREAD_INFORMATION,
-    ) -> BOOL;
+    pub fn GetUmsSystemThreadInformation(ThreadHandle: HANDLE, SystemThreadInfo: PUMS_SYSTEM_THREAD_INFORMATION) -> BOOL;
 }
 extern "C" {
     pub fn SetThreadAffinityMask(hThread: HANDLE, dwThreadAffinityMask: DWORD_PTR) -> DWORD_PTR;
@@ -31605,11 +29713,7 @@ extern "C" {
     pub fn IsSystemResumeAutomatic() -> BOOL;
 }
 extern "C" {
-    pub fn GetThreadSelectorEntry(
-        hThread: HANDLE,
-        dwSelector: DWORD,
-        lpSelectorEntry: LPLDT_ENTRY,
-    ) -> BOOL;
+    pub fn GetThreadSelectorEntry(hThread: HANDLE, dwSelector: DWORD, lpSelectorEntry: LPLDT_ENTRY) -> BOOL;
 }
 extern "C" {
     pub fn SetThreadExecutionState(esFlags: EXECUTION_STATE) -> EXECUTION_STATE;
@@ -31630,11 +29734,7 @@ extern "C" {
     pub fn SetFileCompletionNotificationModes(FileHandle: HANDLE, Flags: UCHAR) -> BOOL;
 }
 extern "C" {
-    pub fn Wow64GetThreadSelectorEntry(
-        hThread: HANDLE,
-        dwSelector: DWORD,
-        lpSelectorEntry: PWOW64_LDT_ENTRY,
-    ) -> BOOL;
+    pub fn Wow64GetThreadSelectorEntry(hThread: HANDLE, dwSelector: DWORD, lpSelectorEntry: PWOW64_LDT_ENTRY) -> BOOL;
 }
 extern "C" {
     pub fn DebugSetProcessKillOnExit(KillOnExit: BOOL) -> BOOL;
@@ -31736,37 +29836,16 @@ extern "C" {
     pub fn WaitCommEvent(hFile: HANDLE, lpEvtMask: LPDWORD, lpOverlapped: LPOVERLAPPED) -> BOOL;
 }
 extern "C" {
-    pub fn OpenCommPort(
-        uPortNumber: ULONG,
-        dwDesiredAccess: DWORD,
-        dwFlagsAndAttributes: DWORD,
-    ) -> HANDLE;
+    pub fn OpenCommPort(uPortNumber: ULONG, dwDesiredAccess: DWORD, dwFlagsAndAttributes: DWORD) -> HANDLE;
 }
 extern "C" {
-    pub fn GetCommPorts(
-        lpPortNumbers: PULONG,
-        uPortNumbersCount: ULONG,
-        puPortNumbersFound: PULONG,
-    ) -> ULONG;
+    pub fn GetCommPorts(lpPortNumbers: PULONG, uPortNumbersCount: ULONG, puPortNumbersFound: PULONG) -> ULONG;
 }
 extern "C" {
-    pub fn SetTapePosition(
-        hDevice: HANDLE,
-        dwPositionMethod: DWORD,
-        dwPartition: DWORD,
-        dwOffsetLow: DWORD,
-        dwOffsetHigh: DWORD,
-        bImmediate: BOOL,
-    ) -> DWORD;
+    pub fn SetTapePosition(hDevice: HANDLE, dwPositionMethod: DWORD, dwPartition: DWORD, dwOffsetLow: DWORD, dwOffsetHigh: DWORD, bImmediate: BOOL) -> DWORD;
 }
 extern "C" {
-    pub fn GetTapePosition(
-        hDevice: HANDLE,
-        dwPositionType: DWORD,
-        lpdwPartition: LPDWORD,
-        lpdwOffsetLow: LPDWORD,
-        lpdwOffsetHigh: LPDWORD,
-    ) -> DWORD;
+    pub fn GetTapePosition(hDevice: HANDLE, dwPositionType: DWORD, lpdwPartition: LPDWORD, lpdwOffsetLow: LPDWORD, lpdwOffsetHigh: LPDWORD) -> DWORD;
 }
 extern "C" {
     pub fn PrepareTape(hDevice: HANDLE, dwOperation: DWORD, bImmediate: BOOL) -> DWORD;
@@ -31775,45 +29854,22 @@ extern "C" {
     pub fn EraseTape(hDevice: HANDLE, dwEraseType: DWORD, bImmediate: BOOL) -> DWORD;
 }
 extern "C" {
-    pub fn CreateTapePartition(
-        hDevice: HANDLE,
-        dwPartitionMethod: DWORD,
-        dwCount: DWORD,
-        dwSize: DWORD,
-    ) -> DWORD;
+    pub fn CreateTapePartition(hDevice: HANDLE, dwPartitionMethod: DWORD, dwCount: DWORD, dwSize: DWORD) -> DWORD;
 }
 extern "C" {
-    pub fn WriteTapemark(
-        hDevice: HANDLE,
-        dwTapemarkType: DWORD,
-        dwTapemarkCount: DWORD,
-        bImmediate: BOOL,
-    ) -> DWORD;
+    pub fn WriteTapemark(hDevice: HANDLE, dwTapemarkType: DWORD, dwTapemarkCount: DWORD, bImmediate: BOOL) -> DWORD;
 }
 extern "C" {
     pub fn GetTapeStatus(hDevice: HANDLE) -> DWORD;
 }
 extern "C" {
-    pub fn GetTapeParameters(
-        hDevice: HANDLE,
-        dwOperation: DWORD,
-        lpdwSize: LPDWORD,
-        lpTapeInformation: LPVOID,
-    ) -> DWORD;
+    pub fn GetTapeParameters(hDevice: HANDLE, dwOperation: DWORD, lpdwSize: LPDWORD, lpTapeInformation: LPVOID) -> DWORD;
 }
 extern "C" {
-    pub fn SetTapeParameters(
-        hDevice: HANDLE,
-        dwOperation: DWORD,
-        lpTapeInformation: LPVOID,
-    ) -> DWORD;
+    pub fn SetTapeParameters(hDevice: HANDLE, dwOperation: DWORD, lpTapeInformation: LPVOID) -> DWORD;
 }
 extern "C" {
-    pub fn MulDiv(
-        nNumber: ::std::os::raw::c_int,
-        nNumerator: ::std::os::raw::c_int,
-        nDenominator: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int;
+    pub fn MulDiv(nNumber: ::std::os::raw::c_int, nNumerator: ::std::os::raw::c_int, nDenominator: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
 }
 pub const _DEP_SYSTEM_POLICY_TYPE_DEPPolicyAlwaysOff: _DEP_SYSTEM_POLICY_TYPE = 0;
 pub const _DEP_SYSTEM_POLICY_TYPE_DEPPolicyAlwaysOn: _DEP_SYSTEM_POLICY_TYPE = 1;
@@ -31829,11 +29885,7 @@ extern "C" {
     pub fn GetSystemRegistryQuota(pdwQuotaAllowed: PDWORD, pdwQuotaUsed: PDWORD) -> BOOL;
 }
 extern "C" {
-    pub fn FileTimeToDosDateTime(
-        lpFileTime: *const FILETIME,
-        lpFatDate: LPWORD,
-        lpFatTime: LPWORD,
-    ) -> BOOL;
+    pub fn FileTimeToDosDateTime(lpFileTime: *const FILETIME, lpFatDate: LPWORD, lpFatTime: LPWORD) -> BOOL;
 }
 extern "C" {
     pub fn DosDateTimeToFileTime(wFatDate: WORD, wFatTime: WORD, lpFileTime: LPFILETIME) -> BOOL;
@@ -31861,29 +29913,13 @@ extern "C" {
     ) -> DWORD;
 }
 extern "C" {
-    pub fn CreateMailslotA(
-        lpName: LPCSTR,
-        nMaxMessageSize: DWORD,
-        lReadTimeout: DWORD,
-        lpSecurityAttributes: LPSECURITY_ATTRIBUTES,
-    ) -> HANDLE;
+    pub fn CreateMailslotA(lpName: LPCSTR, nMaxMessageSize: DWORD, lReadTimeout: DWORD, lpSecurityAttributes: LPSECURITY_ATTRIBUTES) -> HANDLE;
 }
 extern "C" {
-    pub fn CreateMailslotW(
-        lpName: LPCWSTR,
-        nMaxMessageSize: DWORD,
-        lReadTimeout: DWORD,
-        lpSecurityAttributes: LPSECURITY_ATTRIBUTES,
-    ) -> HANDLE;
+    pub fn CreateMailslotW(lpName: LPCWSTR, nMaxMessageSize: DWORD, lReadTimeout: DWORD, lpSecurityAttributes: LPSECURITY_ATTRIBUTES) -> HANDLE;
 }
 extern "C" {
-    pub fn GetMailslotInfo(
-        hMailslot: HANDLE,
-        lpMaxMessageSize: LPDWORD,
-        lpNextSize: LPDWORD,
-        lpMessageCount: LPDWORD,
-        lpReadTimeout: LPDWORD,
-    ) -> BOOL;
+    pub fn GetMailslotInfo(hMailslot: HANDLE, lpMaxMessageSize: LPDWORD, lpNextSize: LPDWORD, lpMessageCount: LPDWORD, lpReadTimeout: LPDWORD) -> BOOL;
 }
 extern "C" {
     pub fn SetMailslotInfo(hMailslot: HANDLE, lReadTimeout: DWORD) -> BOOL;
@@ -31906,37 +29942,19 @@ extern "C" {
 extern "C" {
     pub fn FileEncryptionStatusW(lpFileName: LPCWSTR, lpStatus: LPDWORD) -> BOOL;
 }
-pub type PFE_EXPORT_FUNC =
-    unsafe extern "C" fn(pbData: PBYTE, pvCallbackContext: PVOID, ulLength: ULONG) -> DWORD;
-pub type PFE_IMPORT_FUNC =
-    unsafe extern "C" fn(pbData: PBYTE, pvCallbackContext: PVOID, ulLength: PULONG) -> DWORD;
+pub type PFE_EXPORT_FUNC = unsafe extern "C" fn(pbData: PBYTE, pvCallbackContext: PVOID, ulLength: ULONG) -> DWORD;
+pub type PFE_IMPORT_FUNC = unsafe extern "C" fn(pbData: PBYTE, pvCallbackContext: PVOID, ulLength: PULONG) -> DWORD;
 extern "C" {
-    pub fn OpenEncryptedFileRawA(
-        lpFileName: LPCSTR,
-        ulFlags: ULONG,
-        pvContext: *mut PVOID,
-    ) -> DWORD;
+    pub fn OpenEncryptedFileRawA(lpFileName: LPCSTR, ulFlags: ULONG, pvContext: *mut PVOID) -> DWORD;
 }
 extern "C" {
-    pub fn OpenEncryptedFileRawW(
-        lpFileName: LPCWSTR,
-        ulFlags: ULONG,
-        pvContext: *mut PVOID,
-    ) -> DWORD;
+    pub fn OpenEncryptedFileRawW(lpFileName: LPCWSTR, ulFlags: ULONG, pvContext: *mut PVOID) -> DWORD;
 }
 extern "C" {
-    pub fn ReadEncryptedFileRaw(
-        pfExportCallback: PFE_EXPORT_FUNC,
-        pvCallbackContext: PVOID,
-        pvContext: PVOID,
-    ) -> DWORD;
+    pub fn ReadEncryptedFileRaw(pfExportCallback: PFE_EXPORT_FUNC, pvCallbackContext: PVOID, pvContext: PVOID) -> DWORD;
 }
 extern "C" {
-    pub fn WriteEncryptedFileRaw(
-        pfImportCallback: PFE_IMPORT_FUNC,
-        pvCallbackContext: PVOID,
-        pvContext: PVOID,
-    ) -> DWORD;
+    pub fn WriteEncryptedFileRaw(pfImportCallback: PFE_IMPORT_FUNC, pvCallbackContext: PVOID, pvContext: PVOID) -> DWORD;
 }
 extern "C" {
     pub fn CloseEncryptedFileRaw(pvContext: PVOID);
@@ -31954,18 +29972,10 @@ extern "C" {
     pub fn lstrcmpiW(lpString1: LPCWSTR, lpString2: LPCWSTR) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn lstrcpynA(
-        lpString1: LPSTR,
-        lpString2: LPCSTR,
-        iMaxLength: ::std::os::raw::c_int,
-    ) -> LPSTR;
+    pub fn lstrcpynA(lpString1: LPSTR, lpString2: LPCSTR, iMaxLength: ::std::os::raw::c_int) -> LPSTR;
 }
 extern "C" {
-    pub fn lstrcpynW(
-        lpString1: LPWSTR,
-        lpString2: LPCWSTR,
-        iMaxLength: ::std::os::raw::c_int,
-    ) -> LPWSTR;
+    pub fn lstrcpynW(lpString1: LPWSTR, lpString2: LPCWSTR, iMaxLength: ::std::os::raw::c_int) -> LPWSTR;
 }
 extern "C" {
     pub fn lstrcpyA(lpString1: LPSTR, lpString2: LPCSTR) -> LPSTR;
@@ -32001,18 +30011,10 @@ extern "C" {
     pub fn _lwrite(hFile: HFILE, lpBuffer: LPCCH, uBytes: UINT) -> UINT;
 }
 extern "C" {
-    pub fn _hread(
-        hFile: HFILE,
-        lpBuffer: LPVOID,
-        lBytes: ::std::os::raw::c_long,
-    ) -> ::std::os::raw::c_long;
+    pub fn _hread(hFile: HFILE, lpBuffer: LPVOID, lBytes: ::std::os::raw::c_long) -> ::std::os::raw::c_long;
 }
 extern "C" {
-    pub fn _hwrite(
-        hFile: HFILE,
-        lpBuffer: LPCCH,
-        lBytes: ::std::os::raw::c_long,
-    ) -> ::std::os::raw::c_long;
+    pub fn _hwrite(hFile: HFILE, lpBuffer: LPCCH, lBytes: ::std::os::raw::c_long) -> ::std::os::raw::c_long;
 }
 extern "C" {
     pub fn _lclose(hFile: HFILE) -> HFILE;
@@ -32021,11 +30023,7 @@ extern "C" {
     pub fn _llseek(hFile: HFILE, lOffset: LONG, iOrigin: ::std::os::raw::c_int) -> LONG;
 }
 extern "C" {
-    pub fn IsTextUnicode(
-        lpv: *const ::std::os::raw::c_void,
-        iSize: ::std::os::raw::c_int,
-        lpiResult: LPINT,
-    ) -> BOOL;
+    pub fn IsTextUnicode(lpv: *const ::std::os::raw::c_void, iSize: ::std::os::raw::c_int, lpiResult: LPINT) -> BOOL;
 }
 extern "C" {
     pub fn BackupRead(
@@ -32092,29 +30090,16 @@ extern "C" {
     pub fn OpenMutexA(dwDesiredAccess: DWORD, bInheritHandle: BOOL, lpName: LPCSTR) -> HANDLE;
 }
 extern "C" {
-    pub fn CreateSemaphoreA(
-        lpSemaphoreAttributes: LPSECURITY_ATTRIBUTES,
-        lInitialCount: LONG,
-        lMaximumCount: LONG,
-        lpName: LPCSTR,
-    ) -> HANDLE;
+    pub fn CreateSemaphoreA(lpSemaphoreAttributes: LPSECURITY_ATTRIBUTES, lInitialCount: LONG, lMaximumCount: LONG, lpName: LPCSTR) -> HANDLE;
 }
 extern "C" {
     pub fn OpenSemaphoreA(dwDesiredAccess: DWORD, bInheritHandle: BOOL, lpName: LPCSTR) -> HANDLE;
 }
 extern "C" {
-    pub fn CreateWaitableTimerA(
-        lpTimerAttributes: LPSECURITY_ATTRIBUTES,
-        bManualReset: BOOL,
-        lpTimerName: LPCSTR,
-    ) -> HANDLE;
+    pub fn CreateWaitableTimerA(lpTimerAttributes: LPSECURITY_ATTRIBUTES, bManualReset: BOOL, lpTimerName: LPCSTR) -> HANDLE;
 }
 extern "C" {
-    pub fn OpenWaitableTimerA(
-        dwDesiredAccess: DWORD,
-        bInheritHandle: BOOL,
-        lpTimerName: LPCSTR,
-    ) -> HANDLE;
+    pub fn OpenWaitableTimerA(dwDesiredAccess: DWORD, bInheritHandle: BOOL, lpTimerName: LPCSTR) -> HANDLE;
 }
 extern "C" {
     pub fn CreateSemaphoreExA(
@@ -32127,12 +30112,7 @@ extern "C" {
     ) -> HANDLE;
 }
 extern "C" {
-    pub fn CreateWaitableTimerExA(
-        lpTimerAttributes: LPSECURITY_ATTRIBUTES,
-        lpTimerName: LPCSTR,
-        dwFlags: DWORD,
-        dwDesiredAccess: DWORD,
-    ) -> HANDLE;
+    pub fn CreateWaitableTimerExA(lpTimerAttributes: LPSECURITY_ATTRIBUTES, lpTimerName: LPCSTR, dwFlags: DWORD, dwDesiredAccess: DWORD) -> HANDLE;
 }
 extern "C" {
     pub fn CreateFileMappingA(
@@ -32156,8 +30136,7 @@ extern "C" {
     ) -> HANDLE;
 }
 extern "C" {
-    pub fn OpenFileMappingA(dwDesiredAccess: DWORD, bInheritHandle: BOOL, lpName: LPCSTR)
-        -> HANDLE;
+    pub fn OpenFileMappingA(dwDesiredAccess: DWORD, bInheritHandle: BOOL, lpName: LPCSTR) -> HANDLE;
 }
 extern "C" {
     pub fn GetLogicalDriveStringsA(nBufferLength: DWORD, lpBuffer: LPSTR) -> DWORD;
@@ -32166,124 +30145,56 @@ extern "C" {
     pub fn LoadPackagedLibrary(lpwLibFileName: LPCWSTR, Reserved: DWORD) -> HMODULE;
 }
 extern "C" {
-    pub fn QueryFullProcessImageNameA(
-        hProcess: HANDLE,
-        dwFlags: DWORD,
-        lpExeName: LPSTR,
-        lpdwSize: PDWORD,
-    ) -> BOOL;
+    pub fn QueryFullProcessImageNameA(hProcess: HANDLE, dwFlags: DWORD, lpExeName: LPSTR, lpdwSize: PDWORD) -> BOOL;
 }
 extern "C" {
-    pub fn QueryFullProcessImageNameW(
-        hProcess: HANDLE,
-        dwFlags: DWORD,
-        lpExeName: LPWSTR,
-        lpdwSize: PDWORD,
-    ) -> BOOL;
+    pub fn QueryFullProcessImageNameW(hProcess: HANDLE, dwFlags: DWORD, lpExeName: LPWSTR, lpdwSize: PDWORD) -> BOOL;
 }
-pub const _PROC_THREAD_ATTRIBUTE_NUM_ProcThreadAttributeParentProcess: _PROC_THREAD_ATTRIBUTE_NUM =
-    0;
+pub const _PROC_THREAD_ATTRIBUTE_NUM_ProcThreadAttributeParentProcess: _PROC_THREAD_ATTRIBUTE_NUM = 0;
 pub const _PROC_THREAD_ATTRIBUTE_NUM_ProcThreadAttributeHandleList: _PROC_THREAD_ATTRIBUTE_NUM = 2;
-pub const _PROC_THREAD_ATTRIBUTE_NUM_ProcThreadAttributeGroupAffinity: _PROC_THREAD_ATTRIBUTE_NUM =
-    3;
-pub const _PROC_THREAD_ATTRIBUTE_NUM_ProcThreadAttributePreferredNode: _PROC_THREAD_ATTRIBUTE_NUM =
-    4;
-pub const _PROC_THREAD_ATTRIBUTE_NUM_ProcThreadAttributeIdealProcessor: _PROC_THREAD_ATTRIBUTE_NUM =
-    5;
+pub const _PROC_THREAD_ATTRIBUTE_NUM_ProcThreadAttributeGroupAffinity: _PROC_THREAD_ATTRIBUTE_NUM = 3;
+pub const _PROC_THREAD_ATTRIBUTE_NUM_ProcThreadAttributePreferredNode: _PROC_THREAD_ATTRIBUTE_NUM = 4;
+pub const _PROC_THREAD_ATTRIBUTE_NUM_ProcThreadAttributeIdealProcessor: _PROC_THREAD_ATTRIBUTE_NUM = 5;
 pub const _PROC_THREAD_ATTRIBUTE_NUM_ProcThreadAttributeUmsThread: _PROC_THREAD_ATTRIBUTE_NUM = 6;
-pub const _PROC_THREAD_ATTRIBUTE_NUM_ProcThreadAttributeMitigationPolicy:
-    _PROC_THREAD_ATTRIBUTE_NUM = 7;
-pub const _PROC_THREAD_ATTRIBUTE_NUM_ProcThreadAttributeSecurityCapabilities:
-    _PROC_THREAD_ATTRIBUTE_NUM = 9;
-pub const _PROC_THREAD_ATTRIBUTE_NUM_ProcThreadAttributeProtectionLevel:
-    _PROC_THREAD_ATTRIBUTE_NUM = 11;
+pub const _PROC_THREAD_ATTRIBUTE_NUM_ProcThreadAttributeMitigationPolicy: _PROC_THREAD_ATTRIBUTE_NUM = 7;
+pub const _PROC_THREAD_ATTRIBUTE_NUM_ProcThreadAttributeSecurityCapabilities: _PROC_THREAD_ATTRIBUTE_NUM = 9;
+pub const _PROC_THREAD_ATTRIBUTE_NUM_ProcThreadAttributeProtectionLevel: _PROC_THREAD_ATTRIBUTE_NUM = 11;
 pub const _PROC_THREAD_ATTRIBUTE_NUM_ProcThreadAttributeJobList: _PROC_THREAD_ATTRIBUTE_NUM = 13;
-pub const _PROC_THREAD_ATTRIBUTE_NUM_ProcThreadAttributeChildProcessPolicy:
-    _PROC_THREAD_ATTRIBUTE_NUM = 14;
-pub const _PROC_THREAD_ATTRIBUTE_NUM_ProcThreadAttributeAllApplicationPackagesPolicy:
-    _PROC_THREAD_ATTRIBUTE_NUM = 15;
-pub const _PROC_THREAD_ATTRIBUTE_NUM_ProcThreadAttributeWin32kFilter: _PROC_THREAD_ATTRIBUTE_NUM =
-    16;
-pub const _PROC_THREAD_ATTRIBUTE_NUM_ProcThreadAttributeSafeOpenPromptOriginClaim:
-    _PROC_THREAD_ATTRIBUTE_NUM = 17;
-pub const _PROC_THREAD_ATTRIBUTE_NUM_ProcThreadAttributeDesktopAppPolicy:
-    _PROC_THREAD_ATTRIBUTE_NUM = 18;
-pub const _PROC_THREAD_ATTRIBUTE_NUM_ProcThreadAttributePseudoConsole: _PROC_THREAD_ATTRIBUTE_NUM =
-    22;
-pub const _PROC_THREAD_ATTRIBUTE_NUM_ProcThreadAttributeMitigationAuditPolicy:
-    _PROC_THREAD_ATTRIBUTE_NUM = 24;
+pub const _PROC_THREAD_ATTRIBUTE_NUM_ProcThreadAttributeChildProcessPolicy: _PROC_THREAD_ATTRIBUTE_NUM = 14;
+pub const _PROC_THREAD_ATTRIBUTE_NUM_ProcThreadAttributeAllApplicationPackagesPolicy: _PROC_THREAD_ATTRIBUTE_NUM = 15;
+pub const _PROC_THREAD_ATTRIBUTE_NUM_ProcThreadAttributeWin32kFilter: _PROC_THREAD_ATTRIBUTE_NUM = 16;
+pub const _PROC_THREAD_ATTRIBUTE_NUM_ProcThreadAttributeSafeOpenPromptOriginClaim: _PROC_THREAD_ATTRIBUTE_NUM = 17;
+pub const _PROC_THREAD_ATTRIBUTE_NUM_ProcThreadAttributeDesktopAppPolicy: _PROC_THREAD_ATTRIBUTE_NUM = 18;
+pub const _PROC_THREAD_ATTRIBUTE_NUM_ProcThreadAttributePseudoConsole: _PROC_THREAD_ATTRIBUTE_NUM = 22;
+pub const _PROC_THREAD_ATTRIBUTE_NUM_ProcThreadAttributeMitigationAuditPolicy: _PROC_THREAD_ATTRIBUTE_NUM = 24;
 pub type _PROC_THREAD_ATTRIBUTE_NUM = ::std::os::raw::c_int;
 pub use self::_PROC_THREAD_ATTRIBUTE_NUM as PROC_THREAD_ATTRIBUTE_NUM;
 extern "C" {
     pub fn GetStartupInfoA(lpStartupInfo: LPSTARTUPINFOA);
 }
 extern "C" {
-    pub fn GetFirmwareEnvironmentVariableA(
-        lpName: LPCSTR,
-        lpGuid: LPCSTR,
-        pBuffer: PVOID,
-        nSize: DWORD,
-    ) -> DWORD;
+    pub fn GetFirmwareEnvironmentVariableA(lpName: LPCSTR, lpGuid: LPCSTR, pBuffer: PVOID, nSize: DWORD) -> DWORD;
 }
 extern "C" {
-    pub fn GetFirmwareEnvironmentVariableW(
-        lpName: LPCWSTR,
-        lpGuid: LPCWSTR,
-        pBuffer: PVOID,
-        nSize: DWORD,
-    ) -> DWORD;
+    pub fn GetFirmwareEnvironmentVariableW(lpName: LPCWSTR, lpGuid: LPCWSTR, pBuffer: PVOID, nSize: DWORD) -> DWORD;
 }
 extern "C" {
-    pub fn GetFirmwareEnvironmentVariableExA(
-        lpName: LPCSTR,
-        lpGuid: LPCSTR,
-        pBuffer: PVOID,
-        nSize: DWORD,
-        pdwAttribubutes: PDWORD,
-    ) -> DWORD;
+    pub fn GetFirmwareEnvironmentVariableExA(lpName: LPCSTR, lpGuid: LPCSTR, pBuffer: PVOID, nSize: DWORD, pdwAttribubutes: PDWORD) -> DWORD;
 }
 extern "C" {
-    pub fn GetFirmwareEnvironmentVariableExW(
-        lpName: LPCWSTR,
-        lpGuid: LPCWSTR,
-        pBuffer: PVOID,
-        nSize: DWORD,
-        pdwAttribubutes: PDWORD,
-    ) -> DWORD;
+    pub fn GetFirmwareEnvironmentVariableExW(lpName: LPCWSTR, lpGuid: LPCWSTR, pBuffer: PVOID, nSize: DWORD, pdwAttribubutes: PDWORD) -> DWORD;
 }
 extern "C" {
-    pub fn SetFirmwareEnvironmentVariableA(
-        lpName: LPCSTR,
-        lpGuid: LPCSTR,
-        pValue: PVOID,
-        nSize: DWORD,
-    ) -> BOOL;
+    pub fn SetFirmwareEnvironmentVariableA(lpName: LPCSTR, lpGuid: LPCSTR, pValue: PVOID, nSize: DWORD) -> BOOL;
 }
 extern "C" {
-    pub fn SetFirmwareEnvironmentVariableW(
-        lpName: LPCWSTR,
-        lpGuid: LPCWSTR,
-        pValue: PVOID,
-        nSize: DWORD,
-    ) -> BOOL;
+    pub fn SetFirmwareEnvironmentVariableW(lpName: LPCWSTR, lpGuid: LPCWSTR, pValue: PVOID, nSize: DWORD) -> BOOL;
 }
 extern "C" {
-    pub fn SetFirmwareEnvironmentVariableExA(
-        lpName: LPCSTR,
-        lpGuid: LPCSTR,
-        pValue: PVOID,
-        nSize: DWORD,
-        dwAttributes: DWORD,
-    ) -> BOOL;
+    pub fn SetFirmwareEnvironmentVariableExA(lpName: LPCSTR, lpGuid: LPCSTR, pValue: PVOID, nSize: DWORD, dwAttributes: DWORD) -> BOOL;
 }
 extern "C" {
-    pub fn SetFirmwareEnvironmentVariableExW(
-        lpName: LPCWSTR,
-        lpGuid: LPCWSTR,
-        pValue: PVOID,
-        nSize: DWORD,
-        dwAttributes: DWORD,
-    ) -> BOOL;
+    pub fn SetFirmwareEnvironmentVariableExW(lpName: LPCWSTR, lpGuid: LPCWSTR, pValue: PVOID, nSize: DWORD, dwAttributes: DWORD) -> BOOL;
 }
 extern "C" {
     pub fn GetFirmwareType(FirmwareType: PFIRMWARE_TYPE) -> BOOL;
@@ -32295,52 +30206,22 @@ extern "C" {
     pub fn FindResourceA(hModule: HMODULE, lpName: LPCSTR, lpType: LPCSTR) -> HRSRC;
 }
 extern "C" {
-    pub fn FindResourceExA(
-        hModule: HMODULE,
-        lpType: LPCSTR,
-        lpName: LPCSTR,
-        wLanguage: WORD,
-    ) -> HRSRC;
+    pub fn FindResourceExA(hModule: HMODULE, lpType: LPCSTR, lpName: LPCSTR, wLanguage: WORD) -> HRSRC;
 }
 extern "C" {
-    pub fn EnumResourceTypesA(
-        hModule: HMODULE,
-        lpEnumFunc: ENUMRESTYPEPROCA,
-        lParam: LONG_PTR,
-    ) -> BOOL;
+    pub fn EnumResourceTypesA(hModule: HMODULE, lpEnumFunc: ENUMRESTYPEPROCA, lParam: LONG_PTR) -> BOOL;
 }
 extern "C" {
-    pub fn EnumResourceTypesW(
-        hModule: HMODULE,
-        lpEnumFunc: ENUMRESTYPEPROCW,
-        lParam: LONG_PTR,
-    ) -> BOOL;
+    pub fn EnumResourceTypesW(hModule: HMODULE, lpEnumFunc: ENUMRESTYPEPROCW, lParam: LONG_PTR) -> BOOL;
 }
 extern "C" {
-    pub fn EnumResourceNamesA(
-        hModule: HMODULE,
-        lpType: LPCSTR,
-        lpEnumFunc: ENUMRESNAMEPROCA,
-        lParam: LONG_PTR,
-    ) -> BOOL;
+    pub fn EnumResourceNamesA(hModule: HMODULE, lpType: LPCSTR, lpEnumFunc: ENUMRESNAMEPROCA, lParam: LONG_PTR) -> BOOL;
 }
 extern "C" {
-    pub fn EnumResourceLanguagesA(
-        hModule: HMODULE,
-        lpType: LPCSTR,
-        lpName: LPCSTR,
-        lpEnumFunc: ENUMRESLANGPROCA,
-        lParam: LONG_PTR,
-    ) -> BOOL;
+    pub fn EnumResourceLanguagesA(hModule: HMODULE, lpType: LPCSTR, lpName: LPCSTR, lpEnumFunc: ENUMRESLANGPROCA, lParam: LONG_PTR) -> BOOL;
 }
 extern "C" {
-    pub fn EnumResourceLanguagesW(
-        hModule: HMODULE,
-        lpType: LPCWSTR,
-        lpName: LPCWSTR,
-        lpEnumFunc: ENUMRESLANGPROCW,
-        lParam: LONG_PTR,
-    ) -> BOOL;
+    pub fn EnumResourceLanguagesW(hModule: HMODULE, lpType: LPCWSTR, lpName: LPCWSTR, lpEnumFunc: ENUMRESLANGPROCW, lParam: LONG_PTR) -> BOOL;
 }
 extern "C" {
     pub fn BeginUpdateResourceA(pFileName: LPCSTR, bDeleteExistingResources: BOOL) -> HANDLE;
@@ -32349,24 +30230,10 @@ extern "C" {
     pub fn BeginUpdateResourceW(pFileName: LPCWSTR, bDeleteExistingResources: BOOL) -> HANDLE;
 }
 extern "C" {
-    pub fn UpdateResourceA(
-        hUpdate: HANDLE,
-        lpType: LPCSTR,
-        lpName: LPCSTR,
-        wLanguage: WORD,
-        lpData: LPVOID,
-        cb: DWORD,
-    ) -> BOOL;
+    pub fn UpdateResourceA(hUpdate: HANDLE, lpType: LPCSTR, lpName: LPCSTR, wLanguage: WORD, lpData: LPVOID, cb: DWORD) -> BOOL;
 }
 extern "C" {
-    pub fn UpdateResourceW(
-        hUpdate: HANDLE,
-        lpType: LPCWSTR,
-        lpName: LPCWSTR,
-        wLanguage: WORD,
-        lpData: LPVOID,
-        cb: DWORD,
-    ) -> BOOL;
+    pub fn UpdateResourceW(hUpdate: HANDLE, lpType: LPCWSTR, lpName: LPCWSTR, wLanguage: WORD, lpData: LPVOID, cb: DWORD) -> BOOL;
 }
 extern "C" {
     pub fn EndUpdateResourceA(hUpdate: HANDLE, fDiscard: BOOL) -> BOOL;
@@ -32423,22 +30290,10 @@ extern "C" {
     pub fn GetProfileIntW(lpAppName: LPCWSTR, lpKeyName: LPCWSTR, nDefault: INT) -> UINT;
 }
 extern "C" {
-    pub fn GetProfileStringA(
-        lpAppName: LPCSTR,
-        lpKeyName: LPCSTR,
-        lpDefault: LPCSTR,
-        lpReturnedString: LPSTR,
-        nSize: DWORD,
-    ) -> DWORD;
+    pub fn GetProfileStringA(lpAppName: LPCSTR, lpKeyName: LPCSTR, lpDefault: LPCSTR, lpReturnedString: LPSTR, nSize: DWORD) -> DWORD;
 }
 extern "C" {
-    pub fn GetProfileStringW(
-        lpAppName: LPCWSTR,
-        lpKeyName: LPCWSTR,
-        lpDefault: LPCWSTR,
-        lpReturnedString: LPWSTR,
-        nSize: DWORD,
-    ) -> DWORD;
+    pub fn GetProfileStringW(lpAppName: LPCWSTR, lpKeyName: LPCWSTR, lpDefault: LPCWSTR, lpReturnedString: LPWSTR, nSize: DWORD) -> DWORD;
 }
 extern "C" {
     pub fn WriteProfileStringA(lpAppName: LPCSTR, lpKeyName: LPCSTR, lpString: LPCSTR) -> BOOL;
@@ -32459,20 +30314,10 @@ extern "C" {
     pub fn WriteProfileSectionW(lpAppName: LPCWSTR, lpString: LPCWSTR) -> BOOL;
 }
 extern "C" {
-    pub fn GetPrivateProfileIntA(
-        lpAppName: LPCSTR,
-        lpKeyName: LPCSTR,
-        nDefault: INT,
-        lpFileName: LPCSTR,
-    ) -> UINT;
+    pub fn GetPrivateProfileIntA(lpAppName: LPCSTR, lpKeyName: LPCSTR, nDefault: INT, lpFileName: LPCSTR) -> UINT;
 }
 extern "C" {
-    pub fn GetPrivateProfileIntW(
-        lpAppName: LPCWSTR,
-        lpKeyName: LPCWSTR,
-        nDefault: INT,
-        lpFileName: LPCWSTR,
-    ) -> UINT;
+    pub fn GetPrivateProfileIntW(lpAppName: LPCWSTR, lpKeyName: LPCWSTR, nDefault: INT, lpFileName: LPCWSTR) -> UINT;
 }
 extern "C" {
     pub fn GetPrivateProfileStringA(
@@ -32495,107 +30340,46 @@ extern "C" {
     ) -> DWORD;
 }
 extern "C" {
-    pub fn WritePrivateProfileStringA(
-        lpAppName: LPCSTR,
-        lpKeyName: LPCSTR,
-        lpString: LPCSTR,
-        lpFileName: LPCSTR,
-    ) -> BOOL;
+    pub fn WritePrivateProfileStringA(lpAppName: LPCSTR, lpKeyName: LPCSTR, lpString: LPCSTR, lpFileName: LPCSTR) -> BOOL;
 }
 extern "C" {
-    pub fn WritePrivateProfileStringW(
-        lpAppName: LPCWSTR,
-        lpKeyName: LPCWSTR,
-        lpString: LPCWSTR,
-        lpFileName: LPCWSTR,
-    ) -> BOOL;
+    pub fn WritePrivateProfileStringW(lpAppName: LPCWSTR, lpKeyName: LPCWSTR, lpString: LPCWSTR, lpFileName: LPCWSTR) -> BOOL;
 }
 extern "C" {
-    pub fn GetPrivateProfileSectionA(
-        lpAppName: LPCSTR,
-        lpReturnedString: LPSTR,
-        nSize: DWORD,
-        lpFileName: LPCSTR,
-    ) -> DWORD;
+    pub fn GetPrivateProfileSectionA(lpAppName: LPCSTR, lpReturnedString: LPSTR, nSize: DWORD, lpFileName: LPCSTR) -> DWORD;
 }
 extern "C" {
-    pub fn GetPrivateProfileSectionW(
-        lpAppName: LPCWSTR,
-        lpReturnedString: LPWSTR,
-        nSize: DWORD,
-        lpFileName: LPCWSTR,
-    ) -> DWORD;
+    pub fn GetPrivateProfileSectionW(lpAppName: LPCWSTR, lpReturnedString: LPWSTR, nSize: DWORD, lpFileName: LPCWSTR) -> DWORD;
 }
 extern "C" {
-    pub fn WritePrivateProfileSectionA(
-        lpAppName: LPCSTR,
-        lpString: LPCSTR,
-        lpFileName: LPCSTR,
-    ) -> BOOL;
+    pub fn WritePrivateProfileSectionA(lpAppName: LPCSTR, lpString: LPCSTR, lpFileName: LPCSTR) -> BOOL;
 }
 extern "C" {
-    pub fn WritePrivateProfileSectionW(
-        lpAppName: LPCWSTR,
-        lpString: LPCWSTR,
-        lpFileName: LPCWSTR,
-    ) -> BOOL;
+    pub fn WritePrivateProfileSectionW(lpAppName: LPCWSTR, lpString: LPCWSTR, lpFileName: LPCWSTR) -> BOOL;
 }
 extern "C" {
-    pub fn GetPrivateProfileSectionNamesA(
-        lpszReturnBuffer: LPSTR,
-        nSize: DWORD,
-        lpFileName: LPCSTR,
-    ) -> DWORD;
+    pub fn GetPrivateProfileSectionNamesA(lpszReturnBuffer: LPSTR, nSize: DWORD, lpFileName: LPCSTR) -> DWORD;
 }
 extern "C" {
-    pub fn GetPrivateProfileSectionNamesW(
-        lpszReturnBuffer: LPWSTR,
-        nSize: DWORD,
-        lpFileName: LPCWSTR,
-    ) -> DWORD;
+    pub fn GetPrivateProfileSectionNamesW(lpszReturnBuffer: LPWSTR, nSize: DWORD, lpFileName: LPCWSTR) -> DWORD;
 }
 extern "C" {
-    pub fn GetPrivateProfileStructA(
-        lpszSection: LPCSTR,
-        lpszKey: LPCSTR,
-        lpStruct: LPVOID,
-        uSizeStruct: UINT,
-        szFile: LPCSTR,
-    ) -> BOOL;
+    pub fn GetPrivateProfileStructA(lpszSection: LPCSTR, lpszKey: LPCSTR, lpStruct: LPVOID, uSizeStruct: UINT, szFile: LPCSTR) -> BOOL;
 }
 extern "C" {
-    pub fn GetPrivateProfileStructW(
-        lpszSection: LPCWSTR,
-        lpszKey: LPCWSTR,
-        lpStruct: LPVOID,
-        uSizeStruct: UINT,
-        szFile: LPCWSTR,
-    ) -> BOOL;
+    pub fn GetPrivateProfileStructW(lpszSection: LPCWSTR, lpszKey: LPCWSTR, lpStruct: LPVOID, uSizeStruct: UINT, szFile: LPCWSTR) -> BOOL;
 }
 extern "C" {
-    pub fn WritePrivateProfileStructA(
-        lpszSection: LPCSTR,
-        lpszKey: LPCSTR,
-        lpStruct: LPVOID,
-        uSizeStruct: UINT,
-        szFile: LPCSTR,
-    ) -> BOOL;
+    pub fn WritePrivateProfileStructA(lpszSection: LPCSTR, lpszKey: LPCSTR, lpStruct: LPVOID, uSizeStruct: UINT, szFile: LPCSTR) -> BOOL;
 }
 extern "C" {
-    pub fn WritePrivateProfileStructW(
-        lpszSection: LPCWSTR,
-        lpszKey: LPCWSTR,
-        lpStruct: LPVOID,
-        uSizeStruct: UINT,
-        szFile: LPCWSTR,
-    ) -> BOOL;
+    pub fn WritePrivateProfileStructW(lpszSection: LPCWSTR, lpszKey: LPCWSTR, lpStruct: LPVOID, uSizeStruct: UINT, szFile: LPCWSTR) -> BOOL;
 }
 extern "C" {
     pub fn Wow64EnableWow64FsRedirection(Wow64FsEnableRedirection: BOOLEAN) -> BOOLEAN;
 }
 pub type PGET_SYSTEM_WOW64_DIRECTORY_A = unsafe extern "C" fn(lpBuffer: LPSTR, uSize: UINT) -> UINT;
-pub type PGET_SYSTEM_WOW64_DIRECTORY_W =
-    unsafe extern "C" fn(lpBuffer: LPWSTR, uSize: UINT) -> UINT;
+pub type PGET_SYSTEM_WOW64_DIRECTORY_W = unsafe extern "C" fn(lpBuffer: LPWSTR, uSize: UINT) -> UINT;
 extern "C" {
     pub fn SetDllDirectoryA(lpPathName: LPCSTR) -> BOOL;
 }
@@ -32612,18 +30396,10 @@ extern "C" {
     pub fn SetSearchPathMode(Flags: DWORD) -> BOOL;
 }
 extern "C" {
-    pub fn CreateDirectoryExA(
-        lpTemplateDirectory: LPCSTR,
-        lpNewDirectory: LPCSTR,
-        lpSecurityAttributes: LPSECURITY_ATTRIBUTES,
-    ) -> BOOL;
+    pub fn CreateDirectoryExA(lpTemplateDirectory: LPCSTR, lpNewDirectory: LPCSTR, lpSecurityAttributes: LPSECURITY_ATTRIBUTES) -> BOOL;
 }
 extern "C" {
-    pub fn CreateDirectoryExW(
-        lpTemplateDirectory: LPCWSTR,
-        lpNewDirectory: LPCWSTR,
-        lpSecurityAttributes: LPSECURITY_ATTRIBUTES,
-    ) -> BOOL;
+    pub fn CreateDirectoryExW(lpTemplateDirectory: LPCWSTR, lpNewDirectory: LPCWSTR, lpSecurityAttributes: LPSECURITY_ATTRIBUTES) -> BOOL;
 }
 extern "C" {
     pub fn CreateDirectoryTransactedA(
@@ -32648,22 +30424,10 @@ extern "C" {
     pub fn RemoveDirectoryTransactedW(lpPathName: LPCWSTR, hTransaction: HANDLE) -> BOOL;
 }
 extern "C" {
-    pub fn GetFullPathNameTransactedA(
-        lpFileName: LPCSTR,
-        nBufferLength: DWORD,
-        lpBuffer: LPSTR,
-        lpFilePart: *mut LPSTR,
-        hTransaction: HANDLE,
-    ) -> DWORD;
+    pub fn GetFullPathNameTransactedA(lpFileName: LPCSTR, nBufferLength: DWORD, lpBuffer: LPSTR, lpFilePart: *mut LPSTR, hTransaction: HANDLE) -> DWORD;
 }
 extern "C" {
-    pub fn GetFullPathNameTransactedW(
-        lpFileName: LPCWSTR,
-        nBufferLength: DWORD,
-        lpBuffer: LPWSTR,
-        lpFilePart: *mut LPWSTR,
-        hTransaction: HANDLE,
-    ) -> DWORD;
+    pub fn GetFullPathNameTransactedW(lpFileName: LPCWSTR, nBufferLength: DWORD, lpBuffer: LPWSTR, lpFilePart: *mut LPWSTR, hTransaction: HANDLE) -> DWORD;
 }
 extern "C" {
     pub fn DefineDosDeviceA(dwFlags: DWORD, lpDeviceName: LPCSTR, lpTargetPath: LPCSTR) -> BOOL;
@@ -32700,56 +30464,25 @@ extern "C" {
     ) -> HANDLE;
 }
 extern "C" {
-    pub fn ReOpenFile(
-        hOriginalFile: HANDLE,
-        dwDesiredAccess: DWORD,
-        dwShareMode: DWORD,
-        dwFlagsAndAttributes: DWORD,
-    ) -> HANDLE;
+    pub fn ReOpenFile(hOriginalFile: HANDLE, dwDesiredAccess: DWORD, dwShareMode: DWORD, dwFlagsAndAttributes: DWORD) -> HANDLE;
 }
 extern "C" {
-    pub fn SetFileAttributesTransactedA(
-        lpFileName: LPCSTR,
-        dwFileAttributes: DWORD,
-        hTransaction: HANDLE,
-    ) -> BOOL;
+    pub fn SetFileAttributesTransactedA(lpFileName: LPCSTR, dwFileAttributes: DWORD, hTransaction: HANDLE) -> BOOL;
 }
 extern "C" {
-    pub fn SetFileAttributesTransactedW(
-        lpFileName: LPCWSTR,
-        dwFileAttributes: DWORD,
-        hTransaction: HANDLE,
-    ) -> BOOL;
+    pub fn SetFileAttributesTransactedW(lpFileName: LPCWSTR, dwFileAttributes: DWORD, hTransaction: HANDLE) -> BOOL;
 }
 extern "C" {
-    pub fn GetFileAttributesTransactedA(
-        lpFileName: LPCSTR,
-        fInfoLevelId: GET_FILEEX_INFO_LEVELS,
-        lpFileInformation: LPVOID,
-        hTransaction: HANDLE,
-    ) -> BOOL;
+    pub fn GetFileAttributesTransactedA(lpFileName: LPCSTR, fInfoLevelId: GET_FILEEX_INFO_LEVELS, lpFileInformation: LPVOID, hTransaction: HANDLE) -> BOOL;
 }
 extern "C" {
-    pub fn GetFileAttributesTransactedW(
-        lpFileName: LPCWSTR,
-        fInfoLevelId: GET_FILEEX_INFO_LEVELS,
-        lpFileInformation: LPVOID,
-        hTransaction: HANDLE,
-    ) -> BOOL;
+    pub fn GetFileAttributesTransactedW(lpFileName: LPCWSTR, fInfoLevelId: GET_FILEEX_INFO_LEVELS, lpFileInformation: LPVOID, hTransaction: HANDLE) -> BOOL;
 }
 extern "C" {
-    pub fn GetCompressedFileSizeTransactedA(
-        lpFileName: LPCSTR,
-        lpFileSizeHigh: LPDWORD,
-        hTransaction: HANDLE,
-    ) -> DWORD;
+    pub fn GetCompressedFileSizeTransactedA(lpFileName: LPCSTR, lpFileSizeHigh: LPDWORD, hTransaction: HANDLE) -> DWORD;
 }
 extern "C" {
-    pub fn GetCompressedFileSizeTransactedW(
-        lpFileName: LPCWSTR,
-        lpFileSizeHigh: LPDWORD,
-        hTransaction: HANDLE,
-    ) -> DWORD;
+    pub fn GetCompressedFileSizeTransactedW(lpFileName: LPCWSTR, lpFileSizeHigh: LPDWORD, hTransaction: HANDLE) -> DWORD;
 }
 extern "C" {
     pub fn DeleteFileTransactedA(lpFileName: LPCSTR, hTransaction: HANDLE) -> BOOL;
@@ -32758,22 +30491,10 @@ extern "C" {
     pub fn DeleteFileTransactedW(lpFileName: LPCWSTR, hTransaction: HANDLE) -> BOOL;
 }
 extern "C" {
-    pub fn CheckNameLegalDOS8Dot3A(
-        lpName: LPCSTR,
-        lpOemName: LPSTR,
-        OemNameSize: DWORD,
-        pbNameContainsSpaces: PBOOL,
-        pbNameLegal: PBOOL,
-    ) -> BOOL;
+    pub fn CheckNameLegalDOS8Dot3A(lpName: LPCSTR, lpOemName: LPSTR, OemNameSize: DWORD, pbNameContainsSpaces: PBOOL, pbNameLegal: PBOOL) -> BOOL;
 }
 extern "C" {
-    pub fn CheckNameLegalDOS8Dot3W(
-        lpName: LPCWSTR,
-        lpOemName: LPSTR,
-        OemNameSize: DWORD,
-        pbNameContainsSpaces: PBOOL,
-        pbNameLegal: PBOOL,
-    ) -> BOOL;
+    pub fn CheckNameLegalDOS8Dot3W(lpName: LPCWSTR, lpOemName: LPSTR, OemNameSize: DWORD, pbNameContainsSpaces: PBOOL, pbNameLegal: PBOOL) -> BOOL;
 }
 extern "C" {
     pub fn FindFirstFileTransactedA(
@@ -32798,18 +30519,10 @@ extern "C" {
     ) -> HANDLE;
 }
 extern "C" {
-    pub fn CopyFileA(
-        lpExistingFileName: LPCSTR,
-        lpNewFileName: LPCSTR,
-        bFailIfExists: BOOL,
-    ) -> BOOL;
+    pub fn CopyFileA(lpExistingFileName: LPCSTR, lpNewFileName: LPCSTR, bFailIfExists: BOOL) -> BOOL;
 }
 extern "C" {
-    pub fn CopyFileW(
-        lpExistingFileName: LPCWSTR,
-        lpNewFileName: LPCWSTR,
-        bFailIfExists: BOOL,
-    ) -> BOOL;
+    pub fn CopyFileW(lpExistingFileName: LPCWSTR, lpNewFileName: LPCWSTR, bFailIfExists: BOOL) -> BOOL;
 }
 pub type LPPROGRESS_ROUTINE = unsafe extern "C" fn(
     TotalFileSize: LARGE_INTEGER,
@@ -32974,10 +30687,7 @@ pub struct COPYFILE2_MESSAGE__bindgen_ty_1__bindgen_ty_6 {
     pub uliTotalFileSize: ULARGE_INTEGER,
     pub uliTotalBytesTransferred: ULARGE_INTEGER,
 }
-pub type PCOPYFILE2_PROGRESS_ROUTINE = unsafe extern "C" fn(
-    pMessage: *const COPYFILE2_MESSAGE,
-    pvCallbackContext: PVOID,
-) -> COPYFILE2_MESSAGE_ACTION;
+pub type PCOPYFILE2_PROGRESS_ROUTINE = unsafe extern "C" fn(pMessage: *const COPYFILE2_MESSAGE, pvCallbackContext: PVOID) -> COPYFILE2_MESSAGE_ACTION;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct COPYFILE2_EXTENDED_PARAMETERS {
@@ -32988,11 +30698,7 @@ pub struct COPYFILE2_EXTENDED_PARAMETERS {
     pub pvCallbackContext: PVOID,
 }
 extern "C" {
-    pub fn CopyFile2(
-        pwszExistingFileName: PCWSTR,
-        pwszNewFileName: PCWSTR,
-        pExtendedParameters: *mut COPYFILE2_EXTENDED_PARAMETERS,
-    ) -> HRESULT;
+    pub fn CopyFile2(pwszExistingFileName: PCWSTR, pwszNewFileName: PCWSTR, pExtendedParameters: *mut COPYFILE2_EXTENDED_PARAMETERS) -> HRESULT;
 }
 extern "C" {
     pub fn MoveFileA(lpExistingFileName: LPCSTR, lpNewFileName: LPCSTR) -> BOOL;
@@ -33004,8 +30710,7 @@ extern "C" {
     pub fn MoveFileExA(lpExistingFileName: LPCSTR, lpNewFileName: LPCSTR, dwFlags: DWORD) -> BOOL;
 }
 extern "C" {
-    pub fn MoveFileExW(lpExistingFileName: LPCWSTR, lpNewFileName: LPCWSTR, dwFlags: DWORD)
-        -> BOOL;
+    pub fn MoveFileExW(lpExistingFileName: LPCWSTR, lpNewFileName: LPCWSTR, dwFlags: DWORD) -> BOOL;
 }
 extern "C" {
     pub fn MoveFileWithProgressA(
@@ -33066,26 +30771,14 @@ extern "C" {
     ) -> BOOL;
 }
 extern "C" {
-    pub fn CreateHardLinkA(
-        lpFileName: LPCSTR,
-        lpExistingFileName: LPCSTR,
-        lpSecurityAttributes: LPSECURITY_ATTRIBUTES,
-    ) -> BOOL;
+    pub fn CreateHardLinkA(lpFileName: LPCSTR, lpExistingFileName: LPCSTR, lpSecurityAttributes: LPSECURITY_ATTRIBUTES) -> BOOL;
 }
 extern "C" {
-    pub fn CreateHardLinkW(
-        lpFileName: LPCWSTR,
-        lpExistingFileName: LPCWSTR,
-        lpSecurityAttributes: LPSECURITY_ATTRIBUTES,
-    ) -> BOOL;
+    pub fn CreateHardLinkW(lpFileName: LPCWSTR, lpExistingFileName: LPCWSTR, lpSecurityAttributes: LPSECURITY_ATTRIBUTES) -> BOOL;
 }
 extern "C" {
-    pub fn CreateHardLinkTransactedA(
-        lpFileName: LPCSTR,
-        lpExistingFileName: LPCSTR,
-        lpSecurityAttributes: LPSECURITY_ATTRIBUTES,
-        hTransaction: HANDLE,
-    ) -> BOOL;
+    pub fn CreateHardLinkTransactedA(lpFileName: LPCSTR, lpExistingFileName: LPCSTR, lpSecurityAttributes: LPSECURITY_ATTRIBUTES, hTransaction: HANDLE)
+        -> BOOL;
 }
 extern "C" {
     pub fn CreateHardLinkTransactedW(
@@ -33105,13 +30798,7 @@ extern "C" {
     ) -> HANDLE;
 }
 extern "C" {
-    pub fn FindFirstFileNameTransactedW(
-        lpFileName: LPCWSTR,
-        dwFlags: DWORD,
-        StringLength: LPDWORD,
-        LinkName: PWSTR,
-        hTransaction: HANDLE,
-    ) -> HANDLE;
+    pub fn FindFirstFileNameTransactedW(lpFileName: LPCWSTR, dwFlags: DWORD, StringLength: LPDWORD, LinkName: PWSTR, hTransaction: HANDLE) -> HANDLE;
 }
 extern "C" {
     pub fn CreateNamedPipeA(
@@ -33151,11 +30838,7 @@ extern "C" {
     pub fn WaitNamedPipeA(lpNamedPipeName: LPCSTR, nTimeOut: DWORD) -> BOOL;
 }
 extern "C" {
-    pub fn GetNamedPipeClientComputerNameA(
-        Pipe: HANDLE,
-        ClientComputerName: LPSTR,
-        ClientComputerNameLength: ULONG,
-    ) -> BOOL;
+    pub fn GetNamedPipeClientComputerNameA(Pipe: HANDLE, ClientComputerName: LPSTR, ClientComputerNameLength: ULONG) -> BOOL;
 }
 extern "C" {
     pub fn GetNamedPipeClientProcessId(Pipe: HANDLE, ClientProcessId: PULONG) -> BOOL;
@@ -33296,13 +30979,7 @@ pub struct _EVENTLOG_FULL_INFORMATION {
 pub type EVENTLOG_FULL_INFORMATION = _EVENTLOG_FULL_INFORMATION;
 pub type LPEVENTLOG_FULL_INFORMATION = *mut _EVENTLOG_FULL_INFORMATION;
 extern "C" {
-    pub fn GetEventLogInformation(
-        hEventLog: HANDLE,
-        dwInfoLevel: DWORD,
-        lpBuffer: LPVOID,
-        cbBufSize: DWORD,
-        pcbBytesNeeded: LPDWORD,
-    ) -> BOOL;
+    pub fn GetEventLogInformation(hEventLog: HANDLE, dwInfoLevel: DWORD, lpBuffer: LPVOID, cbBufSize: DWORD, pcbBytesNeeded: LPDWORD) -> BOOL;
 }
 pub type OPERATION_ID = ULONG;
 #[repr(C)]
@@ -33432,18 +31109,10 @@ extern "C" {
     ) -> BOOL;
 }
 extern "C" {
-    pub fn ObjectCloseAuditAlarmA(
-        SubsystemName: LPCSTR,
-        HandleId: LPVOID,
-        GenerateOnClose: BOOL,
-    ) -> BOOL;
+    pub fn ObjectCloseAuditAlarmA(SubsystemName: LPCSTR, HandleId: LPVOID, GenerateOnClose: BOOL) -> BOOL;
 }
 extern "C" {
-    pub fn ObjectDeleteAuditAlarmA(
-        SubsystemName: LPCSTR,
-        HandleId: LPVOID,
-        GenerateOnClose: BOOL,
-    ) -> BOOL;
+    pub fn ObjectDeleteAuditAlarmA(SubsystemName: LPCSTR, HandleId: LPVOID, GenerateOnClose: BOOL) -> BOOL;
 }
 extern "C" {
     pub fn PrivilegedServiceAuditAlarmA(
@@ -33467,11 +31136,7 @@ extern "C" {
     ) -> BOOL;
 }
 extern "C" {
-    pub fn SetFileSecurityA(
-        lpFileName: LPCSTR,
-        SecurityInformation: SECURITY_INFORMATION,
-        pSecurityDescriptor: PSECURITY_DESCRIPTOR,
-    ) -> BOOL;
+    pub fn SetFileSecurityA(lpFileName: LPCSTR, SecurityInformation: SECURITY_INFORMATION, pSecurityDescriptor: PSECURITY_DESCRIPTOR) -> BOOL;
 }
 extern "C" {
     pub fn GetFileSecurityA(
@@ -33630,38 +31295,16 @@ extern "C" {
     pub fn LookupPrivilegeValueW(lpSystemName: LPCWSTR, lpName: LPCWSTR, lpLuid: PLUID) -> BOOL;
 }
 extern "C" {
-    pub fn LookupPrivilegeNameA(
-        lpSystemName: LPCSTR,
-        lpLuid: PLUID,
-        lpName: LPSTR,
-        cchName: LPDWORD,
-    ) -> BOOL;
+    pub fn LookupPrivilegeNameA(lpSystemName: LPCSTR, lpLuid: PLUID, lpName: LPSTR, cchName: LPDWORD) -> BOOL;
 }
 extern "C" {
-    pub fn LookupPrivilegeNameW(
-        lpSystemName: LPCWSTR,
-        lpLuid: PLUID,
-        lpName: LPWSTR,
-        cchName: LPDWORD,
-    ) -> BOOL;
+    pub fn LookupPrivilegeNameW(lpSystemName: LPCWSTR, lpLuid: PLUID, lpName: LPWSTR, cchName: LPDWORD) -> BOOL;
 }
 extern "C" {
-    pub fn LookupPrivilegeDisplayNameA(
-        lpSystemName: LPCSTR,
-        lpName: LPCSTR,
-        lpDisplayName: LPSTR,
-        cchDisplayName: LPDWORD,
-        lpLanguageId: LPDWORD,
-    ) -> BOOL;
+    pub fn LookupPrivilegeDisplayNameA(lpSystemName: LPCSTR, lpName: LPCSTR, lpDisplayName: LPSTR, cchDisplayName: LPDWORD, lpLanguageId: LPDWORD) -> BOOL;
 }
 extern "C" {
-    pub fn LookupPrivilegeDisplayNameW(
-        lpSystemName: LPCWSTR,
-        lpName: LPCWSTR,
-        lpDisplayName: LPWSTR,
-        cchDisplayName: LPDWORD,
-        lpLanguageId: LPDWORD,
-    ) -> BOOL;
+    pub fn LookupPrivilegeDisplayNameW(lpSystemName: LPCWSTR, lpName: LPCWSTR, lpDisplayName: LPWSTR, cchDisplayName: LPDWORD, lpLanguageId: LPDWORD) -> BOOL;
 }
 extern "C" {
     pub fn BuildCommDCBA(lpDef: LPCSTR, lpDCB: LPDCB) -> BOOL;
@@ -33670,18 +31313,10 @@ extern "C" {
     pub fn BuildCommDCBW(lpDef: LPCWSTR, lpDCB: LPDCB) -> BOOL;
 }
 extern "C" {
-    pub fn BuildCommDCBAndTimeoutsA(
-        lpDef: LPCSTR,
-        lpDCB: LPDCB,
-        lpCommTimeouts: LPCOMMTIMEOUTS,
-    ) -> BOOL;
+    pub fn BuildCommDCBAndTimeoutsA(lpDef: LPCSTR, lpDCB: LPDCB, lpCommTimeouts: LPCOMMTIMEOUTS) -> BOOL;
 }
 extern "C" {
-    pub fn BuildCommDCBAndTimeoutsW(
-        lpDef: LPCWSTR,
-        lpDCB: LPDCB,
-        lpCommTimeouts: LPCOMMTIMEOUTS,
-    ) -> BOOL;
+    pub fn BuildCommDCBAndTimeoutsW(lpDef: LPCWSTR, lpDCB: LPDCB, lpCommTimeouts: LPCOMMTIMEOUTS) -> BOOL;
 }
 extern "C" {
     pub fn CommConfigDialogA(lpszName: LPCSTR, hWnd: HWND, lpCC: LPCOMMCONFIG) -> BOOL;
@@ -33708,18 +31343,10 @@ extern "C" {
     pub fn GetComputerNameW(lpBuffer: LPWSTR, nSize: LPDWORD) -> BOOL;
 }
 extern "C" {
-    pub fn DnsHostnameToComputerNameA(
-        Hostname: LPCSTR,
-        ComputerName: LPSTR,
-        nSize: LPDWORD,
-    ) -> BOOL;
+    pub fn DnsHostnameToComputerNameA(Hostname: LPCSTR, ComputerName: LPSTR, nSize: LPDWORD) -> BOOL;
 }
 extern "C" {
-    pub fn DnsHostnameToComputerNameW(
-        Hostname: LPCWSTR,
-        ComputerName: LPWSTR,
-        nSize: LPDWORD,
-    ) -> BOOL;
+    pub fn DnsHostnameToComputerNameW(Hostname: LPCWSTR, ComputerName: LPWSTR, nSize: LPDWORD) -> BOOL;
 }
 extern "C" {
     pub fn GetUserNameA(lpBuffer: LPSTR, pcbBuffer: LPDWORD) -> BOOL;
@@ -33728,24 +31355,10 @@ extern "C" {
     pub fn GetUserNameW(lpBuffer: LPWSTR, pcbBuffer: LPDWORD) -> BOOL;
 }
 extern "C" {
-    pub fn LogonUserA(
-        lpszUsername: LPCSTR,
-        lpszDomain: LPCSTR,
-        lpszPassword: LPCSTR,
-        dwLogonType: DWORD,
-        dwLogonProvider: DWORD,
-        phToken: PHANDLE,
-    ) -> BOOL;
+    pub fn LogonUserA(lpszUsername: LPCSTR, lpszDomain: LPCSTR, lpszPassword: LPCSTR, dwLogonType: DWORD, dwLogonProvider: DWORD, phToken: PHANDLE) -> BOOL;
 }
 extern "C" {
-    pub fn LogonUserW(
-        lpszUsername: LPCWSTR,
-        lpszDomain: LPCWSTR,
-        lpszPassword: LPCWSTR,
-        dwLogonType: DWORD,
-        dwLogonProvider: DWORD,
-        phToken: PHANDLE,
-    ) -> BOOL;
+    pub fn LogonUserW(lpszUsername: LPCWSTR, lpszDomain: LPCWSTR, lpszPassword: LPCWSTR, dwLogonType: DWORD, dwLogonProvider: DWORD, phToken: PHANDLE) -> BOOL;
 }
 extern "C" {
     pub fn LogonUserExA(
@@ -33820,21 +31433,10 @@ extern "C" {
     pub fn UnregisterWait(WaitHandle: HANDLE) -> BOOL;
 }
 extern "C" {
-    pub fn BindIoCompletionCallback(
-        FileHandle: HANDLE,
-        Function: LPOVERLAPPED_COMPLETION_ROUTINE,
-        Flags: ULONG,
-    ) -> BOOL;
+    pub fn BindIoCompletionCallback(FileHandle: HANDLE, Function: LPOVERLAPPED_COMPLETION_ROUTINE, Flags: ULONG) -> BOOL;
 }
 extern "C" {
-    pub fn SetTimerQueueTimer(
-        TimerQueue: HANDLE,
-        Callback: WAITORTIMERCALLBACK,
-        Parameter: PVOID,
-        DueTime: DWORD,
-        Period: DWORD,
-        PreferIo: BOOL,
-    ) -> HANDLE;
+    pub fn SetTimerQueueTimer(TimerQueue: HANDLE, Callback: WAITORTIMERCALLBACK, Parameter: PVOID, DueTime: DWORD, Period: DWORD, PreferIo: BOOL) -> HANDLE;
 }
 extern "C" {
     pub fn CancelTimerQueueTimer(TimerQueue: HANDLE, Timer: HANDLE) -> BOOL;
@@ -33843,11 +31445,7 @@ extern "C" {
     pub fn DeleteTimerQueue(TimerQueue: HANDLE) -> BOOL;
 }
 extern "C" {
-    pub fn CreatePrivateNamespaceA(
-        lpPrivateNamespaceAttributes: LPSECURITY_ATTRIBUTES,
-        lpBoundaryDescriptor: LPVOID,
-        lpAliasPrefix: LPCSTR,
-    ) -> HANDLE;
+    pub fn CreatePrivateNamespaceA(lpPrivateNamespaceAttributes: LPSECURITY_ATTRIBUTES, lpBoundaryDescriptor: LPVOID, lpAliasPrefix: LPCSTR) -> HANDLE;
 }
 extern "C" {
     pub fn OpenPrivateNamespaceA(lpBoundaryDescriptor: LPVOID, lpAliasPrefix: LPCSTR) -> HANDLE;
@@ -33856,10 +31454,7 @@ extern "C" {
     pub fn CreateBoundaryDescriptorA(Name: LPCSTR, Flags: ULONG) -> HANDLE;
 }
 extern "C" {
-    pub fn AddIntegrityLabelToBoundaryDescriptor(
-        BoundaryDescriptor: *mut HANDLE,
-        IntegrityLabel: PSID,
-    ) -> BOOL;
+    pub fn AddIntegrityLabelToBoundaryDescriptor(BoundaryDescriptor: *mut HANDLE, IntegrityLabel: PSID) -> BOOL;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -33888,18 +31483,10 @@ extern "C" {
     pub fn GetCurrentHwProfileW(lpHwProfileInfo: LPHW_PROFILE_INFOW) -> BOOL;
 }
 extern "C" {
-    pub fn VerifyVersionInfoA(
-        lpVersionInformation: LPOSVERSIONINFOEXA,
-        dwTypeMask: DWORD,
-        dwlConditionMask: DWORDLONG,
-    ) -> BOOL;
+    pub fn VerifyVersionInfoA(lpVersionInformation: LPOSVERSIONINFOEXA, dwTypeMask: DWORD, dwlConditionMask: DWORDLONG) -> BOOL;
 }
 extern "C" {
-    pub fn VerifyVersionInfoW(
-        lpVersionInformation: LPOSVERSIONINFOEXW,
-        dwTypeMask: DWORD,
-        dwlConditionMask: DWORDLONG,
-    ) -> BOOL;
+    pub fn VerifyVersionInfoW(lpVersionInformation: LPOSVERSIONINFOEXW, dwTypeMask: DWORD, dwlConditionMask: DWORDLONG) -> BOOL;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -33957,34 +31544,19 @@ extern "C" {
     pub fn SetTimeZoneInformation(lpTimeZoneInformation: *const TIME_ZONE_INFORMATION) -> BOOL;
 }
 extern "C" {
-    pub fn SetDynamicTimeZoneInformation(
-        lpTimeZoneInformation: *const DYNAMIC_TIME_ZONE_INFORMATION,
-    ) -> BOOL;
+    pub fn SetDynamicTimeZoneInformation(lpTimeZoneInformation: *const DYNAMIC_TIME_ZONE_INFORMATION) -> BOOL;
 }
 extern "C" {
-    pub fn GetDynamicTimeZoneInformation(
-        pTimeZoneInformation: PDYNAMIC_TIME_ZONE_INFORMATION,
-    ) -> DWORD;
+    pub fn GetDynamicTimeZoneInformation(pTimeZoneInformation: PDYNAMIC_TIME_ZONE_INFORMATION) -> DWORD;
 }
 extern "C" {
-    pub fn GetTimeZoneInformationForYear(
-        wYear: USHORT,
-        pdtzi: PDYNAMIC_TIME_ZONE_INFORMATION,
-        ptzi: LPTIME_ZONE_INFORMATION,
-    ) -> BOOL;
+    pub fn GetTimeZoneInformationForYear(wYear: USHORT, pdtzi: PDYNAMIC_TIME_ZONE_INFORMATION, ptzi: LPTIME_ZONE_INFORMATION) -> BOOL;
 }
 extern "C" {
-    pub fn EnumDynamicTimeZoneInformation(
-        dwIndex: DWORD,
-        lpTimeZoneInformation: PDYNAMIC_TIME_ZONE_INFORMATION,
-    ) -> DWORD;
+    pub fn EnumDynamicTimeZoneInformation(dwIndex: DWORD, lpTimeZoneInformation: PDYNAMIC_TIME_ZONE_INFORMATION) -> DWORD;
 }
 extern "C" {
-    pub fn GetDynamicTimeZoneInformationEffectiveYears(
-        lpTimeZoneInformation: PDYNAMIC_TIME_ZONE_INFORMATION,
-        FirstYear: LPDWORD,
-        LastYear: LPDWORD,
-    ) -> DWORD;
+    pub fn GetDynamicTimeZoneInformationEffectiveYears(lpTimeZoneInformation: PDYNAMIC_TIME_ZONE_INFORMATION, FirstYear: LPDWORD, LastYear: LPDWORD) -> DWORD;
 }
 extern "C" {
     pub fn SystemTimeToTzSpecificLocalTimeEx(
@@ -34033,11 +31605,7 @@ extern "C" {
     pub fn GetSystemPowerStatus(lpSystemPowerStatus: LPSYSTEM_POWER_STATUS) -> BOOL;
 }
 extern "C" {
-    pub fn MapUserPhysicalPagesScatter(
-        VirtualAddresses: *mut PVOID,
-        NumberOfPages: ULONG_PTR,
-        PageArray: PULONG_PTR,
-    ) -> BOOL;
+    pub fn MapUserPhysicalPagesScatter(VirtualAddresses: *mut PVOID, NumberOfPages: ULONG_PTR, PageArray: PULONG_PTR) -> BOOL;
 }
 extern "C" {
     pub fn CreateJobObjectA(lpJobAttributes: LPSECURITY_ATTRIBUTES, lpName: LPCSTR) -> HANDLE;
@@ -34052,39 +31620,19 @@ extern "C" {
     pub fn FindFirstVolumeA(lpszVolumeName: LPSTR, cchBufferLength: DWORD) -> HANDLE;
 }
 extern "C" {
-    pub fn FindNextVolumeA(
-        hFindVolume: HANDLE,
-        lpszVolumeName: LPSTR,
-        cchBufferLength: DWORD,
-    ) -> BOOL;
+    pub fn FindNextVolumeA(hFindVolume: HANDLE, lpszVolumeName: LPSTR, cchBufferLength: DWORD) -> BOOL;
 }
 extern "C" {
-    pub fn FindFirstVolumeMountPointA(
-        lpszRootPathName: LPCSTR,
-        lpszVolumeMountPoint: LPSTR,
-        cchBufferLength: DWORD,
-    ) -> HANDLE;
+    pub fn FindFirstVolumeMountPointA(lpszRootPathName: LPCSTR, lpszVolumeMountPoint: LPSTR, cchBufferLength: DWORD) -> HANDLE;
 }
 extern "C" {
-    pub fn FindFirstVolumeMountPointW(
-        lpszRootPathName: LPCWSTR,
-        lpszVolumeMountPoint: LPWSTR,
-        cchBufferLength: DWORD,
-    ) -> HANDLE;
+    pub fn FindFirstVolumeMountPointW(lpszRootPathName: LPCWSTR, lpszVolumeMountPoint: LPWSTR, cchBufferLength: DWORD) -> HANDLE;
 }
 extern "C" {
-    pub fn FindNextVolumeMountPointA(
-        hFindVolumeMountPoint: HANDLE,
-        lpszVolumeMountPoint: LPSTR,
-        cchBufferLength: DWORD,
-    ) -> BOOL;
+    pub fn FindNextVolumeMountPointA(hFindVolumeMountPoint: HANDLE, lpszVolumeMountPoint: LPSTR, cchBufferLength: DWORD) -> BOOL;
 }
 extern "C" {
-    pub fn FindNextVolumeMountPointW(
-        hFindVolumeMountPoint: HANDLE,
-        lpszVolumeMountPoint: LPWSTR,
-        cchBufferLength: DWORD,
-    ) -> BOOL;
+    pub fn FindNextVolumeMountPointW(hFindVolumeMountPoint: HANDLE, lpszVolumeMountPoint: LPWSTR, cchBufferLength: DWORD) -> BOOL;
 }
 extern "C" {
     pub fn FindVolumeMountPointClose(hFindVolumeMountPoint: HANDLE) -> BOOL;
@@ -34099,26 +31647,13 @@ extern "C" {
     pub fn DeleteVolumeMountPointA(lpszVolumeMountPoint: LPCSTR) -> BOOL;
 }
 extern "C" {
-    pub fn GetVolumeNameForVolumeMountPointA(
-        lpszVolumeMountPoint: LPCSTR,
-        lpszVolumeName: LPSTR,
-        cchBufferLength: DWORD,
-    ) -> BOOL;
+    pub fn GetVolumeNameForVolumeMountPointA(lpszVolumeMountPoint: LPCSTR, lpszVolumeName: LPSTR, cchBufferLength: DWORD) -> BOOL;
 }
 extern "C" {
-    pub fn GetVolumePathNameA(
-        lpszFileName: LPCSTR,
-        lpszVolumePathName: LPSTR,
-        cchBufferLength: DWORD,
-    ) -> BOOL;
+    pub fn GetVolumePathNameA(lpszFileName: LPCSTR, lpszVolumePathName: LPSTR, cchBufferLength: DWORD) -> BOOL;
 }
 extern "C" {
-    pub fn GetVolumePathNamesForVolumeNameA(
-        lpszVolumeName: LPCSTR,
-        lpszVolumePathNames: LPCH,
-        cchBufferLength: DWORD,
-        lpcchReturnLength: PDWORD,
-    ) -> BOOL;
+    pub fn GetVolumePathNamesForVolumeNameA(lpszVolumeName: LPCSTR, lpszVolumePathNames: LPCH, cchBufferLength: DWORD, lpcchReturnLength: PDWORD) -> BOOL;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -34205,12 +31740,9 @@ pub struct tagACTCTX_SECTION_KEYED_DATA_ASSEMBLY_METADATA {
     pub lpSectionGlobalDataBase: PVOID,
     pub ulSectionGlobalDataLength: ULONG,
 }
-pub type ACTCTX_SECTION_KEYED_DATA_ASSEMBLY_METADATA =
-    tagACTCTX_SECTION_KEYED_DATA_ASSEMBLY_METADATA;
-pub type PACTCTX_SECTION_KEYED_DATA_ASSEMBLY_METADATA =
-    *mut tagACTCTX_SECTION_KEYED_DATA_ASSEMBLY_METADATA;
-pub type PCACTCTX_SECTION_KEYED_DATA_ASSEMBLY_METADATA =
-    *const ACTCTX_SECTION_KEYED_DATA_ASSEMBLY_METADATA;
+pub type ACTCTX_SECTION_KEYED_DATA_ASSEMBLY_METADATA = tagACTCTX_SECTION_KEYED_DATA_ASSEMBLY_METADATA;
+pub type PACTCTX_SECTION_KEYED_DATA_ASSEMBLY_METADATA = *mut tagACTCTX_SECTION_KEYED_DATA_ASSEMBLY_METADATA;
+pub type PCACTCTX_SECTION_KEYED_DATA_ASSEMBLY_METADATA = *const ACTCTX_SECTION_KEYED_DATA_ASSEMBLY_METADATA;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct tagACTCTX_SECTION_KEYED_DATA {
@@ -34356,12 +31888,7 @@ extern "C" {
     ) -> HRESULT;
 }
 extern "C" {
-    pub fn GetApplicationRestartSettings(
-        hProcess: HANDLE,
-        pwzCommandline: PWSTR,
-        pcchSize: PDWORD,
-        pdwFlags: PDWORD,
-    ) -> HRESULT;
+    pub fn GetApplicationRestartSettings(hProcess: HANDLE, pwzCommandline: PWSTR, pcchSize: PDWORD, pdwFlags: PDWORD) -> HRESULT;
 }
 extern "C" {
     pub fn ApplicationRecoveryInProgress(pbCancelled: PBOOL) -> HRESULT;
@@ -34626,12 +32153,8 @@ pub struct _FILE_REMOTE_PROTOCOL_INFO__bindgen_ty_2__bindgen_ty_1__bindgen_ty_2 
 pub type FILE_REMOTE_PROTOCOL_INFO = _FILE_REMOTE_PROTOCOL_INFO;
 pub type PFILE_REMOTE_PROTOCOL_INFO = *mut _FILE_REMOTE_PROTOCOL_INFO;
 extern "C" {
-    pub fn GetFileInformationByHandleEx(
-        hFile: HANDLE,
-        FileInformationClass: FILE_INFO_BY_HANDLE_CLASS,
-        lpFileInformation: LPVOID,
-        dwBufferSize: DWORD,
-    ) -> BOOL;
+    pub fn GetFileInformationByHandleEx(hFile: HANDLE, FileInformationClass: FILE_INFO_BY_HANDLE_CLASS, lpFileInformation: LPVOID, dwBufferSize: DWORD)
+        -> BOOL;
 }
 pub const _FILE_ID_TYPE_FileIdType: _FILE_ID_TYPE = 0;
 pub const _FILE_ID_TYPE_ObjectIdType: _FILE_ID_TYPE = 1;
@@ -34666,18 +32189,10 @@ extern "C" {
     ) -> HANDLE;
 }
 extern "C" {
-    pub fn CreateSymbolicLinkA(
-        lpSymlinkFileName: LPCSTR,
-        lpTargetFileName: LPCSTR,
-        dwFlags: DWORD,
-    ) -> BOOLEAN;
+    pub fn CreateSymbolicLinkA(lpSymlinkFileName: LPCSTR, lpTargetFileName: LPCSTR, dwFlags: DWORD) -> BOOLEAN;
 }
 extern "C" {
-    pub fn CreateSymbolicLinkW(
-        lpSymlinkFileName: LPCWSTR,
-        lpTargetFileName: LPCWSTR,
-        dwFlags: DWORD,
-    ) -> BOOLEAN;
+    pub fn CreateSymbolicLinkW(lpSymlinkFileName: LPCWSTR, lpTargetFileName: LPCWSTR, dwFlags: DWORD) -> BOOLEAN;
 }
 extern "C" {
     pub fn QueryActCtxSettingsW(
@@ -34691,27 +32206,13 @@ extern "C" {
     ) -> BOOL;
 }
 extern "C" {
-    pub fn CreateSymbolicLinkTransactedA(
-        lpSymlinkFileName: LPCSTR,
-        lpTargetFileName: LPCSTR,
-        dwFlags: DWORD,
-        hTransaction: HANDLE,
-    ) -> BOOLEAN;
+    pub fn CreateSymbolicLinkTransactedA(lpSymlinkFileName: LPCSTR, lpTargetFileName: LPCSTR, dwFlags: DWORD, hTransaction: HANDLE) -> BOOLEAN;
 }
 extern "C" {
-    pub fn CreateSymbolicLinkTransactedW(
-        lpSymlinkFileName: LPCWSTR,
-        lpTargetFileName: LPCWSTR,
-        dwFlags: DWORD,
-        hTransaction: HANDLE,
-    ) -> BOOLEAN;
+    pub fn CreateSymbolicLinkTransactedW(lpSymlinkFileName: LPCWSTR, lpTargetFileName: LPCWSTR, dwFlags: DWORD, hTransaction: HANDLE) -> BOOLEAN;
 }
 extern "C" {
-    pub fn ReplacePartitionUnit(
-        TargetPartition: PWSTR,
-        SparePartition: PWSTR,
-        Flags: ULONG,
-    ) -> BOOL;
+    pub fn ReplacePartitionUnit(TargetPartition: PWSTR, SparePartition: PWSTR, Flags: ULONG) -> BOOL;
 }
 extern "C" {
     pub fn AddSecureMemoryCacheCallback(pfnCallBack: PSECURE_MEMORY_CACHE_CALLBACK) -> BOOL;
@@ -34723,21 +32224,10 @@ extern "C" {
     pub fn CopyContext(Destination: PCONTEXT, ContextFlags: DWORD, Source: PCONTEXT) -> BOOL;
 }
 extern "C" {
-    pub fn InitializeContext(
-        Buffer: PVOID,
-        ContextFlags: DWORD,
-        Context: *mut PCONTEXT,
-        ContextLength: PDWORD,
-    ) -> BOOL;
+    pub fn InitializeContext(Buffer: PVOID, ContextFlags: DWORD, Context: *mut PCONTEXT, ContextLength: PDWORD) -> BOOL;
 }
 extern "C" {
-    pub fn InitializeContext2(
-        Buffer: PVOID,
-        ContextFlags: DWORD,
-        Context: *mut PCONTEXT,
-        ContextLength: PDWORD,
-        XStateCompactionMask: ULONG64,
-    ) -> BOOL;
+    pub fn InitializeContext2(Buffer: PVOID, ContextFlags: DWORD, Context: *mut PCONTEXT, ContextLength: PDWORD, XStateCompactionMask: ULONG64) -> BOOL;
 }
 extern "C" {
     pub fn GetEnabledXStateFeatures() -> DWORD64;
@@ -34752,12 +32242,7 @@ extern "C" {
     pub fn SetXStateFeaturesMask(Context: PCONTEXT, FeatureMask: DWORD64) -> BOOL;
 }
 extern "C" {
-    pub fn EnableThreadProfiling(
-        ThreadHandle: HANDLE,
-        Flags: DWORD,
-        HardwareCounters: DWORD64,
-        PerformanceDataHandle: *mut HANDLE,
-    ) -> DWORD;
+    pub fn EnableThreadProfiling(ThreadHandle: HANDLE, Flags: DWORD, HardwareCounters: DWORD64, PerformanceDataHandle: *mut HANDLE) -> DWORD;
 }
 extern "C" {
     pub fn DisableThreadProfiling(PerformanceDataHandle: HANDLE) -> DWORD;
@@ -34766,16 +32251,10 @@ extern "C" {
     pub fn QueryThreadProfiling(ThreadHandle: HANDLE, Enabled: PBOOLEAN) -> DWORD;
 }
 extern "C" {
-    pub fn ReadThreadProfilingData(
-        PerformanceDataHandle: HANDLE,
-        Flags: DWORD,
-        PerformanceData: PPERFORMANCE_DATA,
-    ) -> DWORD;
+    pub fn ReadThreadProfilingData(PerformanceDataHandle: HANDLE, Flags: DWORD, PerformanceData: PPERFORMANCE_DATA) -> DWORD;
 }
 extern "C" {
-    pub fn RaiseCustomSystemEventTrigger(
-        CustomSystemEventTriggerConfig: PCUSTOM_SYSTEM_EVENT_TRIGGER_CONFIG,
-    ) -> DWORD;
+    pub fn RaiseCustomSystemEventTrigger(CustomSystemEventTriggerConfig: PCUSTOM_SYSTEM_EVENT_TRIGGER_CONFIG) -> DWORD;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -35709,55 +33188,33 @@ pub struct DISPLAYCONFIG_RATIONAL {
     pub Numerator: UINT32,
     pub Denominator: UINT32,
 }
-pub const DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY_DISPLAYCONFIG_OUTPUT_TECHNOLOGY_OTHER:
-    DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY = -1;
-pub const DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY_DISPLAYCONFIG_OUTPUT_TECHNOLOGY_HD15:
-    DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY = 0;
-pub const DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY_DISPLAYCONFIG_OUTPUT_TECHNOLOGY_SVIDEO:
-    DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY = 1;
-pub const DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY_DISPLAYCONFIG_OUTPUT_TECHNOLOGY_COMPOSITE_VIDEO:
-    DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY = 2;
-pub const DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY_DISPLAYCONFIG_OUTPUT_TECHNOLOGY_COMPONENT_VIDEO:
-    DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY = 3;
-pub const DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY_DISPLAYCONFIG_OUTPUT_TECHNOLOGY_DVI:
-    DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY = 4;
-pub const DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY_DISPLAYCONFIG_OUTPUT_TECHNOLOGY_HDMI:
-    DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY = 5;
-pub const DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY_DISPLAYCONFIG_OUTPUT_TECHNOLOGY_LVDS:
-    DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY = 6;
-pub const DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY_DISPLAYCONFIG_OUTPUT_TECHNOLOGY_D_JPN:
-    DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY = 8;
-pub const DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY_DISPLAYCONFIG_OUTPUT_TECHNOLOGY_SDI:
-    DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY = 9;
-pub const DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY_DISPLAYCONFIG_OUTPUT_TECHNOLOGY_DISPLAYPORT_EXTERNAL : DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY = 10 ;
-pub const DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY_DISPLAYCONFIG_OUTPUT_TECHNOLOGY_DISPLAYPORT_EMBEDDED : DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY = 11 ;
-pub const DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY_DISPLAYCONFIG_OUTPUT_TECHNOLOGY_UDI_EXTERNAL:
-    DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY = 12;
-pub const DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY_DISPLAYCONFIG_OUTPUT_TECHNOLOGY_UDI_EMBEDDED:
-    DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY = 13;
-pub const DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY_DISPLAYCONFIG_OUTPUT_TECHNOLOGY_SDTVDONGLE:
-    DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY = 14;
-pub const DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY_DISPLAYCONFIG_OUTPUT_TECHNOLOGY_MIRACAST:
-    DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY = 15;
-pub const DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY_DISPLAYCONFIG_OUTPUT_TECHNOLOGY_INDIRECT_WIRED:
-    DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY = 16;
-pub const DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY_DISPLAYCONFIG_OUTPUT_TECHNOLOGY_INDIRECT_VIRTUAL:
-    DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY = 17;
-pub const DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY_DISPLAYCONFIG_OUTPUT_TECHNOLOGY_INTERNAL:
-    DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY = -2147483648;
-pub const DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY_DISPLAYCONFIG_OUTPUT_TECHNOLOGY_FORCE_UINT32:
-    DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY = -1;
+pub const DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY_DISPLAYCONFIG_OUTPUT_TECHNOLOGY_OTHER: DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY = -1;
+pub const DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY_DISPLAYCONFIG_OUTPUT_TECHNOLOGY_HD15: DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY = 0;
+pub const DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY_DISPLAYCONFIG_OUTPUT_TECHNOLOGY_SVIDEO: DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY = 1;
+pub const DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY_DISPLAYCONFIG_OUTPUT_TECHNOLOGY_COMPOSITE_VIDEO: DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY = 2;
+pub const DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY_DISPLAYCONFIG_OUTPUT_TECHNOLOGY_COMPONENT_VIDEO: DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY = 3;
+pub const DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY_DISPLAYCONFIG_OUTPUT_TECHNOLOGY_DVI: DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY = 4;
+pub const DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY_DISPLAYCONFIG_OUTPUT_TECHNOLOGY_HDMI: DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY = 5;
+pub const DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY_DISPLAYCONFIG_OUTPUT_TECHNOLOGY_LVDS: DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY = 6;
+pub const DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY_DISPLAYCONFIG_OUTPUT_TECHNOLOGY_D_JPN: DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY = 8;
+pub const DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY_DISPLAYCONFIG_OUTPUT_TECHNOLOGY_SDI: DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY = 9;
+pub const DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY_DISPLAYCONFIG_OUTPUT_TECHNOLOGY_DISPLAYPORT_EXTERNAL: DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY = 10;
+pub const DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY_DISPLAYCONFIG_OUTPUT_TECHNOLOGY_DISPLAYPORT_EMBEDDED: DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY = 11;
+pub const DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY_DISPLAYCONFIG_OUTPUT_TECHNOLOGY_UDI_EXTERNAL: DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY = 12;
+pub const DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY_DISPLAYCONFIG_OUTPUT_TECHNOLOGY_UDI_EMBEDDED: DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY = 13;
+pub const DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY_DISPLAYCONFIG_OUTPUT_TECHNOLOGY_SDTVDONGLE: DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY = 14;
+pub const DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY_DISPLAYCONFIG_OUTPUT_TECHNOLOGY_MIRACAST: DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY = 15;
+pub const DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY_DISPLAYCONFIG_OUTPUT_TECHNOLOGY_INDIRECT_WIRED: DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY = 16;
+pub const DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY_DISPLAYCONFIG_OUTPUT_TECHNOLOGY_INDIRECT_VIRTUAL: DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY = 17;
+pub const DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY_DISPLAYCONFIG_OUTPUT_TECHNOLOGY_INTERNAL: DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY = -2147483648;
+pub const DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY_DISPLAYCONFIG_OUTPUT_TECHNOLOGY_FORCE_UINT32: DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY = -1;
 pub type DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY = ::std::os::raw::c_int;
-pub const DISPLAYCONFIG_SCANLINE_ORDERING_DISPLAYCONFIG_SCANLINE_ORDERING_UNSPECIFIED:
-    DISPLAYCONFIG_SCANLINE_ORDERING = 0;
-pub const DISPLAYCONFIG_SCANLINE_ORDERING_DISPLAYCONFIG_SCANLINE_ORDERING_PROGRESSIVE:
-    DISPLAYCONFIG_SCANLINE_ORDERING = 1;
-pub const DISPLAYCONFIG_SCANLINE_ORDERING_DISPLAYCONFIG_SCANLINE_ORDERING_INTERLACED:
-    DISPLAYCONFIG_SCANLINE_ORDERING = 2;
-pub const DISPLAYCONFIG_SCANLINE_ORDERING_DISPLAYCONFIG_SCANLINE_ORDERING_INTERLACED_UPPERFIELDFIRST : DISPLAYCONFIG_SCANLINE_ORDERING = 2 ;
-pub const DISPLAYCONFIG_SCANLINE_ORDERING_DISPLAYCONFIG_SCANLINE_ORDERING_INTERLACED_LOWERFIELDFIRST : DISPLAYCONFIG_SCANLINE_ORDERING = 3 ;
-pub const DISPLAYCONFIG_SCANLINE_ORDERING_DISPLAYCONFIG_SCANLINE_ORDERING_FORCE_UINT32:
-    DISPLAYCONFIG_SCANLINE_ORDERING = -1;
+pub const DISPLAYCONFIG_SCANLINE_ORDERING_DISPLAYCONFIG_SCANLINE_ORDERING_UNSPECIFIED: DISPLAYCONFIG_SCANLINE_ORDERING = 0;
+pub const DISPLAYCONFIG_SCANLINE_ORDERING_DISPLAYCONFIG_SCANLINE_ORDERING_PROGRESSIVE: DISPLAYCONFIG_SCANLINE_ORDERING = 1;
+pub const DISPLAYCONFIG_SCANLINE_ORDERING_DISPLAYCONFIG_SCANLINE_ORDERING_INTERLACED: DISPLAYCONFIG_SCANLINE_ORDERING = 2;
+pub const DISPLAYCONFIG_SCANLINE_ORDERING_DISPLAYCONFIG_SCANLINE_ORDERING_INTERLACED_UPPERFIELDFIRST: DISPLAYCONFIG_SCANLINE_ORDERING = 2;
+pub const DISPLAYCONFIG_SCANLINE_ORDERING_DISPLAYCONFIG_SCANLINE_ORDERING_INTERLACED_LOWERFIELDFIRST: DISPLAYCONFIG_SCANLINE_ORDERING = 3;
+pub const DISPLAYCONFIG_SCANLINE_ORDERING_DISPLAYCONFIG_SCANLINE_ORDERING_FORCE_UINT32: DISPLAYCONFIG_SCANLINE_ORDERING = -1;
 pub type DISPLAYCONFIG_SCANLINE_ORDERING = ::std::os::raw::c_int;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -35824,11 +33281,7 @@ impl DISPLAYCONFIG_VIDEO_SIGNAL_INFO__bindgen_ty_1__bindgen_ty_1 {
         }
     }
     #[inline]
-    pub fn new_bitfield_1(
-        videoStandard: UINT32,
-        vSyncFreqDivider: UINT32,
-        reserved: UINT32,
-    ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
+    pub fn new_bitfield_1(videoStandard: UINT32, vSyncFreqDivider: UINT32, reserved: UINT32) -> __BindgenBitfieldUnit<[u8; 4usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 16u8, {
             let videoStandard: u32 = unsafe { ::std::mem::transmute(videoStandard) };
@@ -35848,8 +33301,7 @@ impl DISPLAYCONFIG_VIDEO_SIGNAL_INFO__bindgen_ty_1__bindgen_ty_1 {
 pub const DISPLAYCONFIG_SCALING_DISPLAYCONFIG_SCALING_IDENTITY: DISPLAYCONFIG_SCALING = 1;
 pub const DISPLAYCONFIG_SCALING_DISPLAYCONFIG_SCALING_CENTERED: DISPLAYCONFIG_SCALING = 2;
 pub const DISPLAYCONFIG_SCALING_DISPLAYCONFIG_SCALING_STRETCHED: DISPLAYCONFIG_SCALING = 3;
-pub const DISPLAYCONFIG_SCALING_DISPLAYCONFIG_SCALING_ASPECTRATIOCENTEREDMAX:
-    DISPLAYCONFIG_SCALING = 4;
+pub const DISPLAYCONFIG_SCALING_DISPLAYCONFIG_SCALING_ASPECTRATIOCENTEREDMAX: DISPLAYCONFIG_SCALING = 4;
 pub const DISPLAYCONFIG_SCALING_DISPLAYCONFIG_SCALING_CUSTOM: DISPLAYCONFIG_SCALING = 5;
 pub const DISPLAYCONFIG_SCALING_DISPLAYCONFIG_SCALING_PREFERRED: DISPLAYCONFIG_SCALING = 128;
 pub const DISPLAYCONFIG_SCALING_DISPLAYCONFIG_SCALING_FORCE_UINT32: DISPLAYCONFIG_SCALING = -1;
@@ -35860,22 +33312,17 @@ pub const DISPLAYCONFIG_ROTATION_DISPLAYCONFIG_ROTATION_ROTATE180: DISPLAYCONFIG
 pub const DISPLAYCONFIG_ROTATION_DISPLAYCONFIG_ROTATION_ROTATE270: DISPLAYCONFIG_ROTATION = 4;
 pub const DISPLAYCONFIG_ROTATION_DISPLAYCONFIG_ROTATION_FORCE_UINT32: DISPLAYCONFIG_ROTATION = -1;
 pub type DISPLAYCONFIG_ROTATION = ::std::os::raw::c_int;
-pub const DISPLAYCONFIG_MODE_INFO_TYPE_DISPLAYCONFIG_MODE_INFO_TYPE_SOURCE:
-    DISPLAYCONFIG_MODE_INFO_TYPE = 1;
-pub const DISPLAYCONFIG_MODE_INFO_TYPE_DISPLAYCONFIG_MODE_INFO_TYPE_TARGET:
-    DISPLAYCONFIG_MODE_INFO_TYPE = 2;
-pub const DISPLAYCONFIG_MODE_INFO_TYPE_DISPLAYCONFIG_MODE_INFO_TYPE_DESKTOP_IMAGE:
-    DISPLAYCONFIG_MODE_INFO_TYPE = 3;
-pub const DISPLAYCONFIG_MODE_INFO_TYPE_DISPLAYCONFIG_MODE_INFO_TYPE_FORCE_UINT32:
-    DISPLAYCONFIG_MODE_INFO_TYPE = -1;
+pub const DISPLAYCONFIG_MODE_INFO_TYPE_DISPLAYCONFIG_MODE_INFO_TYPE_SOURCE: DISPLAYCONFIG_MODE_INFO_TYPE = 1;
+pub const DISPLAYCONFIG_MODE_INFO_TYPE_DISPLAYCONFIG_MODE_INFO_TYPE_TARGET: DISPLAYCONFIG_MODE_INFO_TYPE = 2;
+pub const DISPLAYCONFIG_MODE_INFO_TYPE_DISPLAYCONFIG_MODE_INFO_TYPE_DESKTOP_IMAGE: DISPLAYCONFIG_MODE_INFO_TYPE = 3;
+pub const DISPLAYCONFIG_MODE_INFO_TYPE_DISPLAYCONFIG_MODE_INFO_TYPE_FORCE_UINT32: DISPLAYCONFIG_MODE_INFO_TYPE = -1;
 pub type DISPLAYCONFIG_MODE_INFO_TYPE = ::std::os::raw::c_int;
 pub const DISPLAYCONFIG_PIXELFORMAT_DISPLAYCONFIG_PIXELFORMAT_8BPP: DISPLAYCONFIG_PIXELFORMAT = 1;
 pub const DISPLAYCONFIG_PIXELFORMAT_DISPLAYCONFIG_PIXELFORMAT_16BPP: DISPLAYCONFIG_PIXELFORMAT = 2;
 pub const DISPLAYCONFIG_PIXELFORMAT_DISPLAYCONFIG_PIXELFORMAT_24BPP: DISPLAYCONFIG_PIXELFORMAT = 3;
 pub const DISPLAYCONFIG_PIXELFORMAT_DISPLAYCONFIG_PIXELFORMAT_32BPP: DISPLAYCONFIG_PIXELFORMAT = 4;
 pub const DISPLAYCONFIG_PIXELFORMAT_DISPLAYCONFIG_PIXELFORMAT_NONGDI: DISPLAYCONFIG_PIXELFORMAT = 5;
-pub const DISPLAYCONFIG_PIXELFORMAT_DISPLAYCONFIG_PIXELFORMAT_FORCE_UINT32:
-    DISPLAYCONFIG_PIXELFORMAT = -1;
+pub const DISPLAYCONFIG_PIXELFORMAT_DISPLAYCONFIG_PIXELFORMAT_FORCE_UINT32: DISPLAYCONFIG_PIXELFORMAT = -1;
 pub type DISPLAYCONFIG_PIXELFORMAT = ::std::os::raw::c_int;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -35957,10 +33404,7 @@ impl DISPLAYCONFIG_PATH_SOURCE_INFO__bindgen_ty_1__bindgen_ty_1 {
         }
     }
     #[inline]
-    pub fn new_bitfield_1(
-        cloneGroupId: UINT32,
-        sourceModeInfoIdx: UINT32,
-    ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
+    pub fn new_bitfield_1(cloneGroupId: UINT32, sourceModeInfoIdx: UINT32) -> __BindgenBitfieldUnit<[u8; 4usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 16u8, {
             let cloneGroupId: u32 = unsafe { ::std::mem::transmute(cloneGroupId) };
@@ -36024,10 +33468,7 @@ impl DISPLAYCONFIG_PATH_TARGET_INFO__bindgen_ty_1__bindgen_ty_1 {
         }
     }
     #[inline]
-    pub fn new_bitfield_1(
-        desktopModeInfoIdx: UINT32,
-        targetModeInfoIdx: UINT32,
-    ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
+    pub fn new_bitfield_1(desktopModeInfoIdx: UINT32, targetModeInfoIdx: UINT32) -> __BindgenBitfieldUnit<[u8; 4usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 16u8, {
             let desktopModeInfoIdx: u32 = unsafe { ::std::mem::transmute(desktopModeInfoIdx) };
@@ -36051,31 +33492,20 @@ pub const DISPLAYCONFIG_TOPOLOGY_ID_DISPLAYCONFIG_TOPOLOGY_INTERNAL: DISPLAYCONF
 pub const DISPLAYCONFIG_TOPOLOGY_ID_DISPLAYCONFIG_TOPOLOGY_CLONE: DISPLAYCONFIG_TOPOLOGY_ID = 2;
 pub const DISPLAYCONFIG_TOPOLOGY_ID_DISPLAYCONFIG_TOPOLOGY_EXTEND: DISPLAYCONFIG_TOPOLOGY_ID = 4;
 pub const DISPLAYCONFIG_TOPOLOGY_ID_DISPLAYCONFIG_TOPOLOGY_EXTERNAL: DISPLAYCONFIG_TOPOLOGY_ID = 8;
-pub const DISPLAYCONFIG_TOPOLOGY_ID_DISPLAYCONFIG_TOPOLOGY_FORCE_UINT32: DISPLAYCONFIG_TOPOLOGY_ID =
-    -1;
+pub const DISPLAYCONFIG_TOPOLOGY_ID_DISPLAYCONFIG_TOPOLOGY_FORCE_UINT32: DISPLAYCONFIG_TOPOLOGY_ID = -1;
 pub type DISPLAYCONFIG_TOPOLOGY_ID = ::std::os::raw::c_int;
-pub const DISPLAYCONFIG_DEVICE_INFO_TYPE_DISPLAYCONFIG_DEVICE_INFO_GET_SOURCE_NAME:
-    DISPLAYCONFIG_DEVICE_INFO_TYPE = 1;
-pub const DISPLAYCONFIG_DEVICE_INFO_TYPE_DISPLAYCONFIG_DEVICE_INFO_GET_TARGET_NAME:
-    DISPLAYCONFIG_DEVICE_INFO_TYPE = 2;
-pub const DISPLAYCONFIG_DEVICE_INFO_TYPE_DISPLAYCONFIG_DEVICE_INFO_GET_TARGET_PREFERRED_MODE:
-    DISPLAYCONFIG_DEVICE_INFO_TYPE = 3;
-pub const DISPLAYCONFIG_DEVICE_INFO_TYPE_DISPLAYCONFIG_DEVICE_INFO_GET_ADAPTER_NAME:
-    DISPLAYCONFIG_DEVICE_INFO_TYPE = 4;
-pub const DISPLAYCONFIG_DEVICE_INFO_TYPE_DISPLAYCONFIG_DEVICE_INFO_SET_TARGET_PERSISTENCE:
-    DISPLAYCONFIG_DEVICE_INFO_TYPE = 5;
-pub const DISPLAYCONFIG_DEVICE_INFO_TYPE_DISPLAYCONFIG_DEVICE_INFO_GET_TARGET_BASE_TYPE:
-    DISPLAYCONFIG_DEVICE_INFO_TYPE = 6;
-pub const DISPLAYCONFIG_DEVICE_INFO_TYPE_DISPLAYCONFIG_DEVICE_INFO_GET_SUPPORT_VIRTUAL_RESOLUTION : DISPLAYCONFIG_DEVICE_INFO_TYPE = 7 ;
-pub const DISPLAYCONFIG_DEVICE_INFO_TYPE_DISPLAYCONFIG_DEVICE_INFO_SET_SUPPORT_VIRTUAL_RESOLUTION : DISPLAYCONFIG_DEVICE_INFO_TYPE = 8 ;
-pub const DISPLAYCONFIG_DEVICE_INFO_TYPE_DISPLAYCONFIG_DEVICE_INFO_GET_ADVANCED_COLOR_INFO:
-    DISPLAYCONFIG_DEVICE_INFO_TYPE = 9;
-pub const DISPLAYCONFIG_DEVICE_INFO_TYPE_DISPLAYCONFIG_DEVICE_INFO_SET_ADVANCED_COLOR_STATE:
-    DISPLAYCONFIG_DEVICE_INFO_TYPE = 10;
-pub const DISPLAYCONFIG_DEVICE_INFO_TYPE_DISPLAYCONFIG_DEVICE_INFO_GET_SDR_WHITE_LEVEL:
-    DISPLAYCONFIG_DEVICE_INFO_TYPE = 11;
-pub const DISPLAYCONFIG_DEVICE_INFO_TYPE_DISPLAYCONFIG_DEVICE_INFO_FORCE_UINT32:
-    DISPLAYCONFIG_DEVICE_INFO_TYPE = -1;
+pub const DISPLAYCONFIG_DEVICE_INFO_TYPE_DISPLAYCONFIG_DEVICE_INFO_GET_SOURCE_NAME: DISPLAYCONFIG_DEVICE_INFO_TYPE = 1;
+pub const DISPLAYCONFIG_DEVICE_INFO_TYPE_DISPLAYCONFIG_DEVICE_INFO_GET_TARGET_NAME: DISPLAYCONFIG_DEVICE_INFO_TYPE = 2;
+pub const DISPLAYCONFIG_DEVICE_INFO_TYPE_DISPLAYCONFIG_DEVICE_INFO_GET_TARGET_PREFERRED_MODE: DISPLAYCONFIG_DEVICE_INFO_TYPE = 3;
+pub const DISPLAYCONFIG_DEVICE_INFO_TYPE_DISPLAYCONFIG_DEVICE_INFO_GET_ADAPTER_NAME: DISPLAYCONFIG_DEVICE_INFO_TYPE = 4;
+pub const DISPLAYCONFIG_DEVICE_INFO_TYPE_DISPLAYCONFIG_DEVICE_INFO_SET_TARGET_PERSISTENCE: DISPLAYCONFIG_DEVICE_INFO_TYPE = 5;
+pub const DISPLAYCONFIG_DEVICE_INFO_TYPE_DISPLAYCONFIG_DEVICE_INFO_GET_TARGET_BASE_TYPE: DISPLAYCONFIG_DEVICE_INFO_TYPE = 6;
+pub const DISPLAYCONFIG_DEVICE_INFO_TYPE_DISPLAYCONFIG_DEVICE_INFO_GET_SUPPORT_VIRTUAL_RESOLUTION: DISPLAYCONFIG_DEVICE_INFO_TYPE = 7;
+pub const DISPLAYCONFIG_DEVICE_INFO_TYPE_DISPLAYCONFIG_DEVICE_INFO_SET_SUPPORT_VIRTUAL_RESOLUTION: DISPLAYCONFIG_DEVICE_INFO_TYPE = 8;
+pub const DISPLAYCONFIG_DEVICE_INFO_TYPE_DISPLAYCONFIG_DEVICE_INFO_GET_ADVANCED_COLOR_INFO: DISPLAYCONFIG_DEVICE_INFO_TYPE = 9;
+pub const DISPLAYCONFIG_DEVICE_INFO_TYPE_DISPLAYCONFIG_DEVICE_INFO_SET_ADVANCED_COLOR_STATE: DISPLAYCONFIG_DEVICE_INFO_TYPE = 10;
+pub const DISPLAYCONFIG_DEVICE_INFO_TYPE_DISPLAYCONFIG_DEVICE_INFO_GET_SDR_WHITE_LEVEL: DISPLAYCONFIG_DEVICE_INFO_TYPE = 11;
+pub const DISPLAYCONFIG_DEVICE_INFO_TYPE_DISPLAYCONFIG_DEVICE_INFO_FORCE_UINT32: DISPLAYCONFIG_DEVICE_INFO_TYPE = -1;
 pub type DISPLAYCONFIG_DEVICE_INFO_TYPE = ::std::os::raw::c_int;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -36256,10 +33686,7 @@ impl DISPLAYCONFIG_SET_TARGET_PERSISTENCE__bindgen_ty_1__bindgen_ty_1 {
         }
     }
     #[inline]
-    pub fn new_bitfield_1(
-        bootPersistenceOn: UINT32,
-        reserved: UINT32,
-    ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
+    pub fn new_bitfield_1(bootPersistenceOn: UINT32, reserved: UINT32) -> __BindgenBitfieldUnit<[u8; 4usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
             let bootPersistenceOn: u32 = unsafe { ::std::mem::transmute(bootPersistenceOn) };
@@ -36315,14 +33742,10 @@ impl DISPLAYCONFIG_SUPPORT_VIRTUAL_RESOLUTION__bindgen_ty_1__bindgen_ty_1 {
         }
     }
     #[inline]
-    pub fn new_bitfield_1(
-        disableMonitorVirtualResolution: UINT32,
-        reserved: UINT32,
-    ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
+    pub fn new_bitfield_1(disableMonitorVirtualResolution: UINT32, reserved: UINT32) -> __BindgenBitfieldUnit<[u8; 4usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
-            let disableMonitorVirtualResolution: u32 =
-                unsafe { ::std::mem::transmute(disableMonitorVirtualResolution) };
+            let disableMonitorVirtualResolution: u32 = unsafe { ::std::mem::transmute(disableMonitorVirtualResolution) };
             disableMonitorVirtualResolution as u64
         });
         __bindgen_bitfield_unit.set(1usize, 31u8, {
@@ -36332,18 +33755,12 @@ impl DISPLAYCONFIG_SUPPORT_VIRTUAL_RESOLUTION__bindgen_ty_1__bindgen_ty_1 {
         __bindgen_bitfield_unit
     }
 }
-pub const _DISPLAYCONFIG_COLOR_ENCODING_DISPLAYCONFIG_COLOR_ENCODING_RGB:
-    _DISPLAYCONFIG_COLOR_ENCODING = 0;
-pub const _DISPLAYCONFIG_COLOR_ENCODING_DISPLAYCONFIG_COLOR_ENCODING_YCBCR444:
-    _DISPLAYCONFIG_COLOR_ENCODING = 1;
-pub const _DISPLAYCONFIG_COLOR_ENCODING_DISPLAYCONFIG_COLOR_ENCODING_YCBCR422:
-    _DISPLAYCONFIG_COLOR_ENCODING = 2;
-pub const _DISPLAYCONFIG_COLOR_ENCODING_DISPLAYCONFIG_COLOR_ENCODING_YCBCR420:
-    _DISPLAYCONFIG_COLOR_ENCODING = 3;
-pub const _DISPLAYCONFIG_COLOR_ENCODING_DISPLAYCONFIG_COLOR_ENCODING_INTENSITY:
-    _DISPLAYCONFIG_COLOR_ENCODING = 4;
-pub const _DISPLAYCONFIG_COLOR_ENCODING_DISPLAYCONFIG_COLOR_ENCODING_FORCE_UINT32:
-    _DISPLAYCONFIG_COLOR_ENCODING = -1;
+pub const _DISPLAYCONFIG_COLOR_ENCODING_DISPLAYCONFIG_COLOR_ENCODING_RGB: _DISPLAYCONFIG_COLOR_ENCODING = 0;
+pub const _DISPLAYCONFIG_COLOR_ENCODING_DISPLAYCONFIG_COLOR_ENCODING_YCBCR444: _DISPLAYCONFIG_COLOR_ENCODING = 1;
+pub const _DISPLAYCONFIG_COLOR_ENCODING_DISPLAYCONFIG_COLOR_ENCODING_YCBCR422: _DISPLAYCONFIG_COLOR_ENCODING = 2;
+pub const _DISPLAYCONFIG_COLOR_ENCODING_DISPLAYCONFIG_COLOR_ENCODING_YCBCR420: _DISPLAYCONFIG_COLOR_ENCODING = 3;
+pub const _DISPLAYCONFIG_COLOR_ENCODING_DISPLAYCONFIG_COLOR_ENCODING_INTENSITY: _DISPLAYCONFIG_COLOR_ENCODING = 4;
+pub const _DISPLAYCONFIG_COLOR_ENCODING_DISPLAYCONFIG_COLOR_ENCODING_FORCE_UINT32: _DISPLAYCONFIG_COLOR_ENCODING = -1;
 pub type _DISPLAYCONFIG_COLOR_ENCODING = ::std::os::raw::c_int;
 pub use self::_DISPLAYCONFIG_COLOR_ENCODING as DISPLAYCONFIG_COLOR_ENCODING;
 #[repr(C)]
@@ -36433,8 +33850,7 @@ impl _DISPLAYCONFIG_GET_ADVANCED_COLOR_INFO__bindgen_ty_1__bindgen_ty_1 {
     ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
-            let advancedColorSupported: u32 =
-                unsafe { ::std::mem::transmute(advancedColorSupported) };
+            let advancedColorSupported: u32 = unsafe { ::std::mem::transmute(advancedColorSupported) };
             advancedColorSupported as u64
         });
         __bindgen_bitfield_unit.set(1usize, 1u8, {
@@ -36446,8 +33862,7 @@ impl _DISPLAYCONFIG_GET_ADVANCED_COLOR_INFO__bindgen_ty_1__bindgen_ty_1 {
             wideColorEnforced as u64
         });
         __bindgen_bitfield_unit.set(3usize, 1u8, {
-            let advancedColorForceDisabled: u32 =
-                unsafe { ::std::mem::transmute(advancedColorForceDisabled) };
+            let advancedColorForceDisabled: u32 = unsafe { ::std::mem::transmute(advancedColorForceDisabled) };
             advancedColorForceDisabled as u64
         });
         __bindgen_bitfield_unit.set(4usize, 28u8, {
@@ -36501,10 +33916,7 @@ impl _DISPLAYCONFIG_SET_ADVANCED_COLOR_STATE__bindgen_ty_1__bindgen_ty_1 {
         }
     }
     #[inline]
-    pub fn new_bitfield_1(
-        enableAdvancedColor: UINT32,
-        reserved: UINT32,
-    ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
+    pub fn new_bitfield_1(enableAdvancedColor: UINT32, reserved: UINT32) -> __BindgenBitfieldUnit<[u8; 4usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
             let enableAdvancedColor: u32 = unsafe { ::std::mem::transmute(enableAdvancedColor) };
@@ -36814,24 +34226,13 @@ pub struct tagPIXELFORMATDESCRIPTOR {
 pub type PIXELFORMATDESCRIPTOR = tagPIXELFORMATDESCRIPTOR;
 pub type PPIXELFORMATDESCRIPTOR = *mut tagPIXELFORMATDESCRIPTOR;
 pub type LPPIXELFORMATDESCRIPTOR = *mut tagPIXELFORMATDESCRIPTOR;
-pub type OLDFONTENUMPROCA = unsafe extern "C" fn(
-    arg1: *const LOGFONTA,
-    arg2: *const TEXTMETRICA,
-    arg3: DWORD,
-    arg4: LPARAM,
-) -> ::std::os::raw::c_int;
-pub type OLDFONTENUMPROCW = unsafe extern "C" fn(
-    arg1: *const LOGFONTW,
-    arg2: *const TEXTMETRICW,
-    arg3: DWORD,
-    arg4: LPARAM,
-) -> ::std::os::raw::c_int;
+pub type OLDFONTENUMPROCA = unsafe extern "C" fn(arg1: *const LOGFONTA, arg2: *const TEXTMETRICA, arg3: DWORD, arg4: LPARAM) -> ::std::os::raw::c_int;
+pub type OLDFONTENUMPROCW = unsafe extern "C" fn(arg1: *const LOGFONTW, arg2: *const TEXTMETRICW, arg3: DWORD, arg4: LPARAM) -> ::std::os::raw::c_int;
 pub type FONTENUMPROCA = OLDFONTENUMPROCA;
 pub type FONTENUMPROCW = OLDFONTENUMPROCW;
 pub type FONTENUMPROC = FONTENUMPROCA;
 pub type GOBJENUMPROC = unsafe extern "C" fn(arg1: LPVOID, arg2: LPARAM) -> ::std::os::raw::c_int;
-pub type LINEDDAPROC =
-    unsafe extern "C" fn(arg1: ::std::os::raw::c_int, arg2: ::std::os::raw::c_int, arg3: LPARAM);
+pub type LINEDDAPROC = unsafe extern "C" fn(arg1: ::std::os::raw::c_int, arg2: ::std::os::raw::c_int, arg3: LPARAM);
 extern "C" {
     pub fn AddFontResourceA(arg1: LPCSTR) -> ::std::os::raw::c_int;
 }
@@ -36839,12 +34240,7 @@ extern "C" {
     pub fn AddFontResourceW(arg1: LPCWSTR) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn AnimatePalette(
-        hPal: HPALETTE,
-        iStartIndex: UINT,
-        cEntries: UINT,
-        ppe: *const PALETTEENTRY,
-    ) -> BOOL;
+    pub fn AnimatePalette(hPal: HPALETTE, iStartIndex: UINT, cEntries: UINT, ppe: *const PALETTEENTRY) -> BOOL;
 }
 extern "C" {
     pub fn Arc(
@@ -36889,19 +34285,13 @@ extern "C" {
     ) -> BOOL;
 }
 extern "C" {
-    pub fn ChoosePixelFormat(hdc: HDC, ppfd: *const PIXELFORMATDESCRIPTOR)
-        -> ::std::os::raw::c_int;
+    pub fn ChoosePixelFormat(hdc: HDC, ppfd: *const PIXELFORMATDESCRIPTOR) -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn CloseMetaFile(hdc: HDC) -> HMETAFILE;
 }
 extern "C" {
-    pub fn CombineRgn(
-        hrgnDst: HRGN,
-        hrgnSrc1: HRGN,
-        hrgnSrc2: HRGN,
-        iMode: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int;
+    pub fn CombineRgn(hrgnDst: HRGN, hrgnSrc1: HRGN, hrgnSrc2: HRGN, iMode: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn CopyMetaFileA(arg1: HMETAFILE, arg2: LPCSTR) -> HMETAFILE;
@@ -36925,37 +34315,19 @@ extern "C" {
     pub fn CreateBrushIndirect(plbrush: *const LOGBRUSH) -> HBRUSH;
 }
 extern "C" {
-    pub fn CreateCompatibleBitmap(
-        hdc: HDC,
-        cx: ::std::os::raw::c_int,
-        cy: ::std::os::raw::c_int,
-    ) -> HBITMAP;
+    pub fn CreateCompatibleBitmap(hdc: HDC, cx: ::std::os::raw::c_int, cy: ::std::os::raw::c_int) -> HBITMAP;
 }
 extern "C" {
-    pub fn CreateDiscardableBitmap(
-        hdc: HDC,
-        cx: ::std::os::raw::c_int,
-        cy: ::std::os::raw::c_int,
-    ) -> HBITMAP;
+    pub fn CreateDiscardableBitmap(hdc: HDC, cx: ::std::os::raw::c_int, cy: ::std::os::raw::c_int) -> HBITMAP;
 }
 extern "C" {
     pub fn CreateCompatibleDC(hdc: HDC) -> HDC;
 }
 extern "C" {
-    pub fn CreateDCA(
-        pwszDriver: LPCSTR,
-        pwszDevice: LPCSTR,
-        pszPort: LPCSTR,
-        pdm: *const DEVMODEA,
-    ) -> HDC;
+    pub fn CreateDCA(pwszDriver: LPCSTR, pwszDevice: LPCSTR, pszPort: LPCSTR, pdm: *const DEVMODEA) -> HDC;
 }
 extern "C" {
-    pub fn CreateDCW(
-        pwszDriver: LPCWSTR,
-        pwszDevice: LPCWSTR,
-        pszPort: LPCWSTR,
-        pdm: *const DEVMODEW,
-    ) -> HDC;
+    pub fn CreateDCW(pwszDriver: LPCWSTR, pwszDevice: LPCWSTR, pszPort: LPCWSTR, pdm: *const DEVMODEW) -> HDC;
 }
 extern "C" {
     pub fn CreateDIBitmap(
@@ -36971,18 +34343,10 @@ extern "C" {
     pub fn CreateDIBPatternBrush(h: HGLOBAL, iUsage: UINT) -> HBRUSH;
 }
 extern "C" {
-    pub fn CreateDIBPatternBrushPt(
-        lpPackedDIB: *const ::std::os::raw::c_void,
-        iUsage: UINT,
-    ) -> HBRUSH;
+    pub fn CreateDIBPatternBrushPt(lpPackedDIB: *const ::std::os::raw::c_void, iUsage: UINT) -> HBRUSH;
 }
 extern "C" {
-    pub fn CreateEllipticRgn(
-        x1: ::std::os::raw::c_int,
-        y1: ::std::os::raw::c_int,
-        x2: ::std::os::raw::c_int,
-        y2: ::std::os::raw::c_int,
-    ) -> HRGN;
+    pub fn CreateEllipticRgn(x1: ::std::os::raw::c_int, y1: ::std::os::raw::c_int, x2: ::std::os::raw::c_int, y2: ::std::os::raw::c_int) -> HRGN;
 }
 extern "C" {
     pub fn CreateEllipticRgnIndirect(lprect: *const RECT) -> HRGN;
@@ -37033,20 +34397,10 @@ extern "C" {
     pub fn CreateHatchBrush(iHatch: ::std::os::raw::c_int, color: COLORREF) -> HBRUSH;
 }
 extern "C" {
-    pub fn CreateICA(
-        pszDriver: LPCSTR,
-        pszDevice: LPCSTR,
-        pszPort: LPCSTR,
-        pdm: *const DEVMODEA,
-    ) -> HDC;
+    pub fn CreateICA(pszDriver: LPCSTR, pszDevice: LPCSTR, pszPort: LPCSTR, pdm: *const DEVMODEA) -> HDC;
 }
 extern "C" {
-    pub fn CreateICW(
-        pszDriver: LPCWSTR,
-        pszDevice: LPCWSTR,
-        pszPort: LPCWSTR,
-        pdm: *const DEVMODEW,
-    ) -> HDC;
+    pub fn CreateICW(pszDriver: LPCWSTR, pszDevice: LPCWSTR, pszPort: LPCWSTR, pdm: *const DEVMODEW) -> HDC;
 }
 extern "C" {
     pub fn CreateMetaFileA(pszFile: LPCSTR) -> HDC;
@@ -37058,33 +34412,19 @@ extern "C" {
     pub fn CreatePalette(plpal: *const LOGPALETTE) -> HPALETTE;
 }
 extern "C" {
-    pub fn CreatePen(
-        iStyle: ::std::os::raw::c_int,
-        cWidth: ::std::os::raw::c_int,
-        color: COLORREF,
-    ) -> HPEN;
+    pub fn CreatePen(iStyle: ::std::os::raw::c_int, cWidth: ::std::os::raw::c_int, color: COLORREF) -> HPEN;
 }
 extern "C" {
     pub fn CreatePenIndirect(plpen: *const LOGPEN) -> HPEN;
 }
 extern "C" {
-    pub fn CreatePolyPolygonRgn(
-        pptl: *const POINT,
-        pc: *const INT,
-        cPoly: ::std::os::raw::c_int,
-        iMode: ::std::os::raw::c_int,
-    ) -> HRGN;
+    pub fn CreatePolyPolygonRgn(pptl: *const POINT, pc: *const INT, cPoly: ::std::os::raw::c_int, iMode: ::std::os::raw::c_int) -> HRGN;
 }
 extern "C" {
     pub fn CreatePatternBrush(hbm: HBITMAP) -> HBRUSH;
 }
 extern "C" {
-    pub fn CreateRectRgn(
-        x1: ::std::os::raw::c_int,
-        y1: ::std::os::raw::c_int,
-        x2: ::std::os::raw::c_int,
-        y2: ::std::os::raw::c_int,
-    ) -> HRGN;
+    pub fn CreateRectRgn(x1: ::std::os::raw::c_int, y1: ::std::os::raw::c_int, x2: ::std::os::raw::c_int, y2: ::std::os::raw::c_int) -> HRGN;
 }
 extern "C" {
     pub fn CreateRectRgnIndirect(lprect: *const RECT) -> HRGN;
@@ -37100,20 +34440,10 @@ extern "C" {
     ) -> HRGN;
 }
 extern "C" {
-    pub fn CreateScalableFontResourceA(
-        fdwHidden: DWORD,
-        lpszFont: LPCSTR,
-        lpszFile: LPCSTR,
-        lpszPath: LPCSTR,
-    ) -> BOOL;
+    pub fn CreateScalableFontResourceA(fdwHidden: DWORD, lpszFont: LPCSTR, lpszFile: LPCSTR, lpszPath: LPCSTR) -> BOOL;
 }
 extern "C" {
-    pub fn CreateScalableFontResourceW(
-        fdwHidden: DWORD,
-        lpszFont: LPCWSTR,
-        lpszFile: LPCWSTR,
-        lpszPath: LPCWSTR,
-    ) -> BOOL;
+    pub fn CreateScalableFontResourceW(fdwHidden: DWORD, lpszFont: LPCWSTR, lpszFile: LPCWSTR, lpszPath: LPCWSTR) -> BOOL;
 }
 extern "C" {
     pub fn CreateSolidBrush(color: COLORREF) -> HBRUSH;
@@ -37128,134 +34458,49 @@ extern "C" {
     pub fn DeleteObject(ho: HGDIOBJ) -> BOOL;
 }
 extern "C" {
-    pub fn DescribePixelFormat(
-        hdc: HDC,
-        iPixelFormat: ::std::os::raw::c_int,
-        nBytes: UINT,
-        ppfd: LPPIXELFORMATDESCRIPTOR,
-    ) -> ::std::os::raw::c_int;
+    pub fn DescribePixelFormat(hdc: HDC, iPixelFormat: ::std::os::raw::c_int, nBytes: UINT, ppfd: LPPIXELFORMATDESCRIPTOR) -> ::std::os::raw::c_int;
 }
-pub type LPFNDEVMODE = unsafe extern "C" fn(
-    arg1: HWND,
-    arg2: HMODULE,
-    arg3: LPDEVMODE,
-    arg4: LPSTR,
-    arg5: LPSTR,
-    arg6: LPDEVMODE,
-    arg7: LPSTR,
-    arg8: UINT,
-) -> UINT;
-pub type LPFNDEVCAPS = unsafe extern "C" fn(
-    arg1: LPSTR,
-    arg2: LPSTR,
-    arg3: UINT,
-    arg4: LPSTR,
-    arg5: LPDEVMODE,
-) -> DWORD;
+pub type LPFNDEVMODE =
+    unsafe extern "C" fn(arg1: HWND, arg2: HMODULE, arg3: LPDEVMODE, arg4: LPSTR, arg5: LPSTR, arg6: LPDEVMODE, arg7: LPSTR, arg8: UINT) -> UINT;
+pub type LPFNDEVCAPS = unsafe extern "C" fn(arg1: LPSTR, arg2: LPSTR, arg3: UINT, arg4: LPSTR, arg5: LPDEVMODE) -> DWORD;
 extern "C" {
-    pub fn DeviceCapabilitiesA(
-        pDevice: LPCSTR,
-        pPort: LPCSTR,
-        fwCapability: WORD,
-        pOutput: LPSTR,
-        pDevMode: *const DEVMODEA,
-    ) -> ::std::os::raw::c_int;
+    pub fn DeviceCapabilitiesA(pDevice: LPCSTR, pPort: LPCSTR, fwCapability: WORD, pOutput: LPSTR, pDevMode: *const DEVMODEA) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn DeviceCapabilitiesW(
-        pDevice: LPCWSTR,
-        pPort: LPCWSTR,
-        fwCapability: WORD,
-        pOutput: LPWSTR,
-        pDevMode: *const DEVMODEW,
-    ) -> ::std::os::raw::c_int;
+    pub fn DeviceCapabilitiesW(pDevice: LPCWSTR, pPort: LPCWSTR, fwCapability: WORD, pOutput: LPWSTR, pDevMode: *const DEVMODEW) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn DrawEscape(
-        hdc: HDC,
-        iEscape: ::std::os::raw::c_int,
-        cjIn: ::std::os::raw::c_int,
-        lpIn: LPCSTR,
-    ) -> ::std::os::raw::c_int;
+    pub fn DrawEscape(hdc: HDC, iEscape: ::std::os::raw::c_int, cjIn: ::std::os::raw::c_int, lpIn: LPCSTR) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn Ellipse(
-        hdc: HDC,
-        left: ::std::os::raw::c_int,
-        top: ::std::os::raw::c_int,
-        right: ::std::os::raw::c_int,
-        bottom: ::std::os::raw::c_int,
-    ) -> BOOL;
+    pub fn Ellipse(hdc: HDC, left: ::std::os::raw::c_int, top: ::std::os::raw::c_int, right: ::std::os::raw::c_int, bottom: ::std::os::raw::c_int) -> BOOL;
 }
 extern "C" {
-    pub fn EnumFontFamiliesExA(
-        hdc: HDC,
-        lpLogfont: LPLOGFONTA,
-        lpProc: FONTENUMPROCA,
-        lParam: LPARAM,
-        dwFlags: DWORD,
-    ) -> ::std::os::raw::c_int;
+    pub fn EnumFontFamiliesExA(hdc: HDC, lpLogfont: LPLOGFONTA, lpProc: FONTENUMPROCA, lParam: LPARAM, dwFlags: DWORD) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn EnumFontFamiliesExW(
-        hdc: HDC,
-        lpLogfont: LPLOGFONTW,
-        lpProc: FONTENUMPROCW,
-        lParam: LPARAM,
-        dwFlags: DWORD,
-    ) -> ::std::os::raw::c_int;
+    pub fn EnumFontFamiliesExW(hdc: HDC, lpLogfont: LPLOGFONTW, lpProc: FONTENUMPROCW, lParam: LPARAM, dwFlags: DWORD) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn EnumFontFamiliesA(
-        hdc: HDC,
-        lpLogfont: LPCSTR,
-        lpProc: FONTENUMPROCA,
-        lParam: LPARAM,
-    ) -> ::std::os::raw::c_int;
+    pub fn EnumFontFamiliesA(hdc: HDC, lpLogfont: LPCSTR, lpProc: FONTENUMPROCA, lParam: LPARAM) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn EnumFontFamiliesW(
-        hdc: HDC,
-        lpLogfont: LPCWSTR,
-        lpProc: FONTENUMPROCW,
-        lParam: LPARAM,
-    ) -> ::std::os::raw::c_int;
+    pub fn EnumFontFamiliesW(hdc: HDC, lpLogfont: LPCWSTR, lpProc: FONTENUMPROCW, lParam: LPARAM) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn EnumFontsA(
-        hdc: HDC,
-        lpLogfont: LPCSTR,
-        lpProc: FONTENUMPROCA,
-        lParam: LPARAM,
-    ) -> ::std::os::raw::c_int;
+    pub fn EnumFontsA(hdc: HDC, lpLogfont: LPCSTR, lpProc: FONTENUMPROCA, lParam: LPARAM) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn EnumFontsW(
-        hdc: HDC,
-        lpLogfont: LPCWSTR,
-        lpProc: FONTENUMPROCW,
-        lParam: LPARAM,
-    ) -> ::std::os::raw::c_int;
+    pub fn EnumFontsW(hdc: HDC, lpLogfont: LPCWSTR, lpProc: FONTENUMPROCW, lParam: LPARAM) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn EnumObjects(
-        hdc: HDC,
-        nType: ::std::os::raw::c_int,
-        lpFunc: GOBJENUMPROC,
-        lParam: LPARAM,
-    ) -> ::std::os::raw::c_int;
+    pub fn EnumObjects(hdc: HDC, nType: ::std::os::raw::c_int, lpFunc: GOBJENUMPROC, lParam: LPARAM) -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn EqualRgn(hrgn1: HRGN, hrgn2: HRGN) -> BOOL;
 }
 extern "C" {
-    pub fn Escape(
-        hdc: HDC,
-        iEscape: ::std::os::raw::c_int,
-        cjIn: ::std::os::raw::c_int,
-        pvIn: LPCSTR,
-        pvOut: LPVOID,
-    ) -> ::std::os::raw::c_int;
+    pub fn Escape(hdc: HDC, iEscape: ::std::os::raw::c_int, cjIn: ::std::os::raw::c_int, pvIn: LPCSTR, pvOut: LPVOID) -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn ExtEscape(
@@ -37280,33 +34525,16 @@ extern "C" {
     pub fn ExtCreateRegion(lpx: *const XFORM, nCount: DWORD, lpData: *const RGNDATA) -> HRGN;
 }
 extern "C" {
-    pub fn ExtFloodFill(
-        hdc: HDC,
-        x: ::std::os::raw::c_int,
-        y: ::std::os::raw::c_int,
-        color: COLORREF,
-        type_: UINT,
-    ) -> BOOL;
+    pub fn ExtFloodFill(hdc: HDC, x: ::std::os::raw::c_int, y: ::std::os::raw::c_int, color: COLORREF, type_: UINT) -> BOOL;
 }
 extern "C" {
     pub fn FillRgn(hdc: HDC, hrgn: HRGN, hbr: HBRUSH) -> BOOL;
 }
 extern "C" {
-    pub fn FloodFill(
-        hdc: HDC,
-        x: ::std::os::raw::c_int,
-        y: ::std::os::raw::c_int,
-        color: COLORREF,
-    ) -> BOOL;
+    pub fn FloodFill(hdc: HDC, x: ::std::os::raw::c_int, y: ::std::os::raw::c_int, color: COLORREF) -> BOOL;
 }
 extern "C" {
-    pub fn FrameRgn(
-        hdc: HDC,
-        hrgn: HRGN,
-        hbr: HBRUSH,
-        w: ::std::os::raw::c_int,
-        h: ::std::os::raw::c_int,
-    ) -> BOOL;
+    pub fn FrameRgn(hdc: HDC, hrgn: HRGN, hbr: HBRUSH, w: ::std::os::raw::c_int, h: ::std::os::raw::c_int) -> BOOL;
 }
 extern "C" {
     pub fn GetROP2(hdc: HDC) -> ::std::os::raw::c_int;
@@ -37387,46 +34615,16 @@ extern "C" {
     pub fn GetDeviceCaps(hdc: HDC, index: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn GetDIBits(
-        hdc: HDC,
-        hbm: HBITMAP,
-        start: UINT,
-        cLines: UINT,
-        lpvBits: LPVOID,
-        lpbmi: LPBITMAPINFO,
-        usage: UINT,
-    ) -> ::std::os::raw::c_int;
+    pub fn GetDIBits(hdc: HDC, hbm: HBITMAP, start: UINT, cLines: UINT, lpvBits: LPVOID, lpbmi: LPBITMAPINFO, usage: UINT) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn GetFontData(
-        hdc: HDC,
-        dwTable: DWORD,
-        dwOffset: DWORD,
-        pvBuffer: PVOID,
-        cjBuffer: DWORD,
-    ) -> DWORD;
+    pub fn GetFontData(hdc: HDC, dwTable: DWORD, dwOffset: DWORD, pvBuffer: PVOID, cjBuffer: DWORD) -> DWORD;
 }
 extern "C" {
-    pub fn GetGlyphOutlineA(
-        hdc: HDC,
-        uChar: UINT,
-        fuFormat: UINT,
-        lpgm: LPGLYPHMETRICS,
-        cjBuffer: DWORD,
-        pvBuffer: LPVOID,
-        lpmat2: *const MAT2,
-    ) -> DWORD;
+    pub fn GetGlyphOutlineA(hdc: HDC, uChar: UINT, fuFormat: UINT, lpgm: LPGLYPHMETRICS, cjBuffer: DWORD, pvBuffer: LPVOID, lpmat2: *const MAT2) -> DWORD;
 }
 extern "C" {
-    pub fn GetGlyphOutlineW(
-        hdc: HDC,
-        uChar: UINT,
-        fuFormat: UINT,
-        lpgm: LPGLYPHMETRICS,
-        cjBuffer: DWORD,
-        pvBuffer: LPVOID,
-        lpmat2: *const MAT2,
-    ) -> DWORD;
+    pub fn GetGlyphOutlineW(hdc: HDC, uChar: UINT, fuFormat: UINT, lpgm: LPGLYPHMETRICS, cjBuffer: DWORD, pvBuffer: LPVOID, lpmat2: *const MAT2) -> DWORD;
 }
 extern "C" {
     pub fn GetGraphicsMode(hdc: HDC) -> ::std::os::raw::c_int;
@@ -37459,12 +34657,7 @@ extern "C" {
     pub fn GetOutlineTextMetricsW(hdc: HDC, cjCopy: UINT, potm: LPOUTLINETEXTMETRICW) -> UINT;
 }
 extern "C" {
-    pub fn GetPaletteEntries(
-        hpal: HPALETTE,
-        iStart: UINT,
-        cEntries: UINT,
-        pPalEntries: LPPALETTEENTRY,
-    ) -> UINT;
+    pub fn GetPaletteEntries(hpal: HPALETTE, iStart: UINT, cEntries: UINT, pPalEntries: LPPALETTEENTRY) -> UINT;
 }
 extern "C" {
     pub fn GetPixel(hdc: HDC, x: ::std::os::raw::c_int, y: ::std::os::raw::c_int) -> COLORREF;
@@ -37494,12 +34687,7 @@ extern "C" {
     pub fn GetStretchBltMode(hdc: HDC) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn GetSystemPaletteEntries(
-        hdc: HDC,
-        iStart: UINT,
-        cEntries: UINT,
-        pPalEntries: LPPALETTEENTRY,
-    ) -> UINT;
+    pub fn GetSystemPaletteEntries(hdc: HDC, iStart: UINT, cEntries: UINT, pPalEntries: LPPALETTEENTRY) -> UINT;
 }
 extern "C" {
     pub fn GetSystemPaletteUse(hdc: HDC) -> UINT;
@@ -37514,36 +34702,16 @@ extern "C" {
     pub fn GetTextColor(hdc: HDC) -> COLORREF;
 }
 extern "C" {
-    pub fn GetTextExtentPointA(
-        hdc: HDC,
-        lpString: LPCSTR,
-        c: ::std::os::raw::c_int,
-        lpsz: LPSIZE,
-    ) -> BOOL;
+    pub fn GetTextExtentPointA(hdc: HDC, lpString: LPCSTR, c: ::std::os::raw::c_int, lpsz: LPSIZE) -> BOOL;
 }
 extern "C" {
-    pub fn GetTextExtentPointW(
-        hdc: HDC,
-        lpString: LPCWSTR,
-        c: ::std::os::raw::c_int,
-        lpsz: LPSIZE,
-    ) -> BOOL;
+    pub fn GetTextExtentPointW(hdc: HDC, lpString: LPCWSTR, c: ::std::os::raw::c_int, lpsz: LPSIZE) -> BOOL;
 }
 extern "C" {
-    pub fn GetTextExtentPoint32A(
-        hdc: HDC,
-        lpString: LPCSTR,
-        c: ::std::os::raw::c_int,
-        psizl: LPSIZE,
-    ) -> BOOL;
+    pub fn GetTextExtentPoint32A(hdc: HDC, lpString: LPCSTR, c: ::std::os::raw::c_int, psizl: LPSIZE) -> BOOL;
 }
 extern "C" {
-    pub fn GetTextExtentPoint32W(
-        hdc: HDC,
-        lpString: LPCWSTR,
-        c: ::std::os::raw::c_int,
-        psizl: LPSIZE,
-    ) -> BOOL;
+    pub fn GetTextExtentPoint32W(hdc: HDC, lpString: LPCWSTR, c: ::std::os::raw::c_int, psizl: LPSIZE) -> BOOL;
 }
 extern "C" {
     pub fn GetTextExtentExPointA(
@@ -37571,11 +34739,7 @@ extern "C" {
     pub fn GetTextCharset(hdc: HDC) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn GetTextCharsetInfo(
-        hdc: HDC,
-        lpSig: LPFONTSIGNATURE,
-        dwFlags: DWORD,
-    ) -> ::std::os::raw::c_int;
+    pub fn GetTextCharsetInfo(hdc: HDC, lpSig: LPFONTSIGNATURE, dwFlags: DWORD) -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn TranslateCharsetInfo(lpSrc: *mut DWORD, lpCs: LPCHARSETINFO, dwFlags: DWORD) -> BOOL;
@@ -37628,30 +34792,13 @@ extern "C" {
     pub fn GetFontUnicodeRanges(hdc: HDC, lpgs: LPGLYPHSET) -> DWORD;
 }
 extern "C" {
-    pub fn GetGlyphIndicesA(
-        hdc: HDC,
-        lpstr: LPCSTR,
-        c: ::std::os::raw::c_int,
-        pgi: LPWORD,
-        fl: DWORD,
-    ) -> DWORD;
+    pub fn GetGlyphIndicesA(hdc: HDC, lpstr: LPCSTR, c: ::std::os::raw::c_int, pgi: LPWORD, fl: DWORD) -> DWORD;
 }
 extern "C" {
-    pub fn GetGlyphIndicesW(
-        hdc: HDC,
-        lpstr: LPCWSTR,
-        c: ::std::os::raw::c_int,
-        pgi: LPWORD,
-        fl: DWORD,
-    ) -> DWORD;
+    pub fn GetGlyphIndicesW(hdc: HDC, lpstr: LPCWSTR, c: ::std::os::raw::c_int, pgi: LPWORD, fl: DWORD) -> DWORD;
 }
 extern "C" {
-    pub fn GetTextExtentPointI(
-        hdc: HDC,
-        pgiIn: LPWORD,
-        cgi: ::std::os::raw::c_int,
-        psize: LPSIZE,
-    ) -> BOOL;
+    pub fn GetTextExtentPointI(hdc: HDC, pgiIn: LPWORD, cgi: ::std::os::raw::c_int, psize: LPSIZE) -> BOOL;
 }
 extern "C" {
     pub fn GetTextExtentExPointI(
@@ -37693,12 +34840,7 @@ extern "C" {
     pub fn RemoveFontResourceExW(name: LPCWSTR, fl: DWORD, pdv: PVOID) -> BOOL;
 }
 extern "C" {
-    pub fn AddFontMemResourceEx(
-        pFileView: PVOID,
-        cjSize: DWORD,
-        pvResrved: PVOID,
-        pNumFonts: *mut DWORD,
-    ) -> HANDLE;
+    pub fn AddFontMemResourceEx(pFileView: PVOID, cjSize: DWORD, pvResrved: PVOID, pNumFonts: *mut DWORD) -> HANDLE;
 }
 extern "C" {
     pub fn RemoveFontMemResourceEx(h: HANDLE) -> BOOL;
@@ -37865,28 +35007,13 @@ extern "C" {
     ) -> BOOL;
 }
 extern "C" {
-    pub fn OffsetClipRgn(
-        hdc: HDC,
-        x: ::std::os::raw::c_int,
-        y: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int;
+    pub fn OffsetClipRgn(hdc: HDC, x: ::std::os::raw::c_int, y: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn OffsetRgn(
-        hrgn: HRGN,
-        x: ::std::os::raw::c_int,
-        y: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int;
+    pub fn OffsetRgn(hrgn: HRGN, x: ::std::os::raw::c_int, y: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn PatBlt(
-        hdc: HDC,
-        x: ::std::os::raw::c_int,
-        y: ::std::os::raw::c_int,
-        w: ::std::os::raw::c_int,
-        h: ::std::os::raw::c_int,
-        rop: DWORD,
-    ) -> BOOL;
+    pub fn PatBlt(hdc: HDC, x: ::std::os::raw::c_int, y: ::std::os::raw::c_int, w: ::std::os::raw::c_int, h: ::std::os::raw::c_int, rop: DWORD) -> BOOL;
 }
 extern "C" {
     pub fn Pie(
@@ -37908,12 +35035,7 @@ extern "C" {
     pub fn PaintRgn(hdc: HDC, hrgn: HRGN) -> BOOL;
 }
 extern "C" {
-    pub fn PolyPolygon(
-        hdc: HDC,
-        apt: *const POINT,
-        asz: *const INT,
-        csz: ::std::os::raw::c_int,
-    ) -> BOOL;
+    pub fn PolyPolygon(hdc: HDC, apt: *const POINT, asz: *const INT, csz: ::std::os::raw::c_int) -> BOOL;
 }
 extern "C" {
     pub fn PtInRegion(hrgn: HRGN, x: ::std::os::raw::c_int, y: ::std::os::raw::c_int) -> BOOL;
@@ -37928,13 +35050,7 @@ extern "C" {
     pub fn RectVisible(hdc: HDC, lprect: *const RECT) -> BOOL;
 }
 extern "C" {
-    pub fn Rectangle(
-        hdc: HDC,
-        left: ::std::os::raw::c_int,
-        top: ::std::os::raw::c_int,
-        right: ::std::os::raw::c_int,
-        bottom: ::std::os::raw::c_int,
-    ) -> BOOL;
+    pub fn Rectangle(hdc: HDC, left: ::std::os::raw::c_int, top: ::std::os::raw::c_int, right: ::std::os::raw::c_int, bottom: ::std::os::raw::c_int) -> BOOL;
 }
 extern "C" {
     pub fn RestoreDC(hdc: HDC, nSavedDC: ::std::os::raw::c_int) -> BOOL;
@@ -37975,11 +35091,7 @@ extern "C" {
     pub fn SelectClipRgn(hdc: HDC, hrgn: HRGN) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn ExtSelectClipRgn(
-        hdc: HDC,
-        hrgn: HRGN,
-        mode: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int;
+    pub fn ExtSelectClipRgn(hdc: HDC, hrgn: HRGN, mode: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn SetMetaRgn(hdc: HDC) -> ::std::os::raw::c_int;
@@ -38054,35 +35166,16 @@ extern "C" {
     pub fn SetMetaFileBitsEx(cbBuffer: UINT, lpData: *const BYTE) -> HMETAFILE;
 }
 extern "C" {
-    pub fn SetPaletteEntries(
-        hpal: HPALETTE,
-        iStart: UINT,
-        cEntries: UINT,
-        pPalEntries: *const PALETTEENTRY,
-    ) -> UINT;
+    pub fn SetPaletteEntries(hpal: HPALETTE, iStart: UINT, cEntries: UINT, pPalEntries: *const PALETTEENTRY) -> UINT;
 }
 extern "C" {
-    pub fn SetPixel(
-        hdc: HDC,
-        x: ::std::os::raw::c_int,
-        y: ::std::os::raw::c_int,
-        color: COLORREF,
-    ) -> COLORREF;
+    pub fn SetPixel(hdc: HDC, x: ::std::os::raw::c_int, y: ::std::os::raw::c_int, color: COLORREF) -> COLORREF;
 }
 extern "C" {
-    pub fn SetPixelV(
-        hdc: HDC,
-        x: ::std::os::raw::c_int,
-        y: ::std::os::raw::c_int,
-        color: COLORREF,
-    ) -> BOOL;
+    pub fn SetPixelV(hdc: HDC, x: ::std::os::raw::c_int, y: ::std::os::raw::c_int, color: COLORREF) -> BOOL;
 }
 extern "C" {
-    pub fn SetPixelFormat(
-        hdc: HDC,
-        format: ::std::os::raw::c_int,
-        ppfd: *const PIXELFORMATDESCRIPTOR,
-    ) -> BOOL;
+    pub fn SetPixelFormat(hdc: HDC, format: ::std::os::raw::c_int, ppfd: *const PIXELFORMATDESCRIPTOR) -> BOOL;
 }
 extern "C" {
     pub fn SetPolyFillMode(hdc: HDC, mode: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
@@ -38103,13 +35196,8 @@ extern "C" {
     ) -> BOOL;
 }
 extern "C" {
-    pub fn SetRectRgn(
-        hrgn: HRGN,
-        left: ::std::os::raw::c_int,
-        top: ::std::os::raw::c_int,
-        right: ::std::os::raw::c_int,
-        bottom: ::std::os::raw::c_int,
-    ) -> BOOL;
+    pub fn SetRectRgn(hrgn: HRGN, left: ::std::os::raw::c_int, top: ::std::os::raw::c_int, right: ::std::os::raw::c_int, bottom: ::std::os::raw::c_int)
+        -> BOOL;
 }
 extern "C" {
     pub fn StretchDIBits(
@@ -38147,11 +35235,7 @@ extern "C" {
     pub fn SetTextAlign(hdc: HDC, align: UINT) -> UINT;
 }
 extern "C" {
-    pub fn SetTextJustification(
-        hdc: HDC,
-        extra: ::std::os::raw::c_int,
-        count: ::std::os::raw::c_int,
-    ) -> BOOL;
+    pub fn SetTextJustification(hdc: HDC, extra: ::std::os::raw::c_int, count: ::std::os::raw::c_int) -> BOOL;
 }
 extern "C" {
     pub fn UpdateColors(hdc: HDC) -> BOOL;
@@ -38230,14 +35314,7 @@ extern "C" {
     ) -> BOOL;
 }
 extern "C" {
-    pub fn GradientFill(
-        hdc: HDC,
-        pVertex: PTRIVERTEX,
-        nVertex: ULONG,
-        pMesh: PVOID,
-        nMesh: ULONG,
-        ulMode: ULONG,
-    ) -> BOOL;
+    pub fn GradientFill(hdc: HDC, pVertex: PTRIVERTEX, nVertex: ULONG, pMesh: PVOID, nMesh: ULONG, ulMode: ULONG) -> BOOL;
 }
 extern "C" {
     pub fn GdiAlphaBlend(
@@ -38270,40 +35347,18 @@ extern "C" {
     ) -> BOOL;
 }
 extern "C" {
-    pub fn GdiGradientFill(
-        hdc: HDC,
-        pVertex: PTRIVERTEX,
-        nVertex: ULONG,
-        pMesh: PVOID,
-        nCount: ULONG,
-        ulMode: ULONG,
-    ) -> BOOL;
+    pub fn GdiGradientFill(hdc: HDC, pVertex: PTRIVERTEX, nVertex: ULONG, pMesh: PVOID, nCount: ULONG, ulMode: ULONG) -> BOOL;
 }
 extern "C" {
-    pub fn PlayMetaFileRecord(
-        hdc: HDC,
-        lpHandleTable: LPHANDLETABLE,
-        lpMR: LPMETARECORD,
-        noObjs: UINT,
-    ) -> BOOL;
+    pub fn PlayMetaFileRecord(hdc: HDC, lpHandleTable: LPHANDLETABLE, lpMR: LPMETARECORD, noObjs: UINT) -> BOOL;
 }
-pub type MFENUMPROC = unsafe extern "C" fn(
-    hdc: HDC,
-    lpht: *mut HANDLETABLE,
-    lpMR: *mut METARECORD,
-    nObj: ::std::os::raw::c_int,
-    param: LPARAM,
-) -> ::std::os::raw::c_int;
+pub type MFENUMPROC =
+    unsafe extern "C" fn(hdc: HDC, lpht: *mut HANDLETABLE, lpMR: *mut METARECORD, nObj: ::std::os::raw::c_int, param: LPARAM) -> ::std::os::raw::c_int;
 extern "C" {
     pub fn EnumMetaFile(hdc: HDC, hmf: HMETAFILE, proc_: MFENUMPROC, param: LPARAM) -> BOOL;
 }
-pub type ENHMFENUMPROC = unsafe extern "C" fn(
-    hdc: HDC,
-    lpht: *mut HANDLETABLE,
-    lpmr: *const ENHMETARECORD,
-    nHandles: ::std::os::raw::c_int,
-    data: LPARAM,
-) -> ::std::os::raw::c_int;
+pub type ENHMFENUMPROC =
+    unsafe extern "C" fn(hdc: HDC, lpht: *mut HANDLETABLE, lpmr: *const ENHMETARECORD, nHandles: ::std::os::raw::c_int, data: LPARAM) -> ::std::os::raw::c_int;
 extern "C" {
     pub fn CloseEnhMetaFile(hdc: HDC) -> HENHMETAFILE;
 }
@@ -38314,32 +35369,16 @@ extern "C" {
     pub fn CopyEnhMetaFileW(hEnh: HENHMETAFILE, lpFileName: LPCWSTR) -> HENHMETAFILE;
 }
 extern "C" {
-    pub fn CreateEnhMetaFileA(
-        hdc: HDC,
-        lpFilename: LPCSTR,
-        lprc: *const RECT,
-        lpDesc: LPCSTR,
-    ) -> HDC;
+    pub fn CreateEnhMetaFileA(hdc: HDC, lpFilename: LPCSTR, lprc: *const RECT, lpDesc: LPCSTR) -> HDC;
 }
 extern "C" {
-    pub fn CreateEnhMetaFileW(
-        hdc: HDC,
-        lpFilename: LPCWSTR,
-        lprc: *const RECT,
-        lpDesc: LPCWSTR,
-    ) -> HDC;
+    pub fn CreateEnhMetaFileW(hdc: HDC, lpFilename: LPCWSTR, lprc: *const RECT, lpDesc: LPCWSTR) -> HDC;
 }
 extern "C" {
     pub fn DeleteEnhMetaFile(hmf: HENHMETAFILE) -> BOOL;
 }
 extern "C" {
-    pub fn EnumEnhMetaFile(
-        hdc: HDC,
-        hmf: HENHMETAFILE,
-        proc_: ENHMFENUMPROC,
-        param: LPVOID,
-        lpRect: *const RECT,
-    ) -> BOOL;
+    pub fn EnumEnhMetaFile(hdc: HDC, hmf: HENHMETAFILE, proc_: ENHMFENUMPROC, param: LPVOID, lpRect: *const RECT) -> BOOL;
 }
 extern "C" {
     pub fn GetEnhMetaFileA(lpName: LPCSTR) -> HENHMETAFILE;
@@ -38351,70 +35390,34 @@ extern "C" {
     pub fn GetEnhMetaFileBits(hEMF: HENHMETAFILE, nSize: UINT, lpData: LPBYTE) -> UINT;
 }
 extern "C" {
-    pub fn GetEnhMetaFileDescriptionA(
-        hemf: HENHMETAFILE,
-        cchBuffer: UINT,
-        lpDescription: LPSTR,
-    ) -> UINT;
+    pub fn GetEnhMetaFileDescriptionA(hemf: HENHMETAFILE, cchBuffer: UINT, lpDescription: LPSTR) -> UINT;
 }
 extern "C" {
-    pub fn GetEnhMetaFileDescriptionW(
-        hemf: HENHMETAFILE,
-        cchBuffer: UINT,
-        lpDescription: LPWSTR,
-    ) -> UINT;
+    pub fn GetEnhMetaFileDescriptionW(hemf: HENHMETAFILE, cchBuffer: UINT, lpDescription: LPWSTR) -> UINT;
 }
 extern "C" {
-    pub fn GetEnhMetaFileHeader(
-        hemf: HENHMETAFILE,
-        nSize: UINT,
-        lpEnhMetaHeader: LPENHMETAHEADER,
-    ) -> UINT;
+    pub fn GetEnhMetaFileHeader(hemf: HENHMETAFILE, nSize: UINT, lpEnhMetaHeader: LPENHMETAHEADER) -> UINT;
 }
 extern "C" {
-    pub fn GetEnhMetaFilePaletteEntries(
-        hemf: HENHMETAFILE,
-        nNumEntries: UINT,
-        lpPaletteEntries: LPPALETTEENTRY,
-    ) -> UINT;
+    pub fn GetEnhMetaFilePaletteEntries(hemf: HENHMETAFILE, nNumEntries: UINT, lpPaletteEntries: LPPALETTEENTRY) -> UINT;
 }
 extern "C" {
-    pub fn GetEnhMetaFilePixelFormat(
-        hemf: HENHMETAFILE,
-        cbBuffer: UINT,
-        ppfd: *mut PIXELFORMATDESCRIPTOR,
-    ) -> UINT;
+    pub fn GetEnhMetaFilePixelFormat(hemf: HENHMETAFILE, cbBuffer: UINT, ppfd: *mut PIXELFORMATDESCRIPTOR) -> UINT;
 }
 extern "C" {
-    pub fn GetWinMetaFileBits(
-        hemf: HENHMETAFILE,
-        cbData16: UINT,
-        pData16: LPBYTE,
-        iMapMode: INT,
-        hdcRef: HDC,
-    ) -> UINT;
+    pub fn GetWinMetaFileBits(hemf: HENHMETAFILE, cbData16: UINT, pData16: LPBYTE, iMapMode: INT, hdcRef: HDC) -> UINT;
 }
 extern "C" {
     pub fn PlayEnhMetaFile(hdc: HDC, hmf: HENHMETAFILE, lprect: *const RECT) -> BOOL;
 }
 extern "C" {
-    pub fn PlayEnhMetaFileRecord(
-        hdc: HDC,
-        pht: LPHANDLETABLE,
-        pmr: *const ENHMETARECORD,
-        cht: UINT,
-    ) -> BOOL;
+    pub fn PlayEnhMetaFileRecord(hdc: HDC, pht: LPHANDLETABLE, pmr: *const ENHMETARECORD, cht: UINT) -> BOOL;
 }
 extern "C" {
     pub fn SetEnhMetaFileBits(nSize: UINT, pb: *const BYTE) -> HENHMETAFILE;
 }
 extern "C" {
-    pub fn SetWinMetaFileBits(
-        nSize: UINT,
-        lpMeta16Data: *const BYTE,
-        hdcRef: HDC,
-        lpMFP: *const METAFILEPICT,
-    ) -> HENHMETAFILE;
+    pub fn SetWinMetaFileBits(nSize: UINT, lpMeta16Data: *const BYTE, hdcRef: HDC, lpMFP: *const METAFILEPICT) -> HENHMETAFILE;
 }
 extern "C" {
     pub fn GdiComment(hdc: HDC, nSize: UINT, lpData: *const BYTE) -> BOOL;
@@ -38438,14 +35441,7 @@ pub type DIBSECTION = tagDIBSECTION;
 pub type LPDIBSECTION = *mut tagDIBSECTION;
 pub type PDIBSECTION = *mut tagDIBSECTION;
 extern "C" {
-    pub fn AngleArc(
-        hdc: HDC,
-        x: ::std::os::raw::c_int,
-        y: ::std::os::raw::c_int,
-        r: DWORD,
-        StartAngle: FLOAT,
-        SweepAngle: FLOAT,
-    ) -> BOOL;
+    pub fn AngleArc(hdc: HDC, x: ::std::os::raw::c_int, y: ::std::os::raw::c_int, r: DWORD, StartAngle: FLOAT, SweepAngle: FLOAT) -> BOOL;
 }
 extern "C" {
     pub fn PolyPolyline(hdc: HDC, apt: *const POINT, asz: *const DWORD, csz: DWORD) -> BOOL;
@@ -38584,23 +35580,13 @@ extern "C" {
     pub fn FlattenPath(hdc: HDC) -> BOOL;
 }
 extern "C" {
-    pub fn GetPath(
-        hdc: HDC,
-        apt: LPPOINT,
-        aj: LPBYTE,
-        cpt: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int;
+    pub fn GetPath(hdc: HDC, apt: LPPOINT, aj: LPBYTE, cpt: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn PathToRegion(hdc: HDC) -> HRGN;
 }
 extern "C" {
-    pub fn PolyDraw(
-        hdc: HDC,
-        apt: *const POINT,
-        aj: *const BYTE,
-        cpt: ::std::os::raw::c_int,
-    ) -> BOOL;
+    pub fn PolyDraw(hdc: HDC, apt: *const POINT, aj: *const BYTE, cpt: ::std::os::raw::c_int) -> BOOL;
 }
 extern "C" {
     pub fn SelectClipPath(hdc: HDC, mode: ::std::os::raw::c_int) -> BOOL;
@@ -38621,13 +35607,7 @@ extern "C" {
     pub fn WidenPath(hdc: HDC) -> BOOL;
 }
 extern "C" {
-    pub fn ExtCreatePen(
-        iPenStyle: DWORD,
-        cWidth: DWORD,
-        plbrush: *const LOGBRUSH,
-        cStyle: DWORD,
-        pstyle: *const DWORD,
-    ) -> HPEN;
+    pub fn ExtCreatePen(iPenStyle: DWORD, cWidth: DWORD, plbrush: *const LOGBRUSH, cStyle: DWORD, pstyle: *const DWORD) -> HPEN;
 }
 extern "C" {
     pub fn GetMiterLimit(hdc: HDC, plimit: PFLOAT) -> BOOL;
@@ -38642,30 +35622,13 @@ extern "C" {
     pub fn GetObjectW(h: HANDLE, c: ::std::os::raw::c_int, pv: LPVOID) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn MoveToEx(
-        hdc: HDC,
-        x: ::std::os::raw::c_int,
-        y: ::std::os::raw::c_int,
-        lppt: LPPOINT,
-    ) -> BOOL;
+    pub fn MoveToEx(hdc: HDC, x: ::std::os::raw::c_int, y: ::std::os::raw::c_int, lppt: LPPOINT) -> BOOL;
 }
 extern "C" {
-    pub fn TextOutA(
-        hdc: HDC,
-        x: ::std::os::raw::c_int,
-        y: ::std::os::raw::c_int,
-        lpString: LPCSTR,
-        c: ::std::os::raw::c_int,
-    ) -> BOOL;
+    pub fn TextOutA(hdc: HDC, x: ::std::os::raw::c_int, y: ::std::os::raw::c_int, lpString: LPCSTR, c: ::std::os::raw::c_int) -> BOOL;
 }
 extern "C" {
-    pub fn TextOutW(
-        hdc: HDC,
-        x: ::std::os::raw::c_int,
-        y: ::std::os::raw::c_int,
-        lpString: LPCWSTR,
-        c: ::std::os::raw::c_int,
-    ) -> BOOL;
+    pub fn TextOutW(hdc: HDC, x: ::std::os::raw::c_int, y: ::std::os::raw::c_int, lpString: LPCWSTR, c: ::std::os::raw::c_int) -> BOOL;
 }
 extern "C" {
     pub fn ExtTextOutA(
@@ -38698,11 +35661,7 @@ extern "C" {
     pub fn PolyTextOutW(hdc: HDC, ppt: *const POLYTEXTW, nstrings: ::std::os::raw::c_int) -> BOOL;
 }
 extern "C" {
-    pub fn CreatePolygonRgn(
-        pptl: *const POINT,
-        cPoint: ::std::os::raw::c_int,
-        iMode: ::std::os::raw::c_int,
-    ) -> HRGN;
+    pub fn CreatePolygonRgn(pptl: *const POINT, cPoint: ::std::os::raw::c_int, iMode: ::std::os::raw::c_int) -> HRGN;
 }
 extern "C" {
     pub fn DPtoLP(hdc: HDC, lppt: LPPOINT, c: ::std::os::raw::c_int) -> BOOL;
@@ -38726,52 +35685,22 @@ extern "C" {
     pub fn PolylineTo(hdc: HDC, apt: *const POINT, cpt: DWORD) -> BOOL;
 }
 extern "C" {
-    pub fn SetViewportExtEx(
-        hdc: HDC,
-        x: ::std::os::raw::c_int,
-        y: ::std::os::raw::c_int,
-        lpsz: LPSIZE,
-    ) -> BOOL;
+    pub fn SetViewportExtEx(hdc: HDC, x: ::std::os::raw::c_int, y: ::std::os::raw::c_int, lpsz: LPSIZE) -> BOOL;
 }
 extern "C" {
-    pub fn SetViewportOrgEx(
-        hdc: HDC,
-        x: ::std::os::raw::c_int,
-        y: ::std::os::raw::c_int,
-        lppt: LPPOINT,
-    ) -> BOOL;
+    pub fn SetViewportOrgEx(hdc: HDC, x: ::std::os::raw::c_int, y: ::std::os::raw::c_int, lppt: LPPOINT) -> BOOL;
 }
 extern "C" {
-    pub fn SetWindowExtEx(
-        hdc: HDC,
-        x: ::std::os::raw::c_int,
-        y: ::std::os::raw::c_int,
-        lpsz: LPSIZE,
-    ) -> BOOL;
+    pub fn SetWindowExtEx(hdc: HDC, x: ::std::os::raw::c_int, y: ::std::os::raw::c_int, lpsz: LPSIZE) -> BOOL;
 }
 extern "C" {
-    pub fn SetWindowOrgEx(
-        hdc: HDC,
-        x: ::std::os::raw::c_int,
-        y: ::std::os::raw::c_int,
-        lppt: LPPOINT,
-    ) -> BOOL;
+    pub fn SetWindowOrgEx(hdc: HDC, x: ::std::os::raw::c_int, y: ::std::os::raw::c_int, lppt: LPPOINT) -> BOOL;
 }
 extern "C" {
-    pub fn OffsetViewportOrgEx(
-        hdc: HDC,
-        x: ::std::os::raw::c_int,
-        y: ::std::os::raw::c_int,
-        lppt: LPPOINT,
-    ) -> BOOL;
+    pub fn OffsetViewportOrgEx(hdc: HDC, x: ::std::os::raw::c_int, y: ::std::os::raw::c_int, lppt: LPPOINT) -> BOOL;
 }
 extern "C" {
-    pub fn OffsetWindowOrgEx(
-        hdc: HDC,
-        x: ::std::os::raw::c_int,
-        y: ::std::os::raw::c_int,
-        lppt: LPPOINT,
-    ) -> BOOL;
+    pub fn OffsetWindowOrgEx(hdc: HDC, x: ::std::os::raw::c_int, y: ::std::os::raw::c_int, lppt: LPPOINT) -> BOOL;
 }
 extern "C" {
     pub fn ScaleViewportExtEx(
@@ -38794,31 +35723,16 @@ extern "C" {
     ) -> BOOL;
 }
 extern "C" {
-    pub fn SetBitmapDimensionEx(
-        hbm: HBITMAP,
-        w: ::std::os::raw::c_int,
-        h: ::std::os::raw::c_int,
-        lpsz: LPSIZE,
-    ) -> BOOL;
+    pub fn SetBitmapDimensionEx(hbm: HBITMAP, w: ::std::os::raw::c_int, h: ::std::os::raw::c_int, lpsz: LPSIZE) -> BOOL;
 }
 extern "C" {
-    pub fn SetBrushOrgEx(
-        hdc: HDC,
-        x: ::std::os::raw::c_int,
-        y: ::std::os::raw::c_int,
-        lppt: LPPOINT,
-    ) -> BOOL;
+    pub fn SetBrushOrgEx(hdc: HDC, x: ::std::os::raw::c_int, y: ::std::os::raw::c_int, lppt: LPPOINT) -> BOOL;
 }
 extern "C" {
-    pub fn GetTextFaceA(hdc: HDC, c: ::std::os::raw::c_int, lpName: LPSTR)
-        -> ::std::os::raw::c_int;
+    pub fn GetTextFaceA(hdc: HDC, c: ::std::os::raw::c_int, lpName: LPSTR) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn GetTextFaceW(
-        hdc: HDC,
-        c: ::std::os::raw::c_int,
-        lpName: LPWSTR,
-    ) -> ::std::os::raw::c_int;
+    pub fn GetTextFaceW(hdc: HDC, c: ::std::os::raw::c_int, lpName: LPWSTR) -> ::std::os::raw::c_int;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -38839,12 +35753,7 @@ extern "C" {
     pub fn GetDCOrgEx(hdc: HDC, lppt: LPPOINT) -> BOOL;
 }
 extern "C" {
-    pub fn FixBrushOrgEx(
-        hdc: HDC,
-        x: ::std::os::raw::c_int,
-        y: ::std::os::raw::c_int,
-        ptl: LPPOINT,
-    ) -> BOOL;
+    pub fn FixBrushOrgEx(hdc: HDC, x: ::std::os::raw::c_int, y: ::std::os::raw::c_int, ptl: LPPOINT) -> BOOL;
 }
 extern "C" {
     pub fn UnrealizeObject(h: HGDIOBJ) -> BOOL;
@@ -38864,29 +35773,16 @@ extern "C" {
     pub fn SetICMMode(hdc: HDC, mode: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn CheckColorsInGamut(
-        hdc: HDC,
-        lpRGBTriple: LPRGBTRIPLE,
-        dlpBuffer: LPVOID,
-        nCount: DWORD,
-    ) -> BOOL;
+    pub fn CheckColorsInGamut(hdc: HDC, lpRGBTriple: LPRGBTRIPLE, dlpBuffer: LPVOID, nCount: DWORD) -> BOOL;
 }
 extern "C" {
     pub fn GetColorSpace(hdc: HDC) -> HCOLORSPACE;
 }
 extern "C" {
-    pub fn GetLogColorSpaceA(
-        hColorSpace: HCOLORSPACE,
-        lpBuffer: LPLOGCOLORSPACEA,
-        nSize: DWORD,
-    ) -> BOOL;
+    pub fn GetLogColorSpaceA(hColorSpace: HCOLORSPACE, lpBuffer: LPLOGCOLORSPACEA, nSize: DWORD) -> BOOL;
 }
 extern "C" {
-    pub fn GetLogColorSpaceW(
-        hColorSpace: HCOLORSPACE,
-        lpBuffer: LPLOGCOLORSPACEW,
-        nSize: DWORD,
-    ) -> BOOL;
+    pub fn GetLogColorSpaceW(hColorSpace: HCOLORSPACE, lpBuffer: LPLOGCOLORSPACEW, nSize: DWORD) -> BOOL;
 }
 extern "C" {
     pub fn CreateColorSpaceA(lplcs: LPLOGCOLORSPACEA) -> HCOLORSPACE;
@@ -38928,20 +35824,10 @@ extern "C" {
     pub fn EnumICMProfilesW(hdc: HDC, proc_: ICMENUMPROCW, param: LPARAM) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn UpdateICMRegKeyA(
-        reserved: DWORD,
-        lpszCMID: LPSTR,
-        lpszFileName: LPSTR,
-        command: UINT,
-    ) -> BOOL;
+    pub fn UpdateICMRegKeyA(reserved: DWORD, lpszCMID: LPSTR, lpszFileName: LPSTR, command: UINT) -> BOOL;
 }
 extern "C" {
-    pub fn UpdateICMRegKeyW(
-        reserved: DWORD,
-        lpszCMID: LPWSTR,
-        lpszFileName: LPWSTR,
-        command: UINT,
-    ) -> BOOL;
+    pub fn UpdateICMRegKeyW(reserved: DWORD, lpszCMID: LPWSTR, lpszFileName: LPWSTR, command: UINT) -> BOOL;
 }
 extern "C" {
     pub fn ColorCorrectPalette(hdc: HDC, hPal: HPALETTE, deFirst: DWORD, num: DWORD) -> BOOL;
@@ -39960,13 +36846,7 @@ pub type LAYERPLANEDESCRIPTOR = tagLAYERPLANEDESCRIPTOR;
 pub type PLAYERPLANEDESCRIPTOR = *mut tagLAYERPLANEDESCRIPTOR;
 pub type LPLAYERPLANEDESCRIPTOR = *mut tagLAYERPLANEDESCRIPTOR;
 extern "C" {
-    pub fn wglDescribeLayerPlane(
-        arg1: HDC,
-        arg2: ::std::os::raw::c_int,
-        arg3: ::std::os::raw::c_int,
-        arg4: UINT,
-        arg5: LPLAYERPLANEDESCRIPTOR,
-    ) -> BOOL;
+    pub fn wglDescribeLayerPlane(arg1: HDC, arg2: ::std::os::raw::c_int, arg3: ::std::os::raw::c_int, arg4: UINT, arg5: LPLAYERPLANEDESCRIPTOR) -> BOOL;
 }
 extern "C" {
     pub fn wglSetLayerPaletteEntries(
@@ -40011,43 +36891,22 @@ pub type MENUTEMPLATE = MENUTEMPLATEA;
 pub type LPMENUTEMPLATEA = PVOID;
 pub type LPMENUTEMPLATEW = PVOID;
 pub type LPMENUTEMPLATE = LPMENUTEMPLATEA;
-pub type WNDPROC =
-    unsafe extern "C" fn(arg1: HWND, arg2: UINT, arg3: WPARAM, arg4: LPARAM) -> LRESULT;
-pub type DLGPROC =
-    unsafe extern "C" fn(arg1: HWND, arg2: UINT, arg3: WPARAM, arg4: LPARAM) -> INT_PTR;
+pub type WNDPROC = unsafe extern "C" fn(arg1: HWND, arg2: UINT, arg3: WPARAM, arg4: LPARAM) -> LRESULT;
+pub type DLGPROC = unsafe extern "C" fn(arg1: HWND, arg2: UINT, arg3: WPARAM, arg4: LPARAM) -> INT_PTR;
 pub type TIMERPROC = unsafe extern "C" fn(arg1: HWND, arg2: UINT, arg3: UINT_PTR, arg4: DWORD);
-pub type GRAYSTRINGPROC =
-    unsafe extern "C" fn(arg1: HDC, arg2: LPARAM, arg3: ::std::os::raw::c_int) -> BOOL;
+pub type GRAYSTRINGPROC = unsafe extern "C" fn(arg1: HDC, arg2: LPARAM, arg3: ::std::os::raw::c_int) -> BOOL;
 pub type WNDENUMPROC = unsafe extern "C" fn(arg1: HWND, arg2: LPARAM) -> BOOL;
-pub type HOOKPROC =
-    unsafe extern "C" fn(code: ::std::os::raw::c_int, wParam: WPARAM, lParam: LPARAM) -> LRESULT;
-pub type SENDASYNCPROC =
-    unsafe extern "C" fn(arg1: HWND, arg2: UINT, arg3: ULONG_PTR, arg4: LRESULT);
+pub type HOOKPROC = unsafe extern "C" fn(code: ::std::os::raw::c_int, wParam: WPARAM, lParam: LPARAM) -> LRESULT;
+pub type SENDASYNCPROC = unsafe extern "C" fn(arg1: HWND, arg2: UINT, arg3: ULONG_PTR, arg4: LRESULT);
 pub type PROPENUMPROCA = unsafe extern "C" fn(arg1: HWND, arg2: LPCSTR, arg3: HANDLE) -> BOOL;
 pub type PROPENUMPROCW = unsafe extern "C" fn(arg1: HWND, arg2: LPCWSTR, arg3: HANDLE) -> BOOL;
-pub type PROPENUMPROCEXA =
-    unsafe extern "C" fn(arg1: HWND, arg2: LPSTR, arg3: HANDLE, arg4: ULONG_PTR) -> BOOL;
-pub type PROPENUMPROCEXW =
-    unsafe extern "C" fn(arg1: HWND, arg2: LPWSTR, arg3: HANDLE, arg4: ULONG_PTR) -> BOOL;
-pub type EDITWORDBREAKPROCA = unsafe extern "C" fn(
-    lpch: LPSTR,
-    ichCurrent: ::std::os::raw::c_int,
-    cch: ::std::os::raw::c_int,
-    code: ::std::os::raw::c_int,
-) -> ::std::os::raw::c_int;
-pub type EDITWORDBREAKPROCW = unsafe extern "C" fn(
-    lpch: LPWSTR,
-    ichCurrent: ::std::os::raw::c_int,
-    cch: ::std::os::raw::c_int,
-    code: ::std::os::raw::c_int,
-) -> ::std::os::raw::c_int;
-pub type DRAWSTATEPROC = unsafe extern "C" fn(
-    hdc: HDC,
-    lData: LPARAM,
-    wData: WPARAM,
-    cx: ::std::os::raw::c_int,
-    cy: ::std::os::raw::c_int,
-) -> BOOL;
+pub type PROPENUMPROCEXA = unsafe extern "C" fn(arg1: HWND, arg2: LPSTR, arg3: HANDLE, arg4: ULONG_PTR) -> BOOL;
+pub type PROPENUMPROCEXW = unsafe extern "C" fn(arg1: HWND, arg2: LPWSTR, arg3: HANDLE, arg4: ULONG_PTR) -> BOOL;
+pub type EDITWORDBREAKPROCA =
+    unsafe extern "C" fn(lpch: LPSTR, ichCurrent: ::std::os::raw::c_int, cch: ::std::os::raw::c_int, code: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
+pub type EDITWORDBREAKPROCW =
+    unsafe extern "C" fn(lpch: LPWSTR, ichCurrent: ::std::os::raw::c_int, cch: ::std::os::raw::c_int, code: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
+pub type DRAWSTATEPROC = unsafe extern "C" fn(hdc: HDC, lData: LPARAM, wData: WPARAM, cx: ::std::os::raw::c_int, cy: ::std::os::raw::c_int) -> BOOL;
 pub type PROPENUMPROC = PROPENUMPROCA;
 pub type PROPENUMPROCEX = PROPENUMPROCEXA;
 pub type EDITWORDBREAKPROC = EDITWORDBREAKPROCA;
@@ -40252,10 +37111,7 @@ extern "C" {
     pub fn GetKeyboardLayoutNameW(pwszKLID: LPWSTR) -> BOOL;
 }
 extern "C" {
-    pub fn GetKeyboardLayoutList(
-        nBuff: ::std::os::raw::c_int,
-        lpList: *mut HKL,
-    ) -> ::std::os::raw::c_int;
+    pub fn GetKeyboardLayoutList(nBuff: ::std::os::raw::c_int, lpList: *mut HKL) -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn GetKeyboardLayout(idThread: DWORD) -> HKL;
@@ -40325,20 +37181,10 @@ extern "C" {
     ) -> HDESK;
 }
 extern "C" {
-    pub fn OpenDesktopA(
-        lpszDesktop: LPCSTR,
-        dwFlags: DWORD,
-        fInherit: BOOL,
-        dwDesiredAccess: ACCESS_MASK,
-    ) -> HDESK;
+    pub fn OpenDesktopA(lpszDesktop: LPCSTR, dwFlags: DWORD, fInherit: BOOL, dwDesiredAccess: ACCESS_MASK) -> HDESK;
 }
 extern "C" {
-    pub fn OpenDesktopW(
-        lpszDesktop: LPCWSTR,
-        dwFlags: DWORD,
-        fInherit: BOOL,
-        dwDesiredAccess: ACCESS_MASK,
-    ) -> HDESK;
+    pub fn OpenDesktopW(lpszDesktop: LPCWSTR, dwFlags: DWORD, fInherit: BOOL, dwDesiredAccess: ACCESS_MASK) -> HDESK;
 }
 extern "C" {
     pub fn OpenInputDesktop(dwFlags: DWORD, fInherit: BOOL, dwDesiredAccess: ACCESS_MASK) -> HDESK;
@@ -40365,34 +37211,16 @@ extern "C" {
     pub fn GetThreadDesktop(dwThreadId: DWORD) -> HDESK;
 }
 extern "C" {
-    pub fn CreateWindowStationA(
-        lpwinsta: LPCSTR,
-        dwFlags: DWORD,
-        dwDesiredAccess: ACCESS_MASK,
-        lpsa: LPSECURITY_ATTRIBUTES,
-    ) -> HWINSTA;
+    pub fn CreateWindowStationA(lpwinsta: LPCSTR, dwFlags: DWORD, dwDesiredAccess: ACCESS_MASK, lpsa: LPSECURITY_ATTRIBUTES) -> HWINSTA;
 }
 extern "C" {
-    pub fn CreateWindowStationW(
-        lpwinsta: LPCWSTR,
-        dwFlags: DWORD,
-        dwDesiredAccess: ACCESS_MASK,
-        lpsa: LPSECURITY_ATTRIBUTES,
-    ) -> HWINSTA;
+    pub fn CreateWindowStationW(lpwinsta: LPCWSTR, dwFlags: DWORD, dwDesiredAccess: ACCESS_MASK, lpsa: LPSECURITY_ATTRIBUTES) -> HWINSTA;
 }
 extern "C" {
-    pub fn OpenWindowStationA(
-        lpszWinSta: LPCSTR,
-        fInherit: BOOL,
-        dwDesiredAccess: ACCESS_MASK,
-    ) -> HWINSTA;
+    pub fn OpenWindowStationA(lpszWinSta: LPCSTR, fInherit: BOOL, dwDesiredAccess: ACCESS_MASK) -> HWINSTA;
 }
 extern "C" {
-    pub fn OpenWindowStationW(
-        lpszWinSta: LPCWSTR,
-        fInherit: BOOL,
-        dwDesiredAccess: ACCESS_MASK,
-    ) -> HWINSTA;
+    pub fn OpenWindowStationW(lpszWinSta: LPCWSTR, fInherit: BOOL, dwDesiredAccess: ACCESS_MASK) -> HWINSTA;
 }
 extern "C" {
     pub fn EnumWindowStationsA(lpEnumFunc: WINSTAENUMPROCA, lParam: LPARAM) -> BOOL;
@@ -40410,11 +37238,7 @@ extern "C" {
     pub fn GetProcessWindowStation() -> HWINSTA;
 }
 extern "C" {
-    pub fn SetUserObjectSecurity(
-        hObj: HANDLE,
-        pSIRequested: PSECURITY_INFORMATION,
-        pSID: PSECURITY_DESCRIPTOR,
-    ) -> BOOL;
+    pub fn SetUserObjectSecurity(hObj: HANDLE, pSIRequested: PSECURITY_INFORMATION, pSID: PSECURITY_DESCRIPTOR) -> BOOL;
 }
 extern "C" {
     pub fn GetUserObjectSecurity(
@@ -40435,38 +37259,16 @@ pub struct tagUSEROBJECTFLAGS {
 pub type USEROBJECTFLAGS = tagUSEROBJECTFLAGS;
 pub type PUSEROBJECTFLAGS = *mut tagUSEROBJECTFLAGS;
 extern "C" {
-    pub fn GetUserObjectInformationA(
-        hObj: HANDLE,
-        nIndex: ::std::os::raw::c_int,
-        pvInfo: PVOID,
-        nLength: DWORD,
-        lpnLengthNeeded: LPDWORD,
-    ) -> BOOL;
+    pub fn GetUserObjectInformationA(hObj: HANDLE, nIndex: ::std::os::raw::c_int, pvInfo: PVOID, nLength: DWORD, lpnLengthNeeded: LPDWORD) -> BOOL;
 }
 extern "C" {
-    pub fn GetUserObjectInformationW(
-        hObj: HANDLE,
-        nIndex: ::std::os::raw::c_int,
-        pvInfo: PVOID,
-        nLength: DWORD,
-        lpnLengthNeeded: LPDWORD,
-    ) -> BOOL;
+    pub fn GetUserObjectInformationW(hObj: HANDLE, nIndex: ::std::os::raw::c_int, pvInfo: PVOID, nLength: DWORD, lpnLengthNeeded: LPDWORD) -> BOOL;
 }
 extern "C" {
-    pub fn SetUserObjectInformationA(
-        hObj: HANDLE,
-        nIndex: ::std::os::raw::c_int,
-        pvInfo: PVOID,
-        nLength: DWORD,
-    ) -> BOOL;
+    pub fn SetUserObjectInformationA(hObj: HANDLE, nIndex: ::std::os::raw::c_int, pvInfo: PVOID, nLength: DWORD) -> BOOL;
 }
 extern "C" {
-    pub fn SetUserObjectInformationW(
-        hObj: HANDLE,
-        nIndex: ::std::os::raw::c_int,
-        pvInfo: PVOID,
-        nLength: DWORD,
-    ) -> BOOL;
+    pub fn SetUserObjectInformationW(hObj: HANDLE, nIndex: ::std::os::raw::c_int, pvInfo: PVOID, nLength: DWORD) -> BOOL;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -40662,12 +37464,7 @@ extern "C" {
     pub fn DrawCaption(hwnd: HWND, hdc: HDC, lprect: *const RECT, flags: UINT) -> BOOL;
 }
 extern "C" {
-    pub fn DrawAnimatedRects(
-        hwnd: HWND,
-        idAni: ::std::os::raw::c_int,
-        lprcFrom: *const RECT,
-        lprcTo: *const RECT,
-    ) -> BOOL;
+    pub fn DrawAnimatedRects(hwnd: HWND, idAni: ::std::os::raw::c_int, lprcFrom: *const RECT, lprcTo: *const RECT) -> BOOL;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -40835,30 +37632,13 @@ extern "C" {
     pub fn SetMessageQueue(cMessagesMax: ::std::os::raw::c_int) -> BOOL;
 }
 extern "C" {
-    pub fn PeekMessageA(
-        lpMsg: LPMSG,
-        hWnd: HWND,
-        wMsgFilterMin: UINT,
-        wMsgFilterMax: UINT,
-        wRemoveMsg: UINT,
-    ) -> BOOL;
+    pub fn PeekMessageA(lpMsg: LPMSG, hWnd: HWND, wMsgFilterMin: UINT, wMsgFilterMax: UINT, wRemoveMsg: UINT) -> BOOL;
 }
 extern "C" {
-    pub fn PeekMessageW(
-        lpMsg: LPMSG,
-        hWnd: HWND,
-        wMsgFilterMin: UINT,
-        wMsgFilterMax: UINT,
-        wRemoveMsg: UINT,
-    ) -> BOOL;
+    pub fn PeekMessageW(lpMsg: LPMSG, hWnd: HWND, wMsgFilterMin: UINT, wMsgFilterMax: UINT, wRemoveMsg: UINT) -> BOOL;
 }
 extern "C" {
-    pub fn RegisterHotKey(
-        hWnd: HWND,
-        id: ::std::os::raw::c_int,
-        fsModifiers: UINT,
-        vk: UINT,
-    ) -> BOOL;
+    pub fn RegisterHotKey(hWnd: HWND, id: ::std::os::raw::c_int, fsModifiers: UINT, vk: UINT) -> BOOL;
 }
 extern "C" {
     pub fn UnregisterHotKey(hWnd: HWND, id: ::std::os::raw::c_int) -> BOOL;
@@ -40894,26 +37674,10 @@ extern "C" {
     pub fn SendMessageW(hWnd: HWND, Msg: UINT, wParam: WPARAM, lParam: LPARAM) -> LRESULT;
 }
 extern "C" {
-    pub fn SendMessageTimeoutA(
-        hWnd: HWND,
-        Msg: UINT,
-        wParam: WPARAM,
-        lParam: LPARAM,
-        fuFlags: UINT,
-        uTimeout: UINT,
-        lpdwResult: PDWORD_PTR,
-    ) -> LRESULT;
+    pub fn SendMessageTimeoutA(hWnd: HWND, Msg: UINT, wParam: WPARAM, lParam: LPARAM, fuFlags: UINT, uTimeout: UINT, lpdwResult: PDWORD_PTR) -> LRESULT;
 }
 extern "C" {
-    pub fn SendMessageTimeoutW(
-        hWnd: HWND,
-        Msg: UINT,
-        wParam: WPARAM,
-        lParam: LPARAM,
-        fuFlags: UINT,
-        uTimeout: UINT,
-        lpdwResult: PDWORD_PTR,
-    ) -> LRESULT;
+    pub fn SendMessageTimeoutW(hWnd: HWND, Msg: UINT, wParam: WPARAM, lParam: LPARAM, fuFlags: UINT, uTimeout: UINT, lpdwResult: PDWORD_PTR) -> LRESULT;
 }
 extern "C" {
     pub fn SendNotifyMessageA(hWnd: HWND, Msg: UINT, wParam: WPARAM, lParam: LPARAM) -> BOOL;
@@ -40922,24 +37686,10 @@ extern "C" {
     pub fn SendNotifyMessageW(hWnd: HWND, Msg: UINT, wParam: WPARAM, lParam: LPARAM) -> BOOL;
 }
 extern "C" {
-    pub fn SendMessageCallbackA(
-        hWnd: HWND,
-        Msg: UINT,
-        wParam: WPARAM,
-        lParam: LPARAM,
-        lpResultCallBack: SENDASYNCPROC,
-        dwData: ULONG_PTR,
-    ) -> BOOL;
+    pub fn SendMessageCallbackA(hWnd: HWND, Msg: UINT, wParam: WPARAM, lParam: LPARAM, lpResultCallBack: SENDASYNCPROC, dwData: ULONG_PTR) -> BOOL;
 }
 extern "C" {
-    pub fn SendMessageCallbackW(
-        hWnd: HWND,
-        Msg: UINT,
-        wParam: WPARAM,
-        lParam: LPARAM,
-        lpResultCallBack: SENDASYNCPROC,
-        dwData: ULONG_PTR,
-    ) -> BOOL;
+    pub fn SendMessageCallbackW(hWnd: HWND, Msg: UINT, wParam: WPARAM, lParam: LPARAM, lpResultCallBack: SENDASYNCPROC, dwData: ULONG_PTR) -> BOOL;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -40951,58 +37701,24 @@ pub struct BSMINFO {
 }
 pub type PBSMINFO = *mut BSMINFO;
 extern "C" {
-    pub fn BroadcastSystemMessageExA(
-        flags: DWORD,
-        lpInfo: LPDWORD,
-        Msg: UINT,
-        wParam: WPARAM,
-        lParam: LPARAM,
-        pbsmInfo: PBSMINFO,
-    ) -> ::std::os::raw::c_long;
+    pub fn BroadcastSystemMessageExA(flags: DWORD, lpInfo: LPDWORD, Msg: UINT, wParam: WPARAM, lParam: LPARAM, pbsmInfo: PBSMINFO) -> ::std::os::raw::c_long;
 }
 extern "C" {
-    pub fn BroadcastSystemMessageExW(
-        flags: DWORD,
-        lpInfo: LPDWORD,
-        Msg: UINT,
-        wParam: WPARAM,
-        lParam: LPARAM,
-        pbsmInfo: PBSMINFO,
-    ) -> ::std::os::raw::c_long;
+    pub fn BroadcastSystemMessageExW(flags: DWORD, lpInfo: LPDWORD, Msg: UINT, wParam: WPARAM, lParam: LPARAM, pbsmInfo: PBSMINFO) -> ::std::os::raw::c_long;
 }
 extern "C" {
-    pub fn BroadcastSystemMessageA(
-        flags: DWORD,
-        lpInfo: LPDWORD,
-        Msg: UINT,
-        wParam: WPARAM,
-        lParam: LPARAM,
-    ) -> ::std::os::raw::c_long;
+    pub fn BroadcastSystemMessageA(flags: DWORD, lpInfo: LPDWORD, Msg: UINT, wParam: WPARAM, lParam: LPARAM) -> ::std::os::raw::c_long;
 }
 extern "C" {
-    pub fn BroadcastSystemMessageW(
-        flags: DWORD,
-        lpInfo: LPDWORD,
-        Msg: UINT,
-        wParam: WPARAM,
-        lParam: LPARAM,
-    ) -> ::std::os::raw::c_long;
+    pub fn BroadcastSystemMessageW(flags: DWORD, lpInfo: LPDWORD, Msg: UINT, wParam: WPARAM, lParam: LPARAM) -> ::std::os::raw::c_long;
 }
 pub type HDEVNOTIFY = PVOID;
 pub type PHDEVNOTIFY = *mut HDEVNOTIFY;
 extern "C" {
-    pub fn RegisterDeviceNotificationA(
-        hRecipient: HANDLE,
-        NotificationFilter: LPVOID,
-        Flags: DWORD,
-    ) -> HDEVNOTIFY;
+    pub fn RegisterDeviceNotificationA(hRecipient: HANDLE, NotificationFilter: LPVOID, Flags: DWORD) -> HDEVNOTIFY;
 }
 extern "C" {
-    pub fn RegisterDeviceNotificationW(
-        hRecipient: HANDLE,
-        NotificationFilter: LPVOID,
-        Flags: DWORD,
-    ) -> HDEVNOTIFY;
+    pub fn RegisterDeviceNotificationW(hRecipient: HANDLE, NotificationFilter: LPVOID, Flags: DWORD) -> HDEVNOTIFY;
 }
 extern "C" {
     pub fn UnregisterDeviceNotification(Handle: HDEVNOTIFY) -> BOOL;
@@ -41010,11 +37726,7 @@ extern "C" {
 pub type HPOWERNOTIFY = PVOID;
 pub type PHPOWERNOTIFY = *mut HPOWERNOTIFY;
 extern "C" {
-    pub fn RegisterPowerSettingNotification(
-        hRecipient: HANDLE,
-        PowerSettingGuid: LPCGUID,
-        Flags: DWORD,
-    ) -> HPOWERNOTIFY;
+    pub fn RegisterPowerSettingNotification(hRecipient: HANDLE, PowerSettingGuid: LPCGUID, Flags: DWORD) -> HPOWERNOTIFY;
 }
 extern "C" {
     pub fn UnregisterPowerSettingNotification(Handle: HPOWERNOTIFY) -> BOOL;
@@ -41059,22 +37771,10 @@ extern "C" {
     pub fn PostQuitMessage(nExitCode: ::std::os::raw::c_int);
 }
 extern "C" {
-    pub fn CallWindowProcA(
-        lpPrevWndFunc: WNDPROC,
-        hWnd: HWND,
-        Msg: UINT,
-        wParam: WPARAM,
-        lParam: LPARAM,
-    ) -> LRESULT;
+    pub fn CallWindowProcA(lpPrevWndFunc: WNDPROC, hWnd: HWND, Msg: UINT, wParam: WPARAM, lParam: LPARAM) -> LRESULT;
 }
 extern "C" {
-    pub fn CallWindowProcW(
-        lpPrevWndFunc: WNDPROC,
-        hWnd: HWND,
-        Msg: UINT,
-        wParam: WPARAM,
-        lParam: LPARAM,
-    ) -> LRESULT;
+    pub fn CallWindowProcW(lpPrevWndFunc: WNDPROC, hWnd: HWND, Msg: UINT, wParam: WPARAM, lParam: LPARAM) -> LRESULT;
 }
 extern "C" {
     pub fn InSendMessage() -> BOOL;
@@ -41101,18 +37801,10 @@ extern "C" {
     pub fn UnregisterClassW(lpClassName: LPCWSTR, hInstance: HINSTANCE) -> BOOL;
 }
 extern "C" {
-    pub fn GetClassInfoA(
-        hInstance: HINSTANCE,
-        lpClassName: LPCSTR,
-        lpWndClass: LPWNDCLASSA,
-    ) -> BOOL;
+    pub fn GetClassInfoA(hInstance: HINSTANCE, lpClassName: LPCSTR, lpWndClass: LPWNDCLASSA) -> BOOL;
 }
 extern "C" {
-    pub fn GetClassInfoW(
-        hInstance: HINSTANCE,
-        lpClassName: LPCWSTR,
-        lpWndClass: LPWNDCLASSW,
-    ) -> BOOL;
+    pub fn GetClassInfoW(hInstance: HINSTANCE, lpClassName: LPCWSTR, lpWndClass: LPWNDCLASSW) -> BOOL;
 }
 extern "C" {
     pub fn RegisterClassExA(arg1: *const WNDCLASSEXA) -> ATOM;
@@ -41207,29 +37899,16 @@ pub struct tagUPDATELAYEREDWINDOWINFO {
 pub type UPDATELAYEREDWINDOWINFO = tagUPDATELAYEREDWINDOWINFO;
 pub type PUPDATELAYEREDWINDOWINFO = *mut tagUPDATELAYEREDWINDOWINFO;
 extern "C" {
-    pub fn UpdateLayeredWindowIndirect(
-        hWnd: HWND,
-        pULWInfo: *const UPDATELAYEREDWINDOWINFO,
-    ) -> BOOL;
+    pub fn UpdateLayeredWindowIndirect(hWnd: HWND, pULWInfo: *const UPDATELAYEREDWINDOWINFO) -> BOOL;
 }
 extern "C" {
-    pub fn GetLayeredWindowAttributes(
-        hwnd: HWND,
-        pcrKey: *mut COLORREF,
-        pbAlpha: *mut BYTE,
-        pdwFlags: *mut DWORD,
-    ) -> BOOL;
+    pub fn GetLayeredWindowAttributes(hwnd: HWND, pcrKey: *mut COLORREF, pbAlpha: *mut BYTE, pdwFlags: *mut DWORD) -> BOOL;
 }
 extern "C" {
     pub fn PrintWindow(hwnd: HWND, hdcBlt: HDC, nFlags: UINT) -> BOOL;
 }
 extern "C" {
-    pub fn SetLayeredWindowAttributes(
-        hwnd: HWND,
-        crKey: COLORREF,
-        bAlpha: BYTE,
-        dwFlags: DWORD,
-    ) -> BOOL;
+    pub fn SetLayeredWindowAttributes(hwnd: HWND, crKey: COLORREF, bAlpha: BYTE, dwFlags: DWORD) -> BOOL;
 }
 extern "C" {
     pub fn ShowWindowAsync(hWnd: HWND, nCmdShow: ::std::os::raw::c_int) -> BOOL;
@@ -41360,58 +38039,22 @@ pub type LPDLGITEMTEMPLATEA = *mut DLGITEMTEMPLATE;
 pub type LPDLGITEMTEMPLATEW = *mut DLGITEMTEMPLATE;
 pub type LPDLGITEMTEMPLATE = LPDLGITEMTEMPLATEA;
 extern "C" {
-    pub fn CreateDialogParamA(
-        hInstance: HINSTANCE,
-        lpTemplateName: LPCSTR,
-        hWndParent: HWND,
-        lpDialogFunc: DLGPROC,
-        dwInitParam: LPARAM,
-    ) -> HWND;
+    pub fn CreateDialogParamA(hInstance: HINSTANCE, lpTemplateName: LPCSTR, hWndParent: HWND, lpDialogFunc: DLGPROC, dwInitParam: LPARAM) -> HWND;
 }
 extern "C" {
-    pub fn CreateDialogParamW(
-        hInstance: HINSTANCE,
-        lpTemplateName: LPCWSTR,
-        hWndParent: HWND,
-        lpDialogFunc: DLGPROC,
-        dwInitParam: LPARAM,
-    ) -> HWND;
+    pub fn CreateDialogParamW(hInstance: HINSTANCE, lpTemplateName: LPCWSTR, hWndParent: HWND, lpDialogFunc: DLGPROC, dwInitParam: LPARAM) -> HWND;
 }
 extern "C" {
-    pub fn CreateDialogIndirectParamA(
-        hInstance: HINSTANCE,
-        lpTemplate: LPCDLGTEMPLATEA,
-        hWndParent: HWND,
-        lpDialogFunc: DLGPROC,
-        dwInitParam: LPARAM,
-    ) -> HWND;
+    pub fn CreateDialogIndirectParamA(hInstance: HINSTANCE, lpTemplate: LPCDLGTEMPLATEA, hWndParent: HWND, lpDialogFunc: DLGPROC, dwInitParam: LPARAM) -> HWND;
 }
 extern "C" {
-    pub fn CreateDialogIndirectParamW(
-        hInstance: HINSTANCE,
-        lpTemplate: LPCDLGTEMPLATEW,
-        hWndParent: HWND,
-        lpDialogFunc: DLGPROC,
-        dwInitParam: LPARAM,
-    ) -> HWND;
+    pub fn CreateDialogIndirectParamW(hInstance: HINSTANCE, lpTemplate: LPCDLGTEMPLATEW, hWndParent: HWND, lpDialogFunc: DLGPROC, dwInitParam: LPARAM) -> HWND;
 }
 extern "C" {
-    pub fn DialogBoxParamA(
-        hInstance: HINSTANCE,
-        lpTemplateName: LPCSTR,
-        hWndParent: HWND,
-        lpDialogFunc: DLGPROC,
-        dwInitParam: LPARAM,
-    ) -> INT_PTR;
+    pub fn DialogBoxParamA(hInstance: HINSTANCE, lpTemplateName: LPCSTR, hWndParent: HWND, lpDialogFunc: DLGPROC, dwInitParam: LPARAM) -> INT_PTR;
 }
 extern "C" {
-    pub fn DialogBoxParamW(
-        hInstance: HINSTANCE,
-        lpTemplateName: LPCWSTR,
-        hWndParent: HWND,
-        lpDialogFunc: DLGPROC,
-        dwInitParam: LPARAM,
-    ) -> INT_PTR;
+    pub fn DialogBoxParamW(hInstance: HINSTANCE, lpTemplateName: LPCWSTR, hWndParent: HWND, lpDialogFunc: DLGPROC, dwInitParam: LPARAM) -> INT_PTR;
 }
 extern "C" {
     pub fn DialogBoxIndirectParamA(
@@ -41438,47 +38081,22 @@ extern "C" {
     pub fn GetDlgItem(hDlg: HWND, nIDDlgItem: ::std::os::raw::c_int) -> HWND;
 }
 extern "C" {
-    pub fn SetDlgItemInt(
-        hDlg: HWND,
-        nIDDlgItem: ::std::os::raw::c_int,
-        uValue: UINT,
-        bSigned: BOOL,
-    ) -> BOOL;
+    pub fn SetDlgItemInt(hDlg: HWND, nIDDlgItem: ::std::os::raw::c_int, uValue: UINT, bSigned: BOOL) -> BOOL;
 }
 extern "C" {
-    pub fn GetDlgItemInt(
-        hDlg: HWND,
-        nIDDlgItem: ::std::os::raw::c_int,
-        lpTranslated: *mut BOOL,
-        bSigned: BOOL,
-    ) -> UINT;
+    pub fn GetDlgItemInt(hDlg: HWND, nIDDlgItem: ::std::os::raw::c_int, lpTranslated: *mut BOOL, bSigned: BOOL) -> UINT;
 }
 extern "C" {
-    pub fn SetDlgItemTextA(hDlg: HWND, nIDDlgItem: ::std::os::raw::c_int, lpString: LPCSTR)
-        -> BOOL;
+    pub fn SetDlgItemTextA(hDlg: HWND, nIDDlgItem: ::std::os::raw::c_int, lpString: LPCSTR) -> BOOL;
 }
 extern "C" {
-    pub fn SetDlgItemTextW(
-        hDlg: HWND,
-        nIDDlgItem: ::std::os::raw::c_int,
-        lpString: LPCWSTR,
-    ) -> BOOL;
+    pub fn SetDlgItemTextW(hDlg: HWND, nIDDlgItem: ::std::os::raw::c_int, lpString: LPCWSTR) -> BOOL;
 }
 extern "C" {
-    pub fn GetDlgItemTextA(
-        hDlg: HWND,
-        nIDDlgItem: ::std::os::raw::c_int,
-        lpString: LPSTR,
-        cchMax: ::std::os::raw::c_int,
-    ) -> UINT;
+    pub fn GetDlgItemTextA(hDlg: HWND, nIDDlgItem: ::std::os::raw::c_int, lpString: LPSTR, cchMax: ::std::os::raw::c_int) -> UINT;
 }
 extern "C" {
-    pub fn GetDlgItemTextW(
-        hDlg: HWND,
-        nIDDlgItem: ::std::os::raw::c_int,
-        lpString: LPWSTR,
-        cchMax: ::std::os::raw::c_int,
-    ) -> UINT;
+    pub fn GetDlgItemTextW(hDlg: HWND, nIDDlgItem: ::std::os::raw::c_int, lpString: LPWSTR, cchMax: ::std::os::raw::c_int) -> UINT;
 }
 extern "C" {
     pub fn CheckDlgButton(hDlg: HWND, nIDButton: ::std::os::raw::c_int, uCheck: UINT) -> BOOL;
@@ -41495,22 +38113,10 @@ extern "C" {
     pub fn IsDlgButtonChecked(hDlg: HWND, nIDButton: ::std::os::raw::c_int) -> UINT;
 }
 extern "C" {
-    pub fn SendDlgItemMessageA(
-        hDlg: HWND,
-        nIDDlgItem: ::std::os::raw::c_int,
-        Msg: UINT,
-        wParam: WPARAM,
-        lParam: LPARAM,
-    ) -> LRESULT;
+    pub fn SendDlgItemMessageA(hDlg: HWND, nIDDlgItem: ::std::os::raw::c_int, Msg: UINT, wParam: WPARAM, lParam: LPARAM) -> LRESULT;
 }
 extern "C" {
-    pub fn SendDlgItemMessageW(
-        hDlg: HWND,
-        nIDDlgItem: ::std::os::raw::c_int,
-        Msg: UINT,
-        wParam: WPARAM,
-        lParam: LPARAM,
-    ) -> LRESULT;
+    pub fn SendDlgItemMessageW(hDlg: HWND, nIDDlgItem: ::std::os::raw::c_int, Msg: UINT, wParam: WPARAM, lParam: LPARAM) -> LRESULT;
 }
 extern "C" {
     pub fn GetNextDlgGroupItem(hDlg: HWND, hCtl: HWND, bPrevious: BOOL) -> HWND;
@@ -41531,17 +38137,11 @@ extern "C" {
     pub fn DefDlgProcW(hDlg: HWND, Msg: UINT, wParam: WPARAM, lParam: LPARAM) -> LRESULT;
 }
 pub const DIALOG_CONTROL_DPI_CHANGE_BEHAVIORS_DCDC_DEFAULT: DIALOG_CONTROL_DPI_CHANGE_BEHAVIORS = 0;
-pub const DIALOG_CONTROL_DPI_CHANGE_BEHAVIORS_DCDC_DISABLE_FONT_UPDATE:
-    DIALOG_CONTROL_DPI_CHANGE_BEHAVIORS = 1;
-pub const DIALOG_CONTROL_DPI_CHANGE_BEHAVIORS_DCDC_DISABLE_RELAYOUT:
-    DIALOG_CONTROL_DPI_CHANGE_BEHAVIORS = 2;
+pub const DIALOG_CONTROL_DPI_CHANGE_BEHAVIORS_DCDC_DISABLE_FONT_UPDATE: DIALOG_CONTROL_DPI_CHANGE_BEHAVIORS = 1;
+pub const DIALOG_CONTROL_DPI_CHANGE_BEHAVIORS_DCDC_DISABLE_RELAYOUT: DIALOG_CONTROL_DPI_CHANGE_BEHAVIORS = 2;
 pub type DIALOG_CONTROL_DPI_CHANGE_BEHAVIORS = ::std::os::raw::c_int;
 extern "C" {
-    pub fn SetDialogControlDpiChangeBehavior(
-        hWnd: HWND,
-        mask: DIALOG_CONTROL_DPI_CHANGE_BEHAVIORS,
-        values: DIALOG_CONTROL_DPI_CHANGE_BEHAVIORS,
-    ) -> BOOL;
+    pub fn SetDialogControlDpiChangeBehavior(hWnd: HWND, mask: DIALOG_CONTROL_DPI_CHANGE_BEHAVIORS, values: DIALOG_CONTROL_DPI_CHANGE_BEHAVIORS) -> BOOL;
 }
 extern "C" {
     pub fn GetDialogControlDpiChangeBehavior(hWnd: HWND) -> DIALOG_CONTROL_DPI_CHANGE_BEHAVIORS;
@@ -41552,11 +38152,7 @@ pub const DIALOG_DPI_CHANGE_BEHAVIORS_DDC_DISABLE_RESIZE: DIALOG_DPI_CHANGE_BEHA
 pub const DIALOG_DPI_CHANGE_BEHAVIORS_DDC_DISABLE_CONTROL_RELAYOUT: DIALOG_DPI_CHANGE_BEHAVIORS = 4;
 pub type DIALOG_DPI_CHANGE_BEHAVIORS = ::std::os::raw::c_int;
 extern "C" {
-    pub fn SetDialogDpiChangeBehavior(
-        hDlg: HWND,
-        mask: DIALOG_DPI_CHANGE_BEHAVIORS,
-        values: DIALOG_DPI_CHANGE_BEHAVIORS,
-    ) -> BOOL;
+    pub fn SetDialogDpiChangeBehavior(hDlg: HWND, mask: DIALOG_DPI_CHANGE_BEHAVIORS, values: DIALOG_DPI_CHANGE_BEHAVIORS) -> BOOL;
 }
 extern "C" {
     pub fn GetDialogDpiChangeBehavior(hDlg: HWND) -> DIALOG_DPI_CHANGE_BEHAVIORS;
@@ -41607,18 +38203,10 @@ extern "C" {
     pub fn EnumClipboardFormats(format: UINT) -> UINT;
 }
 extern "C" {
-    pub fn GetClipboardFormatNameA(
-        format: UINT,
-        lpszFormatName: LPSTR,
-        cchMaxCount: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int;
+    pub fn GetClipboardFormatNameA(format: UINT, lpszFormatName: LPSTR, cchMaxCount: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn GetClipboardFormatNameW(
-        format: UINT,
-        lpszFormatName: LPWSTR,
-        cchMaxCount: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int;
+    pub fn GetClipboardFormatNameW(format: UINT, lpszFormatName: LPWSTR, cchMaxCount: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn EmptyClipboard() -> BOOL;
@@ -41627,10 +38215,7 @@ extern "C" {
     pub fn IsClipboardFormatAvailable(format: UINT) -> BOOL;
 }
 extern "C" {
-    pub fn GetPriorityClipboardFormat(
-        paFormatPriorityList: *mut UINT,
-        cFormats: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int;
+    pub fn GetPriorityClipboardFormat(paFormatPriorityList: *mut UINT, cFormats: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn GetOpenClipboardWindow() -> HWND;
@@ -41642,11 +38227,7 @@ extern "C" {
     pub fn RemoveClipboardFormatListener(hwnd: HWND) -> BOOL;
 }
 extern "C" {
-    pub fn GetUpdatedClipboardFormats(
-        lpuiFormats: PUINT,
-        cFormats: UINT,
-        pcFormatsOut: PUINT,
-    ) -> BOOL;
+    pub fn GetUpdatedClipboardFormats(lpuiFormats: PUINT, cFormats: UINT, pcFormatsOut: PUINT) -> BOOL;
 }
 extern "C" {
     pub fn CharToOemA(pSrc: LPCSTR, pDst: LPSTR) -> BOOL;
@@ -41712,12 +38293,7 @@ extern "C" {
     pub fn CharNextExA(CodePage: WORD, lpCurrentChar: LPCSTR, dwFlags: DWORD) -> LPSTR;
 }
 extern "C" {
-    pub fn CharPrevExA(
-        CodePage: WORD,
-        lpStart: LPCSTR,
-        lpCurrentChar: LPCSTR,
-        dwFlags: DWORD,
-    ) -> LPSTR;
+    pub fn CharPrevExA(CodePage: WORD, lpStart: LPCSTR, lpCurrentChar: LPCSTR, dwFlags: DWORD) -> LPSTR;
 }
 extern "C" {
     pub fn IsCharAlphaA(ch: CHAR) -> BOOL;
@@ -41768,40 +38344,19 @@ extern "C" {
     pub fn SetKeyboardState(lpKeyState: LPBYTE) -> BOOL;
 }
 extern "C" {
-    pub fn GetKeyNameTextA(
-        lParam: LONG,
-        lpString: LPSTR,
-        cchSize: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int;
+    pub fn GetKeyNameTextA(lParam: LONG, lpString: LPSTR, cchSize: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn GetKeyNameTextW(
-        lParam: LONG,
-        lpString: LPWSTR,
-        cchSize: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int;
+    pub fn GetKeyNameTextW(lParam: LONG, lpString: LPWSTR, cchSize: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn GetKeyboardType(nTypeFlag: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn ToAscii(
-        uVirtKey: UINT,
-        uScanCode: UINT,
-        lpKeyState: *const BYTE,
-        lpChar: LPWORD,
-        uFlags: UINT,
-    ) -> ::std::os::raw::c_int;
+    pub fn ToAscii(uVirtKey: UINT, uScanCode: UINT, lpKeyState: *const BYTE, lpChar: LPWORD, uFlags: UINT) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn ToAsciiEx(
-        uVirtKey: UINT,
-        uScanCode: UINT,
-        lpKeyState: *const BYTE,
-        lpChar: LPWORD,
-        uFlags: UINT,
-        dwhkl: HKL,
-    ) -> ::std::os::raw::c_int;
+    pub fn ToAsciiEx(uVirtKey: UINT, uScanCode: UINT, lpKeyState: *const BYTE, lpChar: LPWORD, uFlags: UINT, dwhkl: HKL) -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn ToUnicode(
@@ -41912,12 +38467,7 @@ pub type TOUCHINPUT = tagTOUCHINPUT;
 pub type PTOUCHINPUT = *mut tagTOUCHINPUT;
 pub type PCTOUCHINPUT = *const TOUCHINPUT;
 extern "C" {
-    pub fn GetTouchInputInfo(
-        hTouchInput: HTOUCHINPUT,
-        cInputs: UINT,
-        pInputs: PTOUCHINPUT,
-        cbSize: ::std::os::raw::c_int,
-    ) -> BOOL;
+    pub fn GetTouchInputInfo(hTouchInput: HTOUCHINPUT, cInputs: UINT, pInputs: PTOUCHINPUT, cbSize: ::std::os::raw::c_int) -> BOOL;
 }
 extern "C" {
     pub fn CloseTouchInputHandle(hTouchInput: HTOUCHINPUT) -> BOOL;
@@ -41940,26 +38490,16 @@ pub type tagPOINTER_INPUT_TYPE = ::std::os::raw::c_int;
 pub type POINTER_INPUT_TYPE = DWORD;
 pub type POINTER_FLAGS = UINT32;
 pub const tagPOINTER_BUTTON_CHANGE_TYPE_POINTER_CHANGE_NONE: tagPOINTER_BUTTON_CHANGE_TYPE = 0;
-pub const tagPOINTER_BUTTON_CHANGE_TYPE_POINTER_CHANGE_FIRSTBUTTON_DOWN:
-    tagPOINTER_BUTTON_CHANGE_TYPE = 1;
-pub const tagPOINTER_BUTTON_CHANGE_TYPE_POINTER_CHANGE_FIRSTBUTTON_UP:
-    tagPOINTER_BUTTON_CHANGE_TYPE = 2;
-pub const tagPOINTER_BUTTON_CHANGE_TYPE_POINTER_CHANGE_SECONDBUTTON_DOWN:
-    tagPOINTER_BUTTON_CHANGE_TYPE = 3;
-pub const tagPOINTER_BUTTON_CHANGE_TYPE_POINTER_CHANGE_SECONDBUTTON_UP:
-    tagPOINTER_BUTTON_CHANGE_TYPE = 4;
-pub const tagPOINTER_BUTTON_CHANGE_TYPE_POINTER_CHANGE_THIRDBUTTON_DOWN:
-    tagPOINTER_BUTTON_CHANGE_TYPE = 5;
-pub const tagPOINTER_BUTTON_CHANGE_TYPE_POINTER_CHANGE_THIRDBUTTON_UP:
-    tagPOINTER_BUTTON_CHANGE_TYPE = 6;
-pub const tagPOINTER_BUTTON_CHANGE_TYPE_POINTER_CHANGE_FOURTHBUTTON_DOWN:
-    tagPOINTER_BUTTON_CHANGE_TYPE = 7;
-pub const tagPOINTER_BUTTON_CHANGE_TYPE_POINTER_CHANGE_FOURTHBUTTON_UP:
-    tagPOINTER_BUTTON_CHANGE_TYPE = 8;
-pub const tagPOINTER_BUTTON_CHANGE_TYPE_POINTER_CHANGE_FIFTHBUTTON_DOWN:
-    tagPOINTER_BUTTON_CHANGE_TYPE = 9;
-pub const tagPOINTER_BUTTON_CHANGE_TYPE_POINTER_CHANGE_FIFTHBUTTON_UP:
-    tagPOINTER_BUTTON_CHANGE_TYPE = 10;
+pub const tagPOINTER_BUTTON_CHANGE_TYPE_POINTER_CHANGE_FIRSTBUTTON_DOWN: tagPOINTER_BUTTON_CHANGE_TYPE = 1;
+pub const tagPOINTER_BUTTON_CHANGE_TYPE_POINTER_CHANGE_FIRSTBUTTON_UP: tagPOINTER_BUTTON_CHANGE_TYPE = 2;
+pub const tagPOINTER_BUTTON_CHANGE_TYPE_POINTER_CHANGE_SECONDBUTTON_DOWN: tagPOINTER_BUTTON_CHANGE_TYPE = 3;
+pub const tagPOINTER_BUTTON_CHANGE_TYPE_POINTER_CHANGE_SECONDBUTTON_UP: tagPOINTER_BUTTON_CHANGE_TYPE = 4;
+pub const tagPOINTER_BUTTON_CHANGE_TYPE_POINTER_CHANGE_THIRDBUTTON_DOWN: tagPOINTER_BUTTON_CHANGE_TYPE = 5;
+pub const tagPOINTER_BUTTON_CHANGE_TYPE_POINTER_CHANGE_THIRDBUTTON_UP: tagPOINTER_BUTTON_CHANGE_TYPE = 6;
+pub const tagPOINTER_BUTTON_CHANGE_TYPE_POINTER_CHANGE_FOURTHBUTTON_DOWN: tagPOINTER_BUTTON_CHANGE_TYPE = 7;
+pub const tagPOINTER_BUTTON_CHANGE_TYPE_POINTER_CHANGE_FOURTHBUTTON_UP: tagPOINTER_BUTTON_CHANGE_TYPE = 8;
+pub const tagPOINTER_BUTTON_CHANGE_TYPE_POINTER_CHANGE_FIFTHBUTTON_DOWN: tagPOINTER_BUTTON_CHANGE_TYPE = 9;
+pub const tagPOINTER_BUTTON_CHANGE_TYPE_POINTER_CHANGE_FIFTHBUTTON_UP: tagPOINTER_BUTTON_CHANGE_TYPE = 10;
 pub type tagPOINTER_BUTTON_CHANGE_TYPE = ::std::os::raw::c_int;
 pub use self::tagPOINTER_BUTTON_CHANGE_TYPE as POINTER_BUTTON_CHANGE_TYPE;
 #[repr(C)]
@@ -42071,76 +38611,38 @@ extern "C" {
     pub fn GetPointerInfo(pointerId: UINT32, pointerInfo: *mut POINTER_INFO) -> BOOL;
 }
 extern "C" {
-    pub fn GetPointerInfoHistory(
-        pointerId: UINT32,
-        entriesCount: *mut UINT32,
-        pointerInfo: *mut POINTER_INFO,
-    ) -> BOOL;
+    pub fn GetPointerInfoHistory(pointerId: UINT32, entriesCount: *mut UINT32, pointerInfo: *mut POINTER_INFO) -> BOOL;
 }
 extern "C" {
-    pub fn GetPointerFrameInfo(
-        pointerId: UINT32,
-        pointerCount: *mut UINT32,
-        pointerInfo: *mut POINTER_INFO,
-    ) -> BOOL;
+    pub fn GetPointerFrameInfo(pointerId: UINT32, pointerCount: *mut UINT32, pointerInfo: *mut POINTER_INFO) -> BOOL;
 }
 extern "C" {
-    pub fn GetPointerFrameInfoHistory(
-        pointerId: UINT32,
-        entriesCount: *mut UINT32,
-        pointerCount: *mut UINT32,
-        pointerInfo: *mut POINTER_INFO,
-    ) -> BOOL;
+    pub fn GetPointerFrameInfoHistory(pointerId: UINT32, entriesCount: *mut UINT32, pointerCount: *mut UINT32, pointerInfo: *mut POINTER_INFO) -> BOOL;
 }
 extern "C" {
     pub fn GetPointerTouchInfo(pointerId: UINT32, touchInfo: *mut POINTER_TOUCH_INFO) -> BOOL;
 }
 extern "C" {
-    pub fn GetPointerTouchInfoHistory(
-        pointerId: UINT32,
-        entriesCount: *mut UINT32,
-        touchInfo: *mut POINTER_TOUCH_INFO,
-    ) -> BOOL;
+    pub fn GetPointerTouchInfoHistory(pointerId: UINT32, entriesCount: *mut UINT32, touchInfo: *mut POINTER_TOUCH_INFO) -> BOOL;
 }
 extern "C" {
-    pub fn GetPointerFrameTouchInfo(
-        pointerId: UINT32,
-        pointerCount: *mut UINT32,
-        touchInfo: *mut POINTER_TOUCH_INFO,
-    ) -> BOOL;
+    pub fn GetPointerFrameTouchInfo(pointerId: UINT32, pointerCount: *mut UINT32, touchInfo: *mut POINTER_TOUCH_INFO) -> BOOL;
 }
 extern "C" {
-    pub fn GetPointerFrameTouchInfoHistory(
-        pointerId: UINT32,
-        entriesCount: *mut UINT32,
-        pointerCount: *mut UINT32,
-        touchInfo: *mut POINTER_TOUCH_INFO,
-    ) -> BOOL;
+    pub fn GetPointerFrameTouchInfoHistory(pointerId: UINT32, entriesCount: *mut UINT32, pointerCount: *mut UINT32, touchInfo: *mut POINTER_TOUCH_INFO)
+        -> BOOL;
 }
 extern "C" {
     pub fn GetPointerPenInfo(pointerId: UINT32, penInfo: *mut POINTER_PEN_INFO) -> BOOL;
 }
 extern "C" {
-    pub fn GetPointerPenInfoHistory(
-        pointerId: UINT32,
-        entriesCount: *mut UINT32,
-        penInfo: *mut POINTER_PEN_INFO,
-    ) -> BOOL;
+    pub fn GetPointerPenInfoHistory(pointerId: UINT32, entriesCount: *mut UINT32, penInfo: *mut POINTER_PEN_INFO) -> BOOL;
 }
 extern "C" {
-    pub fn GetPointerFramePenInfo(
-        pointerId: UINT32,
-        pointerCount: *mut UINT32,
-        penInfo: *mut POINTER_PEN_INFO,
-    ) -> BOOL;
+    pub fn GetPointerFramePenInfo(pointerId: UINT32, pointerCount: *mut UINT32, penInfo: *mut POINTER_PEN_INFO) -> BOOL;
 }
 extern "C" {
-    pub fn GetPointerFramePenInfoHistory(
-        pointerId: UINT32,
-        entriesCount: *mut UINT32,
-        pointerCount: *mut UINT32,
-        penInfo: *mut POINTER_PEN_INFO,
-    ) -> BOOL;
+    pub fn GetPointerFramePenInfoHistory(pointerId: UINT32, entriesCount: *mut UINT32, pointerCount: *mut UINT32, penInfo: *mut POINTER_PEN_INFO) -> BOOL;
 }
 extern "C" {
     pub fn SkipPointerFrameMessages(pointerId: UINT32) -> BOOL;
@@ -42152,11 +38654,7 @@ extern "C" {
     pub fn UnregisterPointerInputTarget(hwnd: HWND, pointerType: POINTER_INPUT_TYPE) -> BOOL;
 }
 extern "C" {
-    pub fn RegisterPointerInputTargetEx(
-        hwnd: HWND,
-        pointerType: POINTER_INPUT_TYPE,
-        fObserve: BOOL,
-    ) -> BOOL;
+    pub fn RegisterPointerInputTargetEx(hwnd: HWND, pointerType: POINTER_INPUT_TYPE, fObserve: BOOL) -> BOOL;
 }
 extern "C" {
     pub fn UnregisterPointerInputTargetEx(hwnd: HWND, pointerType: POINTER_INPUT_TYPE) -> BOOL;
@@ -42168,18 +38666,10 @@ pub struct HSYNTHETICPOINTERDEVICE__ {
 }
 pub type HSYNTHETICPOINTERDEVICE = *mut HSYNTHETICPOINTERDEVICE__;
 extern "C" {
-    pub fn CreateSyntheticPointerDevice(
-        pointerType: POINTER_INPUT_TYPE,
-        maxCount: ULONG,
-        mode: POINTER_FEEDBACK_MODE,
-    ) -> HSYNTHETICPOINTERDEVICE;
+    pub fn CreateSyntheticPointerDevice(pointerType: POINTER_INPUT_TYPE, maxCount: ULONG, mode: POINTER_FEEDBACK_MODE) -> HSYNTHETICPOINTERDEVICE;
 }
 extern "C" {
-    pub fn InjectSyntheticPointerInput(
-        device: HSYNTHETICPOINTERDEVICE,
-        pointerInfo: *const POINTER_TYPE_INFO,
-        count: UINT32,
-    ) -> BOOL;
+    pub fn InjectSyntheticPointerInput(device: HSYNTHETICPOINTERDEVICE, pointerInfo: *const POINTER_TYPE_INFO, count: UINT32) -> BOOL;
 }
 extern "C" {
     pub fn DestroySyntheticPointerDevice(device: HSYNTHETICPOINTERDEVICE);
@@ -42251,22 +38741,10 @@ pub const tagFEEDBACK_TYPE_FEEDBACK_MAX: tagFEEDBACK_TYPE = -1;
 pub type tagFEEDBACK_TYPE = ::std::os::raw::c_int;
 pub use self::tagFEEDBACK_TYPE as FEEDBACK_TYPE;
 extern "C" {
-    pub fn GetWindowFeedbackSetting(
-        hwnd: HWND,
-        feedback: FEEDBACK_TYPE,
-        dwFlags: DWORD,
-        pSize: *mut UINT32,
-        config: *mut ::std::os::raw::c_void,
-    ) -> BOOL;
+    pub fn GetWindowFeedbackSetting(hwnd: HWND, feedback: FEEDBACK_TYPE, dwFlags: DWORD, pSize: *mut UINT32, config: *mut ::std::os::raw::c_void) -> BOOL;
 }
 extern "C" {
-    pub fn SetWindowFeedbackSetting(
-        hwnd: HWND,
-        feedback: FEEDBACK_TYPE,
-        dwFlags: DWORD,
-        size: UINT32,
-        configuration: *const ::std::os::raw::c_void,
-    ) -> BOOL;
+    pub fn SetWindowFeedbackSetting(hwnd: HWND, feedback: FEEDBACK_TYPE, dwFlags: DWORD, size: UINT32, configuration: *const ::std::os::raw::c_void) -> BOOL;
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
@@ -42301,11 +38779,7 @@ pub struct tagINPUT_TRANSFORM__bindgen_ty_1__bindgen_ty_1 {
 }
 pub type INPUT_TRANSFORM = tagINPUT_TRANSFORM;
 extern "C" {
-    pub fn GetPointerInputTransform(
-        pointerId: UINT32,
-        historyCount: UINT32,
-        inputTransform: *mut INPUT_TRANSFORM,
-    ) -> BOOL;
+    pub fn GetPointerInputTransform(pointerId: UINT32, historyCount: UINT32, inputTransform: *mut INPUT_TRANSFORM) -> BOOL;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -42346,39 +38820,16 @@ extern "C" {
     pub fn ReleaseCapture() -> BOOL;
 }
 extern "C" {
-    pub fn MsgWaitForMultipleObjects(
-        nCount: DWORD,
-        pHandles: *const HANDLE,
-        fWaitAll: BOOL,
-        dwMilliseconds: DWORD,
-        dwWakeMask: DWORD,
-    ) -> DWORD;
+    pub fn MsgWaitForMultipleObjects(nCount: DWORD, pHandles: *const HANDLE, fWaitAll: BOOL, dwMilliseconds: DWORD, dwWakeMask: DWORD) -> DWORD;
 }
 extern "C" {
-    pub fn MsgWaitForMultipleObjectsEx(
-        nCount: DWORD,
-        pHandles: *const HANDLE,
-        dwMilliseconds: DWORD,
-        dwWakeMask: DWORD,
-        dwFlags: DWORD,
-    ) -> DWORD;
+    pub fn MsgWaitForMultipleObjectsEx(nCount: DWORD, pHandles: *const HANDLE, dwMilliseconds: DWORD, dwWakeMask: DWORD, dwFlags: DWORD) -> DWORD;
 }
 extern "C" {
-    pub fn SetTimer(
-        hWnd: HWND,
-        nIDEvent: UINT_PTR,
-        uElapse: UINT,
-        lpTimerFunc: TIMERPROC,
-    ) -> UINT_PTR;
+    pub fn SetTimer(hWnd: HWND, nIDEvent: UINT_PTR, uElapse: UINT, lpTimerFunc: TIMERPROC) -> UINT_PTR;
 }
 extern "C" {
-    pub fn SetCoalescableTimer(
-        hWnd: HWND,
-        nIDEvent: UINT_PTR,
-        uElapse: UINT,
-        lpTimerFunc: TIMERPROC,
-        uToleranceDelay: ULONG,
-    ) -> UINT_PTR;
+    pub fn SetCoalescableTimer(hWnd: HWND, nIDEvent: UINT_PTR, uElapse: UINT, lpTimerFunc: TIMERPROC, uToleranceDelay: ULONG) -> UINT_PTR;
 }
 extern "C" {
     pub fn KillTimer(hWnd: HWND, uIDEvent: UINT_PTR) -> BOOL;
@@ -42408,41 +38859,22 @@ extern "C" {
     pub fn DestroyAcceleratorTable(hAccel: HACCEL) -> BOOL;
 }
 extern "C" {
-    pub fn CopyAcceleratorTableA(
-        hAccelSrc: HACCEL,
-        lpAccelDst: LPACCEL,
-        cAccelEntries: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int;
+    pub fn CopyAcceleratorTableA(hAccelSrc: HACCEL, lpAccelDst: LPACCEL, cAccelEntries: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn CopyAcceleratorTableW(
-        hAccelSrc: HACCEL,
-        lpAccelDst: LPACCEL,
-        cAccelEntries: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int;
+    pub fn CopyAcceleratorTableW(hAccelSrc: HACCEL, lpAccelDst: LPACCEL, cAccelEntries: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn TranslateAcceleratorA(
-        hWnd: HWND,
-        hAccTable: HACCEL,
-        lpMsg: LPMSG,
-    ) -> ::std::os::raw::c_int;
+    pub fn TranslateAcceleratorA(hWnd: HWND, hAccTable: HACCEL, lpMsg: LPMSG) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn TranslateAcceleratorW(
-        hWnd: HWND,
-        hAccTable: HACCEL,
-        lpMsg: LPMSG,
-    ) -> ::std::os::raw::c_int;
+    pub fn TranslateAcceleratorW(hWnd: HWND, hAccTable: HACCEL, lpMsg: LPMSG) -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn GetSystemMetrics(nIndex: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn GetSystemMetricsForDpi(
-        nIndex: ::std::os::raw::c_int,
-        dpi: UINT,
-    ) -> ::std::os::raw::c_int;
+    pub fn GetSystemMetricsForDpi(nIndex: ::std::os::raw::c_int, dpi: UINT) -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn LoadMenuA(hInstance: HINSTANCE, lpMenuName: LPCSTR) -> HMENU;
@@ -42463,43 +38895,19 @@ extern "C" {
     pub fn SetMenu(hWnd: HWND, hMenu: HMENU) -> BOOL;
 }
 extern "C" {
-    pub fn ChangeMenuA(
-        hMenu: HMENU,
-        cmd: UINT,
-        lpszNewItem: LPCSTR,
-        cmdInsert: UINT,
-        flags: UINT,
-    ) -> BOOL;
+    pub fn ChangeMenuA(hMenu: HMENU, cmd: UINT, lpszNewItem: LPCSTR, cmdInsert: UINT, flags: UINT) -> BOOL;
 }
 extern "C" {
-    pub fn ChangeMenuW(
-        hMenu: HMENU,
-        cmd: UINT,
-        lpszNewItem: LPCWSTR,
-        cmdInsert: UINT,
-        flags: UINT,
-    ) -> BOOL;
+    pub fn ChangeMenuW(hMenu: HMENU, cmd: UINT, lpszNewItem: LPCWSTR, cmdInsert: UINT, flags: UINT) -> BOOL;
 }
 extern "C" {
     pub fn HiliteMenuItem(hWnd: HWND, hMenu: HMENU, uIDHiliteItem: UINT, uHilite: UINT) -> BOOL;
 }
 extern "C" {
-    pub fn GetMenuStringA(
-        hMenu: HMENU,
-        uIDItem: UINT,
-        lpString: LPSTR,
-        cchMax: ::std::os::raw::c_int,
-        flags: UINT,
-    ) -> ::std::os::raw::c_int;
+    pub fn GetMenuStringA(hMenu: HMENU, uIDItem: UINT, lpString: LPSTR, cchMax: ::std::os::raw::c_int, flags: UINT) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn GetMenuStringW(
-        hMenu: HMENU,
-        uIDItem: UINT,
-        lpString: LPWSTR,
-        cchMax: ::std::os::raw::c_int,
-        flags: UINT,
-    ) -> ::std::os::raw::c_int;
+    pub fn GetMenuStringW(hMenu: HMENU, uIDItem: UINT, lpString: LPWSTR, cchMax: ::std::os::raw::c_int, flags: UINT) -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn GetMenuState(hMenu: HMENU, uId: UINT, uFlags: UINT) -> UINT;
@@ -42535,52 +38943,22 @@ extern "C" {
     pub fn GetMenuItemCount(hMenu: HMENU) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn InsertMenuA(
-        hMenu: HMENU,
-        uPosition: UINT,
-        uFlags: UINT,
-        uIDNewItem: UINT_PTR,
-        lpNewItem: LPCSTR,
-    ) -> BOOL;
+    pub fn InsertMenuA(hMenu: HMENU, uPosition: UINT, uFlags: UINT, uIDNewItem: UINT_PTR, lpNewItem: LPCSTR) -> BOOL;
 }
 extern "C" {
-    pub fn InsertMenuW(
-        hMenu: HMENU,
-        uPosition: UINT,
-        uFlags: UINT,
-        uIDNewItem: UINT_PTR,
-        lpNewItem: LPCWSTR,
-    ) -> BOOL;
+    pub fn InsertMenuW(hMenu: HMENU, uPosition: UINT, uFlags: UINT, uIDNewItem: UINT_PTR, lpNewItem: LPCWSTR) -> BOOL;
 }
 extern "C" {
-    pub fn AppendMenuA(hMenu: HMENU, uFlags: UINT, uIDNewItem: UINT_PTR, lpNewItem: LPCSTR)
-        -> BOOL;
+    pub fn AppendMenuA(hMenu: HMENU, uFlags: UINT, uIDNewItem: UINT_PTR, lpNewItem: LPCSTR) -> BOOL;
 }
 extern "C" {
-    pub fn AppendMenuW(
-        hMenu: HMENU,
-        uFlags: UINT,
-        uIDNewItem: UINT_PTR,
-        lpNewItem: LPCWSTR,
-    ) -> BOOL;
+    pub fn AppendMenuW(hMenu: HMENU, uFlags: UINT, uIDNewItem: UINT_PTR, lpNewItem: LPCWSTR) -> BOOL;
 }
 extern "C" {
-    pub fn ModifyMenuA(
-        hMnu: HMENU,
-        uPosition: UINT,
-        uFlags: UINT,
-        uIDNewItem: UINT_PTR,
-        lpNewItem: LPCSTR,
-    ) -> BOOL;
+    pub fn ModifyMenuA(hMnu: HMENU, uPosition: UINT, uFlags: UINT, uIDNewItem: UINT_PTR, lpNewItem: LPCSTR) -> BOOL;
 }
 extern "C" {
-    pub fn ModifyMenuW(
-        hMnu: HMENU,
-        uPosition: UINT,
-        uFlags: UINT,
-        uIDNewItem: UINT_PTR,
-        lpNewItem: LPCWSTR,
-    ) -> BOOL;
+    pub fn ModifyMenuW(hMnu: HMENU, uPosition: UINT, uFlags: UINT, uIDNewItem: UINT_PTR, lpNewItem: LPCWSTR) -> BOOL;
 }
 extern "C" {
     pub fn RemoveMenu(hMenu: HMENU, uPosition: UINT, uFlags: UINT) -> BOOL;
@@ -42589,13 +38967,7 @@ extern "C" {
     pub fn DeleteMenu(hMenu: HMENU, uPosition: UINT, uFlags: UINT) -> BOOL;
 }
 extern "C" {
-    pub fn SetMenuItemBitmaps(
-        hMenu: HMENU,
-        uPosition: UINT,
-        uFlags: UINT,
-        hBitmapUnchecked: HBITMAP,
-        hBitmapChecked: HBITMAP,
-    ) -> BOOL;
+    pub fn SetMenuItemBitmaps(hMenu: HMENU, uPosition: UINT, uFlags: UINT, hBitmapUnchecked: HBITMAP, hBitmapChecked: HBITMAP) -> BOOL;
 }
 extern "C" {
     pub fn GetMenuCheckMarkDimensions() -> LONG;
@@ -42620,14 +38992,7 @@ pub struct tagTPMPARAMS {
 pub type TPMPARAMS = tagTPMPARAMS;
 pub type LPTPMPARAMS = *mut TPMPARAMS;
 extern "C" {
-    pub fn TrackPopupMenuEx(
-        hMenu: HMENU,
-        uFlags: UINT,
-        x: ::std::os::raw::c_int,
-        y: ::std::os::raw::c_int,
-        hwnd: HWND,
-        lptpm: LPTPMPARAMS,
-    ) -> BOOL;
+    pub fn TrackPopupMenuEx(hMenu: HMENU, uFlags: UINT, x: ::std::os::raw::c_int, y: ::std::os::raw::c_int, hwnd: HWND, lptpm: LPTPMPARAMS) -> BOOL;
 }
 extern "C" {
     pub fn CalculatePopupWindowPosition(
@@ -42714,52 +39079,22 @@ pub type LPCMENUITEMINFOA = *const MENUITEMINFOA;
 pub type LPCMENUITEMINFOW = *const MENUITEMINFOW;
 pub type LPCMENUITEMINFO = LPCMENUITEMINFOA;
 extern "C" {
-    pub fn InsertMenuItemA(
-        hmenu: HMENU,
-        item: UINT,
-        fByPosition: BOOL,
-        lpmi: LPCMENUITEMINFOA,
-    ) -> BOOL;
+    pub fn InsertMenuItemA(hmenu: HMENU, item: UINT, fByPosition: BOOL, lpmi: LPCMENUITEMINFOA) -> BOOL;
 }
 extern "C" {
-    pub fn InsertMenuItemW(
-        hmenu: HMENU,
-        item: UINT,
-        fByPosition: BOOL,
-        lpmi: LPCMENUITEMINFOW,
-    ) -> BOOL;
+    pub fn InsertMenuItemW(hmenu: HMENU, item: UINT, fByPosition: BOOL, lpmi: LPCMENUITEMINFOW) -> BOOL;
 }
 extern "C" {
-    pub fn GetMenuItemInfoA(
-        hmenu: HMENU,
-        item: UINT,
-        fByPosition: BOOL,
-        lpmii: LPMENUITEMINFOA,
-    ) -> BOOL;
+    pub fn GetMenuItemInfoA(hmenu: HMENU, item: UINT, fByPosition: BOOL, lpmii: LPMENUITEMINFOA) -> BOOL;
 }
 extern "C" {
-    pub fn GetMenuItemInfoW(
-        hmenu: HMENU,
-        item: UINT,
-        fByPosition: BOOL,
-        lpmii: LPMENUITEMINFOW,
-    ) -> BOOL;
+    pub fn GetMenuItemInfoW(hmenu: HMENU, item: UINT, fByPosition: BOOL, lpmii: LPMENUITEMINFOW) -> BOOL;
 }
 extern "C" {
-    pub fn SetMenuItemInfoA(
-        hmenu: HMENU,
-        item: UINT,
-        fByPositon: BOOL,
-        lpmii: LPCMENUITEMINFOA,
-    ) -> BOOL;
+    pub fn SetMenuItemInfoA(hmenu: HMENU, item: UINT, fByPositon: BOOL, lpmii: LPCMENUITEMINFOA) -> BOOL;
 }
 extern "C" {
-    pub fn SetMenuItemInfoW(
-        hmenu: HMENU,
-        item: UINT,
-        fByPositon: BOOL,
-        lpmii: LPCMENUITEMINFOW,
-    ) -> BOOL;
+    pub fn SetMenuItemInfoW(hmenu: HMENU, item: UINT, fByPositon: BOOL, lpmii: LPCMENUITEMINFOW) -> BOOL;
 }
 extern "C" {
     pub fn GetMenuDefaultItem(hMenu: HMENU, fByPos: UINT, gmdiFlags: UINT) -> UINT;
@@ -42787,24 +39122,13 @@ pub type DROPSTRUCT = tagDROPSTRUCT;
 pub type PDROPSTRUCT = *mut tagDROPSTRUCT;
 pub type LPDROPSTRUCT = *mut tagDROPSTRUCT;
 extern "C" {
-    pub fn DragObject(
-        hwndParent: HWND,
-        hwndFrom: HWND,
-        fmt: UINT,
-        data: ULONG_PTR,
-        hcur: HCURSOR,
-    ) -> DWORD;
+    pub fn DragObject(hwndParent: HWND, hwndFrom: HWND, fmt: UINT, data: ULONG_PTR, hcur: HCURSOR) -> DWORD;
 }
 extern "C" {
     pub fn DragDetect(hwnd: HWND, pt: POINT) -> BOOL;
 }
 extern "C" {
-    pub fn DrawIcon(
-        hDC: HDC,
-        X: ::std::os::raw::c_int,
-        Y: ::std::os::raw::c_int,
-        hIcon: HICON,
-    ) -> BOOL;
+    pub fn DrawIcon(hDC: HDC, X: ::std::os::raw::c_int, Y: ::std::os::raw::c_int, hIcon: HICON) -> BOOL;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -42818,32 +39142,14 @@ pub struct tagDRAWTEXTPARAMS {
 pub type DRAWTEXTPARAMS = tagDRAWTEXTPARAMS;
 pub type LPDRAWTEXTPARAMS = *mut tagDRAWTEXTPARAMS;
 extern "C" {
-    pub fn DrawTextA(
-        hdc: HDC,
-        lpchText: LPCSTR,
-        cchText: ::std::os::raw::c_int,
-        lprc: LPRECT,
-        format: UINT,
-    ) -> ::std::os::raw::c_int;
+    pub fn DrawTextA(hdc: HDC, lpchText: LPCSTR, cchText: ::std::os::raw::c_int, lprc: LPRECT, format: UINT) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn DrawTextW(
-        hdc: HDC,
-        lpchText: LPCWSTR,
-        cchText: ::std::os::raw::c_int,
-        lprc: LPRECT,
-        format: UINT,
-    ) -> ::std::os::raw::c_int;
+    pub fn DrawTextW(hdc: HDC, lpchText: LPCWSTR, cchText: ::std::os::raw::c_int, lprc: LPRECT, format: UINT) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn DrawTextExA(
-        hdc: HDC,
-        lpchText: LPSTR,
-        cchText: ::std::os::raw::c_int,
-        lprc: LPRECT,
-        format: UINT,
-        lpdtp: LPDRAWTEXTPARAMS,
-    ) -> ::std::os::raw::c_int;
+    pub fn DrawTextExA(hdc: HDC, lpchText: LPSTR, cchText: ::std::os::raw::c_int, lprc: LPRECT, format: UINT, lpdtp: LPDRAWTEXTPARAMS)
+        -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn DrawTextExW(
@@ -43027,20 +39333,13 @@ extern "C" {
     pub fn ValidateRgn(hWnd: HWND, hRgn: HRGN) -> BOOL;
 }
 extern "C" {
-    pub fn RedrawWindow(hWnd: HWND, lprcUpdate: *const RECT, hrgnUpdate: HRGN, flags: UINT)
-        -> BOOL;
+    pub fn RedrawWindow(hWnd: HWND, lprcUpdate: *const RECT, hrgnUpdate: HRGN, flags: UINT) -> BOOL;
 }
 extern "C" {
     pub fn LockWindowUpdate(hWndLock: HWND) -> BOOL;
 }
 extern "C" {
-    pub fn ScrollWindow(
-        hWnd: HWND,
-        XAmount: ::std::os::raw::c_int,
-        YAmount: ::std::os::raw::c_int,
-        lpRect: *const RECT,
-        lpClipRect: *const RECT,
-    ) -> BOOL;
+    pub fn ScrollWindow(hWnd: HWND, XAmount: ::std::os::raw::c_int, YAmount: ::std::os::raw::c_int, lpRect: *const RECT, lpClipRect: *const RECT) -> BOOL;
 }
 extern "C" {
     pub fn ScrollDC(
@@ -43066,32 +39365,16 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn SetScrollPos(
-        hWnd: HWND,
-        nBar: ::std::os::raw::c_int,
-        nPos: ::std::os::raw::c_int,
-        bRedraw: BOOL,
-    ) -> ::std::os::raw::c_int;
+    pub fn SetScrollPos(hWnd: HWND, nBar: ::std::os::raw::c_int, nPos: ::std::os::raw::c_int, bRedraw: BOOL) -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn GetScrollPos(hWnd: HWND, nBar: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn SetScrollRange(
-        hWnd: HWND,
-        nBar: ::std::os::raw::c_int,
-        nMinPos: ::std::os::raw::c_int,
-        nMaxPos: ::std::os::raw::c_int,
-        bRedraw: BOOL,
-    ) -> BOOL;
+    pub fn SetScrollRange(hWnd: HWND, nBar: ::std::os::raw::c_int, nMinPos: ::std::os::raw::c_int, nMaxPos: ::std::os::raw::c_int, bRedraw: BOOL) -> BOOL;
 }
 extern "C" {
-    pub fn GetScrollRange(
-        hWnd: HWND,
-        nBar: ::std::os::raw::c_int,
-        lpMinPos: LPINT,
-        lpMaxPos: LPINT,
-    ) -> BOOL;
+    pub fn GetScrollRange(hWnd: HWND, nBar: ::std::os::raw::c_int, lpMinPos: LPINT, lpMaxPos: LPINT) -> BOOL;
 }
 extern "C" {
     pub fn ShowScrollBar(hWnd: HWND, wBar: ::std::os::raw::c_int, bShow: BOOL) -> BOOL;
@@ -43118,18 +39401,10 @@ extern "C" {
     pub fn RemovePropW(hWnd: HWND, lpString: LPCWSTR) -> HANDLE;
 }
 extern "C" {
-    pub fn EnumPropsExA(
-        hWnd: HWND,
-        lpEnumFunc: PROPENUMPROCEXA,
-        lParam: LPARAM,
-    ) -> ::std::os::raw::c_int;
+    pub fn EnumPropsExA(hWnd: HWND, lpEnumFunc: PROPENUMPROCEXA, lParam: LPARAM) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn EnumPropsExW(
-        hWnd: HWND,
-        lpEnumFunc: PROPENUMPROCEXW,
-        lParam: LPARAM,
-    ) -> ::std::os::raw::c_int;
+    pub fn EnumPropsExW(hWnd: HWND, lpEnumFunc: PROPENUMPROCEXW, lParam: LPARAM) -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn EnumPropsA(hWnd: HWND, lpEnumFunc: PROPENUMPROCA) -> ::std::os::raw::c_int;
@@ -43144,18 +39419,10 @@ extern "C" {
     pub fn SetWindowTextW(hWnd: HWND, lpString: LPCWSTR) -> BOOL;
 }
 extern "C" {
-    pub fn GetWindowTextA(
-        hWnd: HWND,
-        lpString: LPSTR,
-        nMaxCount: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int;
+    pub fn GetWindowTextA(hWnd: HWND, lpString: LPSTR, nMaxCount: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn GetWindowTextW(
-        hWnd: HWND,
-        lpString: LPWSTR,
-        nMaxCount: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int;
+    pub fn GetWindowTextW(hWnd: HWND, lpString: LPWSTR, nMaxCount: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn GetWindowTextLengthA(hWnd: HWND) -> ::std::os::raw::c_int;
@@ -43173,21 +39440,10 @@ extern "C" {
     pub fn AdjustWindowRect(lpRect: LPRECT, dwStyle: DWORD, bMenu: BOOL) -> BOOL;
 }
 extern "C" {
-    pub fn AdjustWindowRectEx(
-        lpRect: LPRECT,
-        dwStyle: DWORD,
-        bMenu: BOOL,
-        dwExStyle: DWORD,
-    ) -> BOOL;
+    pub fn AdjustWindowRectEx(lpRect: LPRECT, dwStyle: DWORD, bMenu: BOOL, dwExStyle: DWORD) -> BOOL;
 }
 extern "C" {
-    pub fn AdjustWindowRectExForDpi(
-        lpRect: LPRECT,
-        dwStyle: DWORD,
-        bMenu: BOOL,
-        dwExStyle: DWORD,
-        dpi: UINT,
-    ) -> BOOL;
+    pub fn AdjustWindowRectExForDpi(lpRect: LPRECT, dwStyle: DWORD, bMenu: BOOL, dwExStyle: DWORD, dpi: UINT) -> BOOL;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -43214,38 +39470,16 @@ extern "C" {
     pub fn GetMenuContextHelpId(arg1: HMENU) -> DWORD;
 }
 extern "C" {
-    pub fn MessageBoxA(
-        hWnd: HWND,
-        lpText: LPCSTR,
-        lpCaption: LPCSTR,
-        uType: UINT,
-    ) -> ::std::os::raw::c_int;
+    pub fn MessageBoxA(hWnd: HWND, lpText: LPCSTR, lpCaption: LPCSTR, uType: UINT) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn MessageBoxW(
-        hWnd: HWND,
-        lpText: LPCWSTR,
-        lpCaption: LPCWSTR,
-        uType: UINT,
-    ) -> ::std::os::raw::c_int;
+    pub fn MessageBoxW(hWnd: HWND, lpText: LPCWSTR, lpCaption: LPCWSTR, uType: UINT) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn MessageBoxExA(
-        hWnd: HWND,
-        lpText: LPCSTR,
-        lpCaption: LPCSTR,
-        uType: UINT,
-        wLanguageId: WORD,
-    ) -> ::std::os::raw::c_int;
+    pub fn MessageBoxExA(hWnd: HWND, lpText: LPCSTR, lpCaption: LPCSTR, uType: UINT, wLanguageId: WORD) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn MessageBoxExW(
-        hWnd: HWND,
-        lpText: LPCWSTR,
-        lpCaption: LPCWSTR,
-        uType: UINT,
-        wLanguageId: WORD,
-    ) -> ::std::os::raw::c_int;
+    pub fn MessageBoxExW(hWnd: HWND, lpText: LPCWSTR, lpCaption: LPCWSTR, uType: UINT, wLanguageId: WORD) -> ::std::os::raw::c_int;
 }
 pub type MSGBOXCALLBACK = unsafe extern "C" fn(lpHelpInfo: LPHELPINFO);
 #[repr(C)]
@@ -43319,12 +39553,7 @@ extern "C" {
     pub fn GetCursor() -> HCURSOR;
 }
 extern "C" {
-    pub fn CreateCaret(
-        hWnd: HWND,
-        hBitmap: HBITMAP,
-        nWidth: ::std::os::raw::c_int,
-        nHeight: ::std::os::raw::c_int,
-    ) -> BOOL;
+    pub fn CreateCaret(hWnd: HWND, hBitmap: HBITMAP, nWidth: ::std::os::raw::c_int, nHeight: ::std::os::raw::c_int) -> BOOL;
 }
 extern "C" {
     pub fn GetCaretBlinkTime() -> UINT;
@@ -43366,12 +39595,7 @@ extern "C" {
     pub fn PhysicalToLogicalPointForPerMonitorDPI(hWnd: HWND, lpPoint: LPPOINT) -> BOOL;
 }
 extern "C" {
-    pub fn MapWindowPoints(
-        hWndFrom: HWND,
-        hWndTo: HWND,
-        lpPoints: LPPOINT,
-        cPoints: UINT,
-    ) -> ::std::os::raw::c_int;
+    pub fn MapWindowPoints(hWndFrom: HWND, hWndTo: HWND, lpPoints: LPPOINT, cPoints: UINT) -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn WindowFromPoint(Point: POINT) -> HWND;
@@ -43395,11 +39619,7 @@ extern "C" {
     pub fn GetSysColorBrush(nIndex: ::std::os::raw::c_int) -> HBRUSH;
 }
 extern "C" {
-    pub fn SetSysColors(
-        cElements: ::std::os::raw::c_int,
-        lpaElements: *const INT,
-        lpaRgbValues: *const COLORREF,
-    ) -> BOOL;
+    pub fn SetSysColors(cElements: ::std::os::raw::c_int, lpaElements: *const INT, lpaRgbValues: *const COLORREF) -> BOOL;
 }
 extern "C" {
     pub fn DrawFocusRect(hDC: HDC, lprc: *const RECT) -> BOOL;
@@ -43477,18 +39697,10 @@ extern "C" {
     pub fn GetWindowLongPtrW(hWnd: HWND, nIndex: ::std::os::raw::c_int) -> LONG_PTR;
 }
 extern "C" {
-    pub fn SetWindowLongPtrA(
-        hWnd: HWND,
-        nIndex: ::std::os::raw::c_int,
-        dwNewLong: LONG_PTR,
-    ) -> LONG_PTR;
+    pub fn SetWindowLongPtrA(hWnd: HWND, nIndex: ::std::os::raw::c_int, dwNewLong: LONG_PTR) -> LONG_PTR;
 }
 extern "C" {
-    pub fn SetWindowLongPtrW(
-        hWnd: HWND,
-        nIndex: ::std::os::raw::c_int,
-        dwNewLong: LONG_PTR,
-    ) -> LONG_PTR;
+    pub fn SetWindowLongPtrW(hWnd: HWND, nIndex: ::std::os::raw::c_int, dwNewLong: LONG_PTR) -> LONG_PTR;
 }
 extern "C" {
     pub fn GetClassWord(hWnd: HWND, nIndex: ::std::os::raw::c_int) -> WORD;
@@ -43515,18 +39727,10 @@ extern "C" {
     pub fn GetClassLongPtrW(hWnd: HWND, nIndex: ::std::os::raw::c_int) -> ULONG_PTR;
 }
 extern "C" {
-    pub fn SetClassLongPtrA(
-        hWnd: HWND,
-        nIndex: ::std::os::raw::c_int,
-        dwNewLong: LONG_PTR,
-    ) -> ULONG_PTR;
+    pub fn SetClassLongPtrA(hWnd: HWND, nIndex: ::std::os::raw::c_int, dwNewLong: LONG_PTR) -> ULONG_PTR;
 }
 extern "C" {
-    pub fn SetClassLongPtrW(
-        hWnd: HWND,
-        nIndex: ::std::os::raw::c_int,
-        dwNewLong: LONG_PTR,
-    ) -> ULONG_PTR;
+    pub fn SetClassLongPtrW(hWnd: HWND, nIndex: ::std::os::raw::c_int, dwNewLong: LONG_PTR) -> ULONG_PTR;
 }
 extern "C" {
     pub fn GetProcessDefaultLayout(pdwDefaultLayout: *mut DWORD) -> BOOL;
@@ -43553,20 +39757,10 @@ extern "C" {
     pub fn FindWindowW(lpClassName: LPCWSTR, lpWindowName: LPCWSTR) -> HWND;
 }
 extern "C" {
-    pub fn FindWindowExA(
-        hWndParent: HWND,
-        hWndChildAfter: HWND,
-        lpszClass: LPCSTR,
-        lpszWindow: LPCSTR,
-    ) -> HWND;
+    pub fn FindWindowExA(hWndParent: HWND, hWndChildAfter: HWND, lpszClass: LPCSTR, lpszWindow: LPCSTR) -> HWND;
 }
 extern "C" {
-    pub fn FindWindowExW(
-        hWndParent: HWND,
-        hWndChildAfter: HWND,
-        lpszClass: LPCWSTR,
-        lpszWindow: LPCWSTR,
-    ) -> HWND;
+    pub fn FindWindowExW(hWndParent: HWND, hWndChildAfter: HWND, lpszClass: LPCWSTR, lpszWindow: LPCWSTR) -> HWND;
 }
 extern "C" {
     pub fn GetShellWindow() -> HWND;
@@ -43584,18 +39778,10 @@ extern "C" {
     pub fn EnumThreadWindows(dwThreadId: DWORD, lpfn: WNDENUMPROC, lParam: LPARAM) -> BOOL;
 }
 extern "C" {
-    pub fn GetClassNameA(
-        hWnd: HWND,
-        lpClassName: LPSTR,
-        nMaxCount: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int;
+    pub fn GetClassNameA(hWnd: HWND, lpClassName: LPSTR, nMaxCount: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn GetClassNameW(
-        hWnd: HWND,
-        lpClassName: LPWSTR,
-        nMaxCount: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int;
+    pub fn GetClassNameW(hWnd: HWND, lpClassName: LPWSTR, nMaxCount: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn GetTopWindow(hWnd: HWND) -> HWND;
@@ -43622,40 +39808,19 @@ extern "C" {
     pub fn UnhookWindowsHook(nCode: ::std::os::raw::c_int, pfnFilterProc: HOOKPROC) -> BOOL;
 }
 extern "C" {
-    pub fn SetWindowsHookExA(
-        idHook: ::std::os::raw::c_int,
-        lpfn: HOOKPROC,
-        hmod: HINSTANCE,
-        dwThreadId: DWORD,
-    ) -> HHOOK;
+    pub fn SetWindowsHookExA(idHook: ::std::os::raw::c_int, lpfn: HOOKPROC, hmod: HINSTANCE, dwThreadId: DWORD) -> HHOOK;
 }
 extern "C" {
-    pub fn SetWindowsHookExW(
-        idHook: ::std::os::raw::c_int,
-        lpfn: HOOKPROC,
-        hmod: HINSTANCE,
-        dwThreadId: DWORD,
-    ) -> HHOOK;
+    pub fn SetWindowsHookExW(idHook: ::std::os::raw::c_int, lpfn: HOOKPROC, hmod: HINSTANCE, dwThreadId: DWORD) -> HHOOK;
 }
 extern "C" {
     pub fn UnhookWindowsHookEx(hhk: HHOOK) -> BOOL;
 }
 extern "C" {
-    pub fn CallNextHookEx(
-        hhk: HHOOK,
-        nCode: ::std::os::raw::c_int,
-        wParam: WPARAM,
-        lParam: LPARAM,
-    ) -> LRESULT;
+    pub fn CallNextHookEx(hhk: HHOOK, nCode: ::std::os::raw::c_int, wParam: WPARAM, lParam: LPARAM) -> LRESULT;
 }
 extern "C" {
-    pub fn CheckMenuRadioItem(
-        hmenu: HMENU,
-        first: UINT,
-        last: UINT,
-        check: UINT,
-        flags: UINT,
-    ) -> BOOL;
+    pub fn CheckMenuRadioItem(hmenu: HMENU, first: UINT, last: UINT, check: UINT, flags: UINT) -> BOOL;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -43775,12 +39940,7 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn CreateIconFromResource(
-        presbits: PBYTE,
-        dwResSize: DWORD,
-        fIcon: BOOL,
-        dwVer: DWORD,
-    ) -> HICON;
+    pub fn CreateIconFromResource(presbits: PBYTE, dwResSize: DWORD, fIcon: BOOL, dwVer: DWORD) -> HICON;
 }
 extern "C" {
     pub fn CreateIconFromResourceEx(
@@ -43807,33 +39967,13 @@ pub struct tagCURSORSHAPE {
 pub type CURSORSHAPE = tagCURSORSHAPE;
 pub type LPCURSORSHAPE = *mut tagCURSORSHAPE;
 extern "C" {
-    pub fn LoadImageA(
-        hInst: HINSTANCE,
-        name: LPCSTR,
-        type_: UINT,
-        cx: ::std::os::raw::c_int,
-        cy: ::std::os::raw::c_int,
-        fuLoad: UINT,
-    ) -> HANDLE;
+    pub fn LoadImageA(hInst: HINSTANCE, name: LPCSTR, type_: UINT, cx: ::std::os::raw::c_int, cy: ::std::os::raw::c_int, fuLoad: UINT) -> HANDLE;
 }
 extern "C" {
-    pub fn LoadImageW(
-        hInst: HINSTANCE,
-        name: LPCWSTR,
-        type_: UINT,
-        cx: ::std::os::raw::c_int,
-        cy: ::std::os::raw::c_int,
-        fuLoad: UINT,
-    ) -> HANDLE;
+    pub fn LoadImageW(hInst: HINSTANCE, name: LPCWSTR, type_: UINT, cx: ::std::os::raw::c_int, cy: ::std::os::raw::c_int, fuLoad: UINT) -> HANDLE;
 }
 extern "C" {
-    pub fn CopyImage(
-        h: HANDLE,
-        type_: UINT,
-        cx: ::std::os::raw::c_int,
-        cy: ::std::os::raw::c_int,
-        flags: UINT,
-    ) -> HANDLE;
+    pub fn CopyImage(h: HANDLE, type_: UINT, cx: ::std::os::raw::c_int, cy: ::std::os::raw::c_int, flags: UINT) -> HANDLE;
 }
 extern "C" {
     pub fn DrawIconEx(
@@ -43895,8 +40035,7 @@ extern "C" {
 extern "C" {
     pub fn GetIconInfoExW(hicon: HICON, piconinfo: PICONINFOEXW) -> BOOL;
 }
-pub const EDIT_CONTROL_FEATURE_EDIT_CONTROL_FEATURE_ENTERPRISE_DATA_PROTECTION_PASTE_SUPPORT:
-    EDIT_CONTROL_FEATURE = 0;
+pub const EDIT_CONTROL_FEATURE_EDIT_CONTROL_FEATURE_ENTERPRISE_DATA_PROTECTION_PASTE_SUPPORT: EDIT_CONTROL_FEATURE = 0;
 pub const EDIT_CONTROL_FEATURE_EDIT_CONTROL_FEATURE_PASTE_NOTIFICATIONS: EDIT_CONTROL_FEATURE = 1;
 pub type EDIT_CONTROL_FEATURE = ::std::os::raw::c_int;
 extern "C" {
@@ -43927,20 +40066,10 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn DlgDirSelectExA(
-        hwndDlg: HWND,
-        lpString: LPSTR,
-        chCount: ::std::os::raw::c_int,
-        idListBox: ::std::os::raw::c_int,
-    ) -> BOOL;
+    pub fn DlgDirSelectExA(hwndDlg: HWND, lpString: LPSTR, chCount: ::std::os::raw::c_int, idListBox: ::std::os::raw::c_int) -> BOOL;
 }
 extern "C" {
-    pub fn DlgDirSelectExW(
-        hwndDlg: HWND,
-        lpString: LPWSTR,
-        chCount: ::std::os::raw::c_int,
-        idListBox: ::std::os::raw::c_int,
-    ) -> BOOL;
+    pub fn DlgDirSelectExW(hwndDlg: HWND, lpString: LPWSTR, chCount: ::std::os::raw::c_int, idListBox: ::std::os::raw::c_int) -> BOOL;
 }
 extern "C" {
     pub fn DlgDirListComboBoxA(
@@ -43961,20 +40090,10 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn DlgDirSelectComboBoxExA(
-        hwndDlg: HWND,
-        lpString: LPSTR,
-        cchOut: ::std::os::raw::c_int,
-        idComboBox: ::std::os::raw::c_int,
-    ) -> BOOL;
+    pub fn DlgDirSelectComboBoxExA(hwndDlg: HWND, lpString: LPSTR, cchOut: ::std::os::raw::c_int, idComboBox: ::std::os::raw::c_int) -> BOOL;
 }
 extern "C" {
-    pub fn DlgDirSelectComboBoxExW(
-        hwndDlg: HWND,
-        lpString: LPWSTR,
-        cchOut: ::std::os::raw::c_int,
-        idComboBox: ::std::os::raw::c_int,
-    ) -> BOOL;
+    pub fn DlgDirSelectComboBoxExW(hwndDlg: HWND, lpString: LPWSTR, cchOut: ::std::os::raw::c_int, idComboBox: ::std::os::raw::c_int) -> BOOL;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -43991,12 +40110,7 @@ pub type SCROLLINFO = tagSCROLLINFO;
 pub type LPSCROLLINFO = *mut tagSCROLLINFO;
 pub type LPCSCROLLINFO = *const SCROLLINFO;
 extern "C" {
-    pub fn SetScrollInfo(
-        hwnd: HWND,
-        nBar: ::std::os::raw::c_int,
-        lpsi: LPCSCROLLINFO,
-        redraw: BOOL,
-    ) -> ::std::os::raw::c_int;
+    pub fn SetScrollInfo(hwnd: HWND, nBar: ::std::os::raw::c_int, lpsi: LPCSCROLLINFO, redraw: BOOL) -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn GetScrollInfo(hwnd: HWND, nBar: ::std::os::raw::c_int, lpsi: LPSCROLLINFO) -> BOOL;
@@ -44042,22 +40156,10 @@ pub struct tagCLIENTCREATESTRUCT {
 pub type CLIENTCREATESTRUCT = tagCLIENTCREATESTRUCT;
 pub type LPCLIENTCREATESTRUCT = *mut tagCLIENTCREATESTRUCT;
 extern "C" {
-    pub fn DefFrameProcA(
-        hWnd: HWND,
-        hWndMDIClient: HWND,
-        uMsg: UINT,
-        wParam: WPARAM,
-        lParam: LPARAM,
-    ) -> LRESULT;
+    pub fn DefFrameProcA(hWnd: HWND, hWndMDIClient: HWND, uMsg: UINT, wParam: WPARAM, lParam: LPARAM) -> LRESULT;
 }
 extern "C" {
-    pub fn DefFrameProcW(
-        hWnd: HWND,
-        hWndMDIClient: HWND,
-        uMsg: UINT,
-        wParam: WPARAM,
-        lParam: LPARAM,
-    ) -> LRESULT;
+    pub fn DefFrameProcW(hWnd: HWND, hWndMDIClient: HWND, uMsg: UINT, wParam: WPARAM, lParam: LPARAM) -> LRESULT;
 }
 extern "C" {
     pub fn DefMDIChildProcA(hWnd: HWND, uMsg: UINT, wParam: WPARAM, lParam: LPARAM) -> LRESULT;
@@ -44100,22 +40202,10 @@ extern "C" {
     ) -> HWND;
 }
 extern "C" {
-    pub fn TileWindows(
-        hwndParent: HWND,
-        wHow: UINT,
-        lpRect: *const RECT,
-        cKids: UINT,
-        lpKids: *const HWND,
-    ) -> WORD;
+    pub fn TileWindows(hwndParent: HWND, wHow: UINT, lpRect: *const RECT, cKids: UINT, lpKids: *const HWND) -> WORD;
 }
 extern "C" {
-    pub fn CascadeWindows(
-        hwndParent: HWND,
-        wHow: UINT,
-        lpRect: *const RECT,
-        cKids: UINT,
-        lpKids: *const HWND,
-    ) -> WORD;
+    pub fn CascadeWindows(hwndParent: HWND, wHow: UINT, lpRect: *const RECT, cKids: UINT, lpKids: *const HWND) -> WORD;
 }
 pub type HELPPOLY = DWORD;
 #[repr(C)]
@@ -44377,75 +40467,31 @@ extern "C" {
     pub fn ChangeDisplaySettingsW(lpDevMode: *mut DEVMODEW, dwFlags: DWORD) -> LONG;
 }
 extern "C" {
-    pub fn ChangeDisplaySettingsExA(
-        lpszDeviceName: LPCSTR,
-        lpDevMode: *mut DEVMODEA,
-        hwnd: HWND,
-        dwflags: DWORD,
-        lParam: LPVOID,
-    ) -> LONG;
+    pub fn ChangeDisplaySettingsExA(lpszDeviceName: LPCSTR, lpDevMode: *mut DEVMODEA, hwnd: HWND, dwflags: DWORD, lParam: LPVOID) -> LONG;
 }
 extern "C" {
-    pub fn ChangeDisplaySettingsExW(
-        lpszDeviceName: LPCWSTR,
-        lpDevMode: *mut DEVMODEW,
-        hwnd: HWND,
-        dwflags: DWORD,
-        lParam: LPVOID,
-    ) -> LONG;
+    pub fn ChangeDisplaySettingsExW(lpszDeviceName: LPCWSTR, lpDevMode: *mut DEVMODEW, hwnd: HWND, dwflags: DWORD, lParam: LPVOID) -> LONG;
 }
 extern "C" {
-    pub fn EnumDisplaySettingsA(
-        lpszDeviceName: LPCSTR,
-        iModeNum: DWORD,
-        lpDevMode: *mut DEVMODEA,
-    ) -> BOOL;
+    pub fn EnumDisplaySettingsA(lpszDeviceName: LPCSTR, iModeNum: DWORD, lpDevMode: *mut DEVMODEA) -> BOOL;
 }
 extern "C" {
-    pub fn EnumDisplaySettingsW(
-        lpszDeviceName: LPCWSTR,
-        iModeNum: DWORD,
-        lpDevMode: *mut DEVMODEW,
-    ) -> BOOL;
+    pub fn EnumDisplaySettingsW(lpszDeviceName: LPCWSTR, iModeNum: DWORD, lpDevMode: *mut DEVMODEW) -> BOOL;
 }
 extern "C" {
-    pub fn EnumDisplaySettingsExA(
-        lpszDeviceName: LPCSTR,
-        iModeNum: DWORD,
-        lpDevMode: *mut DEVMODEA,
-        dwFlags: DWORD,
-    ) -> BOOL;
+    pub fn EnumDisplaySettingsExA(lpszDeviceName: LPCSTR, iModeNum: DWORD, lpDevMode: *mut DEVMODEA, dwFlags: DWORD) -> BOOL;
 }
 extern "C" {
-    pub fn EnumDisplaySettingsExW(
-        lpszDeviceName: LPCWSTR,
-        iModeNum: DWORD,
-        lpDevMode: *mut DEVMODEW,
-        dwFlags: DWORD,
-    ) -> BOOL;
+    pub fn EnumDisplaySettingsExW(lpszDeviceName: LPCWSTR, iModeNum: DWORD, lpDevMode: *mut DEVMODEW, dwFlags: DWORD) -> BOOL;
 }
 extern "C" {
-    pub fn EnumDisplayDevicesA(
-        lpDevice: LPCSTR,
-        iDevNum: DWORD,
-        lpDisplayDevice: PDISPLAY_DEVICEA,
-        dwFlags: DWORD,
-    ) -> BOOL;
+    pub fn EnumDisplayDevicesA(lpDevice: LPCSTR, iDevNum: DWORD, lpDisplayDevice: PDISPLAY_DEVICEA, dwFlags: DWORD) -> BOOL;
 }
 extern "C" {
-    pub fn EnumDisplayDevicesW(
-        lpDevice: LPCWSTR,
-        iDevNum: DWORD,
-        lpDisplayDevice: PDISPLAY_DEVICEW,
-        dwFlags: DWORD,
-    ) -> BOOL;
+    pub fn EnumDisplayDevicesW(lpDevice: LPCWSTR, iDevNum: DWORD, lpDisplayDevice: PDISPLAY_DEVICEW, dwFlags: DWORD) -> BOOL;
 }
 extern "C" {
-    pub fn GetDisplayConfigBufferSizes(
-        flags: UINT32,
-        numPathArrayElements: *mut UINT32,
-        numModeInfoArrayElements: *mut UINT32,
-    ) -> LONG;
+    pub fn GetDisplayConfigBufferSizes(flags: UINT32, numPathArrayElements: *mut UINT32, numModeInfoArrayElements: *mut UINT32) -> LONG;
 }
 extern "C" {
     pub fn SetDisplayConfig(
@@ -44467,36 +40513,19 @@ extern "C" {
     ) -> LONG;
 }
 extern "C" {
-    pub fn DisplayConfigGetDeviceInfo(requestPacket: *mut DISPLAYCONFIG_DEVICE_INFO_HEADER)
-        -> LONG;
+    pub fn DisplayConfigGetDeviceInfo(requestPacket: *mut DISPLAYCONFIG_DEVICE_INFO_HEADER) -> LONG;
 }
 extern "C" {
     pub fn DisplayConfigSetDeviceInfo(setPacket: *mut DISPLAYCONFIG_DEVICE_INFO_HEADER) -> LONG;
 }
 extern "C" {
-    pub fn SystemParametersInfoA(
-        uiAction: UINT,
-        uiParam: UINT,
-        pvParam: PVOID,
-        fWinIni: UINT,
-    ) -> BOOL;
+    pub fn SystemParametersInfoA(uiAction: UINT, uiParam: UINT, pvParam: PVOID, fWinIni: UINT) -> BOOL;
 }
 extern "C" {
-    pub fn SystemParametersInfoW(
-        uiAction: UINT,
-        uiParam: UINT,
-        pvParam: PVOID,
-        fWinIni: UINT,
-    ) -> BOOL;
+    pub fn SystemParametersInfoW(uiAction: UINT, uiParam: UINT, pvParam: PVOID, fWinIni: UINT) -> BOOL;
 }
 extern "C" {
-    pub fn SystemParametersInfoForDpi(
-        uiAction: UINT,
-        uiParam: UINT,
-        pvParam: PVOID,
-        fWinIni: UINT,
-        dpi: UINT,
-    ) -> BOOL;
+    pub fn SystemParametersInfoForDpi(uiAction: UINT, uiParam: UINT, pvParam: PVOID, fWinIni: UINT, dpi: UINT) -> BOOL;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -44605,11 +40634,7 @@ extern "C" {
     pub fn SetLastErrorEx(dwErrCode: DWORD, dwType: DWORD);
 }
 extern "C" {
-    pub fn InternalGetWindowText(
-        hWnd: HWND,
-        pString: LPWSTR,
-        cchMaxCount: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int;
+    pub fn InternalGetWindowText(hWnd: HWND, pString: LPWSTR, cchMaxCount: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn CancelShutdown() -> BOOL;
@@ -44659,28 +40684,15 @@ extern "C" {
 extern "C" {
     pub fn GetMonitorInfoW(hMonitor: HMONITOR, lpmi: LPMONITORINFO) -> BOOL;
 }
-pub type MONITORENUMPROC =
-    unsafe extern "C" fn(arg1: HMONITOR, arg2: HDC, arg3: LPRECT, arg4: LPARAM) -> BOOL;
+pub type MONITORENUMPROC = unsafe extern "C" fn(arg1: HMONITOR, arg2: HDC, arg3: LPRECT, arg4: LPARAM) -> BOOL;
 extern "C" {
-    pub fn EnumDisplayMonitors(
-        hdc: HDC,
-        lprcClip: LPCRECT,
-        lpfnEnum: MONITORENUMPROC,
-        dwData: LPARAM,
-    ) -> BOOL;
+    pub fn EnumDisplayMonitors(hdc: HDC, lprcClip: LPCRECT, lpfnEnum: MONITORENUMPROC, dwData: LPARAM) -> BOOL;
 }
 extern "C" {
     pub fn NotifyWinEvent(event: DWORD, hwnd: HWND, idObject: LONG, idChild: LONG);
 }
-pub type WINEVENTPROC = unsafe extern "C" fn(
-    hWinEventHook: HWINEVENTHOOK,
-    event: DWORD,
-    hwnd: HWND,
-    idObject: LONG,
-    idChild: LONG,
-    idEventThread: DWORD,
-    dwmsEventTime: DWORD,
-);
+pub type WINEVENTPROC =
+    unsafe extern "C" fn(hWinEventHook: HWINEVENTHOOK, event: DWORD, hwnd: HWND, idObject: LONG, idChild: LONG, idEventThread: DWORD, dwmsEventTime: DWORD);
 extern "C" {
     pub fn SetWinEventHook(
         eventMin: DWORD,
@@ -44727,8 +40739,7 @@ extern "C" {
     pub fn IsProcessDPIAware() -> BOOL;
 }
 extern "C" {
-    pub fn SetThreadDpiAwarenessContext(dpiContext: DPI_AWARENESS_CONTEXT)
-        -> DPI_AWARENESS_CONTEXT;
+    pub fn SetThreadDpiAwarenessContext(dpiContext: DPI_AWARENESS_CONTEXT) -> DPI_AWARENESS_CONTEXT;
 }
 extern "C" {
     pub fn GetThreadDpiAwarenessContext() -> DPI_AWARENESS_CONTEXT;
@@ -44743,10 +40754,7 @@ extern "C" {
     pub fn GetDpiFromDpiAwarenessContext(value: DPI_AWARENESS_CONTEXT) -> UINT;
 }
 extern "C" {
-    pub fn AreDpiAwarenessContextsEqual(
-        dpiContextA: DPI_AWARENESS_CONTEXT,
-        dpiContextB: DPI_AWARENESS_CONTEXT,
-    ) -> BOOL;
+    pub fn AreDpiAwarenessContextsEqual(dpiContextA: DPI_AWARENESS_CONTEXT, dpiContextB: DPI_AWARENESS_CONTEXT) -> BOOL;
 }
 extern "C" {
     pub fn IsValidDpiAwarenessContext(value: DPI_AWARENESS_CONTEXT) -> BOOL;
@@ -44891,11 +40899,7 @@ impl tagMENUBARINFO {
         }
     }
     #[inline]
-    pub fn new_bitfield_1(
-        fBarFocused: BOOL,
-        fFocused: BOOL,
-        fUnused: BOOL,
-    ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
+    pub fn new_bitfield_1(fBarFocused: BOOL, fFocused: BOOL, fUnused: BOOL) -> __BindgenBitfieldUnit<[u8; 4usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
             let fBarFocused: u32 = unsafe { ::std::mem::transmute(fBarFocused) };
@@ -44981,22 +40985,10 @@ pub type ALTTABINFO = tagALTTABINFO;
 pub type PALTTABINFO = *mut tagALTTABINFO;
 pub type LPALTTABINFO = *mut tagALTTABINFO;
 extern "C" {
-    pub fn GetAltTabInfoA(
-        hwnd: HWND,
-        iItem: ::std::os::raw::c_int,
-        pati: PALTTABINFO,
-        pszItemText: LPSTR,
-        cchItemText: UINT,
-    ) -> BOOL;
+    pub fn GetAltTabInfoA(hwnd: HWND, iItem: ::std::os::raw::c_int, pati: PALTTABINFO, pszItemText: LPSTR, cchItemText: UINT) -> BOOL;
 }
 extern "C" {
-    pub fn GetAltTabInfoW(
-        hwnd: HWND,
-        iItem: ::std::os::raw::c_int,
-        pati: PALTTABINFO,
-        pszItemText: LPWSTR,
-        cchItemText: UINT,
-    ) -> BOOL;
+    pub fn GetAltTabInfoW(hwnd: HWND, iItem: ::std::os::raw::c_int, pati: PALTTABINFO, pszItemText: LPWSTR, cchItemText: UINT) -> BOOL;
 }
 extern "C" {
     pub fn GetListBoxInfo(hwnd: HWND) -> DWORD;
@@ -45089,13 +41081,7 @@ pub type RAWINPUT = tagRAWINPUT;
 pub type PRAWINPUT = *mut tagRAWINPUT;
 pub type LPRAWINPUT = *mut tagRAWINPUT;
 extern "C" {
-    pub fn GetRawInputData(
-        hRawInput: HRAWINPUT,
-        uiCommand: UINT,
-        pData: LPVOID,
-        pcbSize: PUINT,
-        cbSizeHeader: UINT,
-    ) -> UINT;
+    pub fn GetRawInputData(hRawInput: HRAWINPUT, uiCommand: UINT, pData: LPVOID, pcbSize: PUINT, cbSizeHeader: UINT) -> UINT;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -45148,20 +41134,10 @@ pub type RID_DEVICE_INFO = tagRID_DEVICE_INFO;
 pub type PRID_DEVICE_INFO = *mut tagRID_DEVICE_INFO;
 pub type LPRID_DEVICE_INFO = *mut tagRID_DEVICE_INFO;
 extern "C" {
-    pub fn GetRawInputDeviceInfoA(
-        hDevice: HANDLE,
-        uiCommand: UINT,
-        pData: LPVOID,
-        pcbSize: PUINT,
-    ) -> UINT;
+    pub fn GetRawInputDeviceInfoA(hDevice: HANDLE, uiCommand: UINT, pData: LPVOID, pcbSize: PUINT) -> UINT;
 }
 extern "C" {
-    pub fn GetRawInputDeviceInfoW(
-        hDevice: HANDLE,
-        uiCommand: UINT,
-        pData: LPVOID,
-        pcbSize: PUINT,
-    ) -> UINT;
+    pub fn GetRawInputDeviceInfoW(hDevice: HANDLE, uiCommand: UINT, pData: LPVOID, pcbSize: PUINT) -> UINT;
 }
 extern "C" {
     pub fn GetRawInputBuffer(pData: PRAWINPUT, pcbSize: PUINT, cbSizeHeader: UINT) -> UINT;
@@ -45179,18 +41155,10 @@ pub type PRAWINPUTDEVICE = *mut tagRAWINPUTDEVICE;
 pub type LPRAWINPUTDEVICE = *mut tagRAWINPUTDEVICE;
 pub type PCRAWINPUTDEVICE = *const RAWINPUTDEVICE;
 extern "C" {
-    pub fn RegisterRawInputDevices(
-        pRawInputDevices: PCRAWINPUTDEVICE,
-        uiNumDevices: UINT,
-        cbSize: UINT,
-    ) -> BOOL;
+    pub fn RegisterRawInputDevices(pRawInputDevices: PCRAWINPUTDEVICE, uiNumDevices: UINT, cbSize: UINT) -> BOOL;
 }
 extern "C" {
-    pub fn GetRegisteredRawInputDevices(
-        pRawInputDevices: PRAWINPUTDEVICE,
-        puiNumDevices: PUINT,
-        cbSize: UINT,
-    ) -> UINT;
+    pub fn GetRegisteredRawInputDevices(pRawInputDevices: PRAWINPUTDEVICE, puiNumDevices: PUINT, cbSize: UINT) -> UINT;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -45201,11 +41169,7 @@ pub struct tagRAWINPUTDEVICELIST {
 pub type RAWINPUTDEVICELIST = tagRAWINPUTDEVICELIST;
 pub type PRAWINPUTDEVICELIST = *mut tagRAWINPUTDEVICELIST;
 extern "C" {
-    pub fn GetRawInputDeviceList(
-        pRawInputDeviceList: PRAWINPUTDEVICELIST,
-        puiNumDevices: PUINT,
-        cbSize: UINT,
-    ) -> UINT;
+    pub fn GetRawInputDeviceList(pRawInputDeviceList: PRAWINPUTDEVICELIST, puiNumDevices: PUINT, cbSize: UINT) -> UINT;
 }
 extern "C" {
     pub fn DefRawInputProc(paRawInput: *mut PRAWINPUT, nInput: INT, cbSizeHeader: UINT) -> LRESULT;
@@ -45242,14 +41206,10 @@ pub struct tagPOINTER_DEVICE_PROPERTY {
     pub usageId: USHORT,
 }
 pub type POINTER_DEVICE_PROPERTY = tagPOINTER_DEVICE_PROPERTY;
-pub const tagPOINTER_DEVICE_CURSOR_TYPE_POINTER_DEVICE_CURSOR_TYPE_UNKNOWN:
-    tagPOINTER_DEVICE_CURSOR_TYPE = 0;
-pub const tagPOINTER_DEVICE_CURSOR_TYPE_POINTER_DEVICE_CURSOR_TYPE_TIP:
-    tagPOINTER_DEVICE_CURSOR_TYPE = 1;
-pub const tagPOINTER_DEVICE_CURSOR_TYPE_POINTER_DEVICE_CURSOR_TYPE_ERASER:
-    tagPOINTER_DEVICE_CURSOR_TYPE = 2;
-pub const tagPOINTER_DEVICE_CURSOR_TYPE_POINTER_DEVICE_CURSOR_TYPE_MAX:
-    tagPOINTER_DEVICE_CURSOR_TYPE = -1;
+pub const tagPOINTER_DEVICE_CURSOR_TYPE_POINTER_DEVICE_CURSOR_TYPE_UNKNOWN: tagPOINTER_DEVICE_CURSOR_TYPE = 0;
+pub const tagPOINTER_DEVICE_CURSOR_TYPE_POINTER_DEVICE_CURSOR_TYPE_TIP: tagPOINTER_DEVICE_CURSOR_TYPE = 1;
+pub const tagPOINTER_DEVICE_CURSOR_TYPE_POINTER_DEVICE_CURSOR_TYPE_ERASER: tagPOINTER_DEVICE_CURSOR_TYPE = 2;
+pub const tagPOINTER_DEVICE_CURSOR_TYPE_POINTER_DEVICE_CURSOR_TYPE_MAX: tagPOINTER_DEVICE_CURSOR_TYPE = -1;
 pub type tagPOINTER_DEVICE_CURSOR_TYPE = ::std::os::raw::c_int;
 pub use self::tagPOINTER_DEVICE_CURSOR_TYPE as POINTER_DEVICE_CURSOR_TYPE;
 #[repr(C)]
@@ -45260,37 +41220,22 @@ pub struct tagPOINTER_DEVICE_CURSOR_INFO {
 }
 pub type POINTER_DEVICE_CURSOR_INFO = tagPOINTER_DEVICE_CURSOR_INFO;
 extern "C" {
-    pub fn GetPointerDevices(
-        deviceCount: *mut UINT32,
-        pointerDevices: *mut POINTER_DEVICE_INFO,
-    ) -> BOOL;
+    pub fn GetPointerDevices(deviceCount: *mut UINT32, pointerDevices: *mut POINTER_DEVICE_INFO) -> BOOL;
 }
 extern "C" {
     pub fn GetPointerDevice(device: HANDLE, pointerDevice: *mut POINTER_DEVICE_INFO) -> BOOL;
 }
 extern "C" {
-    pub fn GetPointerDeviceProperties(
-        device: HANDLE,
-        propertyCount: *mut UINT32,
-        pointerProperties: *mut POINTER_DEVICE_PROPERTY,
-    ) -> BOOL;
+    pub fn GetPointerDeviceProperties(device: HANDLE, propertyCount: *mut UINT32, pointerProperties: *mut POINTER_DEVICE_PROPERTY) -> BOOL;
 }
 extern "C" {
     pub fn RegisterPointerDeviceNotifications(window: HWND, notifyRange: BOOL) -> BOOL;
 }
 extern "C" {
-    pub fn GetPointerDeviceRects(
-        device: HANDLE,
-        pointerDeviceRect: *mut RECT,
-        displayRect: *mut RECT,
-    ) -> BOOL;
+    pub fn GetPointerDeviceRects(device: HANDLE, pointerDeviceRect: *mut RECT, displayRect: *mut RECT) -> BOOL;
 }
 extern "C" {
-    pub fn GetPointerDeviceCursors(
-        device: HANDLE,
-        cursorCount: *mut UINT32,
-        deviceCursors: *mut POINTER_DEVICE_CURSOR_INFO,
-    ) -> BOOL;
+    pub fn GetPointerDeviceCursors(device: HANDLE, cursorCount: *mut UINT32, deviceCursors: *mut POINTER_DEVICE_CURSOR_INFO) -> BOOL;
 }
 extern "C" {
     pub fn GetRawPointerDeviceData(
@@ -45313,12 +41258,7 @@ pub struct tagCHANGEFILTERSTRUCT {
 pub type CHANGEFILTERSTRUCT = tagCHANGEFILTERSTRUCT;
 pub type PCHANGEFILTERSTRUCT = *mut tagCHANGEFILTERSTRUCT;
 extern "C" {
-    pub fn ChangeWindowMessageFilterEx(
-        hwnd: HWND,
-        message: UINT,
-        action: DWORD,
-        pChangeFilterStruct: PCHANGEFILTERSTRUCT,
-    ) -> BOOL;
+    pub fn ChangeWindowMessageFilterEx(hwnd: HWND, message: UINT, action: DWORD, pChangeFilterStruct: PCHANGEFILTERSTRUCT) -> BOOL;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -45357,11 +41297,7 @@ extern "C" {
     pub fn GetGestureInfo(hGestureInfo: HGESTUREINFO, pGestureInfo: PGESTUREINFO) -> BOOL;
 }
 extern "C" {
-    pub fn GetGestureExtraArgs(
-        hGestureInfo: HGESTUREINFO,
-        cbExtraArgs: UINT,
-        pExtraArgs: PBYTE,
-    ) -> BOOL;
+    pub fn GetGestureExtraArgs(hGestureInfo: HGESTUREINFO, cbExtraArgs: UINT, pExtraArgs: PBYTE) -> BOOL;
 }
 extern "C" {
     pub fn CloseGestureInfoHandle(hGestureInfo: HGESTUREINFO) -> BOOL;
@@ -45376,23 +41312,10 @@ pub struct tagGESTURECONFIG {
 pub type GESTURECONFIG = tagGESTURECONFIG;
 pub type PGESTURECONFIG = *mut tagGESTURECONFIG;
 extern "C" {
-    pub fn SetGestureConfig(
-        hwnd: HWND,
-        dwReserved: DWORD,
-        cIDs: UINT,
-        pGestureConfig: PGESTURECONFIG,
-        cbSize: UINT,
-    ) -> BOOL;
+    pub fn SetGestureConfig(hwnd: HWND, dwReserved: DWORD, cIDs: UINT, pGestureConfig: PGESTURECONFIG, cbSize: UINT) -> BOOL;
 }
 extern "C" {
-    pub fn GetGestureConfig(
-        hwnd: HWND,
-        dwReserved: DWORD,
-        dwFlags: DWORD,
-        pcIDs: PUINT,
-        pGestureConfig: PGESTURECONFIG,
-        cbSize: UINT,
-    ) -> BOOL;
+    pub fn GetGestureConfig(hwnd: HWND, dwReserved: DWORD, dwFlags: DWORD, pcIDs: PUINT, pGestureConfig: PGESTURECONFIG, cbSize: UINT) -> BOOL;
 }
 extern "C" {
     pub fn ShutdownBlockReasonCreate(hWnd: HWND, pwszReason: LPCWSTR) -> BOOL;
@@ -45445,10 +41368,8 @@ pub type PAR_STATE = *mut tagAR_STATE;
 pub const ORIENTATION_PREFERENCE_ORIENTATION_PREFERENCE_NONE: ORIENTATION_PREFERENCE = 0;
 pub const ORIENTATION_PREFERENCE_ORIENTATION_PREFERENCE_LANDSCAPE: ORIENTATION_PREFERENCE = 1;
 pub const ORIENTATION_PREFERENCE_ORIENTATION_PREFERENCE_PORTRAIT: ORIENTATION_PREFERENCE = 2;
-pub const ORIENTATION_PREFERENCE_ORIENTATION_PREFERENCE_LANDSCAPE_FLIPPED: ORIENTATION_PREFERENCE =
-    4;
-pub const ORIENTATION_PREFERENCE_ORIENTATION_PREFERENCE_PORTRAIT_FLIPPED: ORIENTATION_PREFERENCE =
-    8;
+pub const ORIENTATION_PREFERENCE_ORIENTATION_PREFERENCE_LANDSCAPE_FLIPPED: ORIENTATION_PREFERENCE = 4;
+pub const ORIENTATION_PREFERENCE_ORIENTATION_PREFERENCE_PORTRAIT_FLIPPED: ORIENTATION_PREFERENCE = 8;
 pub type ORIENTATION_PREFERENCE = ::std::os::raw::c_int;
 extern "C" {
     pub fn GetAutoRotationState(pState: PAR_STATE) -> BOOL;
@@ -45457,11 +41378,7 @@ extern "C" {
     pub fn GetDisplayAutoRotationPreferences(pOrientation: *mut ORIENTATION_PREFERENCE) -> BOOL;
 }
 extern "C" {
-    pub fn GetDisplayAutoRotationPreferencesByProcessId(
-        dwProcessId: DWORD,
-        pOrientation: *mut ORIENTATION_PREFERENCE,
-        fRotateScreen: *mut BOOL,
-    ) -> BOOL;
+    pub fn GetDisplayAutoRotationPreferencesByProcessId(dwProcessId: DWORD, pOrientation: *mut ORIENTATION_PREFERENCE, fRotateScreen: *mut BOOL) -> BOOL;
 }
 extern "C" {
     pub fn SetDisplayAutoRotationPreferences(orientation: ORIENTATION_PREFERENCE) -> BOOL;
@@ -45699,15 +41616,8 @@ pub const _NORM_FORM_NormalizationKC: _NORM_FORM = 5;
 pub const _NORM_FORM_NormalizationKD: _NORM_FORM = 6;
 pub type _NORM_FORM = ::std::os::raw::c_int;
 pub use self::_NORM_FORM as NORM_FORM;
-pub type LANGUAGEGROUP_ENUMPROCA = unsafe extern "C" fn(
-    arg1: LGRPID,
-    arg2: LPSTR,
-    arg3: LPSTR,
-    arg4: DWORD,
-    arg5: LONG_PTR,
-) -> BOOL;
-pub type LANGGROUPLOCALE_ENUMPROCA =
-    unsafe extern "C" fn(arg1: LGRPID, arg2: LCID, arg3: LPSTR, arg4: LONG_PTR) -> BOOL;
+pub type LANGUAGEGROUP_ENUMPROCA = unsafe extern "C" fn(arg1: LGRPID, arg2: LPSTR, arg3: LPSTR, arg4: DWORD, arg5: LONG_PTR) -> BOOL;
+pub type LANGGROUPLOCALE_ENUMPROCA = unsafe extern "C" fn(arg1: LGRPID, arg2: LCID, arg3: LPSTR, arg4: LONG_PTR) -> BOOL;
 pub type UILANGUAGE_ENUMPROCA = unsafe extern "C" fn(arg1: LPSTR, arg2: LONG_PTR) -> BOOL;
 pub type CODEPAGE_ENUMPROCA = unsafe extern "C" fn(arg1: LPSTR) -> BOOL;
 pub type DATEFMT_ENUMPROCA = unsafe extern "C" fn(arg1: LPSTR) -> BOOL;
@@ -45715,15 +41625,8 @@ pub type DATEFMT_ENUMPROCEXA = unsafe extern "C" fn(arg1: LPSTR, arg2: CALID) ->
 pub type TIMEFMT_ENUMPROCA = unsafe extern "C" fn(arg1: LPSTR) -> BOOL;
 pub type CALINFO_ENUMPROCA = unsafe extern "C" fn(arg1: LPSTR) -> BOOL;
 pub type CALINFO_ENUMPROCEXA = unsafe extern "C" fn(arg1: LPSTR, arg2: CALID) -> BOOL;
-pub type LANGUAGEGROUP_ENUMPROCW = unsafe extern "C" fn(
-    arg1: LGRPID,
-    arg2: LPWSTR,
-    arg3: LPWSTR,
-    arg4: DWORD,
-    arg5: LONG_PTR,
-) -> BOOL;
-pub type LANGGROUPLOCALE_ENUMPROCW =
-    unsafe extern "C" fn(arg1: LGRPID, arg2: LCID, arg3: LPWSTR, arg4: LONG_PTR) -> BOOL;
+pub type LANGUAGEGROUP_ENUMPROCW = unsafe extern "C" fn(arg1: LGRPID, arg2: LPWSTR, arg3: LPWSTR, arg4: DWORD, arg5: LONG_PTR) -> BOOL;
+pub type LANGGROUPLOCALE_ENUMPROCW = unsafe extern "C" fn(arg1: LGRPID, arg2: LCID, arg3: LPWSTR, arg4: LONG_PTR) -> BOOL;
 pub type UILANGUAGE_ENUMPROCW = unsafe extern "C" fn(arg1: LPWSTR, arg2: LONG_PTR) -> BOOL;
 pub type CODEPAGE_ENUMPROCW = unsafe extern "C" fn(arg1: LPWSTR) -> BOOL;
 pub type DATEFMT_ENUMPROCW = unsafe extern "C" fn(arg1: LPWSTR) -> BOOL;
@@ -45794,21 +41697,10 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn GetStringTypeExW(
-        Locale: LCID,
-        dwInfoType: DWORD,
-        lpSrcStr: LPCWCH,
-        cchSrc: ::std::os::raw::c_int,
-        lpCharType: LPWORD,
-    ) -> BOOL;
+    pub fn GetStringTypeExW(Locale: LCID, dwInfoType: DWORD, lpSrcStr: LPCWCH, cchSrc: ::std::os::raw::c_int, lpCharType: LPWORD) -> BOOL;
 }
 extern "C" {
-    pub fn GetStringTypeW(
-        dwInfoType: DWORD,
-        lpSrcStr: LPCWCH,
-        cchSrc: ::std::os::raw::c_int,
-        lpCharType: LPWORD,
-    ) -> BOOL;
+    pub fn GetStringTypeW(dwInfoType: DWORD, lpSrcStr: LPCWCH, cchSrc: ::std::os::raw::c_int, lpCharType: LPWORD) -> BOOL;
 }
 extern "C" {
     pub fn MultiByteToWideChar(
@@ -45892,20 +41784,10 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn GetLocaleInfoW(
-        Locale: LCID,
-        LCType: LCTYPE,
-        lpLCData: LPWSTR,
-        cchData: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int;
+    pub fn GetLocaleInfoW(Locale: LCID, LCType: LCTYPE, lpLCData: LPWSTR, cchData: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn GetLocaleInfoA(
-        Locale: LCID,
-        LCType: LCTYPE,
-        lpLCData: LPSTR,
-        cchData: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int;
+    pub fn GetLocaleInfoA(Locale: LCID, LCType: LCTYPE, lpLCData: LPSTR, cchData: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn SetLocaleInfoA(Locale: LCID, LCType: LCTYPE, lpLCData: LPCSTR) -> BOOL;
@@ -45934,20 +41816,10 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn SetCalendarInfoA(
-        Locale: LCID,
-        Calendar: CALID,
-        CalType: CALTYPE,
-        lpCalData: LPCSTR,
-    ) -> BOOL;
+    pub fn SetCalendarInfoA(Locale: LCID, Calendar: CALID, CalType: CALTYPE, lpCalData: LPCSTR) -> BOOL;
 }
 extern "C" {
-    pub fn SetCalendarInfoW(
-        Locale: LCID,
-        Calendar: CALID,
-        CalType: CALTYPE,
-        lpCalData: LPCWSTR,
-    ) -> BOOL;
+    pub fn SetCalendarInfoW(Locale: LCID, Calendar: CALID, CalType: CALTYPE, lpCalData: LPCWSTR) -> BOOL;
 }
 extern "C" {
     pub fn LoadStringByReference(
@@ -45970,12 +41842,7 @@ extern "C" {
     pub fn LocaleNameToLCID(lpName: LPCWSTR, dwFlags: DWORD) -> LCID;
 }
 extern "C" {
-    pub fn LCIDToLocaleName(
-        Locale: LCID,
-        lpName: LPWSTR,
-        cchName: ::std::os::raw::c_int,
-        dwFlags: DWORD,
-    ) -> ::std::os::raw::c_int;
+    pub fn LCIDToLocaleName(Locale: LCID, lpName: LPWSTR, cchName: ::std::os::raw::c_int, dwFlags: DWORD) -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn GetDurationFormat(
@@ -46029,140 +41896,64 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn EnumCalendarInfoA(
-        lpCalInfoEnumProc: CALINFO_ENUMPROCA,
-        Locale: LCID,
-        Calendar: CALID,
-        CalType: CALTYPE,
-    ) -> BOOL;
+    pub fn EnumCalendarInfoA(lpCalInfoEnumProc: CALINFO_ENUMPROCA, Locale: LCID, Calendar: CALID, CalType: CALTYPE) -> BOOL;
 }
 extern "C" {
-    pub fn EnumCalendarInfoW(
-        lpCalInfoEnumProc: CALINFO_ENUMPROCW,
-        Locale: LCID,
-        Calendar: CALID,
-        CalType: CALTYPE,
-    ) -> BOOL;
+    pub fn EnumCalendarInfoW(lpCalInfoEnumProc: CALINFO_ENUMPROCW, Locale: LCID, Calendar: CALID, CalType: CALTYPE) -> BOOL;
 }
 extern "C" {
-    pub fn EnumCalendarInfoExA(
-        lpCalInfoEnumProcEx: CALINFO_ENUMPROCEXA,
-        Locale: LCID,
-        Calendar: CALID,
-        CalType: CALTYPE,
-    ) -> BOOL;
+    pub fn EnumCalendarInfoExA(lpCalInfoEnumProcEx: CALINFO_ENUMPROCEXA, Locale: LCID, Calendar: CALID, CalType: CALTYPE) -> BOOL;
 }
 extern "C" {
-    pub fn EnumCalendarInfoExW(
-        lpCalInfoEnumProcEx: CALINFO_ENUMPROCEXW,
-        Locale: LCID,
-        Calendar: CALID,
-        CalType: CALTYPE,
-    ) -> BOOL;
+    pub fn EnumCalendarInfoExW(lpCalInfoEnumProcEx: CALINFO_ENUMPROCEXW, Locale: LCID, Calendar: CALID, CalType: CALTYPE) -> BOOL;
 }
 extern "C" {
-    pub fn EnumTimeFormatsA(
-        lpTimeFmtEnumProc: TIMEFMT_ENUMPROCA,
-        Locale: LCID,
-        dwFlags: DWORD,
-    ) -> BOOL;
+    pub fn EnumTimeFormatsA(lpTimeFmtEnumProc: TIMEFMT_ENUMPROCA, Locale: LCID, dwFlags: DWORD) -> BOOL;
 }
 extern "C" {
-    pub fn EnumTimeFormatsW(
-        lpTimeFmtEnumProc: TIMEFMT_ENUMPROCW,
-        Locale: LCID,
-        dwFlags: DWORD,
-    ) -> BOOL;
+    pub fn EnumTimeFormatsW(lpTimeFmtEnumProc: TIMEFMT_ENUMPROCW, Locale: LCID, dwFlags: DWORD) -> BOOL;
 }
 extern "C" {
-    pub fn EnumDateFormatsA(
-        lpDateFmtEnumProc: DATEFMT_ENUMPROCA,
-        Locale: LCID,
-        dwFlags: DWORD,
-    ) -> BOOL;
+    pub fn EnumDateFormatsA(lpDateFmtEnumProc: DATEFMT_ENUMPROCA, Locale: LCID, dwFlags: DWORD) -> BOOL;
 }
 extern "C" {
-    pub fn EnumDateFormatsW(
-        lpDateFmtEnumProc: DATEFMT_ENUMPROCW,
-        Locale: LCID,
-        dwFlags: DWORD,
-    ) -> BOOL;
+    pub fn EnumDateFormatsW(lpDateFmtEnumProc: DATEFMT_ENUMPROCW, Locale: LCID, dwFlags: DWORD) -> BOOL;
 }
 extern "C" {
-    pub fn EnumDateFormatsExA(
-        lpDateFmtEnumProcEx: DATEFMT_ENUMPROCEXA,
-        Locale: LCID,
-        dwFlags: DWORD,
-    ) -> BOOL;
+    pub fn EnumDateFormatsExA(lpDateFmtEnumProcEx: DATEFMT_ENUMPROCEXA, Locale: LCID, dwFlags: DWORD) -> BOOL;
 }
 extern "C" {
-    pub fn EnumDateFormatsExW(
-        lpDateFmtEnumProcEx: DATEFMT_ENUMPROCEXW,
-        Locale: LCID,
-        dwFlags: DWORD,
-    ) -> BOOL;
+    pub fn EnumDateFormatsExW(lpDateFmtEnumProcEx: DATEFMT_ENUMPROCEXW, Locale: LCID, dwFlags: DWORD) -> BOOL;
 }
 extern "C" {
     pub fn IsValidLanguageGroup(LanguageGroup: LGRPID, dwFlags: DWORD) -> BOOL;
 }
 extern "C" {
-    pub fn GetNLSVersion(
-        Function: NLS_FUNCTION,
-        Locale: LCID,
-        lpVersionInformation: LPNLSVERSIONINFO,
-    ) -> BOOL;
+    pub fn GetNLSVersion(Function: NLS_FUNCTION, Locale: LCID, lpVersionInformation: LPNLSVERSIONINFO) -> BOOL;
 }
 extern "C" {
     pub fn IsValidLocale(Locale: LCID, dwFlags: DWORD) -> BOOL;
 }
 extern "C" {
-    pub fn GetGeoInfoA(
-        Location: GEOID,
-        GeoType: GEOTYPE,
-        lpGeoData: LPSTR,
-        cchData: ::std::os::raw::c_int,
-        LangId: LANGID,
-    ) -> ::std::os::raw::c_int;
+    pub fn GetGeoInfoA(Location: GEOID, GeoType: GEOTYPE, lpGeoData: LPSTR, cchData: ::std::os::raw::c_int, LangId: LANGID) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn GetGeoInfoW(
-        Location: GEOID,
-        GeoType: GEOTYPE,
-        lpGeoData: LPWSTR,
-        cchData: ::std::os::raw::c_int,
-        LangId: LANGID,
-    ) -> ::std::os::raw::c_int;
+    pub fn GetGeoInfoW(Location: GEOID, GeoType: GEOTYPE, lpGeoData: LPWSTR, cchData: ::std::os::raw::c_int, LangId: LANGID) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn GetGeoInfoEx(
-        location: PWSTR,
-        geoType: GEOTYPE,
-        geoData: PWSTR,
-        geoDataCount: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int;
+    pub fn GetGeoInfoEx(location: PWSTR, geoType: GEOTYPE, geoData: PWSTR, geoDataCount: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn EnumSystemGeoID(
-        GeoClass: GEOCLASS,
-        ParentGeoId: GEOID,
-        lpGeoEnumProc: GEO_ENUMPROC,
-    ) -> BOOL;
+    pub fn EnumSystemGeoID(GeoClass: GEOCLASS, ParentGeoId: GEOID, lpGeoEnumProc: GEO_ENUMPROC) -> BOOL;
 }
 extern "C" {
-    pub fn EnumSystemGeoNames(
-        geoClass: GEOCLASS,
-        geoEnumProc: GEO_ENUMNAMEPROC,
-        data: LPARAM,
-    ) -> BOOL;
+    pub fn EnumSystemGeoNames(geoClass: GEOCLASS, geoEnumProc: GEO_ENUMNAMEPROC, data: LPARAM) -> BOOL;
 }
 extern "C" {
     pub fn GetUserGeoID(GeoClass: GEOCLASS) -> GEOID;
 }
 extern "C" {
-    pub fn GetUserDefaultGeoName(
-        geoName: LPWSTR,
-        geoNameCount: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int;
+    pub fn GetUserDefaultGeoName(geoName: LPWSTR, geoNameCount: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn SetUserGeoID(GeoId: GEOID) -> BOOL;
@@ -46204,58 +41995,25 @@ extern "C" {
     pub fn GetThreadUILanguage() -> LANGID;
 }
 extern "C" {
-    pub fn GetProcessPreferredUILanguages(
-        dwFlags: DWORD,
-        pulNumLanguages: PULONG,
-        pwszLanguagesBuffer: PZZWSTR,
-        pcchLanguagesBuffer: PULONG,
-    ) -> BOOL;
+    pub fn GetProcessPreferredUILanguages(dwFlags: DWORD, pulNumLanguages: PULONG, pwszLanguagesBuffer: PZZWSTR, pcchLanguagesBuffer: PULONG) -> BOOL;
 }
 extern "C" {
-    pub fn SetProcessPreferredUILanguages(
-        dwFlags: DWORD,
-        pwszLanguagesBuffer: PCZZWSTR,
-        pulNumLanguages: PULONG,
-    ) -> BOOL;
+    pub fn SetProcessPreferredUILanguages(dwFlags: DWORD, pwszLanguagesBuffer: PCZZWSTR, pulNumLanguages: PULONG) -> BOOL;
 }
 extern "C" {
-    pub fn GetUserPreferredUILanguages(
-        dwFlags: DWORD,
-        pulNumLanguages: PULONG,
-        pwszLanguagesBuffer: PZZWSTR,
-        pcchLanguagesBuffer: PULONG,
-    ) -> BOOL;
+    pub fn GetUserPreferredUILanguages(dwFlags: DWORD, pulNumLanguages: PULONG, pwszLanguagesBuffer: PZZWSTR, pcchLanguagesBuffer: PULONG) -> BOOL;
 }
 extern "C" {
-    pub fn GetSystemPreferredUILanguages(
-        dwFlags: DWORD,
-        pulNumLanguages: PULONG,
-        pwszLanguagesBuffer: PZZWSTR,
-        pcchLanguagesBuffer: PULONG,
-    ) -> BOOL;
+    pub fn GetSystemPreferredUILanguages(dwFlags: DWORD, pulNumLanguages: PULONG, pwszLanguagesBuffer: PZZWSTR, pcchLanguagesBuffer: PULONG) -> BOOL;
 }
 extern "C" {
-    pub fn GetThreadPreferredUILanguages(
-        dwFlags: DWORD,
-        pulNumLanguages: PULONG,
-        pwszLanguagesBuffer: PZZWSTR,
-        pcchLanguagesBuffer: PULONG,
-    ) -> BOOL;
+    pub fn GetThreadPreferredUILanguages(dwFlags: DWORD, pulNumLanguages: PULONG, pwszLanguagesBuffer: PZZWSTR, pcchLanguagesBuffer: PULONG) -> BOOL;
 }
 extern "C" {
-    pub fn SetThreadPreferredUILanguages(
-        dwFlags: DWORD,
-        pwszLanguagesBuffer: PCZZWSTR,
-        pulNumLanguages: PULONG,
-    ) -> BOOL;
+    pub fn SetThreadPreferredUILanguages(dwFlags: DWORD, pwszLanguagesBuffer: PCZZWSTR, pulNumLanguages: PULONG) -> BOOL;
 }
 extern "C" {
-    pub fn GetFileMUIInfo(
-        dwFlags: DWORD,
-        pcwszFilePath: PCWSTR,
-        pFileMUIInfo: PFILEMUIINFO,
-        pcbFileMUIInfo: *mut DWORD,
-    ) -> BOOL;
+    pub fn GetFileMUIInfo(dwFlags: DWORD, pcwszFilePath: PCWSTR, pFileMUIInfo: PFILEMUIINFO, pcbFileMUIInfo: *mut DWORD) -> BOOL;
 }
 extern "C" {
     pub fn GetFileMUIPath(
@@ -46284,42 +42042,19 @@ pub struct HSAVEDUILANGUAGES__ {
 }
 pub type HSAVEDUILANGUAGES = *mut HSAVEDUILANGUAGES__;
 extern "C" {
-    pub fn SetThreadPreferredUILanguages2(
-        flags: ULONG,
-        languages: PCZZWSTR,
-        numLanguagesSet: PULONG,
-        snapshot: *mut HSAVEDUILANGUAGES,
-    ) -> BOOL;
+    pub fn SetThreadPreferredUILanguages2(flags: ULONG, languages: PCZZWSTR, numLanguagesSet: PULONG, snapshot: *mut HSAVEDUILANGUAGES) -> BOOL;
 }
 extern "C" {
     pub fn RestoreThreadPreferredUILanguages(snapshot: HSAVEDUILANGUAGES);
 }
 extern "C" {
-    pub fn NotifyUILanguageChange(
-        dwFlags: DWORD,
-        pcwstrNewLanguage: PCWSTR,
-        pcwstrPreviousLanguage: PCWSTR,
-        dwReserved: DWORD,
-        pdwStatusRtrn: PDWORD,
-    ) -> BOOL;
+    pub fn NotifyUILanguageChange(dwFlags: DWORD, pcwstrNewLanguage: PCWSTR, pcwstrPreviousLanguage: PCWSTR, dwReserved: DWORD, pdwStatusRtrn: PDWORD) -> BOOL;
 }
 extern "C" {
-    pub fn GetStringTypeExA(
-        Locale: LCID,
-        dwInfoType: DWORD,
-        lpSrcStr: LPCSTR,
-        cchSrc: ::std::os::raw::c_int,
-        lpCharType: LPWORD,
-    ) -> BOOL;
+    pub fn GetStringTypeExA(Locale: LCID, dwInfoType: DWORD, lpSrcStr: LPCSTR, cchSrc: ::std::os::raw::c_int, lpCharType: LPWORD) -> BOOL;
 }
 extern "C" {
-    pub fn GetStringTypeA(
-        Locale: LCID,
-        dwInfoType: DWORD,
-        lpSrcStr: LPCSTR,
-        cchSrc: ::std::os::raw::c_int,
-        lpCharType: LPWORD,
-    ) -> BOOL;
+    pub fn GetStringTypeA(Locale: LCID, dwInfoType: DWORD, lpSrcStr: LPCSTR, cchSrc: ::std::os::raw::c_int, lpCharType: LPWORD) -> BOOL;
 }
 extern "C" {
     pub fn FoldStringA(
@@ -46337,48 +42072,22 @@ extern "C" {
     pub fn EnumSystemLocalesW(lpLocaleEnumProc: LOCALE_ENUMPROCW, dwFlags: DWORD) -> BOOL;
 }
 extern "C" {
-    pub fn EnumSystemLanguageGroupsA(
-        lpLanguageGroupEnumProc: LANGUAGEGROUP_ENUMPROCA,
-        dwFlags: DWORD,
-        lParam: LONG_PTR,
-    ) -> BOOL;
+    pub fn EnumSystemLanguageGroupsA(lpLanguageGroupEnumProc: LANGUAGEGROUP_ENUMPROCA, dwFlags: DWORD, lParam: LONG_PTR) -> BOOL;
 }
 extern "C" {
-    pub fn EnumSystemLanguageGroupsW(
-        lpLanguageGroupEnumProc: LANGUAGEGROUP_ENUMPROCW,
-        dwFlags: DWORD,
-        lParam: LONG_PTR,
-    ) -> BOOL;
+    pub fn EnumSystemLanguageGroupsW(lpLanguageGroupEnumProc: LANGUAGEGROUP_ENUMPROCW, dwFlags: DWORD, lParam: LONG_PTR) -> BOOL;
 }
 extern "C" {
-    pub fn EnumLanguageGroupLocalesA(
-        lpLangGroupLocaleEnumProc: LANGGROUPLOCALE_ENUMPROCA,
-        LanguageGroup: LGRPID,
-        dwFlags: DWORD,
-        lParam: LONG_PTR,
-    ) -> BOOL;
+    pub fn EnumLanguageGroupLocalesA(lpLangGroupLocaleEnumProc: LANGGROUPLOCALE_ENUMPROCA, LanguageGroup: LGRPID, dwFlags: DWORD, lParam: LONG_PTR) -> BOOL;
 }
 extern "C" {
-    pub fn EnumLanguageGroupLocalesW(
-        lpLangGroupLocaleEnumProc: LANGGROUPLOCALE_ENUMPROCW,
-        LanguageGroup: LGRPID,
-        dwFlags: DWORD,
-        lParam: LONG_PTR,
-    ) -> BOOL;
+    pub fn EnumLanguageGroupLocalesW(lpLangGroupLocaleEnumProc: LANGGROUPLOCALE_ENUMPROCW, LanguageGroup: LGRPID, dwFlags: DWORD, lParam: LONG_PTR) -> BOOL;
 }
 extern "C" {
-    pub fn EnumUILanguagesA(
-        lpUILanguageEnumProc: UILANGUAGE_ENUMPROCA,
-        dwFlags: DWORD,
-        lParam: LONG_PTR,
-    ) -> BOOL;
+    pub fn EnumUILanguagesA(lpUILanguageEnumProc: UILANGUAGE_ENUMPROCA, dwFlags: DWORD, lParam: LONG_PTR) -> BOOL;
 }
 extern "C" {
-    pub fn EnumUILanguagesW(
-        lpUILanguageEnumProc: UILANGUAGE_ENUMPROCW,
-        dwFlags: DWORD,
-        lParam: LONG_PTR,
-    ) -> BOOL;
+    pub fn EnumUILanguagesW(lpUILanguageEnumProc: UILANGUAGE_ENUMPROCW, dwFlags: DWORD, lParam: LONG_PTR) -> BOOL;
 }
 extern "C" {
     pub fn EnumSystemCodePagesA(lpCodePageEnumProc: CODEPAGE_ENUMPROCA, dwFlags: DWORD) -> BOOL;
@@ -46423,11 +42132,7 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn IsNormalizedString(
-        NormForm: NORM_FORM,
-        lpString: LPCWSTR,
-        cwLength: ::std::os::raw::c_int,
-    ) -> BOOL;
+    pub fn IsNormalizedString(NormForm: NORM_FORM, lpString: LPCWSTR, cwLength: ::std::os::raw::c_int) -> BOOL;
 }
 extern "C" {
     pub fn VerifyScripts(
@@ -46448,12 +42153,7 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn GetLocaleInfoEx(
-        lpLocaleName: LPCWSTR,
-        LCType: LCTYPE,
-        lpLCData: LPWSTR,
-        cchData: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int;
+    pub fn GetLocaleInfoEx(lpLocaleName: LPCWSTR, LCType: LCTYPE, lpLCData: LPWSTR, cchData: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn GetCalendarInfoEx(
@@ -46487,39 +42187,19 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn GetUserDefaultLocaleName(
-        lpLocaleName: LPWSTR,
-        cchLocaleName: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int;
+    pub fn GetUserDefaultLocaleName(lpLocaleName: LPWSTR, cchLocaleName: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn GetSystemDefaultLocaleName(
-        lpLocaleName: LPWSTR,
-        cchLocaleName: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int;
+    pub fn GetSystemDefaultLocaleName(lpLocaleName: LPWSTR, cchLocaleName: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn IsNLSDefinedString(
-        Function: NLS_FUNCTION,
-        dwFlags: DWORD,
-        lpVersionInformation: LPNLSVERSIONINFO,
-        lpString: LPCWSTR,
-        cchStr: INT,
-    ) -> BOOL;
+    pub fn IsNLSDefinedString(Function: NLS_FUNCTION, dwFlags: DWORD, lpVersionInformation: LPNLSVERSIONINFO, lpString: LPCWSTR, cchStr: INT) -> BOOL;
 }
 extern "C" {
-    pub fn GetNLSVersionEx(
-        function: NLS_FUNCTION,
-        lpLocaleName: LPCWSTR,
-        lpVersionInformation: LPNLSVERSIONINFOEX,
-    ) -> BOOL;
+    pub fn GetNLSVersionEx(function: NLS_FUNCTION, lpLocaleName: LPCWSTR, lpVersionInformation: LPNLSVERSIONINFOEX) -> BOOL;
 }
 extern "C" {
-    pub fn IsValidNLSVersion(
-        function: NLS_FUNCTION,
-        lpLocaleName: LPCWSTR,
-        lpVersionInformation: LPNLSVERSIONINFOEX,
-    ) -> DWORD;
+    pub fn IsValidNLSVersion(function: NLS_FUNCTION, lpLocaleName: LPCWSTR, lpVersionInformation: LPNLSVERSIONINFOEX) -> DWORD;
 }
 extern "C" {
     pub fn FindNLSStringEx(
@@ -46551,8 +42231,7 @@ extern "C" {
 extern "C" {
     pub fn IsValidLocaleName(lpLocaleName: LPCWSTR) -> BOOL;
 }
-pub type CALINFO_ENUMPROCEXEX =
-    unsafe extern "C" fn(arg1: LPWSTR, arg2: CALID, arg3: LPWSTR, arg4: LPARAM) -> BOOL;
+pub type CALINFO_ENUMPROCEXEX = unsafe extern "C" fn(arg1: LPWSTR, arg2: CALID, arg3: LPWSTR, arg4: LPARAM) -> BOOL;
 extern "C" {
     pub fn EnumCalendarInfoExEx(
         pCalInfoEnumProcExEx: CALINFO_ENUMPROCEXEX,
@@ -46563,40 +42242,20 @@ extern "C" {
         lParam: LPARAM,
     ) -> BOOL;
 }
-pub type DATEFMT_ENUMPROCEXEX =
-    unsafe extern "C" fn(arg1: LPWSTR, arg2: CALID, arg3: LPARAM) -> BOOL;
+pub type DATEFMT_ENUMPROCEXEX = unsafe extern "C" fn(arg1: LPWSTR, arg2: CALID, arg3: LPARAM) -> BOOL;
 extern "C" {
-    pub fn EnumDateFormatsExEx(
-        lpDateFmtEnumProcExEx: DATEFMT_ENUMPROCEXEX,
-        lpLocaleName: LPCWSTR,
-        dwFlags: DWORD,
-        lParam: LPARAM,
-    ) -> BOOL;
+    pub fn EnumDateFormatsExEx(lpDateFmtEnumProcExEx: DATEFMT_ENUMPROCEXEX, lpLocaleName: LPCWSTR, dwFlags: DWORD, lParam: LPARAM) -> BOOL;
 }
 pub type TIMEFMT_ENUMPROCEX = unsafe extern "C" fn(arg1: LPWSTR, arg2: LPARAM) -> BOOL;
 extern "C" {
-    pub fn EnumTimeFormatsEx(
-        lpTimeFmtEnumProcEx: TIMEFMT_ENUMPROCEX,
-        lpLocaleName: LPCWSTR,
-        dwFlags: DWORD,
-        lParam: LPARAM,
-    ) -> BOOL;
+    pub fn EnumTimeFormatsEx(lpTimeFmtEnumProcEx: TIMEFMT_ENUMPROCEX, lpLocaleName: LPCWSTR, dwFlags: DWORD, lParam: LPARAM) -> BOOL;
 }
 pub type LOCALE_ENUMPROCEX = unsafe extern "C" fn(arg1: LPWSTR, arg2: DWORD, arg3: LPARAM) -> BOOL;
 extern "C" {
-    pub fn EnumSystemLocalesEx(
-        lpLocaleEnumProcEx: LOCALE_ENUMPROCEX,
-        dwFlags: DWORD,
-        lParam: LPARAM,
-        lpReserved: LPVOID,
-    ) -> BOOL;
+    pub fn EnumSystemLocalesEx(lpLocaleEnumProcEx: LOCALE_ENUMPROCEX, dwFlags: DWORD, lParam: LPARAM, lpReserved: LPVOID) -> BOOL;
 }
 extern "C" {
-    pub fn ResolveLocaleName(
-        lpNameToResolve: LPCWSTR,
-        lpLocaleName: LPWSTR,
-        cchLocaleName: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int;
+    pub fn ResolveLocaleName(lpNameToResolve: LPCWSTR, lpLocaleName: LPWSTR, cchLocaleName: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -46730,36 +42389,16 @@ extern "C" {
     pub fn GetNumberOfConsoleInputEvents(hConsoleInput: HANDLE, lpNumberOfEvents: LPDWORD) -> BOOL;
 }
 extern "C" {
-    pub fn ReadConsoleInputA(
-        hConsoleInput: HANDLE,
-        lpBuffer: PINPUT_RECORD,
-        nLength: DWORD,
-        lpNumberOfEventsRead: LPDWORD,
-    ) -> BOOL;
+    pub fn ReadConsoleInputA(hConsoleInput: HANDLE, lpBuffer: PINPUT_RECORD, nLength: DWORD, lpNumberOfEventsRead: LPDWORD) -> BOOL;
 }
 extern "C" {
-    pub fn ReadConsoleInputW(
-        hConsoleInput: HANDLE,
-        lpBuffer: PINPUT_RECORD,
-        nLength: DWORD,
-        lpNumberOfEventsRead: LPDWORD,
-    ) -> BOOL;
+    pub fn ReadConsoleInputW(hConsoleInput: HANDLE, lpBuffer: PINPUT_RECORD, nLength: DWORD, lpNumberOfEventsRead: LPDWORD) -> BOOL;
 }
 extern "C" {
-    pub fn PeekConsoleInputA(
-        hConsoleInput: HANDLE,
-        lpBuffer: PINPUT_RECORD,
-        nLength: DWORD,
-        lpNumberOfEventsRead: LPDWORD,
-    ) -> BOOL;
+    pub fn PeekConsoleInputA(hConsoleInput: HANDLE, lpBuffer: PINPUT_RECORD, nLength: DWORD, lpNumberOfEventsRead: LPDWORD) -> BOOL;
 }
 extern "C" {
-    pub fn PeekConsoleInputW(
-        hConsoleInput: HANDLE,
-        lpBuffer: PINPUT_RECORD,
-        nLength: DWORD,
-        lpNumberOfEventsRead: LPDWORD,
-    ) -> BOOL;
+    pub fn PeekConsoleInputW(hConsoleInput: HANDLE, lpBuffer: PINPUT_RECORD, nLength: DWORD, lpNumberOfEventsRead: LPDWORD) -> BOOL;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -46812,13 +42451,7 @@ extern "C" {
     pub fn SetConsoleCtrlHandler(HandlerRoutine: PHANDLER_ROUTINE, Add: BOOL) -> BOOL;
 }
 extern "C" {
-    pub fn CreatePseudoConsole(
-        size: COORD,
-        hInput: HANDLE,
-        hOutput: HANDLE,
-        dwFlags: DWORD,
-        phPC: *mut HPCON,
-    ) -> HRESULT;
+    pub fn CreatePseudoConsole(size: COORD, hInput: HANDLE, hOutput: HANDLE, dwFlags: DWORD, phPC: *mut HPCON) -> HRESULT;
 }
 extern "C" {
     pub fn ResizePseudoConsole(hPC: HPCON, size: COORD) -> HRESULT;
@@ -46827,31 +42460,14 @@ extern "C" {
     pub fn ClosePseudoConsole(hPC: HPCON);
 }
 extern "C" {
-    pub fn FillConsoleOutputCharacterA(
-        hConsoleOutput: HANDLE,
-        cCharacter: CHAR,
-        nLength: DWORD,
-        dwWriteCoord: COORD,
-        lpNumberOfCharsWritten: LPDWORD,
-    ) -> BOOL;
+    pub fn FillConsoleOutputCharacterA(hConsoleOutput: HANDLE, cCharacter: CHAR, nLength: DWORD, dwWriteCoord: COORD, lpNumberOfCharsWritten: LPDWORD) -> BOOL;
 }
 extern "C" {
-    pub fn FillConsoleOutputCharacterW(
-        hConsoleOutput: HANDLE,
-        cCharacter: WCHAR,
-        nLength: DWORD,
-        dwWriteCoord: COORD,
-        lpNumberOfCharsWritten: LPDWORD,
-    ) -> BOOL;
+    pub fn FillConsoleOutputCharacterW(hConsoleOutput: HANDLE, cCharacter: WCHAR, nLength: DWORD, dwWriteCoord: COORD, lpNumberOfCharsWritten: LPDWORD)
+        -> BOOL;
 }
 extern "C" {
-    pub fn FillConsoleOutputAttribute(
-        hConsoleOutput: HANDLE,
-        wAttribute: WORD,
-        nLength: DWORD,
-        dwWriteCoord: COORD,
-        lpNumberOfAttrsWritten: LPDWORD,
-    ) -> BOOL;
+    pub fn FillConsoleOutputAttribute(hConsoleOutput: HANDLE, wAttribute: WORD, nLength: DWORD, dwWriteCoord: COORD, lpNumberOfAttrsWritten: LPDWORD) -> BOOL;
 }
 extern "C" {
     pub fn GenerateConsoleCtrlEvent(dwCtrlEvent: DWORD, dwProcessGroupId: DWORD) -> BOOL;
@@ -46886,16 +42502,10 @@ pub struct _CONSOLE_CURSOR_INFO {
 pub type CONSOLE_CURSOR_INFO = _CONSOLE_CURSOR_INFO;
 pub type PCONSOLE_CURSOR_INFO = *mut _CONSOLE_CURSOR_INFO;
 extern "C" {
-    pub fn GetConsoleCursorInfo(
-        hConsoleOutput: HANDLE,
-        lpConsoleCursorInfo: PCONSOLE_CURSOR_INFO,
-    ) -> BOOL;
+    pub fn GetConsoleCursorInfo(hConsoleOutput: HANDLE, lpConsoleCursorInfo: PCONSOLE_CURSOR_INFO) -> BOOL;
 }
 extern "C" {
-    pub fn SetConsoleCursorInfo(
-        hConsoleOutput: HANDLE,
-        lpConsoleCursorInfo: *const CONSOLE_CURSOR_INFO,
-    ) -> BOOL;
+    pub fn SetConsoleCursorInfo(hConsoleOutput: HANDLE, lpConsoleCursorInfo: *const CONSOLE_CURSOR_INFO) -> BOOL;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -46909,10 +42519,7 @@ pub struct _CONSOLE_SCREEN_BUFFER_INFO {
 pub type CONSOLE_SCREEN_BUFFER_INFO = _CONSOLE_SCREEN_BUFFER_INFO;
 pub type PCONSOLE_SCREEN_BUFFER_INFO = *mut _CONSOLE_SCREEN_BUFFER_INFO;
 extern "C" {
-    pub fn GetConsoleScreenBufferInfo(
-        hConsoleOutput: HANDLE,
-        lpConsoleScreenBufferInfo: PCONSOLE_SCREEN_BUFFER_INFO,
-    ) -> BOOL;
+    pub fn GetConsoleScreenBufferInfo(hConsoleOutput: HANDLE, lpConsoleScreenBufferInfo: PCONSOLE_SCREEN_BUFFER_INFO) -> BOOL;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -46930,16 +42537,10 @@ pub struct _CONSOLE_SCREEN_BUFFER_INFOEX {
 pub type CONSOLE_SCREEN_BUFFER_INFOEX = _CONSOLE_SCREEN_BUFFER_INFOEX;
 pub type PCONSOLE_SCREEN_BUFFER_INFOEX = *mut _CONSOLE_SCREEN_BUFFER_INFOEX;
 extern "C" {
-    pub fn GetConsoleScreenBufferInfoEx(
-        hConsoleOutput: HANDLE,
-        lpConsoleScreenBufferInfoEx: PCONSOLE_SCREEN_BUFFER_INFOEX,
-    ) -> BOOL;
+    pub fn GetConsoleScreenBufferInfoEx(hConsoleOutput: HANDLE, lpConsoleScreenBufferInfoEx: PCONSOLE_SCREEN_BUFFER_INFOEX) -> BOOL;
 }
 extern "C" {
-    pub fn SetConsoleScreenBufferInfoEx(
-        hConsoleOutput: HANDLE,
-        lpConsoleScreenBufferInfoEx: PCONSOLE_SCREEN_BUFFER_INFOEX,
-    ) -> BOOL;
+    pub fn SetConsoleScreenBufferInfoEx(hConsoleOutput: HANDLE, lpConsoleScreenBufferInfoEx: PCONSOLE_SCREEN_BUFFER_INFOEX) -> BOOL;
 }
 extern "C" {
     pub fn SetConsoleScreenBufferSize(hConsoleOutput: HANDLE, dwSize: COORD) -> BOOL;
@@ -46954,11 +42555,7 @@ extern "C" {
     pub fn SetConsoleTextAttribute(hConsoleOutput: HANDLE, wAttributes: WORD) -> BOOL;
 }
 extern "C" {
-    pub fn SetConsoleWindowInfo(
-        hConsoleOutput: HANDLE,
-        bAbsolute: BOOL,
-        lpConsoleWindow: *const SMALL_RECT,
-    ) -> BOOL;
+    pub fn SetConsoleWindowInfo(hConsoleOutput: HANDLE, bAbsolute: BOOL, lpConsoleWindow: *const SMALL_RECT) -> BOOL;
 }
 extern "C" {
     pub fn WriteConsoleOutputCharacterA(
@@ -46988,47 +42585,19 @@ extern "C" {
     ) -> BOOL;
 }
 extern "C" {
-    pub fn ReadConsoleOutputCharacterA(
-        hConsoleOutput: HANDLE,
-        lpCharacter: LPSTR,
-        nLength: DWORD,
-        dwReadCoord: COORD,
-        lpNumberOfCharsRead: LPDWORD,
-    ) -> BOOL;
+    pub fn ReadConsoleOutputCharacterA(hConsoleOutput: HANDLE, lpCharacter: LPSTR, nLength: DWORD, dwReadCoord: COORD, lpNumberOfCharsRead: LPDWORD) -> BOOL;
 }
 extern "C" {
-    pub fn ReadConsoleOutputCharacterW(
-        hConsoleOutput: HANDLE,
-        lpCharacter: LPWSTR,
-        nLength: DWORD,
-        dwReadCoord: COORD,
-        lpNumberOfCharsRead: LPDWORD,
-    ) -> BOOL;
+    pub fn ReadConsoleOutputCharacterW(hConsoleOutput: HANDLE, lpCharacter: LPWSTR, nLength: DWORD, dwReadCoord: COORD, lpNumberOfCharsRead: LPDWORD) -> BOOL;
 }
 extern "C" {
-    pub fn ReadConsoleOutputAttribute(
-        hConsoleOutput: HANDLE,
-        lpAttribute: LPWORD,
-        nLength: DWORD,
-        dwReadCoord: COORD,
-        lpNumberOfAttrsRead: LPDWORD,
-    ) -> BOOL;
+    pub fn ReadConsoleOutputAttribute(hConsoleOutput: HANDLE, lpAttribute: LPWORD, nLength: DWORD, dwReadCoord: COORD, lpNumberOfAttrsRead: LPDWORD) -> BOOL;
 }
 extern "C" {
-    pub fn WriteConsoleInputA(
-        hConsoleInput: HANDLE,
-        lpBuffer: *const INPUT_RECORD,
-        nLength: DWORD,
-        lpNumberOfEventsWritten: LPDWORD,
-    ) -> BOOL;
+    pub fn WriteConsoleInputA(hConsoleInput: HANDLE, lpBuffer: *const INPUT_RECORD, nLength: DWORD, lpNumberOfEventsWritten: LPDWORD) -> BOOL;
 }
 extern "C" {
-    pub fn WriteConsoleInputW(
-        hConsoleInput: HANDLE,
-        lpBuffer: *const INPUT_RECORD,
-        nLength: DWORD,
-        lpNumberOfEventsWritten: LPDWORD,
-    ) -> BOOL;
+    pub fn WriteConsoleInputW(hConsoleInput: HANDLE, lpBuffer: *const INPUT_RECORD, nLength: DWORD, lpNumberOfEventsWritten: LPDWORD) -> BOOL;
 }
 extern "C" {
     pub fn ScrollConsoleScreenBufferA(
@@ -47067,22 +42636,10 @@ extern "C" {
     ) -> BOOL;
 }
 extern "C" {
-    pub fn ReadConsoleOutputA(
-        hConsoleOutput: HANDLE,
-        lpBuffer: PCHAR_INFO,
-        dwBufferSize: COORD,
-        dwBufferCoord: COORD,
-        lpReadRegion: PSMALL_RECT,
-    ) -> BOOL;
+    pub fn ReadConsoleOutputA(hConsoleOutput: HANDLE, lpBuffer: PCHAR_INFO, dwBufferSize: COORD, dwBufferCoord: COORD, lpReadRegion: PSMALL_RECT) -> BOOL;
 }
 extern "C" {
-    pub fn ReadConsoleOutputW(
-        hConsoleOutput: HANDLE,
-        lpBuffer: PCHAR_INFO,
-        dwBufferSize: COORD,
-        dwBufferCoord: COORD,
-        lpReadRegion: PSMALL_RECT,
-    ) -> BOOL;
+    pub fn ReadConsoleOutputW(hConsoleOutput: HANDLE, lpBuffer: PCHAR_INFO, dwBufferSize: COORD, dwBufferCoord: COORD, lpReadRegion: PSMALL_RECT) -> BOOL;
 }
 extern "C" {
     pub fn GetConsoleTitleA(lpConsoleTitle: LPSTR, nSize: DWORD) -> DWORD;
@@ -47109,11 +42666,7 @@ extern "C" {
     pub fn GetConsoleFontSize(hConsoleOutput: HANDLE, nFont: DWORD) -> COORD;
 }
 extern "C" {
-    pub fn GetCurrentConsoleFont(
-        hConsoleOutput: HANDLE,
-        bMaximumWindow: BOOL,
-        lpConsoleCurrentFont: PCONSOLE_FONT_INFO,
-    ) -> BOOL;
+    pub fn GetCurrentConsoleFont(hConsoleOutput: HANDLE, bMaximumWindow: BOOL, lpConsoleCurrentFont: PCONSOLE_FONT_INFO) -> BOOL;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -47128,18 +42681,10 @@ pub struct _CONSOLE_FONT_INFOEX {
 pub type CONSOLE_FONT_INFOEX = _CONSOLE_FONT_INFOEX;
 pub type PCONSOLE_FONT_INFOEX = *mut _CONSOLE_FONT_INFOEX;
 extern "C" {
-    pub fn GetCurrentConsoleFontEx(
-        hConsoleOutput: HANDLE,
-        bMaximumWindow: BOOL,
-        lpConsoleCurrentFontEx: PCONSOLE_FONT_INFOEX,
-    ) -> BOOL;
+    pub fn GetCurrentConsoleFontEx(hConsoleOutput: HANDLE, bMaximumWindow: BOOL, lpConsoleCurrentFontEx: PCONSOLE_FONT_INFOEX) -> BOOL;
 }
 extern "C" {
-    pub fn SetCurrentConsoleFontEx(
-        hConsoleOutput: HANDLE,
-        bMaximumWindow: BOOL,
-        lpConsoleCurrentFontEx: PCONSOLE_FONT_INFOEX,
-    ) -> BOOL;
+    pub fn SetCurrentConsoleFontEx(hConsoleOutput: HANDLE, bMaximumWindow: BOOL, lpConsoleCurrentFontEx: PCONSOLE_FONT_INFOEX) -> BOOL;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -47173,11 +42718,7 @@ extern "C" {
     pub fn GetConsoleDisplayMode(lpModeFlags: LPDWORD) -> BOOL;
 }
 extern "C" {
-    pub fn SetConsoleDisplayMode(
-        hConsoleOutput: HANDLE,
-        dwFlags: DWORD,
-        lpNewScreenBufferDimensions: PCOORD,
-    ) -> BOOL;
+    pub fn SetConsoleDisplayMode(hConsoleOutput: HANDLE, dwFlags: DWORD, lpNewScreenBufferDimensions: PCOORD) -> BOOL;
 }
 extern "C" {
     pub fn GetConsoleWindow() -> HWND;
@@ -47189,20 +42730,10 @@ extern "C" {
     pub fn AddConsoleAliasW(Source: LPWSTR, Target: LPWSTR, ExeName: LPWSTR) -> BOOL;
 }
 extern "C" {
-    pub fn GetConsoleAliasA(
-        Source: LPSTR,
-        TargetBuffer: LPSTR,
-        TargetBufferLength: DWORD,
-        ExeName: LPSTR,
-    ) -> DWORD;
+    pub fn GetConsoleAliasA(Source: LPSTR, TargetBuffer: LPSTR, TargetBufferLength: DWORD, ExeName: LPSTR) -> DWORD;
 }
 extern "C" {
-    pub fn GetConsoleAliasW(
-        Source: LPWSTR,
-        TargetBuffer: LPWSTR,
-        TargetBufferLength: DWORD,
-        ExeName: LPWSTR,
-    ) -> DWORD;
+    pub fn GetConsoleAliasW(Source: LPWSTR, TargetBuffer: LPWSTR, TargetBufferLength: DWORD, ExeName: LPWSTR) -> DWORD;
 }
 extern "C" {
     pub fn GetConsoleAliasesLengthA(ExeName: LPSTR) -> DWORD;
@@ -47217,18 +42748,10 @@ extern "C" {
     pub fn GetConsoleAliasExesLengthW() -> DWORD;
 }
 extern "C" {
-    pub fn GetConsoleAliasesA(
-        AliasBuffer: LPSTR,
-        AliasBufferLength: DWORD,
-        ExeName: LPSTR,
-    ) -> DWORD;
+    pub fn GetConsoleAliasesA(AliasBuffer: LPSTR, AliasBufferLength: DWORD, ExeName: LPSTR) -> DWORD;
 }
 extern "C" {
-    pub fn GetConsoleAliasesW(
-        AliasBuffer: LPWSTR,
-        AliasBufferLength: DWORD,
-        ExeName: LPWSTR,
-    ) -> DWORD;
+    pub fn GetConsoleAliasesW(AliasBuffer: LPWSTR, AliasBufferLength: DWORD, ExeName: LPWSTR) -> DWORD;
 }
 extern "C" {
     pub fn GetConsoleAliasExesA(ExeNameBuffer: LPSTR, ExeNameBufferLength: DWORD) -> DWORD;
@@ -47255,18 +42778,10 @@ extern "C" {
     pub fn GetConsoleCommandHistoryLengthW(ExeName: LPWSTR) -> DWORD;
 }
 extern "C" {
-    pub fn GetConsoleCommandHistoryA(
-        Commands: LPSTR,
-        CommandBufferLength: DWORD,
-        ExeName: LPSTR,
-    ) -> DWORD;
+    pub fn GetConsoleCommandHistoryA(Commands: LPSTR, CommandBufferLength: DWORD, ExeName: LPSTR) -> DWORD;
 }
 extern "C" {
-    pub fn GetConsoleCommandHistoryW(
-        Commands: LPWSTR,
-        CommandBufferLength: DWORD,
-        ExeName: LPWSTR,
-    ) -> DWORD;
+    pub fn GetConsoleCommandHistoryW(Commands: LPWSTR, CommandBufferLength: DWORD, ExeName: LPWSTR) -> DWORD;
 }
 extern "C" {
     pub fn GetConsoleProcessList(lpdwProcessList: LPDWORD, dwProcessCount: DWORD) -> DWORD;
@@ -47344,52 +42859,22 @@ extern "C" {
     pub fn GetFileVersionInfoSizeW(lptstrFilename: LPCWSTR, lpdwHandle: LPDWORD) -> DWORD;
 }
 extern "C" {
-    pub fn GetFileVersionInfoA(
-        lptstrFilename: LPCSTR,
-        dwHandle: DWORD,
-        dwLen: DWORD,
-        lpData: LPVOID,
-    ) -> BOOL;
+    pub fn GetFileVersionInfoA(lptstrFilename: LPCSTR, dwHandle: DWORD, dwLen: DWORD, lpData: LPVOID) -> BOOL;
 }
 extern "C" {
-    pub fn GetFileVersionInfoW(
-        lptstrFilename: LPCWSTR,
-        dwHandle: DWORD,
-        dwLen: DWORD,
-        lpData: LPVOID,
-    ) -> BOOL;
+    pub fn GetFileVersionInfoW(lptstrFilename: LPCWSTR, dwHandle: DWORD, dwLen: DWORD, lpData: LPVOID) -> BOOL;
 }
 extern "C" {
-    pub fn GetFileVersionInfoSizeExA(
-        dwFlags: DWORD,
-        lpwstrFilename: LPCSTR,
-        lpdwHandle: LPDWORD,
-    ) -> DWORD;
+    pub fn GetFileVersionInfoSizeExA(dwFlags: DWORD, lpwstrFilename: LPCSTR, lpdwHandle: LPDWORD) -> DWORD;
 }
 extern "C" {
-    pub fn GetFileVersionInfoSizeExW(
-        dwFlags: DWORD,
-        lpwstrFilename: LPCWSTR,
-        lpdwHandle: LPDWORD,
-    ) -> DWORD;
+    pub fn GetFileVersionInfoSizeExW(dwFlags: DWORD, lpwstrFilename: LPCWSTR, lpdwHandle: LPDWORD) -> DWORD;
 }
 extern "C" {
-    pub fn GetFileVersionInfoExA(
-        dwFlags: DWORD,
-        lpwstrFilename: LPCSTR,
-        dwHandle: DWORD,
-        dwLen: DWORD,
-        lpData: LPVOID,
-    ) -> BOOL;
+    pub fn GetFileVersionInfoExA(dwFlags: DWORD, lpwstrFilename: LPCSTR, dwHandle: DWORD, dwLen: DWORD, lpData: LPVOID) -> BOOL;
 }
 extern "C" {
-    pub fn GetFileVersionInfoExW(
-        dwFlags: DWORD,
-        lpwstrFilename: LPCWSTR,
-        dwHandle: DWORD,
-        dwLen: DWORD,
-        lpData: LPVOID,
-    ) -> BOOL;
+    pub fn GetFileVersionInfoExW(dwFlags: DWORD, lpwstrFilename: LPCWSTR, dwHandle: DWORD, dwLen: DWORD, lpData: LPVOID) -> BOOL;
 }
 extern "C" {
     pub fn VerLanguageNameA(wLang: DWORD, szLang: LPSTR, cchLang: DWORD) -> DWORD;
@@ -47398,20 +42883,10 @@ extern "C" {
     pub fn VerLanguageNameW(wLang: DWORD, szLang: LPWSTR, cchLang: DWORD) -> DWORD;
 }
 extern "C" {
-    pub fn VerQueryValueA(
-        pBlock: LPCVOID,
-        lpSubBlock: LPCSTR,
-        lplpBuffer: *mut LPVOID,
-        puLen: PUINT,
-    ) -> BOOL;
+    pub fn VerQueryValueA(pBlock: LPCVOID, lpSubBlock: LPCSTR, lplpBuffer: *mut LPVOID, puLen: PUINT) -> BOOL;
 }
 extern "C" {
-    pub fn VerQueryValueW(
-        pBlock: LPCVOID,
-        lpSubBlock: LPCWSTR,
-        lplpBuffer: *mut LPVOID,
-        puLen: PUINT,
-    ) -> BOOL;
+    pub fn VerQueryValueW(pBlock: LPCVOID, lpSubBlock: LPCWSTR, lplpBuffer: *mut LPVOID, puLen: PUINT) -> BOOL;
 }
 pub type LSTATUS = LONG;
 pub type REGSAM = ACCESS_MASK;
@@ -47445,14 +42920,7 @@ pub type PVALUEW = pvalueW;
 pub type PPVALUEW = *mut pvalueW;
 pub type PVALUE = PVALUEA;
 pub type PPVALUE = PPVALUEA;
-pub type PQUERYHANDLER = unsafe extern "C" fn(
-    arg1: LPVOID,
-    arg2: PVALCONTEXT,
-    arg3: DWORD,
-    arg4: LPVOID,
-    arg5: *mut DWORD,
-    arg6: DWORD,
-) -> DWORD;
+pub type PQUERYHANDLER = unsafe extern "C" fn(arg1: LPVOID, arg2: PVALCONTEXT, arg3: DWORD, arg4: LPVOID, arg5: *mut DWORD, arg6: DWORD) -> DWORD;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct provider_info {
@@ -47494,12 +42962,7 @@ extern "C" {
     pub fn RegOverridePredefKey(hKey: HKEY, hNewHKey: HKEY) -> LSTATUS;
 }
 extern "C" {
-    pub fn RegOpenUserClassesRoot(
-        hToken: HANDLE,
-        dwOptions: DWORD,
-        samDesired: REGSAM,
-        phkResult: PHKEY,
-    ) -> LSTATUS;
+    pub fn RegOpenUserClassesRoot(hToken: HANDLE, dwOptions: DWORD, samDesired: REGSAM, phkResult: PHKEY) -> LSTATUS;
 }
 extern "C" {
     pub fn RegOpenCurrentUser(samDesired: REGSAM, phkResult: PHKEY) -> LSTATUS;
@@ -47517,20 +42980,10 @@ extern "C" {
     pub fn RegConnectRegistryW(lpMachineName: LPCWSTR, hKey: HKEY, phkResult: PHKEY) -> LSTATUS;
 }
 extern "C" {
-    pub fn RegConnectRegistryExA(
-        lpMachineName: LPCSTR,
-        hKey: HKEY,
-        Flags: ULONG,
-        phkResult: PHKEY,
-    ) -> LSTATUS;
+    pub fn RegConnectRegistryExA(lpMachineName: LPCSTR, hKey: HKEY, Flags: ULONG, phkResult: PHKEY) -> LSTATUS;
 }
 extern "C" {
-    pub fn RegConnectRegistryExW(
-        lpMachineName: LPCWSTR,
-        hKey: HKEY,
-        Flags: ULONG,
-        phkResult: PHKEY,
-    ) -> LSTATUS;
+    pub fn RegConnectRegistryExW(lpMachineName: LPCWSTR, hKey: HKEY, Flags: ULONG, phkResult: PHKEY) -> LSTATUS;
 }
 extern "C" {
     pub fn RegCreateKeyA(hKey: HKEY, lpSubKey: LPCSTR, phkResult: PHKEY) -> LSTATUS;
@@ -47601,20 +43054,10 @@ extern "C" {
     pub fn RegDeleteKeyW(hKey: HKEY, lpSubKey: LPCWSTR) -> LSTATUS;
 }
 extern "C" {
-    pub fn RegDeleteKeyExA(
-        hKey: HKEY,
-        lpSubKey: LPCSTR,
-        samDesired: REGSAM,
-        Reserved: DWORD,
-    ) -> LSTATUS;
+    pub fn RegDeleteKeyExA(hKey: HKEY, lpSubKey: LPCSTR, samDesired: REGSAM, Reserved: DWORD) -> LSTATUS;
 }
 extern "C" {
-    pub fn RegDeleteKeyExW(
-        hKey: HKEY,
-        lpSubKey: LPCWSTR,
-        samDesired: REGSAM,
-        Reserved: DWORD,
-    ) -> LSTATUS;
+    pub fn RegDeleteKeyExW(hKey: HKEY, lpSubKey: LPCWSTR, samDesired: REGSAM, Reserved: DWORD) -> LSTATUS;
 }
 extern "C" {
     pub fn RegDeleteKeyTransactedA(
@@ -47723,13 +43166,7 @@ extern "C" {
     pub fn RegLoadKeyW(hKey: HKEY, lpSubKey: LPCWSTR, lpFile: LPCWSTR) -> LSTATUS;
 }
 extern "C" {
-    pub fn RegNotifyChangeKeyValue(
-        hKey: HKEY,
-        bWatchSubtree: BOOL,
-        dwNotifyFilter: DWORD,
-        hEvent: HANDLE,
-        fAsynchronous: BOOL,
-    ) -> LSTATUS;
+    pub fn RegNotifyChangeKeyValue(hKey: HKEY, bWatchSubtree: BOOL, dwNotifyFilter: DWORD, hEvent: HANDLE, fAsynchronous: BOOL) -> LSTATUS;
 }
 extern "C" {
     pub fn RegOpenKeyA(hKey: HKEY, lpSubKey: LPCSTR, phkResult: PHKEY) -> LSTATUS;
@@ -47738,22 +43175,10 @@ extern "C" {
     pub fn RegOpenKeyW(hKey: HKEY, lpSubKey: LPCWSTR, phkResult: PHKEY) -> LSTATUS;
 }
 extern "C" {
-    pub fn RegOpenKeyExA(
-        hKey: HKEY,
-        lpSubKey: LPCSTR,
-        ulOptions: DWORD,
-        samDesired: REGSAM,
-        phkResult: PHKEY,
-    ) -> LSTATUS;
+    pub fn RegOpenKeyExA(hKey: HKEY, lpSubKey: LPCSTR, ulOptions: DWORD, samDesired: REGSAM, phkResult: PHKEY) -> LSTATUS;
 }
 extern "C" {
-    pub fn RegOpenKeyExW(
-        hKey: HKEY,
-        lpSubKey: LPCWSTR,
-        ulOptions: DWORD,
-        samDesired: REGSAM,
-        phkResult: PHKEY,
-    ) -> LSTATUS;
+    pub fn RegOpenKeyExW(hKey: HKEY, lpSubKey: LPCWSTR, ulOptions: DWORD, samDesired: REGSAM, phkResult: PHKEY) -> LSTATUS;
 }
 extern "C" {
     pub fn RegOpenKeyTransactedA(
@@ -47813,66 +43238,25 @@ extern "C" {
     pub fn RegQueryValueA(hKey: HKEY, lpSubKey: LPCSTR, lpData: LPSTR, lpcbData: PLONG) -> LSTATUS;
 }
 extern "C" {
-    pub fn RegQueryValueW(
-        hKey: HKEY,
-        lpSubKey: LPCWSTR,
-        lpData: LPWSTR,
-        lpcbData: PLONG,
-    ) -> LSTATUS;
+    pub fn RegQueryValueW(hKey: HKEY, lpSubKey: LPCWSTR, lpData: LPWSTR, lpcbData: PLONG) -> LSTATUS;
 }
 extern "C" {
-    pub fn RegQueryMultipleValuesA(
-        hKey: HKEY,
-        val_list: PVALENTA,
-        num_vals: DWORD,
-        lpValueBuf: LPSTR,
-        ldwTotsize: LPDWORD,
-    ) -> LSTATUS;
+    pub fn RegQueryMultipleValuesA(hKey: HKEY, val_list: PVALENTA, num_vals: DWORD, lpValueBuf: LPSTR, ldwTotsize: LPDWORD) -> LSTATUS;
 }
 extern "C" {
-    pub fn RegQueryMultipleValuesW(
-        hKey: HKEY,
-        val_list: PVALENTW,
-        num_vals: DWORD,
-        lpValueBuf: LPWSTR,
-        ldwTotsize: LPDWORD,
-    ) -> LSTATUS;
+    pub fn RegQueryMultipleValuesW(hKey: HKEY, val_list: PVALENTW, num_vals: DWORD, lpValueBuf: LPWSTR, ldwTotsize: LPDWORD) -> LSTATUS;
 }
 extern "C" {
-    pub fn RegQueryValueExA(
-        hKey: HKEY,
-        lpValueName: LPCSTR,
-        lpReserved: LPDWORD,
-        lpType: LPDWORD,
-        lpData: LPBYTE,
-        lpcbData: LPDWORD,
-    ) -> LSTATUS;
+    pub fn RegQueryValueExA(hKey: HKEY, lpValueName: LPCSTR, lpReserved: LPDWORD, lpType: LPDWORD, lpData: LPBYTE, lpcbData: LPDWORD) -> LSTATUS;
 }
 extern "C" {
-    pub fn RegQueryValueExW(
-        hKey: HKEY,
-        lpValueName: LPCWSTR,
-        lpReserved: LPDWORD,
-        lpType: LPDWORD,
-        lpData: LPBYTE,
-        lpcbData: LPDWORD,
-    ) -> LSTATUS;
+    pub fn RegQueryValueExW(hKey: HKEY, lpValueName: LPCWSTR, lpReserved: LPDWORD, lpType: LPDWORD, lpData: LPBYTE, lpcbData: LPDWORD) -> LSTATUS;
 }
 extern "C" {
-    pub fn RegReplaceKeyA(
-        hKey: HKEY,
-        lpSubKey: LPCSTR,
-        lpNewFile: LPCSTR,
-        lpOldFile: LPCSTR,
-    ) -> LSTATUS;
+    pub fn RegReplaceKeyA(hKey: HKEY, lpSubKey: LPCSTR, lpNewFile: LPCSTR, lpOldFile: LPCSTR) -> LSTATUS;
 }
 extern "C" {
-    pub fn RegReplaceKeyW(
-        hKey: HKEY,
-        lpSubKey: LPCWSTR,
-        lpNewFile: LPCWSTR,
-        lpOldFile: LPCWSTR,
-    ) -> LSTATUS;
+    pub fn RegReplaceKeyW(hKey: HKEY, lpSubKey: LPCWSTR, lpNewFile: LPCWSTR, lpOldFile: LPCWSTR) -> LSTATUS;
 }
 extern "C" {
     pub fn RegRestoreKeyA(hKey: HKEY, lpFile: LPCSTR, dwFlags: DWORD) -> LSTATUS;
@@ -47884,63 +43268,25 @@ extern "C" {
     pub fn RegRenameKey(hKey: HKEY, lpSubKeyName: LPCWSTR, lpNewKeyName: LPCWSTR) -> LSTATUS;
 }
 extern "C" {
-    pub fn RegSaveKeyA(
-        hKey: HKEY,
-        lpFile: LPCSTR,
-        lpSecurityAttributes: LPSECURITY_ATTRIBUTES,
-    ) -> LSTATUS;
+    pub fn RegSaveKeyA(hKey: HKEY, lpFile: LPCSTR, lpSecurityAttributes: LPSECURITY_ATTRIBUTES) -> LSTATUS;
 }
 extern "C" {
-    pub fn RegSaveKeyW(
-        hKey: HKEY,
-        lpFile: LPCWSTR,
-        lpSecurityAttributes: LPSECURITY_ATTRIBUTES,
-    ) -> LSTATUS;
+    pub fn RegSaveKeyW(hKey: HKEY, lpFile: LPCWSTR, lpSecurityAttributes: LPSECURITY_ATTRIBUTES) -> LSTATUS;
 }
 extern "C" {
-    pub fn RegSetKeySecurity(
-        hKey: HKEY,
-        SecurityInformation: SECURITY_INFORMATION,
-        pSecurityDescriptor: PSECURITY_DESCRIPTOR,
-    ) -> LSTATUS;
+    pub fn RegSetKeySecurity(hKey: HKEY, SecurityInformation: SECURITY_INFORMATION, pSecurityDescriptor: PSECURITY_DESCRIPTOR) -> LSTATUS;
 }
 extern "C" {
-    pub fn RegSetValueA(
-        hKey: HKEY,
-        lpSubKey: LPCSTR,
-        dwType: DWORD,
-        lpData: LPCSTR,
-        cbData: DWORD,
-    ) -> LSTATUS;
+    pub fn RegSetValueA(hKey: HKEY, lpSubKey: LPCSTR, dwType: DWORD, lpData: LPCSTR, cbData: DWORD) -> LSTATUS;
 }
 extern "C" {
-    pub fn RegSetValueW(
-        hKey: HKEY,
-        lpSubKey: LPCWSTR,
-        dwType: DWORD,
-        lpData: LPCWSTR,
-        cbData: DWORD,
-    ) -> LSTATUS;
+    pub fn RegSetValueW(hKey: HKEY, lpSubKey: LPCWSTR, dwType: DWORD, lpData: LPCWSTR, cbData: DWORD) -> LSTATUS;
 }
 extern "C" {
-    pub fn RegSetValueExA(
-        hKey: HKEY,
-        lpValueName: LPCSTR,
-        Reserved: DWORD,
-        dwType: DWORD,
-        lpData: *const BYTE,
-        cbData: DWORD,
-    ) -> LSTATUS;
+    pub fn RegSetValueExA(hKey: HKEY, lpValueName: LPCSTR, Reserved: DWORD, dwType: DWORD, lpData: *const BYTE, cbData: DWORD) -> LSTATUS;
 }
 extern "C" {
-    pub fn RegSetValueExW(
-        hKey: HKEY,
-        lpValueName: LPCWSTR,
-        Reserved: DWORD,
-        dwType: DWORD,
-        lpData: *const BYTE,
-        cbData: DWORD,
-    ) -> LSTATUS;
+    pub fn RegSetValueExW(hKey: HKEY, lpValueName: LPCWSTR, Reserved: DWORD, dwType: DWORD, lpData: *const BYTE, cbData: DWORD) -> LSTATUS;
 }
 extern "C" {
     pub fn RegUnLoadKeyA(hKey: HKEY, lpSubKey: LPCSTR) -> LSTATUS;
@@ -47955,24 +43301,10 @@ extern "C" {
     pub fn RegDeleteKeyValueW(hKey: HKEY, lpSubKey: LPCWSTR, lpValueName: LPCWSTR) -> LSTATUS;
 }
 extern "C" {
-    pub fn RegSetKeyValueA(
-        hKey: HKEY,
-        lpSubKey: LPCSTR,
-        lpValueName: LPCSTR,
-        dwType: DWORD,
-        lpData: LPCVOID,
-        cbData: DWORD,
-    ) -> LSTATUS;
+    pub fn RegSetKeyValueA(hKey: HKEY, lpSubKey: LPCSTR, lpValueName: LPCSTR, dwType: DWORD, lpData: LPCVOID, cbData: DWORD) -> LSTATUS;
 }
 extern "C" {
-    pub fn RegSetKeyValueW(
-        hKey: HKEY,
-        lpSubKey: LPCWSTR,
-        lpValueName: LPCWSTR,
-        dwType: DWORD,
-        lpData: LPCVOID,
-        cbData: DWORD,
-    ) -> LSTATUS;
+    pub fn RegSetKeyValueW(hKey: HKEY, lpSubKey: LPCWSTR, lpValueName: LPCWSTR, dwType: DWORD, lpData: LPCVOID, cbData: DWORD) -> LSTATUS;
 }
 extern "C" {
     pub fn RegDeleteTreeA(hKey: HKEY, lpSubKey: LPCSTR) -> LSTATUS;
@@ -47984,40 +43316,16 @@ extern "C" {
     pub fn RegCopyTreeA(hKeySrc: HKEY, lpSubKey: LPCSTR, hKeyDest: HKEY) -> LSTATUS;
 }
 extern "C" {
-    pub fn RegGetValueA(
-        hkey: HKEY,
-        lpSubKey: LPCSTR,
-        lpValue: LPCSTR,
-        dwFlags: DWORD,
-        pdwType: LPDWORD,
-        pvData: PVOID,
-        pcbData: LPDWORD,
-    ) -> LSTATUS;
+    pub fn RegGetValueA(hkey: HKEY, lpSubKey: LPCSTR, lpValue: LPCSTR, dwFlags: DWORD, pdwType: LPDWORD, pvData: PVOID, pcbData: LPDWORD) -> LSTATUS;
 }
 extern "C" {
-    pub fn RegGetValueW(
-        hkey: HKEY,
-        lpSubKey: LPCWSTR,
-        lpValue: LPCWSTR,
-        dwFlags: DWORD,
-        pdwType: LPDWORD,
-        pvData: PVOID,
-        pcbData: LPDWORD,
-    ) -> LSTATUS;
+    pub fn RegGetValueW(hkey: HKEY, lpSubKey: LPCWSTR, lpValue: LPCWSTR, dwFlags: DWORD, pdwType: LPDWORD, pvData: PVOID, pcbData: LPDWORD) -> LSTATUS;
 }
 extern "C" {
     pub fn RegCopyTreeW(hKeySrc: HKEY, lpSubKey: LPCWSTR, hKeyDest: HKEY) -> LSTATUS;
 }
 extern "C" {
-    pub fn RegLoadMUIStringA(
-        hKey: HKEY,
-        pszValue: LPCSTR,
-        pszOutBuf: LPSTR,
-        cbOutBuf: DWORD,
-        pcbData: LPDWORD,
-        Flags: DWORD,
-        pszDirectory: LPCSTR,
-    ) -> LSTATUS;
+    pub fn RegLoadMUIStringA(hKey: HKEY, pszValue: LPCSTR, pszOutBuf: LPSTR, cbOutBuf: DWORD, pcbData: LPDWORD, Flags: DWORD, pszDirectory: LPCSTR) -> LSTATUS;
 }
 extern "C" {
     pub fn RegLoadMUIStringW(
@@ -48031,40 +43339,16 @@ extern "C" {
     ) -> LSTATUS;
 }
 extern "C" {
-    pub fn RegLoadAppKeyA(
-        lpFile: LPCSTR,
-        phkResult: PHKEY,
-        samDesired: REGSAM,
-        dwOptions: DWORD,
-        Reserved: DWORD,
-    ) -> LSTATUS;
+    pub fn RegLoadAppKeyA(lpFile: LPCSTR, phkResult: PHKEY, samDesired: REGSAM, dwOptions: DWORD, Reserved: DWORD) -> LSTATUS;
 }
 extern "C" {
-    pub fn RegLoadAppKeyW(
-        lpFile: LPCWSTR,
-        phkResult: PHKEY,
-        samDesired: REGSAM,
-        dwOptions: DWORD,
-        Reserved: DWORD,
-    ) -> LSTATUS;
+    pub fn RegLoadAppKeyW(lpFile: LPCWSTR, phkResult: PHKEY, samDesired: REGSAM, dwOptions: DWORD, Reserved: DWORD) -> LSTATUS;
 }
 extern "C" {
-    pub fn InitiateSystemShutdownA(
-        lpMachineName: LPSTR,
-        lpMessage: LPSTR,
-        dwTimeout: DWORD,
-        bForceAppsClosed: BOOL,
-        bRebootAfterShutdown: BOOL,
-    ) -> BOOL;
+    pub fn InitiateSystemShutdownA(lpMachineName: LPSTR, lpMessage: LPSTR, dwTimeout: DWORD, bForceAppsClosed: BOOL, bRebootAfterShutdown: BOOL) -> BOOL;
 }
 extern "C" {
-    pub fn InitiateSystemShutdownW(
-        lpMachineName: LPWSTR,
-        lpMessage: LPWSTR,
-        dwTimeout: DWORD,
-        bForceAppsClosed: BOOL,
-        bRebootAfterShutdown: BOOL,
-    ) -> BOOL;
+    pub fn InitiateSystemShutdownW(lpMachineName: LPWSTR, lpMessage: LPWSTR, dwTimeout: DWORD, bForceAppsClosed: BOOL, bRebootAfterShutdown: BOOL) -> BOOL;
 }
 extern "C" {
     pub fn AbortSystemShutdownA(lpMachineName: LPSTR) -> BOOL;
@@ -48093,41 +43377,19 @@ extern "C" {
     ) -> BOOL;
 }
 extern "C" {
-    pub fn InitiateShutdownA(
-        lpMachineName: LPSTR,
-        lpMessage: LPSTR,
-        dwGracePeriod: DWORD,
-        dwShutdownFlags: DWORD,
-        dwReason: DWORD,
-    ) -> DWORD;
+    pub fn InitiateShutdownA(lpMachineName: LPSTR, lpMessage: LPSTR, dwGracePeriod: DWORD, dwShutdownFlags: DWORD, dwReason: DWORD) -> DWORD;
 }
 extern "C" {
-    pub fn InitiateShutdownW(
-        lpMachineName: LPWSTR,
-        lpMessage: LPWSTR,
-        dwGracePeriod: DWORD,
-        dwShutdownFlags: DWORD,
-        dwReason: DWORD,
-    ) -> DWORD;
+    pub fn InitiateShutdownW(lpMachineName: LPWSTR, lpMessage: LPWSTR, dwGracePeriod: DWORD, dwShutdownFlags: DWORD, dwReason: DWORD) -> DWORD;
 }
 extern "C" {
     pub fn CheckForHiberboot(pHiberboot: PBOOLEAN, bClearFlag: BOOLEAN) -> DWORD;
 }
 extern "C" {
-    pub fn RegSaveKeyExA(
-        hKey: HKEY,
-        lpFile: LPCSTR,
-        lpSecurityAttributes: LPSECURITY_ATTRIBUTES,
-        Flags: DWORD,
-    ) -> LSTATUS;
+    pub fn RegSaveKeyExA(hKey: HKEY, lpFile: LPCSTR, lpSecurityAttributes: LPSECURITY_ATTRIBUTES, Flags: DWORD) -> LSTATUS;
 }
 extern "C" {
-    pub fn RegSaveKeyExW(
-        hKey: HKEY,
-        lpFile: LPCWSTR,
-        lpSecurityAttributes: LPSECURITY_ATTRIBUTES,
-        Flags: DWORD,
-    ) -> LSTATUS;
+    pub fn RegSaveKeyExW(hKey: HKEY, lpFile: LPCWSTR, lpSecurityAttributes: LPSECURITY_ATTRIBUTES, Flags: DWORD) -> LSTATUS;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -48160,52 +43422,22 @@ pub type LPNETRESOURCEW = *mut _NETRESOURCEW;
 pub type NETRESOURCE = NETRESOURCEA;
 pub type LPNETRESOURCE = LPNETRESOURCEA;
 extern "C" {
-    pub fn WNetAddConnectionA(
-        lpRemoteName: LPCSTR,
-        lpPassword: LPCSTR,
-        lpLocalName: LPCSTR,
-    ) -> DWORD;
+    pub fn WNetAddConnectionA(lpRemoteName: LPCSTR, lpPassword: LPCSTR, lpLocalName: LPCSTR) -> DWORD;
 }
 extern "C" {
-    pub fn WNetAddConnectionW(
-        lpRemoteName: LPCWSTR,
-        lpPassword: LPCWSTR,
-        lpLocalName: LPCWSTR,
-    ) -> DWORD;
+    pub fn WNetAddConnectionW(lpRemoteName: LPCWSTR, lpPassword: LPCWSTR, lpLocalName: LPCWSTR) -> DWORD;
 }
 extern "C" {
-    pub fn WNetAddConnection2A(
-        lpNetResource: LPNETRESOURCEA,
-        lpPassword: LPCSTR,
-        lpUserName: LPCSTR,
-        dwFlags: DWORD,
-    ) -> DWORD;
+    pub fn WNetAddConnection2A(lpNetResource: LPNETRESOURCEA, lpPassword: LPCSTR, lpUserName: LPCSTR, dwFlags: DWORD) -> DWORD;
 }
 extern "C" {
-    pub fn WNetAddConnection2W(
-        lpNetResource: LPNETRESOURCEW,
-        lpPassword: LPCWSTR,
-        lpUserName: LPCWSTR,
-        dwFlags: DWORD,
-    ) -> DWORD;
+    pub fn WNetAddConnection2W(lpNetResource: LPNETRESOURCEW, lpPassword: LPCWSTR, lpUserName: LPCWSTR, dwFlags: DWORD) -> DWORD;
 }
 extern "C" {
-    pub fn WNetAddConnection3A(
-        hwndOwner: HWND,
-        lpNetResource: LPNETRESOURCEA,
-        lpPassword: LPCSTR,
-        lpUserName: LPCSTR,
-        dwFlags: DWORD,
-    ) -> DWORD;
+    pub fn WNetAddConnection3A(hwndOwner: HWND, lpNetResource: LPNETRESOURCEA, lpPassword: LPCSTR, lpUserName: LPCSTR, dwFlags: DWORD) -> DWORD;
 }
 extern "C" {
-    pub fn WNetAddConnection3W(
-        hwndOwner: HWND,
-        lpNetResource: LPNETRESOURCEW,
-        lpPassword: LPCWSTR,
-        lpUserName: LPCWSTR,
-        dwFlags: DWORD,
-    ) -> DWORD;
+    pub fn WNetAddConnection3W(hwndOwner: HWND, lpNetResource: LPNETRESOURCEW, lpPassword: LPCWSTR, lpUserName: LPCWSTR, dwFlags: DWORD) -> DWORD;
 }
 extern "C" {
     pub fn WNetAddConnection4A(
@@ -48242,22 +43474,13 @@ extern "C" {
     pub fn WNetCancelConnection2W(lpName: LPCWSTR, dwFlags: DWORD, fForce: BOOL) -> DWORD;
 }
 extern "C" {
-    pub fn WNetGetConnectionA(
-        lpLocalName: LPCSTR,
-        lpRemoteName: LPSTR,
-        lpnLength: LPDWORD,
-    ) -> DWORD;
+    pub fn WNetGetConnectionA(lpLocalName: LPCSTR, lpRemoteName: LPSTR, lpnLength: LPDWORD) -> DWORD;
 }
 extern "C" {
-    pub fn WNetGetConnectionW(
-        lpLocalName: LPCWSTR,
-        lpRemoteName: LPWSTR,
-        lpnLength: LPDWORD,
-    ) -> DWORD;
+    pub fn WNetGetConnectionW(lpLocalName: LPCWSTR, lpRemoteName: LPWSTR, lpnLength: LPDWORD) -> DWORD;
 }
 extern "C" {
-    pub fn WNetRestoreSingleConnectionW(hwndParent: HWND, lpDevice: LPCWSTR, fUseUI: BOOL)
-        -> DWORD;
+    pub fn WNetRestoreSingleConnectionW(hwndParent: HWND, lpDevice: LPCWSTR, fUseUI: BOOL) -> DWORD;
 }
 extern "C" {
     pub fn WNetUseConnectionA(
@@ -48378,71 +43601,31 @@ extern "C" {
     pub fn WNetDisconnectDialog1W(lpConnDlgStruct: LPDISCDLGSTRUCTW) -> DWORD;
 }
 extern "C" {
-    pub fn WNetOpenEnumA(
-        dwScope: DWORD,
-        dwType: DWORD,
-        dwUsage: DWORD,
-        lpNetResource: LPNETRESOURCEA,
-        lphEnum: LPHANDLE,
-    ) -> DWORD;
+    pub fn WNetOpenEnumA(dwScope: DWORD, dwType: DWORD, dwUsage: DWORD, lpNetResource: LPNETRESOURCEA, lphEnum: LPHANDLE) -> DWORD;
 }
 extern "C" {
-    pub fn WNetOpenEnumW(
-        dwScope: DWORD,
-        dwType: DWORD,
-        dwUsage: DWORD,
-        lpNetResource: LPNETRESOURCEW,
-        lphEnum: LPHANDLE,
-    ) -> DWORD;
+    pub fn WNetOpenEnumW(dwScope: DWORD, dwType: DWORD, dwUsage: DWORD, lpNetResource: LPNETRESOURCEW, lphEnum: LPHANDLE) -> DWORD;
 }
 extern "C" {
-    pub fn WNetEnumResourceA(
-        hEnum: HANDLE,
-        lpcCount: LPDWORD,
-        lpBuffer: LPVOID,
-        lpBufferSize: LPDWORD,
-    ) -> DWORD;
+    pub fn WNetEnumResourceA(hEnum: HANDLE, lpcCount: LPDWORD, lpBuffer: LPVOID, lpBufferSize: LPDWORD) -> DWORD;
 }
 extern "C" {
-    pub fn WNetEnumResourceW(
-        hEnum: HANDLE,
-        lpcCount: LPDWORD,
-        lpBuffer: LPVOID,
-        lpBufferSize: LPDWORD,
-    ) -> DWORD;
+    pub fn WNetEnumResourceW(hEnum: HANDLE, lpcCount: LPDWORD, lpBuffer: LPVOID, lpBufferSize: LPDWORD) -> DWORD;
 }
 extern "C" {
     pub fn WNetCloseEnum(hEnum: HANDLE) -> DWORD;
 }
 extern "C" {
-    pub fn WNetGetResourceParentA(
-        lpNetResource: LPNETRESOURCEA,
-        lpBuffer: LPVOID,
-        lpcbBuffer: LPDWORD,
-    ) -> DWORD;
+    pub fn WNetGetResourceParentA(lpNetResource: LPNETRESOURCEA, lpBuffer: LPVOID, lpcbBuffer: LPDWORD) -> DWORD;
 }
 extern "C" {
-    pub fn WNetGetResourceParentW(
-        lpNetResource: LPNETRESOURCEW,
-        lpBuffer: LPVOID,
-        lpcbBuffer: LPDWORD,
-    ) -> DWORD;
+    pub fn WNetGetResourceParentW(lpNetResource: LPNETRESOURCEW, lpBuffer: LPVOID, lpcbBuffer: LPDWORD) -> DWORD;
 }
 extern "C" {
-    pub fn WNetGetResourceInformationA(
-        lpNetResource: LPNETRESOURCEA,
-        lpBuffer: LPVOID,
-        lpcbBuffer: LPDWORD,
-        lplpSystem: *mut LPSTR,
-    ) -> DWORD;
+    pub fn WNetGetResourceInformationA(lpNetResource: LPNETRESOURCEA, lpBuffer: LPVOID, lpcbBuffer: LPDWORD, lplpSystem: *mut LPSTR) -> DWORD;
 }
 extern "C" {
-    pub fn WNetGetResourceInformationW(
-        lpNetResource: LPNETRESOURCEW,
-        lpBuffer: LPVOID,
-        lpcbBuffer: LPDWORD,
-        lplpSystem: *mut LPWSTR,
-    ) -> DWORD;
+    pub fn WNetGetResourceInformationW(lpNetResource: LPNETRESOURCEW, lpBuffer: LPVOID, lpcbBuffer: LPDWORD, lplpSystem: *mut LPWSTR) -> DWORD;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -48481,20 +43664,10 @@ pub type LPREMOTE_NAME_INFOW = *mut _REMOTE_NAME_INFOW;
 pub type REMOTE_NAME_INFO = REMOTE_NAME_INFOA;
 pub type LPREMOTE_NAME_INFO = LPREMOTE_NAME_INFOA;
 extern "C" {
-    pub fn WNetGetUniversalNameA(
-        lpLocalPath: LPCSTR,
-        dwInfoLevel: DWORD,
-        lpBuffer: LPVOID,
-        lpBufferSize: LPDWORD,
-    ) -> DWORD;
+    pub fn WNetGetUniversalNameA(lpLocalPath: LPCSTR, dwInfoLevel: DWORD, lpBuffer: LPVOID, lpBufferSize: LPDWORD) -> DWORD;
 }
 extern "C" {
-    pub fn WNetGetUniversalNameW(
-        lpLocalPath: LPCWSTR,
-        dwInfoLevel: DWORD,
-        lpBuffer: LPVOID,
-        lpBufferSize: LPDWORD,
-    ) -> DWORD;
+    pub fn WNetGetUniversalNameW(lpLocalPath: LPCWSTR, dwInfoLevel: DWORD, lpBuffer: LPVOID, lpBufferSize: LPDWORD) -> DWORD;
 }
 extern "C" {
     pub fn WNetGetUserA(lpName: LPCSTR, lpUserName: LPSTR, lpnLength: LPDWORD) -> DWORD;
@@ -48503,18 +43676,10 @@ extern "C" {
     pub fn WNetGetUserW(lpName: LPCWSTR, lpUserName: LPWSTR, lpnLength: LPDWORD) -> DWORD;
 }
 extern "C" {
-    pub fn WNetGetProviderNameA(
-        dwNetType: DWORD,
-        lpProviderName: LPSTR,
-        lpBufferSize: LPDWORD,
-    ) -> DWORD;
+    pub fn WNetGetProviderNameA(dwNetType: DWORD, lpProviderName: LPSTR, lpBufferSize: LPDWORD) -> DWORD;
 }
 extern "C" {
-    pub fn WNetGetProviderNameW(
-        dwNetType: DWORD,
-        lpProviderName: LPWSTR,
-        lpBufferSize: LPDWORD,
-    ) -> DWORD;
+    pub fn WNetGetProviderNameW(dwNetType: DWORD, lpProviderName: LPWSTR, lpBufferSize: LPDWORD) -> DWORD;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -48531,34 +43696,16 @@ pub struct _NETINFOSTRUCT {
 pub type NETINFOSTRUCT = _NETINFOSTRUCT;
 pub type LPNETINFOSTRUCT = *mut _NETINFOSTRUCT;
 extern "C" {
-    pub fn WNetGetNetworkInformationA(
-        lpProvider: LPCSTR,
-        lpNetInfoStruct: LPNETINFOSTRUCT,
-    ) -> DWORD;
+    pub fn WNetGetNetworkInformationA(lpProvider: LPCSTR, lpNetInfoStruct: LPNETINFOSTRUCT) -> DWORD;
 }
 extern "C" {
-    pub fn WNetGetNetworkInformationW(
-        lpProvider: LPCWSTR,
-        lpNetInfoStruct: LPNETINFOSTRUCT,
-    ) -> DWORD;
+    pub fn WNetGetNetworkInformationW(lpProvider: LPCWSTR, lpNetInfoStruct: LPNETINFOSTRUCT) -> DWORD;
 }
 extern "C" {
-    pub fn WNetGetLastErrorA(
-        lpError: LPDWORD,
-        lpErrorBuf: LPSTR,
-        nErrorBufSize: DWORD,
-        lpNameBuf: LPSTR,
-        nNameBufSize: DWORD,
-    ) -> DWORD;
+    pub fn WNetGetLastErrorA(lpError: LPDWORD, lpErrorBuf: LPSTR, nErrorBufSize: DWORD, lpNameBuf: LPSTR, nNameBufSize: DWORD) -> DWORD;
 }
 extern "C" {
-    pub fn WNetGetLastErrorW(
-        lpError: LPDWORD,
-        lpErrorBuf: LPWSTR,
-        nErrorBufSize: DWORD,
-        lpNameBuf: LPWSTR,
-        nNameBufSize: DWORD,
-    ) -> DWORD;
+    pub fn WNetGetLastErrorW(lpError: LPDWORD, lpErrorBuf: LPWSTR, nErrorBufSize: DWORD, lpNameBuf: LPWSTR, nNameBufSize: DWORD) -> DWORD;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -48572,16 +43719,10 @@ pub struct _NETCONNECTINFOSTRUCT {
 pub type NETCONNECTINFOSTRUCT = _NETCONNECTINFOSTRUCT;
 pub type LPNETCONNECTINFOSTRUCT = *mut _NETCONNECTINFOSTRUCT;
 extern "C" {
-    pub fn MultinetGetConnectionPerformanceA(
-        lpNetResource: LPNETRESOURCEA,
-        lpNetConnectInfoStruct: LPNETCONNECTINFOSTRUCT,
-    ) -> DWORD;
+    pub fn MultinetGetConnectionPerformanceA(lpNetResource: LPNETRESOURCEA, lpNetConnectInfoStruct: LPNETCONNECTINFOSTRUCT) -> DWORD;
 }
 extern "C" {
-    pub fn MultinetGetConnectionPerformanceW(
-        lpNetResource: LPNETRESOURCEW,
-        lpNetConnectInfoStruct: LPNETCONNECTINFOSTRUCT,
-    ) -> DWORD;
+    pub fn MultinetGetConnectionPerformanceW(lpNetResource: LPNETRESOURCEW, lpNetConnectInfoStruct: LPNETCONNECTINFOSTRUCT) -> DWORD;
 }
 extern "C" {
     pub fn uaw_CharUpperW(String: LPUWSTR) -> LPUWSTR;
@@ -48666,10 +43807,8 @@ pub struct _SERVICE_CUSTOM_SYSTEM_STATE_CHANGE_DATA_ITEM__bindgen_ty_1__bindgen_
     pub DataOffset: DWORD,
     pub Data: [BYTE; 1usize],
 }
-pub type SERVICE_CUSTOM_SYSTEM_STATE_CHANGE_DATA_ITEM =
-    _SERVICE_CUSTOM_SYSTEM_STATE_CHANGE_DATA_ITEM;
-pub type LPSERVICE_CUSTOM_SYSTEM_STATE_CHANGE_DATA_ITEM =
-    *mut _SERVICE_CUSTOM_SYSTEM_STATE_CHANGE_DATA_ITEM;
+pub type SERVICE_CUSTOM_SYSTEM_STATE_CHANGE_DATA_ITEM = _SERVICE_CUSTOM_SYSTEM_STATE_CHANGE_DATA_ITEM;
+pub type LPSERVICE_CUSTOM_SYSTEM_STATE_CHANGE_DATA_ITEM = *mut _SERVICE_CUSTOM_SYSTEM_STATE_CHANGE_DATA_ITEM;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct _SERVICE_DESCRIPTIONA {
@@ -48961,10 +44100,8 @@ pub type QUERY_SERVICE_CONFIGW = _QUERY_SERVICE_CONFIGW;
 pub type LPQUERY_SERVICE_CONFIGW = *mut _QUERY_SERVICE_CONFIGW;
 pub type QUERY_SERVICE_CONFIG = QUERY_SERVICE_CONFIGA;
 pub type LPQUERY_SERVICE_CONFIG = LPQUERY_SERVICE_CONFIGA;
-pub type LPSERVICE_MAIN_FUNCTIONW =
-    unsafe extern "C" fn(dwNumServicesArgs: DWORD, lpServiceArgVectors: *mut LPWSTR);
-pub type LPSERVICE_MAIN_FUNCTIONA =
-    unsafe extern "C" fn(dwNumServicesArgs: DWORD, lpServiceArgVectors: *mut LPSTR);
+pub type LPSERVICE_MAIN_FUNCTIONW = unsafe extern "C" fn(dwNumServicesArgs: DWORD, lpServiceArgVectors: *mut LPWSTR);
+pub type LPSERVICE_MAIN_FUNCTIONA = unsafe extern "C" fn(dwNumServicesArgs: DWORD, lpServiceArgVectors: *mut LPSTR);
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct _SERVICE_TABLE_ENTRYA {
@@ -48984,12 +44121,7 @@ pub type LPSERVICE_TABLE_ENTRYW = *mut _SERVICE_TABLE_ENTRYW;
 pub type SERVICE_TABLE_ENTRY = SERVICE_TABLE_ENTRYA;
 pub type LPSERVICE_TABLE_ENTRY = LPSERVICE_TABLE_ENTRYA;
 pub type LPHANDLER_FUNCTION = unsafe extern "C" fn(dwControl: DWORD);
-pub type LPHANDLER_FUNCTION_EX = unsafe extern "C" fn(
-    dwControl: DWORD,
-    dwEventType: DWORD,
-    lpEventData: LPVOID,
-    lpContext: LPVOID,
-) -> DWORD;
+pub type LPHANDLER_FUNCTION_EX = unsafe extern "C" fn(dwControl: DWORD, dwEventType: DWORD, lpEventData: LPVOID, lpContext: LPVOID) -> DWORD;
 pub type PFN_SC_NOTIFY_CALLBACK = unsafe extern "C" fn(pParameter: PVOID);
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -49103,11 +44235,7 @@ extern "C" {
     pub fn CloseServiceHandle(hSCObject: SC_HANDLE) -> BOOL;
 }
 extern "C" {
-    pub fn ControlService(
-        hService: SC_HANDLE,
-        dwControl: DWORD,
-        lpServiceStatus: LPSERVICE_STATUS,
-    ) -> BOOL;
+    pub fn ControlService(hService: SC_HANDLE, dwControl: DWORD, lpServiceStatus: LPSERVICE_STATUS) -> BOOL;
 }
 extern "C" {
     pub fn CreateServiceA(
@@ -49219,36 +44347,16 @@ extern "C" {
     ) -> BOOL;
 }
 extern "C" {
-    pub fn GetServiceKeyNameA(
-        hSCManager: SC_HANDLE,
-        lpDisplayName: LPCSTR,
-        lpServiceName: LPSTR,
-        lpcchBuffer: LPDWORD,
-    ) -> BOOL;
+    pub fn GetServiceKeyNameA(hSCManager: SC_HANDLE, lpDisplayName: LPCSTR, lpServiceName: LPSTR, lpcchBuffer: LPDWORD) -> BOOL;
 }
 extern "C" {
-    pub fn GetServiceKeyNameW(
-        hSCManager: SC_HANDLE,
-        lpDisplayName: LPCWSTR,
-        lpServiceName: LPWSTR,
-        lpcchBuffer: LPDWORD,
-    ) -> BOOL;
+    pub fn GetServiceKeyNameW(hSCManager: SC_HANDLE, lpDisplayName: LPCWSTR, lpServiceName: LPWSTR, lpcchBuffer: LPDWORD) -> BOOL;
 }
 extern "C" {
-    pub fn GetServiceDisplayNameA(
-        hSCManager: SC_HANDLE,
-        lpServiceName: LPCSTR,
-        lpDisplayName: LPSTR,
-        lpcchBuffer: LPDWORD,
-    ) -> BOOL;
+    pub fn GetServiceDisplayNameA(hSCManager: SC_HANDLE, lpServiceName: LPCSTR, lpDisplayName: LPSTR, lpcchBuffer: LPDWORD) -> BOOL;
 }
 extern "C" {
-    pub fn GetServiceDisplayNameW(
-        hSCManager: SC_HANDLE,
-        lpServiceName: LPCWSTR,
-        lpDisplayName: LPWSTR,
-        lpcchBuffer: LPDWORD,
-    ) -> BOOL;
+    pub fn GetServiceDisplayNameW(hSCManager: SC_HANDLE, lpServiceName: LPCWSTR, lpDisplayName: LPWSTR, lpcchBuffer: LPDWORD) -> BOOL;
 }
 extern "C" {
     pub fn LockServiceDatabase(hSCManager: SC_HANDLE) -> SC_LOCK;
@@ -49257,82 +44365,34 @@ extern "C" {
     pub fn NotifyBootConfigStatus(BootAcceptable: BOOL) -> BOOL;
 }
 extern "C" {
-    pub fn OpenSCManagerA(
-        lpMachineName: LPCSTR,
-        lpDatabaseName: LPCSTR,
-        dwDesiredAccess: DWORD,
-    ) -> SC_HANDLE;
+    pub fn OpenSCManagerA(lpMachineName: LPCSTR, lpDatabaseName: LPCSTR, dwDesiredAccess: DWORD) -> SC_HANDLE;
 }
 extern "C" {
-    pub fn OpenSCManagerW(
-        lpMachineName: LPCWSTR,
-        lpDatabaseName: LPCWSTR,
-        dwDesiredAccess: DWORD,
-    ) -> SC_HANDLE;
+    pub fn OpenSCManagerW(lpMachineName: LPCWSTR, lpDatabaseName: LPCWSTR, dwDesiredAccess: DWORD) -> SC_HANDLE;
 }
 extern "C" {
-    pub fn OpenServiceA(
-        hSCManager: SC_HANDLE,
-        lpServiceName: LPCSTR,
-        dwDesiredAccess: DWORD,
-    ) -> SC_HANDLE;
+    pub fn OpenServiceA(hSCManager: SC_HANDLE, lpServiceName: LPCSTR, dwDesiredAccess: DWORD) -> SC_HANDLE;
 }
 extern "C" {
-    pub fn OpenServiceW(
-        hSCManager: SC_HANDLE,
-        lpServiceName: LPCWSTR,
-        dwDesiredAccess: DWORD,
-    ) -> SC_HANDLE;
+    pub fn OpenServiceW(hSCManager: SC_HANDLE, lpServiceName: LPCWSTR, dwDesiredAccess: DWORD) -> SC_HANDLE;
 }
 extern "C" {
-    pub fn QueryServiceConfigA(
-        hService: SC_HANDLE,
-        lpServiceConfig: LPQUERY_SERVICE_CONFIGA,
-        cbBufSize: DWORD,
-        pcbBytesNeeded: LPDWORD,
-    ) -> BOOL;
+    pub fn QueryServiceConfigA(hService: SC_HANDLE, lpServiceConfig: LPQUERY_SERVICE_CONFIGA, cbBufSize: DWORD, pcbBytesNeeded: LPDWORD) -> BOOL;
 }
 extern "C" {
-    pub fn QueryServiceConfigW(
-        hService: SC_HANDLE,
-        lpServiceConfig: LPQUERY_SERVICE_CONFIGW,
-        cbBufSize: DWORD,
-        pcbBytesNeeded: LPDWORD,
-    ) -> BOOL;
+    pub fn QueryServiceConfigW(hService: SC_HANDLE, lpServiceConfig: LPQUERY_SERVICE_CONFIGW, cbBufSize: DWORD, pcbBytesNeeded: LPDWORD) -> BOOL;
 }
 extern "C" {
-    pub fn QueryServiceConfig2A(
-        hService: SC_HANDLE,
-        dwInfoLevel: DWORD,
-        lpBuffer: LPBYTE,
-        cbBufSize: DWORD,
-        pcbBytesNeeded: LPDWORD,
-    ) -> BOOL;
+    pub fn QueryServiceConfig2A(hService: SC_HANDLE, dwInfoLevel: DWORD, lpBuffer: LPBYTE, cbBufSize: DWORD, pcbBytesNeeded: LPDWORD) -> BOOL;
 }
 extern "C" {
-    pub fn QueryServiceConfig2W(
-        hService: SC_HANDLE,
-        dwInfoLevel: DWORD,
-        lpBuffer: LPBYTE,
-        cbBufSize: DWORD,
-        pcbBytesNeeded: LPDWORD,
-    ) -> BOOL;
+    pub fn QueryServiceConfig2W(hService: SC_HANDLE, dwInfoLevel: DWORD, lpBuffer: LPBYTE, cbBufSize: DWORD, pcbBytesNeeded: LPDWORD) -> BOOL;
 }
 extern "C" {
-    pub fn QueryServiceLockStatusA(
-        hSCManager: SC_HANDLE,
-        lpLockStatus: LPQUERY_SERVICE_LOCK_STATUSA,
-        cbBufSize: DWORD,
-        pcbBytesNeeded: LPDWORD,
-    ) -> BOOL;
+    pub fn QueryServiceLockStatusA(hSCManager: SC_HANDLE, lpLockStatus: LPQUERY_SERVICE_LOCK_STATUSA, cbBufSize: DWORD, pcbBytesNeeded: LPDWORD) -> BOOL;
 }
 extern "C" {
-    pub fn QueryServiceLockStatusW(
-        hSCManager: SC_HANDLE,
-        lpLockStatus: LPQUERY_SERVICE_LOCK_STATUSW,
-        cbBufSize: DWORD,
-        pcbBytesNeeded: LPDWORD,
-    ) -> BOOL;
+    pub fn QueryServiceLockStatusW(hSCManager: SC_HANDLE, lpLockStatus: LPQUERY_SERVICE_LOCK_STATUSW, cbBufSize: DWORD, pcbBytesNeeded: LPDWORD) -> BOOL;
 }
 extern "C" {
     pub fn QueryServiceObjectSecurity(
@@ -49347,52 +44407,25 @@ extern "C" {
     pub fn QueryServiceStatus(hService: SC_HANDLE, lpServiceStatus: LPSERVICE_STATUS) -> BOOL;
 }
 extern "C" {
-    pub fn QueryServiceStatusEx(
-        hService: SC_HANDLE,
-        InfoLevel: SC_STATUS_TYPE,
-        lpBuffer: LPBYTE,
-        cbBufSize: DWORD,
-        pcbBytesNeeded: LPDWORD,
-    ) -> BOOL;
+    pub fn QueryServiceStatusEx(hService: SC_HANDLE, InfoLevel: SC_STATUS_TYPE, lpBuffer: LPBYTE, cbBufSize: DWORD, pcbBytesNeeded: LPDWORD) -> BOOL;
 }
 extern "C" {
-    pub fn RegisterServiceCtrlHandlerA(
-        lpServiceName: LPCSTR,
-        lpHandlerProc: LPHANDLER_FUNCTION,
-    ) -> SERVICE_STATUS_HANDLE;
+    pub fn RegisterServiceCtrlHandlerA(lpServiceName: LPCSTR, lpHandlerProc: LPHANDLER_FUNCTION) -> SERVICE_STATUS_HANDLE;
 }
 extern "C" {
-    pub fn RegisterServiceCtrlHandlerW(
-        lpServiceName: LPCWSTR,
-        lpHandlerProc: LPHANDLER_FUNCTION,
-    ) -> SERVICE_STATUS_HANDLE;
+    pub fn RegisterServiceCtrlHandlerW(lpServiceName: LPCWSTR, lpHandlerProc: LPHANDLER_FUNCTION) -> SERVICE_STATUS_HANDLE;
 }
 extern "C" {
-    pub fn RegisterServiceCtrlHandlerExA(
-        lpServiceName: LPCSTR,
-        lpHandlerProc: LPHANDLER_FUNCTION_EX,
-        lpContext: LPVOID,
-    ) -> SERVICE_STATUS_HANDLE;
+    pub fn RegisterServiceCtrlHandlerExA(lpServiceName: LPCSTR, lpHandlerProc: LPHANDLER_FUNCTION_EX, lpContext: LPVOID) -> SERVICE_STATUS_HANDLE;
 }
 extern "C" {
-    pub fn RegisterServiceCtrlHandlerExW(
-        lpServiceName: LPCWSTR,
-        lpHandlerProc: LPHANDLER_FUNCTION_EX,
-        lpContext: LPVOID,
-    ) -> SERVICE_STATUS_HANDLE;
+    pub fn RegisterServiceCtrlHandlerExW(lpServiceName: LPCWSTR, lpHandlerProc: LPHANDLER_FUNCTION_EX, lpContext: LPVOID) -> SERVICE_STATUS_HANDLE;
 }
 extern "C" {
-    pub fn SetServiceObjectSecurity(
-        hService: SC_HANDLE,
-        dwSecurityInformation: SECURITY_INFORMATION,
-        lpSecurityDescriptor: PSECURITY_DESCRIPTOR,
-    ) -> BOOL;
+    pub fn SetServiceObjectSecurity(hService: SC_HANDLE, dwSecurityInformation: SECURITY_INFORMATION, lpSecurityDescriptor: PSECURITY_DESCRIPTOR) -> BOOL;
 }
 extern "C" {
-    pub fn SetServiceStatus(
-        hServiceStatus: SERVICE_STATUS_HANDLE,
-        lpServiceStatus: LPSERVICE_STATUS,
-    ) -> BOOL;
+    pub fn SetServiceStatus(hServiceStatus: SERVICE_STATUS_HANDLE, lpServiceStatus: LPSERVICE_STATUS) -> BOOL;
 }
 extern "C" {
     pub fn StartServiceCtrlDispatcherA(lpServiceStartTable: *const SERVICE_TABLE_ENTRYA) -> BOOL;
@@ -49401,58 +44434,28 @@ extern "C" {
     pub fn StartServiceCtrlDispatcherW(lpServiceStartTable: *const SERVICE_TABLE_ENTRYW) -> BOOL;
 }
 extern "C" {
-    pub fn StartServiceA(
-        hService: SC_HANDLE,
-        dwNumServiceArgs: DWORD,
-        lpServiceArgVectors: *mut LPCSTR,
-    ) -> BOOL;
+    pub fn StartServiceA(hService: SC_HANDLE, dwNumServiceArgs: DWORD, lpServiceArgVectors: *mut LPCSTR) -> BOOL;
 }
 extern "C" {
-    pub fn StartServiceW(
-        hService: SC_HANDLE,
-        dwNumServiceArgs: DWORD,
-        lpServiceArgVectors: *mut LPCWSTR,
-    ) -> BOOL;
+    pub fn StartServiceW(hService: SC_HANDLE, dwNumServiceArgs: DWORD, lpServiceArgVectors: *mut LPCWSTR) -> BOOL;
 }
 extern "C" {
     pub fn UnlockServiceDatabase(ScLock: SC_LOCK) -> BOOL;
 }
 extern "C" {
-    pub fn NotifyServiceStatusChangeA(
-        hService: SC_HANDLE,
-        dwNotifyMask: DWORD,
-        pNotifyBuffer: PSERVICE_NOTIFYA,
-    ) -> DWORD;
+    pub fn NotifyServiceStatusChangeA(hService: SC_HANDLE, dwNotifyMask: DWORD, pNotifyBuffer: PSERVICE_NOTIFYA) -> DWORD;
 }
 extern "C" {
-    pub fn NotifyServiceStatusChangeW(
-        hService: SC_HANDLE,
-        dwNotifyMask: DWORD,
-        pNotifyBuffer: PSERVICE_NOTIFYW,
-    ) -> DWORD;
+    pub fn NotifyServiceStatusChangeW(hService: SC_HANDLE, dwNotifyMask: DWORD, pNotifyBuffer: PSERVICE_NOTIFYW) -> DWORD;
 }
 extern "C" {
-    pub fn ControlServiceExA(
-        hService: SC_HANDLE,
-        dwControl: DWORD,
-        dwInfoLevel: DWORD,
-        pControlParams: PVOID,
-    ) -> BOOL;
+    pub fn ControlServiceExA(hService: SC_HANDLE, dwControl: DWORD, dwInfoLevel: DWORD, pControlParams: PVOID) -> BOOL;
 }
 extern "C" {
-    pub fn ControlServiceExW(
-        hService: SC_HANDLE,
-        dwControl: DWORD,
-        dwInfoLevel: DWORD,
-        pControlParams: PVOID,
-    ) -> BOOL;
+    pub fn ControlServiceExW(hService: SC_HANDLE, dwControl: DWORD, dwInfoLevel: DWORD, pControlParams: PVOID) -> BOOL;
 }
 extern "C" {
-    pub fn QueryServiceDynamicInformation(
-        hServiceStatus: SERVICE_STATUS_HANDLE,
-        dwInfoLevel: DWORD,
-        ppDynamicInfo: *mut PVOID,
-    ) -> BOOL;
+    pub fn QueryServiceDynamicInformation(hServiceStatus: SERVICE_STATUS_HANDLE, dwInfoLevel: DWORD, ppDynamicInfo: *mut PVOID) -> BOOL;
 }
 pub const _SC_EVENT_TYPE_SC_EVENT_DATABASE_CHANGE: _SC_EVENT_TYPE = 0;
 pub const _SC_EVENT_TYPE_SC_EVENT_PROPERTY_CHANGE: _SC_EVENT_TYPE = 1;
@@ -49480,17 +44483,10 @@ extern "C" {
     pub fn UnsubscribeServiceChangeNotifications(pSubscription: PSC_NOTIFICATION_REGISTRATION);
 }
 extern "C" {
-    pub fn WaitServiceState(
-        hService: SC_HANDLE,
-        dwNotify: DWORD,
-        dwTimeout: DWORD,
-        hCancelEvent: HANDLE,
-    ) -> DWORD;
+    pub fn WaitServiceState(hService: SC_HANDLE, dwNotify: DWORD, dwTimeout: DWORD, hCancelEvent: HANDLE) -> DWORD;
 }
-pub const SERVICE_REGISTRY_STATE_TYPE_ServiceRegistryStateParameters: SERVICE_REGISTRY_STATE_TYPE =
-    0;
-pub const SERVICE_REGISTRY_STATE_TYPE_ServiceRegistryStatePersistent: SERVICE_REGISTRY_STATE_TYPE =
-    1;
+pub const SERVICE_REGISTRY_STATE_TYPE_ServiceRegistryStateParameters: SERVICE_REGISTRY_STATE_TYPE = 0;
+pub const SERVICE_REGISTRY_STATE_TYPE_ServiceRegistryStatePersistent: SERVICE_REGISTRY_STATE_TYPE = 1;
 pub const SERVICE_REGISTRY_STATE_TYPE_MaxServiceRegistryStateType: SERVICE_REGISTRY_STATE_TYPE = 2;
 pub type SERVICE_REGISTRY_STATE_TYPE = ::std::os::raw::c_int;
 extern "C" {
@@ -49776,40 +44772,16 @@ extern "C" {
     pub fn ImmAssociateContextEx(arg1: HWND, arg2: HIMC, arg3: DWORD) -> BOOL;
 }
 extern "C" {
-    pub fn ImmGetCompositionStringA(
-        arg1: HIMC,
-        arg2: DWORD,
-        lpBuf: LPVOID,
-        dwBufLen: DWORD,
-    ) -> LONG;
+    pub fn ImmGetCompositionStringA(arg1: HIMC, arg2: DWORD, lpBuf: LPVOID, dwBufLen: DWORD) -> LONG;
 }
 extern "C" {
-    pub fn ImmGetCompositionStringW(
-        arg1: HIMC,
-        arg2: DWORD,
-        lpBuf: LPVOID,
-        dwBufLen: DWORD,
-    ) -> LONG;
+    pub fn ImmGetCompositionStringW(arg1: HIMC, arg2: DWORD, lpBuf: LPVOID, dwBufLen: DWORD) -> LONG;
 }
 extern "C" {
-    pub fn ImmSetCompositionStringA(
-        arg1: HIMC,
-        dwIndex: DWORD,
-        lpComp: LPVOID,
-        dwCompLen: DWORD,
-        lpRead: LPVOID,
-        dwReadLen: DWORD,
-    ) -> BOOL;
+    pub fn ImmSetCompositionStringA(arg1: HIMC, dwIndex: DWORD, lpComp: LPVOID, dwCompLen: DWORD, lpRead: LPVOID, dwReadLen: DWORD) -> BOOL;
 }
 extern "C" {
-    pub fn ImmSetCompositionStringW(
-        arg1: HIMC,
-        dwIndex: DWORD,
-        lpComp: LPVOID,
-        dwCompLen: DWORD,
-        lpRead: LPVOID,
-        dwReadLen: DWORD,
-    ) -> BOOL;
+    pub fn ImmSetCompositionStringW(arg1: HIMC, dwIndex: DWORD, lpComp: LPVOID, dwCompLen: DWORD, lpRead: LPVOID, dwReadLen: DWORD) -> BOOL;
 }
 extern "C" {
     pub fn ImmGetCandidateListCountA(arg1: HIMC, lpdwListCount: LPDWORD) -> DWORD;
@@ -49818,20 +44790,10 @@ extern "C" {
     pub fn ImmGetCandidateListCountW(arg1: HIMC, lpdwListCount: LPDWORD) -> DWORD;
 }
 extern "C" {
-    pub fn ImmGetCandidateListA(
-        arg1: HIMC,
-        deIndex: DWORD,
-        lpCandList: LPCANDIDATELIST,
-        dwBufLen: DWORD,
-    ) -> DWORD;
+    pub fn ImmGetCandidateListA(arg1: HIMC, deIndex: DWORD, lpCandList: LPCANDIDATELIST, dwBufLen: DWORD) -> DWORD;
 }
 extern "C" {
-    pub fn ImmGetCandidateListW(
-        arg1: HIMC,
-        deIndex: DWORD,
-        lpCandList: LPCANDIDATELIST,
-        dwBufLen: DWORD,
-    ) -> DWORD;
+    pub fn ImmGetCandidateListW(arg1: HIMC, deIndex: DWORD, lpCandList: LPCANDIDATELIST, dwBufLen: DWORD) -> DWORD;
 }
 extern "C" {
     pub fn ImmGetGuideLineA(arg1: HIMC, dwIndex: DWORD, lpBuf: LPSTR, dwBufLen: DWORD) -> DWORD;
@@ -49840,11 +44802,7 @@ extern "C" {
     pub fn ImmGetGuideLineW(arg1: HIMC, dwIndex: DWORD, lpBuf: LPWSTR, dwBufLen: DWORD) -> DWORD;
 }
 extern "C" {
-    pub fn ImmGetConversionStatus(
-        arg1: HIMC,
-        lpfdwConversion: LPDWORD,
-        lpfdwSentence: LPDWORD,
-    ) -> BOOL;
+    pub fn ImmGetConversionStatus(arg1: HIMC, lpfdwConversion: LPDWORD, lpfdwSentence: LPDWORD) -> BOOL;
 }
 extern "C" {
     pub fn ImmSetConversionStatus(arg1: HIMC, arg2: DWORD, arg3: DWORD) -> BOOL;
@@ -49880,24 +44838,10 @@ extern "C" {
     pub fn ImmEscapeW(arg1: HKL, arg2: HIMC, arg3: UINT, arg4: LPVOID) -> LRESULT;
 }
 extern "C" {
-    pub fn ImmGetConversionListA(
-        arg1: HKL,
-        arg2: HIMC,
-        lpSrc: LPCSTR,
-        lpDst: LPCANDIDATELIST,
-        dwBufLen: DWORD,
-        uFlag: UINT,
-    ) -> DWORD;
+    pub fn ImmGetConversionListA(arg1: HKL, arg2: HIMC, lpSrc: LPCSTR, lpDst: LPCANDIDATELIST, dwBufLen: DWORD, uFlag: UINT) -> DWORD;
 }
 extern "C" {
-    pub fn ImmGetConversionListW(
-        arg1: HKL,
-        arg2: HIMC,
-        lpSrc: LPCWSTR,
-        lpDst: LPCANDIDATELIST,
-        dwBufLen: DWORD,
-        uFlag: UINT,
-    ) -> DWORD;
+    pub fn ImmGetConversionListW(arg1: HKL, arg2: HIMC, lpSrc: LPCWSTR, lpDst: LPCANDIDATELIST, dwBufLen: DWORD, uFlag: UINT) -> DWORD;
 }
 extern "C" {
     pub fn ImmNotifyIME(arg1: HIMC, dwAction: DWORD, dwIndex: DWORD, dwValue: DWORD) -> BOOL;
@@ -49929,49 +44873,19 @@ extern "C" {
 extern "C" {
     pub fn ImmGetVirtualKey(arg1: HWND) -> UINT;
 }
-pub type REGISTERWORDENUMPROCA = unsafe extern "C" fn(
-    lpszReading: LPCSTR,
-    arg1: DWORD,
-    lpszString: LPCSTR,
-    arg2: LPVOID,
-) -> ::std::os::raw::c_int;
-pub type REGISTERWORDENUMPROCW = unsafe extern "C" fn(
-    lpszReading: LPCWSTR,
-    arg1: DWORD,
-    lpszString: LPCWSTR,
-    arg2: LPVOID,
-) -> ::std::os::raw::c_int;
+pub type REGISTERWORDENUMPROCA = unsafe extern "C" fn(lpszReading: LPCSTR, arg1: DWORD, lpszString: LPCSTR, arg2: LPVOID) -> ::std::os::raw::c_int;
+pub type REGISTERWORDENUMPROCW = unsafe extern "C" fn(lpszReading: LPCWSTR, arg1: DWORD, lpszString: LPCWSTR, arg2: LPVOID) -> ::std::os::raw::c_int;
 extern "C" {
-    pub fn ImmRegisterWordA(
-        arg1: HKL,
-        lpszReading: LPCSTR,
-        arg2: DWORD,
-        lpszRegister: LPCSTR,
-    ) -> BOOL;
+    pub fn ImmRegisterWordA(arg1: HKL, lpszReading: LPCSTR, arg2: DWORD, lpszRegister: LPCSTR) -> BOOL;
 }
 extern "C" {
-    pub fn ImmRegisterWordW(
-        arg1: HKL,
-        lpszReading: LPCWSTR,
-        arg2: DWORD,
-        lpszRegister: LPCWSTR,
-    ) -> BOOL;
+    pub fn ImmRegisterWordW(arg1: HKL, lpszReading: LPCWSTR, arg2: DWORD, lpszRegister: LPCWSTR) -> BOOL;
 }
 extern "C" {
-    pub fn ImmUnregisterWordA(
-        arg1: HKL,
-        lpszReading: LPCSTR,
-        arg2: DWORD,
-        lpszUnregister: LPCSTR,
-    ) -> BOOL;
+    pub fn ImmUnregisterWordA(arg1: HKL, lpszReading: LPCSTR, arg2: DWORD, lpszUnregister: LPCSTR) -> BOOL;
 }
 extern "C" {
-    pub fn ImmUnregisterWordW(
-        arg1: HKL,
-        lpszReading: LPCWSTR,
-        arg2: DWORD,
-        lpszUnregister: LPCWSTR,
-    ) -> BOOL;
+    pub fn ImmUnregisterWordW(arg1: HKL, lpszReading: LPCWSTR, arg2: DWORD, lpszUnregister: LPCWSTR) -> BOOL;
 }
 extern "C" {
     pub fn ImmGetRegisterWordStyleA(arg1: HKL, nItem: UINT, lpStyleBuf: LPSTYLEBUFA) -> UINT;
@@ -49980,24 +44894,10 @@ extern "C" {
     pub fn ImmGetRegisterWordStyleW(arg1: HKL, nItem: UINT, lpStyleBuf: LPSTYLEBUFW) -> UINT;
 }
 extern "C" {
-    pub fn ImmEnumRegisterWordA(
-        arg1: HKL,
-        arg2: REGISTERWORDENUMPROCA,
-        lpszReading: LPCSTR,
-        arg3: DWORD,
-        lpszRegister: LPCSTR,
-        arg4: LPVOID,
-    ) -> UINT;
+    pub fn ImmEnumRegisterWordA(arg1: HKL, arg2: REGISTERWORDENUMPROCA, lpszReading: LPCSTR, arg3: DWORD, lpszRegister: LPCSTR, arg4: LPVOID) -> UINT;
 }
 extern "C" {
-    pub fn ImmEnumRegisterWordW(
-        arg1: HKL,
-        arg2: REGISTERWORDENUMPROCW,
-        lpszReading: LPCWSTR,
-        arg3: DWORD,
-        lpszRegister: LPCWSTR,
-        arg4: LPVOID,
-    ) -> UINT;
+    pub fn ImmEnumRegisterWordW(arg1: HKL, arg2: REGISTERWORDENUMPROCW, lpszReading: LPCWSTR, arg3: DWORD, lpszRegister: LPCWSTR, arg4: LPVOID) -> UINT;
 }
 extern "C" {
     pub fn ImmDisableIME(arg1: DWORD) -> BOOL;

@@ -1,0 +1,8 @@
+[package]
+name = "lemao-core"
+version = "1.0.0"
+edition = "2021"
+
+[dependencies]
+lemao-opengl = { path = "../lemao-opengl" }
+lemao-winapi = { path = "../lemao-winapi" }

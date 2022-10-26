@@ -2,6 +2,7 @@
 members = [
     "lemao-bin",
     "lemao-bindgen",
+    "lemao-core",
+    "lemao-opengl",
     "lemao-winapi",
-    "lemao-opengl"
 ]

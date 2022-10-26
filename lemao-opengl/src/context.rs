@@ -12,8 +12,8 @@ pub struct OpenGLContext {
 impl Default for OpenGLContext {
     fn default() -> Self {
         unsafe {
-            let opengl32_dll_name = CString::new("opengl32.dll").unwrap();
-            let opengl32_dll_handle = winapi::LoadLibraryA(opengl32_dll_name.as_ptr());
+            let opengl32_dll_cstr = CString::new("opengl32.dll").unwrap();
+            let opengl32_dll_handle = winapi::LoadLibraryA(opengl32_dll_cstr.as_ptr());
 
             Self {
                 glGetString: get_proc_address::<opengl::PFNGLGETSTRINGPROC>("glGetString", opengl32_dll_handle),
@@ -25,16 +25,16 @@ impl Default for OpenGLContext {
 
 fn get_proc_address<T>(name: &str, dll_handle: *mut winapi::HINSTANCE__) -> T {
     unsafe {
-        let function_name = CString::new(name).unwrap();
-        let function_handle = winapi::GetProcAddress(dll_handle, function_name.as_ptr());
+        let function_cstr = CString::new(name).unwrap();
+        let function_handle = winapi::GetProcAddress(dll_handle, function_cstr.as_ptr());
         mem::transmute_copy::<winapi::FARPROC, T>(&function_handle)
     }
 }
 
 fn get_wgl_proc_address<T>(name: &str) -> T {
     unsafe {
-        let function_name = CString::new(name).unwrap();
-        let function_handle = winapi::wglGetProcAddress(function_name.as_ptr());
+        let function_cstr = CString::new(name).unwrap();
+        let function_handle = winapi::wglGetProcAddress(function_cstr.as_ptr());
         mem::transmute_copy::<winapi::PROC, T>(&function_handle)
     }
 }
