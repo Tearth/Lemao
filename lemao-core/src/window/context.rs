@@ -33,7 +33,7 @@ impl WindowContext {
             }
 
             // We box and pin window context, so the pointer will be always valid
-            let mut window_context = Box::pin(Self { hwnd: std::ptr::null_mut(), opengl: None, initialized: false });
+            let mut context = Box::pin(Self { hwnd: std::ptr::null_mut(), opengl: None, initialized: false });
 
             let title_cstr = CString::new(title).unwrap();
             let hwnd = winapi::CreateWindowExA(
@@ -48,7 +48,7 @@ impl WindowContext {
                 std::ptr::null_mut(),
                 std::ptr::null_mut(),
                 module_handle,
-                &mut *window_context as *mut _ as winapi::LPVOID,
+                &mut context as *mut _ as winapi::LPVOID,
             );
 
             if hwnd.is_null() {
@@ -56,9 +56,9 @@ impl WindowContext {
             }
 
             // Wait for WM_CREATE, where the context is initialized
-            while !window_context.initialized {}
+            while !context.initialized {}
 
-            window_context
+            context
         }
     }
 
@@ -77,14 +77,22 @@ impl WindowContext {
             true
         }
     }
+
+    pub fn close(&self) {
+        unsafe {
+            if winapi::DestroyWindow(self.hwnd) == 0 {
+                panic!("{}", winapi::GetLastError());
+            }
+        }
+    }
 }
 
-unsafe extern "C" fn wnd_proc(hwnd: winapi::HWND, message: winapi::UINT, w_param: winapi::WPARAM, l_param: winapi::LPARAM) -> winapi::LRESULT {
+extern "C" fn wnd_proc(hwnd: winapi::HWND, message: winapi::UINT, w_param: winapi::WPARAM, l_param: winapi::LPARAM) -> winapi::LRESULT {
     unsafe {
         match message {
             winapi::WM_CREATE => {
                 let create_struct = &mut *(l_param as *mut winapi::CREATESTRUCT);
-                let window_context = &mut *(create_struct.lpCreateParams as *mut WindowContext);
+                let context = &mut *(create_struct.lpCreateParams as *mut Pin<Box<WindowContext>>);
 
                 let pixel_format_descriptor = winapi::PIXELFORMATDESCRIPTOR {
                     nSize: std::mem::size_of::<winapi::PIXELFORMATDESCRIPTOR>() as u16,
@@ -117,23 +125,32 @@ unsafe extern "C" fn wnd_proc(hwnd: winapi::HWND, message: winapi::UINT, w_param
 
                 let window_device_context: winapi::HDC = winapi::GetDC(hwnd);
                 let window_pixel_format = winapi::ChoosePixelFormat(window_device_context, &pixel_format_descriptor);
-                winapi::SetPixelFormat(window_device_context, window_pixel_format, &pixel_format_descriptor);
+                if winapi::SetPixelFormat(window_device_context, window_pixel_format, &pixel_format_descriptor) == 0 {
+                    panic!("{}", winapi::GetLastError());
+                }
 
                 let opengl_context: winapi::HGLRC = winapi::wglCreateContext(window_device_context);
-                winapi::wglMakeCurrent(window_device_context, opengl_context);
-                winapi::SetWindowLongPtrA(hwnd, winapi::GWLP_USERDATA, window_context as *mut _ as winapi::LONG_PTR);
+                if winapi::wglMakeCurrent(window_device_context, opengl_context) == 0 {
+                    panic!("{}", winapi::GetLastError());
+                }
 
-                window_context.hwnd = hwnd;
-                window_context.opengl = Some(Default::default());
-                window_context.initialized = true;
+                // Save pointer to the window context, so it can be used in all future events
+                winapi::SetWindowLongPtrA(hwnd, winapi::GWLP_USERDATA, context as *mut _ as winapi::LONG_PTR);
+
+                context.hwnd = hwnd;
+                context.opengl = Some(Default::default());
+                context.initialized = true;
             }
             winapi::WM_CLOSE => {
-                winapi::DestroyWindow(hwnd);
+                if winapi::DestroyWindow(hwnd) == 0 {
+                    panic!("{}", winapi::GetLastError());
+                }
+
                 return 0;
             }
             winapi::WM_DESTROY => {
                 // let window_context_ptr = winapi::GetWindowLongPtrA(hwnd, winapi::GWLP_USERDATA);
-                // let window_context = &mut *(window_context_ptr as *mut WindowContext);
+                // let window_context = &mut *(window_context_ptr as *mut Pin<Box<WindowContext>>);
                 winapi::PostQuitMessage(0);
                 return 0;
             }
