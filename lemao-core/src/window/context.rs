@@ -1,12 +1,16 @@
+use lemao_opengl::context::OpenGLContext;
 use lemao_winapi::bindings::winapi;
-use std::ffi::CString;
+use std::{ffi::CString, pin::Pin};
 
 pub struct WindowContext {
     pub hwnd: winapi::HWND,
+    pub opengl: Option<OpenGLContext>,
+
+    pub initialized: bool,
 }
 
 impl WindowContext {
-    pub fn new(title: &str, width: i32, height: i32) -> Self {
+    pub fn new(title: &str, width: i32, height: i32) -> Pin<Box<Self>> {
         unsafe {
             let class_cstr = CString::new("LemaoWindow").unwrap();
             let module_handle = winapi::GetModuleHandleA(std::ptr::null_mut());
@@ -28,6 +32,9 @@ impl WindowContext {
                 panic!("{}", winapi::GetLastError());
             }
 
+            // We box and pin window context, so the pointer will be always valid
+            let mut window_context = Box::pin(Self { hwnd: std::ptr::null_mut(), opengl: None, initialized: false });
+
             let title_cstr = CString::new(title).unwrap();
             let hwnd = winapi::CreateWindowExA(
                 0,
@@ -41,21 +48,24 @@ impl WindowContext {
                 std::ptr::null_mut(),
                 std::ptr::null_mut(),
                 module_handle,
-                std::ptr::null_mut(),
+                &mut *window_context as *mut _ as winapi::LPVOID,
             );
 
             if hwnd.is_null() {
                 panic!("{}", winapi::GetLastError());
             }
 
-            Self { hwnd }
+            // Wait for WM_CREATE, where the context is initialized
+            while !window_context.initialized {}
+
+            window_context
         }
     }
 
     pub fn is_running(&self) -> bool {
         unsafe {
             let mut msg: winapi::MSG = std::mem::zeroed();
-            if winapi::PeekMessageA(&mut msg, self.hwnd, 0, 0, winapi::PM_REMOVE) > 0 {
+            while winapi::PeekMessageA(&mut msg, std::ptr::null_mut(), 0, 0, winapi::PM_REMOVE) > 0 {
                 if msg.message == winapi::WM_QUIT {
                     return false;
                 } else {
@@ -70,49 +80,66 @@ impl WindowContext {
 }
 
 unsafe extern "C" fn wnd_proc(hwnd: winapi::HWND, message: winapi::UINT, w_param: winapi::WPARAM, l_param: winapi::LPARAM) -> winapi::LRESULT {
-    match message {
-        winapi::WM_CREATE => {
-            let pixel_format_descriptor = winapi::PIXELFORMATDESCRIPTOR {
-                nSize: std::mem::size_of::<winapi::PIXELFORMATDESCRIPTOR>() as u16,
-                nVersion: 1,
-                dwFlags: winapi::PFD_DRAW_TO_WINDOW | winapi::PFD_SUPPORT_OPENGL | winapi::PFD_DOUBLEBUFFER,
-                iPixelType: winapi::PFD_TYPE_RGBA as u8,
-                cColorBits: 32,
-                cRedBits: 0,
-                cRedShift: 0,
-                cGreenBits: 0,
-                cGreenShift: 0,
-                cBlueBits: 0,
-                cBlueShift: 0,
-                cAlphaBits: 0,
-                cAlphaShift: 0,
-                cAccumBits: 0,
-                cAccumRedBits: 0,
-                cAccumGreenBits: 0,
-                cAccumBlueBits: 0,
-                cAccumAlphaBits: 0,
-                cDepthBits: 24,
-                cStencilBits: 8,
-                cAuxBuffers: 0,
-                iLayerType: winapi::PFD_MAIN_PLANE as u8,
-                bReserved: 0,
-                dwLayerMask: 0,
-                dwVisibleMask: 0,
-                dwDamageMask: 0,
-            };
+    unsafe {
+        match message {
+            winapi::WM_CREATE => {
+                let create_struct = &mut *(l_param as *mut winapi::CREATESTRUCT);
+                let window_context = &mut *(create_struct.lpCreateParams as *mut WindowContext);
 
-            let window_device_context: winapi::HDC = winapi::GetDC(hwnd);
-            let window_pixel_format = winapi::ChoosePixelFormat(window_device_context, &pixel_format_descriptor);
-            winapi::SetPixelFormat(window_device_context, window_pixel_format, &pixel_format_descriptor);
+                let pixel_format_descriptor = winapi::PIXELFORMATDESCRIPTOR {
+                    nSize: std::mem::size_of::<winapi::PIXELFORMATDESCRIPTOR>() as u16,
+                    nVersion: 1,
+                    dwFlags: winapi::PFD_DRAW_TO_WINDOW | winapi::PFD_SUPPORT_OPENGL | winapi::PFD_DOUBLEBUFFER,
+                    iPixelType: winapi::PFD_TYPE_RGBA as u8,
+                    cColorBits: 32,
+                    cRedBits: 0,
+                    cRedShift: 0,
+                    cGreenBits: 0,
+                    cGreenShift: 0,
+                    cBlueBits: 0,
+                    cBlueShift: 0,
+                    cAlphaBits: 0,
+                    cAlphaShift: 0,
+                    cAccumBits: 0,
+                    cAccumRedBits: 0,
+                    cAccumGreenBits: 0,
+                    cAccumBlueBits: 0,
+                    cAccumAlphaBits: 0,
+                    cDepthBits: 24,
+                    cStencilBits: 8,
+                    cAuxBuffers: 0,
+                    iLayerType: winapi::PFD_MAIN_PLANE as u8,
+                    bReserved: 0,
+                    dwLayerMask: 0,
+                    dwVisibleMask: 0,
+                    dwDamageMask: 0,
+                };
 
-            let opengl_context: winapi::HGLRC = winapi::wglCreateContext(window_device_context);
-            winapi::wglMakeCurrent(window_device_context, opengl_context);
+                let window_device_context: winapi::HDC = winapi::GetDC(hwnd);
+                let window_pixel_format = winapi::ChoosePixelFormat(window_device_context, &pixel_format_descriptor);
+                winapi::SetPixelFormat(window_device_context, window_pixel_format, &pixel_format_descriptor);
+
+                let opengl_context: winapi::HGLRC = winapi::wglCreateContext(window_device_context);
+                winapi::wglMakeCurrent(window_device_context, opengl_context);
+                winapi::SetWindowLongPtrA(hwnd, winapi::GWLP_USERDATA, window_context as *mut _ as winapi::LONG_PTR);
+
+                window_context.hwnd = hwnd;
+                window_context.opengl = Some(Default::default());
+                window_context.initialized = true;
+            }
+            winapi::WM_CLOSE => {
+                winapi::DestroyWindow(hwnd);
+                return 0;
+            }
+            winapi::WM_DESTROY => {
+                // let window_context_ptr = winapi::GetWindowLongPtrA(hwnd, winapi::GWLP_USERDATA);
+                // let window_context = &mut *(window_context_ptr as *mut WindowContext);
+                winapi::PostQuitMessage(0);
+                return 0;
+            }
+            _ => {}
         }
-        winapi::WM_DESTROY => {
-            std::process::exit(0);
-        }
-        _ => {}
+
+        winapi::DefWindowProcA(hwnd, message, w_param, l_param)
     }
-
-    winapi::DefWindowProcA(hwnd, message, w_param, l_param)
 }
