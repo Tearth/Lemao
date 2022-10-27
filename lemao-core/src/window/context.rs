@@ -75,6 +75,7 @@ impl WindowContext {
 
                 match message.message {
                     winapi::WM_KEYDOWN => Some(message.into()),
+                    winapi::WM_KEYUP => Some(message.into()),
                     winapi::WM_CHAR => Some(message.into()),
                     winapi::WM_QUIT => Some(InputEvent::WindowClosed),
                     _ => None,

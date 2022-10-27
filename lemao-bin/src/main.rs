@@ -14,6 +14,7 @@ fn main() {
                     Key::Escape => window.close(),
                     _ => println!("Pressed {:?}", k),
                 },
+                InputEvent::KeyReleased(k) => println!("Released {:?}", k),
                 InputEvent::CharPressed(c) => println!("{:?}", c),
                 InputEvent::WindowClosed => {
                     is_running = false;
