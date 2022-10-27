@@ -1,19 +1,25 @@
 use lemao_opengl::context::OpenGLContext;
 use lemao_winapi::bindings::winapi;
-use std::{ffi::CString, pin::Pin};
+use std::ffi::CString;
+use std::mem;
+use std::pin::Pin;
+use std::ptr;
+
+use super::input::InputEvent;
 
 pub struct WindowContext {
-    pub hwnd: winapi::HWND,
-    pub opengl: Option<OpenGLContext>,
+    hwnd: winapi::HWND,
+    opengl: Option<OpenGLContext>,
 
-    pub initialized: bool,
+    initialized: bool,
+    closed: bool,
 }
 
 impl WindowContext {
     pub fn new(title: &str, width: i32, height: i32) -> Pin<Box<Self>> {
         unsafe {
             let class_cstr = CString::new("LemaoWindow").unwrap();
-            let module_handle = winapi::GetModuleHandleA(std::ptr::null_mut());
+            let module_handle = winapi::GetModuleHandleA(ptr::null_mut());
 
             let wnd_class = winapi::WNDCLASS {
                 lpfnWndProc: wnd_proc,
@@ -23,9 +29,9 @@ impl WindowContext {
                 style: winapi::CS_OWNDC,
                 cbClsExtra: 0,
                 cbWndExtra: 0,
-                hIcon: std::ptr::null_mut(),
-                hCursor: winapi::LoadCursorA(std::ptr::null_mut(), 32512 as *const i8),
-                lpszMenuName: std::ptr::null_mut(),
+                hIcon: ptr::null_mut(),
+                hCursor: winapi::LoadCursorA(ptr::null_mut(), 32512 as *const i8),
+                lpszMenuName: ptr::null_mut(),
             };
 
             if winapi::RegisterClassA(&wnd_class) == 0 {
@@ -33,7 +39,7 @@ impl WindowContext {
             }
 
             // We box and pin window context, so the pointer will be always valid
-            let mut context = Box::pin(Self { hwnd: std::ptr::null_mut(), opengl: None, initialized: false });
+            let mut context = Box::pin(Self { hwnd: ptr::null_mut(), opengl: None, initialized: false, closed: false });
 
             let title_cstr = CString::new(title).unwrap();
             let hwnd = winapi::CreateWindowExA(
@@ -45,10 +51,10 @@ impl WindowContext {
                 0,
                 width,
                 height,
-                std::ptr::null_mut(),
-                std::ptr::null_mut(),
+                ptr::null_mut(),
+                ptr::null_mut(),
                 module_handle,
-                &mut context as *mut _ as winapi::LPVOID,
+                &mut *context as *mut _ as winapi::LPVOID,
             );
 
             if hwnd.is_null() {
@@ -62,20 +68,28 @@ impl WindowContext {
         }
     }
 
-    pub fn is_running(&self) -> bool {
+    pub fn poll_event(&self) -> Option<InputEvent> {
         unsafe {
-            let mut msg: winapi::MSG = std::mem::zeroed();
-            while winapi::PeekMessageA(&mut msg, std::ptr::null_mut(), 0, 0, winapi::PM_REMOVE) > 0 {
-                if msg.message == winapi::WM_QUIT {
-                    return false;
-                } else {
-                    winapi::TranslateMessage(&msg);
-                    winapi::DispatchMessageA(&msg);
+            let mut msg: winapi::MSG = mem::zeroed();
+            if winapi::PeekMessageA(&mut msg, ptr::null_mut(), 0, 0, winapi::PM_REMOVE) > 0 {
+                match msg.message {
+                    winapi::WM_QUIT => Some(InputEvent::WindowClosed),
+                    winapi::WM_KEYDOWN => {
+                        winapi::TranslateMessage(&msg);
+                        winapi::DispatchMessageA(&msg);
+                        Some(msg.into())
+                    }
+                    winapi::WM_CHAR => Some(msg.into()),
+                    _ => None,
                 }
+            } else {
+                None
             }
-
-            true
         }
+    }
+
+    pub fn is_running(&self) -> bool {
+        !self.closed
     }
 
     pub fn close(&self) {
@@ -92,10 +106,10 @@ extern "C" fn wnd_proc(hwnd: winapi::HWND, message: winapi::UINT, w_param: winap
         match message {
             winapi::WM_CREATE => {
                 let create_struct = &mut *(l_param as *mut winapi::CREATESTRUCT);
-                let context = &mut *(create_struct.lpCreateParams as *mut Pin<Box<WindowContext>>);
+                let context = &mut *(create_struct.lpCreateParams as *mut WindowContext);
 
                 let pixel_format_descriptor = winapi::PIXELFORMATDESCRIPTOR {
-                    nSize: std::mem::size_of::<winapi::PIXELFORMATDESCRIPTOR>() as u16,
+                    nSize: mem::size_of::<winapi::PIXELFORMATDESCRIPTOR>() as u16,
                     nVersion: 1,
                     dwFlags: winapi::PFD_DRAW_TO_WINDOW | winapi::PFD_SUPPORT_OPENGL | winapi::PFD_DOUBLEBUFFER,
                     iPixelType: winapi::PFD_TYPE_RGBA as u8,
