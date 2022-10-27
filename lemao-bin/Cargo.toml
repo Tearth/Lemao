@@ -5,3 +5,4 @@ edition = "2021"
 
 [dependencies]
 lemao-core = { path = "../lemao-core" }
+lemao-opengl = { path = "../lemao-opengl" }

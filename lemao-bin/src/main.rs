@@ -1,6 +1,29 @@
 use lemao_core::window::context::WindowContext;
+use lemao_core::window::input;
+use lemao_core::window::input::InputEvent;
+use lemao_core::window::input::Key;
 
 fn main() {
     let window = WindowContext::new("Test", 800, 600);
-    while window.is_running() {}
+    let mut is_running = true;
+
+    while is_running {
+        while let Some(event) = window.poll_event() {
+            match event {
+                InputEvent::KeyPressed(k) => match k {
+                    Key::Escape => window.close(),
+                    _ => println!("Pressed {:?}", k),
+                },
+                InputEvent::CharPressed(c) => println!("{:?}", c),
+                InputEvent::WindowClosed => {
+                    is_running = false;
+                }
+                _ => {}
+            }
+        }
+
+        if input::is_key_pressed(Key::Space) {
+            println!("Pressed space");
+        }
+    }
 }

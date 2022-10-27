@@ -70,9 +70,9 @@ pub enum Key {
 }
 
 impl From<winapi::MSG> for InputEvent {
-    fn from(msg: winapi::MSG) -> InputEvent {
-        match msg.message {
-            winapi::WM_KEYDOWN => match msg.wParam {
+    fn from(message: winapi::MSG) -> InputEvent {
+        match message.message {
+            winapi::WM_KEYDOWN => match message.wParam {
                 0x0d => InputEvent::KeyPressed(Key::Enter),
                 0x1b => InputEvent::KeyPressed(Key::Escape),
                 0x20 => InputEvent::KeyPressed(Key::Space),
@@ -133,7 +133,7 @@ impl From<winapi::MSG> for InputEvent {
 
                 _ => InputEvent::Invalid,
             },
-            winapi::WM_CHAR => InputEvent::CharPressed(char::from_u32(msg.wParam as u32).unwrap()),
+            winapi::WM_CHAR => InputEvent::CharPressed(char::from_u32(message.wParam as u32).unwrap()),
             _ => InputEvent::Invalid,
         }
     }

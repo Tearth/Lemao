@@ -6,6 +6,7 @@ use std::mem;
 #[allow(non_snake_case)]
 pub struct OpenGLContext {
     pub glGetString: opengl::PFNGLGETSTRINGPROC,
+    pub glViewport: opengl::PFNGLVIEWPORTPROC,
     pub glCreateProgram: opengl::PFNGLCREATEPROGRAMPROC,
 }
 
@@ -17,6 +18,7 @@ impl Default for OpenGLContext {
 
             Self {
                 glGetString: get_proc_address::<opengl::PFNGLGETSTRINGPROC>("glGetString", opengl32_dll_handle),
+                glViewport: get_proc_address::<opengl::PFNGLVIEWPORTPROC>("glViewport", opengl32_dll_handle),
                 glCreateProgram: get_wgl_proc_address::<opengl::PFNGLCREATEPROGRAMPROC>("glCreateProgram"),
             }
         }
