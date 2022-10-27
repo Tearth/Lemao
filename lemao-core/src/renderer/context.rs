@@ -8,7 +8,7 @@ pub struct RendererContext {
 }
 
 impl RendererContext {
-    pub fn init(&mut self, hwnd: winapi::HWND) {
+    pub fn init(&mut self, hdc: winapi::HDC) {
         unsafe {
             let pixel_format_descriptor = winapi::PIXELFORMATDESCRIPTOR {
                 nSize: mem::size_of::<winapi::PIXELFORMATDESCRIPTOR>() as u16,
@@ -39,14 +39,13 @@ impl RendererContext {
                 dwDamageMask: 0,
             };
 
-            let device_context: winapi::HDC = winapi::GetDC(hwnd);
-            let pixel_format = winapi::ChoosePixelFormat(device_context, &pixel_format_descriptor);
-            if winapi::SetPixelFormat(device_context, pixel_format, &pixel_format_descriptor) == 0 {
+            let pixel_format = winapi::ChoosePixelFormat(hdc, &pixel_format_descriptor);
+            if winapi::SetPixelFormat(hdc, pixel_format, &pixel_format_descriptor) == 0 {
                 panic!("{}", winapi::GetLastError());
             }
 
-            let opengl_context: winapi::HGLRC = winapi::wglCreateContext(device_context);
-            if winapi::wglMakeCurrent(device_context, opengl_context) == 0 {
+            let opengl_context: winapi::HGLRC = winapi::wglCreateContext(hdc);
+            if winapi::wglMakeCurrent(hdc, opengl_context) == 0 {
                 panic!("{}", winapi::GetLastError());
             }
 

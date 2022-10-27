@@ -8,6 +8,7 @@ use std::ptr;
 
 pub struct WindowContext {
     hwnd: winapi::HWND,
+    hdc: winapi::HDC,
     renderer: Option<RendererContext>,
 
     initialized: bool,
@@ -37,7 +38,7 @@ impl WindowContext {
             }
 
             // We box and pin window context, so the pointer will be always valid
-            let mut context = Box::pin(Self { hwnd: ptr::null_mut(), renderer: None, initialized: false });
+            let mut context = Box::pin(Self { hwnd: ptr::null_mut(), hdc: ptr::null_mut(), renderer: None, initialized: false });
 
             let title_cstr = CString::new(title).unwrap();
             let hwnd = winapi::CreateWindowExA(
@@ -86,6 +87,12 @@ impl WindowContext {
         }
     }
 
+    pub fn swap_buffers(&self) {
+        unsafe {
+            winapi::SwapBuffers(self.hdc);
+        }
+    }
+
     pub fn close(&self) {
         unsafe {
             if winapi::DestroyWindow(self.hwnd) == 0 {
@@ -101,13 +108,15 @@ extern "C" fn wnd_proc(hwnd: winapi::HWND, message: winapi::UINT, w_param: winap
             winapi::WM_CREATE => {
                 let create_struct = &mut *(l_param as *mut winapi::CREATESTRUCT);
                 let window = &mut *(create_struct.lpCreateParams as *mut WindowContext);
+                let hdc: winapi::HDC = winapi::GetDC(hwnd);
 
                 // Save pointer to the window context, so it can be used in all future events
                 winapi::SetWindowLongPtrA(hwnd, winapi::GWLP_USERDATA, window as *mut _ as winapi::LONG_PTR);
 
                 window.hwnd = hwnd;
+                window.hdc = hdc;
                 window.renderer = Some(Default::default());
-                window.renderer.as_mut().unwrap().init(hwnd);
+                window.renderer.as_mut().unwrap().init(hdc);
                 window.initialized = true;
             }
             winapi::WM_SIZE => {

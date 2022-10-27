@@ -24,7 +24,9 @@ fn main() {
         }
 
         if input::is_key_pressed(Key::Space) {
-            println!("Pressed space");
+            println!("Pressed Space");
         }
+
+        window.swap_buffers();
     }
 }
