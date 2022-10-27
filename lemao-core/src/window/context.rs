@@ -68,17 +68,19 @@ impl WindowContext {
         }
     }
 
-    pub fn poll_event(&self) -> Option<InputEvent> {
+    pub fn poll_event(&mut self) -> Option<InputEvent> {
         unsafe {
             let mut msg: winapi::MSG = mem::zeroed();
             if winapi::PeekMessageA(&mut msg, ptr::null_mut(), 0, 0, winapi::PM_REMOVE) > 0 {
+                winapi::TranslateMessage(&msg);
+                winapi::DispatchMessageA(&msg);
+
                 match msg.message {
-                    winapi::WM_QUIT => Some(InputEvent::WindowClosed),
-                    winapi::WM_KEYDOWN => {
-                        winapi::TranslateMessage(&msg);
-                        winapi::DispatchMessageA(&msg);
-                        Some(msg.into())
+                    winapi::WM_QUIT => {
+                        self.closed = true;
+                        Some(InputEvent::WindowClosed)
                     }
+                    winapi::WM_KEYDOWN => Some(msg.into()),
                     winapi::WM_CHAR => Some(msg.into()),
                     _ => None,
                 }
