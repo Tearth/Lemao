@@ -89,7 +89,9 @@ impl WindowContext {
 
     pub fn swap_buffers(&self) {
         unsafe {
-            winapi::SwapBuffers(self.hdc);
+            if !self.hdc.is_null() && winapi::SwapBuffers(self.hdc) == 0 {
+                panic!("{}", winapi::GetLastError());
+            }
         }
     }
 
@@ -138,6 +140,14 @@ extern "C" fn wnd_proc(hwnd: winapi::HWND, message: winapi::UINT, w_param: winap
                 return 0;
             }
             winapi::WM_DESTROY => {
+                let window_ptr = winapi::GetWindowLongPtrA(hwnd, winapi::GWLP_USERDATA);
+                let window = &mut *(window_ptr as *mut WindowContext);
+                let renderer = window.renderer.as_ref().unwrap();
+
+                renderer.release();
+                window.hwnd = ptr::null_mut();
+                window.hdc = ptr::null_mut();
+
                 winapi::PostQuitMessage(0);
                 return 0;
             }

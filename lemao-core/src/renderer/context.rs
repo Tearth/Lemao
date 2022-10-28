@@ -5,6 +5,7 @@ use std::mem;
 #[derive(Default)]
 pub struct RendererContext {
     pub gl: Option<OpenGLContext>,
+    pub gl_context: Option<winapi::HGLRC>,
 }
 
 impl RendererContext {
@@ -44,12 +45,19 @@ impl RendererContext {
                 panic!("{}", winapi::GetLastError());
             }
 
-            let opengl_context: winapi::HGLRC = winapi::wglCreateContext(hdc);
-            if winapi::wglMakeCurrent(hdc, opengl_context) == 0 {
+            let gl_context: winapi::HGLRC = winapi::wglCreateContext(hdc);
+            if winapi::wglMakeCurrent(hdc, gl_context) == 0 {
                 panic!("{}", winapi::GetLastError());
             }
 
             self.gl = Some(Default::default());
+            self.gl_context = Some(gl_context);
+        }
+    }
+
+    pub fn release(&self) {
+        unsafe {
+            winapi::wglDeleteContext(self.gl_context.unwrap());
         }
     }
 }
