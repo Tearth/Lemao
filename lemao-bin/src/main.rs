@@ -2,6 +2,7 @@ use lemao_core::window::context::WindowContext;
 use lemao_core::window::input;
 use lemao_core::window::input::InputEvent;
 use lemao_core::window::input::Key;
+use lemao_math::color::Color;
 
 fn main() {
     let window = WindowContext::new("Test", 800, 600);
@@ -27,6 +28,7 @@ fn main() {
             println!("Pressed Space");
         }
 
+        window.clear(Color::new(0.0, 0.0, 0.1, 1.0));
         window.swap_buffers();
     }
 }

@@ -5,6 +5,8 @@ use std::mem;
 
 #[allow(non_snake_case)]
 pub struct OpenGLContext {
+    pub glClear: opengl::PFNGLCLEARPROC,
+    pub glClearColor: opengl::PFNGLCLEARCOLORPROC,
     pub glGetString: opengl::PFNGLGETSTRINGPROC,
     pub glViewport: opengl::PFNGLVIEWPORTPROC,
     pub glCreateProgram: opengl::PFNGLCREATEPROGRAMPROC,
@@ -17,6 +19,8 @@ impl Default for OpenGLContext {
             let opengl32_dll_handle = winapi::LoadLibraryA(opengl32_dll_cstr.as_ptr());
 
             Self {
+                glClear: get_proc_address::<opengl::PFNGLCLEARPROC>("glClear", opengl32_dll_handle),
+                glClearColor: get_proc_address::<opengl::PFNGLCLEARCOLORPROC>("glClearColor", opengl32_dll_handle),
                 glGetString: get_proc_address::<opengl::PFNGLGETSTRINGPROC>("glGetString", opengl32_dll_handle),
                 glViewport: get_proc_address::<opengl::PFNGLVIEWPORTPROC>("glViewport", opengl32_dll_handle),
                 glCreateProgram: get_wgl_proc_address::<opengl::PFNGLCREATEPROGRAMPROC>("glCreateProgram"),

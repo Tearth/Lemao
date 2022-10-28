@@ -1,5 +1,6 @@
 use super::input::InputEvent;
 use crate::renderer::context::RendererContext;
+use lemao_math::color::Color;
 use lemao_winapi::bindings::winapi;
 use std::ffi::CString;
 use std::mem;
@@ -87,6 +88,10 @@ impl WindowContext {
         }
     }
 
+    pub fn clear(&self, color: Color) {
+        self.renderer.as_ref().unwrap().clear(color)
+    }
+
     pub fn swap_buffers(&self) {
         unsafe {
             if !self.hdc.is_null() && winapi::SwapBuffers(self.hdc) == 0 {
@@ -117,20 +122,18 @@ extern "C" fn wnd_proc(hwnd: winapi::HWND, message: winapi::UINT, w_param: winap
 
                 window.hwnd = hwnd;
                 window.hdc = hdc;
-                window.renderer = Some(Default::default());
-                window.renderer.as_mut().unwrap().init(hdc);
+                window.renderer = Some(RendererContext::new(hdc));
                 window.initialized = true;
             }
             winapi::WM_SIZE => {
                 let window_ptr = winapi::GetWindowLongPtrA(hwnd, winapi::GWLP_USERDATA);
                 let window = &mut *(window_ptr as *mut WindowContext);
                 let renderer = window.renderer.as_ref().unwrap();
-                let gl = renderer.gl.as_ref().unwrap();
 
                 let width = (l_param & 0xffff) as i32;
                 let height = (l_param >> 16) as i32;
 
-                (gl.glViewport)(0, 0, width, height);
+                (renderer.gl.glViewport)(0, 0, width, height);
             }
             winapi::WM_CLOSE => {
                 if winapi::DestroyWindow(hwnd) == 0 {

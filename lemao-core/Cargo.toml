@@ -4,5 +4,6 @@ version = "1.0.0"
 edition = "2021"
 
 [dependencies]
+lemao-math = { path = "../lemao-math" }
 lemao-opengl = { path = "../lemao-opengl" }
 lemao-winapi = { path = "../lemao-winapi" }

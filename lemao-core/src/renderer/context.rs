@@ -1,15 +1,16 @@
+use lemao_math::color::Color;
+use lemao_opengl::bindings::opengl;
 use lemao_opengl::context::OpenGLContext;
 use lemao_winapi::bindings::winapi;
 use std::mem;
 
-#[derive(Default)]
 pub struct RendererContext {
-    pub gl: Option<OpenGLContext>,
-    pub gl_context: Option<winapi::HGLRC>,
+    pub gl: OpenGLContext,
+    pub gl_context: winapi::HGLRC,
 }
 
 impl RendererContext {
-    pub fn init(&mut self, hdc: winapi::HDC) {
+    pub fn new(hdc: winapi::HDC) -> Self {
         unsafe {
             let pixel_format_descriptor = winapi::PIXELFORMATDESCRIPTOR {
                 nSize: mem::size_of::<winapi::PIXELFORMATDESCRIPTOR>() as u16,
@@ -50,14 +51,20 @@ impl RendererContext {
                 panic!("{}", winapi::GetLastError());
             }
 
-            self.gl = Some(Default::default());
-            self.gl_context = Some(gl_context);
+            RendererContext { gl: Default::default(), gl_context }
+        }
+    }
+
+    pub fn clear(&self, color: Color) {
+        unsafe {
+            (self.gl.glClearColor)(color.r, color.g, color.b, color.a);
+            (self.gl.glClear)(opengl::GL_COLOR_BUFFER_BIT);
         }
     }
 
     pub fn release(&self) {
         unsafe {
-            winapi::wglDeleteContext(self.gl_context.unwrap());
+            winapi::wglDeleteContext(self.gl_context);
         }
     }
 }
