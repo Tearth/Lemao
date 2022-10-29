@@ -56,7 +56,7 @@ impl RendererContext {
             }
 
             let gl = Default::default();
-            let default_shader_program = match shaders::load_and_compile(&gl, shaders::DEFAULT_VERTEX_SHADER, shaders::DEFAULT_FRAGMENT_SHADER) {
+            let default_shader_program = match shaders::load_default(&gl) {
                 Ok(value) => value,
                 Err(message) => panic!("Default shader compilation error: {}", message),
             };

@@ -3,8 +3,8 @@ use lemao_opengl::context::OpenGLContext;
 use std::ffi::c_void;
 use std::mem;
 use std::ptr;
-
-use super::bmp::Texture;
+use super::textures::Texture;
+use super::textures::TextureFormat;
 
 pub struct Sprite {
     pub vao: u32,
@@ -63,6 +63,8 @@ impl Sprite {
 
             // Texture
             let mut texture = 0;
+            let format = if texture_data.format == TextureFormat::RGB { opengl::GL_RGB } else { opengl::GL_RGBA};
+
             (gl.glGenTextures)(1, &mut texture);
             (gl.glBindTexture)(opengl::GL_TEXTURE_2D, texture);
             (gl.glTexParameteri)(opengl::GL_TEXTURE_2D, opengl::GL_TEXTURE_WRAP_S, opengl::GL_MIRRORED_REPEAT as i32);
@@ -72,11 +74,11 @@ impl Sprite {
             (gl.glTexImage2D)(
                 opengl::GL_TEXTURE_2D,
                 0,
-                opengl::GL_RGBA as i32,
+                format as i32,
                 240,
                 240,
                 0,
-                opengl::GL_RGBA,
+                format,
                 opengl::GL_UNSIGNED_BYTE,
                 texture_data.data.as_ptr() as *const c_void,
             );
