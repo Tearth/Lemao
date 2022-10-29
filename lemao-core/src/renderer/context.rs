@@ -1,3 +1,4 @@
+use super::bmp::Texture;
 use super::shaders;
 use super::sprite::Sprite;
 use lemao_math::color::Color;
@@ -78,8 +79,8 @@ impl RendererContext {
         }
     }
 
-    pub fn create_sprite(&self) -> Sprite {
-        Sprite::new(&self.gl)
+    pub fn create_sprite(&self, loaded_texture: &Texture) -> Sprite {
+        Sprite::new(&self.gl, loaded_texture)
     }
 
     pub fn draw(&self, sprite: &Sprite) {

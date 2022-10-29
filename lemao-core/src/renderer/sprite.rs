@@ -4,18 +4,28 @@ use std::ffi::c_void;
 use std::mem;
 use std::ptr;
 
+use super::bmp::Texture;
+
 pub struct Sprite {
     pub vao: u32,
+    pub texture: u32
 }
 
 impl Sprite {
-    pub fn new(gl: &OpenGLContext) -> Self {
+    pub fn new(gl: &OpenGLContext, texture_data: &Texture) -> Self {
         unsafe {
             let mut vao = 0;
             (gl.glGenVertexArrays)(1, &mut vao);
             (gl.glBindVertexArray)(vao);
-
-            let vertices: [f32; 12] = [0.5, 0.5, 0.0, 0.5, -0.5, 0.0, -0.5, -0.5, 0.0, -0.5, 0.5, 0.0];
+            (gl.glEnable)(opengl::GL_BLEND);
+            (gl.glBlendFunc)(opengl::GL_SRC_ALPHA, opengl::GL_ONE_MINUS_SRC_ALPHA);
+            #[rustfmt::skip]
+            let vertices: [f32; 20] = [
+                0.5, 0.5, 0.0,      1.0, 1.0, 
+                0.5, -0.5, 0.0,     1.0, 0.0,
+                -0.5, -0.5, 0.0,    0.0, 0.0,
+                -0.5, 0.5, 0.0,     0.0, 1.0,
+            ];
             let indices: [u32; 6] = [0, 1, 3, 1, 2, 3];
 
             let mut vbo = 0u32;
@@ -38,10 +48,41 @@ impl Sprite {
                 opengl::GL_STATIC_DRAW,
             );
 
-            (gl.glVertexAttribPointer)(0, 3, opengl::GL_FLOAT, opengl::GL_FALSE as u8, (3 * mem::size_of::<f32>()) as i32, ptr::null_mut());
+            (gl.glVertexAttribPointer)(0, 3, opengl::GL_FLOAT, opengl::GL_FALSE as u8, (5 * mem::size_of::<f32>()) as i32, ptr::null_mut());
             (gl.glEnableVertexAttribArray)(0);
 
-            Sprite { vao }
+            (gl.glVertexAttribPointer)(
+                1,
+                2,
+                opengl::GL_FLOAT,
+                opengl::GL_FALSE as u8,
+                (5 * mem::size_of::<f32>()) as i32,
+                (3 * mem::size_of::<f32>()) as *const c_void,
+            );
+            (gl.glEnableVertexAttribArray)(1);
+
+            // Texture
+            let mut texture = 0;
+            (gl.glGenTextures)(1, &mut texture);
+            (gl.glBindTexture)(opengl::GL_TEXTURE_2D, texture);
+            (gl.glTexParameteri)(opengl::GL_TEXTURE_2D, opengl::GL_TEXTURE_WRAP_S, opengl::GL_MIRRORED_REPEAT as i32);
+            (gl.glTexParameteri)(opengl::GL_TEXTURE_2D, opengl::GL_TEXTURE_WRAP_T, opengl::GL_MIRRORED_REPEAT as i32);
+            (gl.glTexParameteri)(opengl::GL_TEXTURE_2D, opengl::GL_TEXTURE_MIN_FILTER, opengl::GL_NEAREST as i32);
+            (gl.glTexParameteri)(opengl::GL_TEXTURE_2D, opengl::GL_TEXTURE_MAG_FILTER, opengl::GL_LINEAR as i32);
+            (gl.glTexImage2D)(
+                opengl::GL_TEXTURE_2D,
+                0,
+                opengl::GL_RGBA as i32,
+                240,
+                240,
+                0,
+                opengl::GL_RGBA,
+                opengl::GL_UNSIGNED_BYTE,
+                texture_data.data.as_ptr() as *const c_void,
+            );
+            (gl.glGenerateMipmap)(opengl::GL_TEXTURE_2D);
+
+            Sprite { vao, texture }
         }
     }
 
