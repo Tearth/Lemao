@@ -1,6 +1,6 @@
-use super::bmp::Texture;
 use super::shaders;
 use super::sprite::Sprite;
+use super::textures::Texture;
 use lemao_math::color::Color;
 use lemao_opengl::bindings::opengl;
 use lemao_opengl::context::OpenGLContext;
