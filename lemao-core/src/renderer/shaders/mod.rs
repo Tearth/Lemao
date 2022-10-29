@@ -39,15 +39,15 @@ pub fn load(gl: &OpenGLContext, vertex_shader: &str, fragment_shader: &str) -> R
             return Err(String::from_utf8(log).unwrap());
         }
 
-        let shader_program = (gl.glCreateProgram)();
-        (gl.glAttachShader)(shader_program, vertex_shader_id);
-        (gl.glAttachShader)(shader_program, fragment_shader_id);
-        (gl.glLinkProgram)(shader_program);
+        let shader_program_id = (gl.glCreateProgram)();
+        (gl.glAttachShader)(shader_program_id, vertex_shader_id);
+        (gl.glAttachShader)(shader_program_id, fragment_shader_id);
+        (gl.glLinkProgram)(shader_program_id);
 
-        (gl.glGetProgramiv)(shader_program, opengl::GL_LINK_STATUS, &mut success);
+        (gl.glGetProgramiv)(shader_program_id, opengl::GL_LINK_STATUS, &mut success);
         if success == 0 {
             let mut log = vec![0; ERROR_LENGTH];
-            (gl.glGetProgramInfoLog)(shader_program, 1024, ptr::null_mut(), log.as_mut_ptr() as *mut i8);
+            (gl.glGetProgramInfoLog)(shader_program_id, 1024, ptr::null_mut(), log.as_mut_ptr() as *mut i8);
 
             return Err(String::from_utf8(log).unwrap());
         }
@@ -55,7 +55,7 @@ pub fn load(gl: &OpenGLContext, vertex_shader: &str, fragment_shader: &str) -> R
         (gl.glDeleteShader)(vertex_shader_id);
         (gl.glDeleteShader)(fragment_shader_id);
 
-        Ok(shader_program)
+        Ok(shader_program_id)
     }
 }
 

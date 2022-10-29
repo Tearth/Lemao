@@ -1,5 +1,5 @@
+use super::objects::Sprite;
 use super::shaders;
-use super::sprite::Sprite;
 use super::textures::Texture;
 use lemao_math::color::Color;
 use lemao_opengl::bindings::opengl;
@@ -61,6 +61,8 @@ impl RendererContext {
                 Err(message) => panic!("Default shader compilation error: {}", message),
             };
             (gl.glUseProgram)(default_shader_program);
+            (gl.glEnable)(opengl::GL_BLEND);
+            (gl.glBlendFunc)(opengl::GL_SRC_ALPHA, opengl::GL_ONE_MINUS_SRC_ALPHA);
 
             RendererContext { gl, gl_context, default_shader_program }
         }

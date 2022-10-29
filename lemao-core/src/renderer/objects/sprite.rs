@@ -3,22 +3,21 @@ use lemao_opengl::context::OpenGLContext;
 use std::ffi::c_void;
 use std::mem;
 use std::ptr;
-use super::textures::Texture;
-use super::textures::TextureFormat;
+use crate::renderer::textures::Texture;
+use crate::renderer::textures::TextureFormat;
 
 pub struct Sprite {
-    pub vao: u32,
-    pub texture: u32
+    pub vao_index: u32,
+    pub texture_index: u32
 }
 
 impl Sprite {
     pub fn new(gl: &OpenGLContext, texture_data: &Texture) -> Self {
         unsafe {
-            let mut vao = 0;
-            (gl.glGenVertexArrays)(1, &mut vao);
-            (gl.glBindVertexArray)(vao);
-            (gl.glEnable)(opengl::GL_BLEND);
-            (gl.glBlendFunc)(opengl::GL_SRC_ALPHA, opengl::GL_ONE_MINUS_SRC_ALPHA);
+            let mut vao_index = 0;
+            (gl.glGenVertexArrays)(1, &mut vao_index);
+            (gl.glBindVertexArray)(vao_index);
+            
             #[rustfmt::skip]
             let vertices: [f32; 20] = [
                 0.5, 0.5, 0.0,      1.0, 1.0, 
@@ -28,9 +27,9 @@ impl Sprite {
             ];
             let indices: [u32; 6] = [0, 1, 3, 1, 2, 3];
 
-            let mut vbo = 0u32;
-            (gl.glGenBuffers)(1, &mut vbo);
-            (gl.glBindBuffer)(opengl::GL_ARRAY_BUFFER, vbo);
+            let mut vbo_index = 0u32;
+            (gl.glGenBuffers)(1, &mut vbo_index);
+            (gl.glBindBuffer)(opengl::GL_ARRAY_BUFFER, vbo_index);
             (gl.glBufferData)(
                 opengl::GL_ARRAY_BUFFER,
                 (mem::size_of::<f32>() * vertices.len()) as i64,
@@ -38,9 +37,9 @@ impl Sprite {
                 opengl::GL_STATIC_DRAW,
             );
 
-            let mut ebo = 0u32;
-            (gl.glGenBuffers)(1, &mut ebo);
-            (gl.glBindBuffer)(opengl::GL_ELEMENT_ARRAY_BUFFER, ebo);
+            let mut ebo_index = 0u32;
+            (gl.glGenBuffers)(1, &mut ebo_index);
+            (gl.glBindBuffer)(opengl::GL_ELEMENT_ARRAY_BUFFER, ebo_index);
             (gl.glBufferData)(
                 opengl::GL_ELEMENT_ARRAY_BUFFER,
                 (mem::size_of::<u32>() * indices.len()) as i64,
@@ -62,11 +61,11 @@ impl Sprite {
             (gl.glEnableVertexAttribArray)(1);
 
             // Texture
-            let mut texture = 0;
+            let mut texture_index = 0;
             let format = if texture_data.format == TextureFormat::RGB { opengl::GL_RGB } else { opengl::GL_RGBA};
 
-            (gl.glGenTextures)(1, &mut texture);
-            (gl.glBindTexture)(opengl::GL_TEXTURE_2D, texture);
+            (gl.glGenTextures)(1, &mut texture_index);
+            (gl.glBindTexture)(opengl::GL_TEXTURE_2D, texture_index);
             (gl.glTexParameteri)(opengl::GL_TEXTURE_2D, opengl::GL_TEXTURE_WRAP_S, opengl::GL_MIRRORED_REPEAT as i32);
             (gl.glTexParameteri)(opengl::GL_TEXTURE_2D, opengl::GL_TEXTURE_WRAP_T, opengl::GL_MIRRORED_REPEAT as i32);
             (gl.glTexParameteri)(opengl::GL_TEXTURE_2D, opengl::GL_TEXTURE_MIN_FILTER, opengl::GL_NEAREST as i32);
@@ -84,13 +83,14 @@ impl Sprite {
             );
             (gl.glGenerateMipmap)(opengl::GL_TEXTURE_2D);
 
-            Sprite { vao, texture }
+            Sprite { vao_index, texture_index }
         }
     }
 
     pub fn draw(&self, gl: &OpenGLContext) {
         unsafe {
-            (gl.glBindVertexArray)(self.vao);
+            (gl.glBindTexture)(opengl::GL_TEXTURE_2D, self.texture_index);
+            (gl.glBindVertexArray)(self.vao_index);
             (gl.glDrawElements)(opengl::GL_TRIANGLES, 6, opengl::GL_UNSIGNED_INT, ptr::null());
         }
     }
