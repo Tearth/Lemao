@@ -1,3 +1,5 @@
+use super::shaders;
+use super::sprite::Sprite;
 use lemao_math::color::Color;
 use lemao_opengl::bindings::opengl;
 use lemao_opengl::context::OpenGLContext;
@@ -7,6 +9,7 @@ use std::mem;
 pub struct RendererContext {
     pub gl: OpenGLContext,
     pub gl_context: winapi::HGLRC,
+    pub default_shader_program: u32,
 }
 
 impl RendererContext {
@@ -51,7 +54,20 @@ impl RendererContext {
                 panic!("{}", winapi::GetLastError());
             }
 
-            RendererContext { gl: Default::default(), gl_context }
+            let gl = Default::default();
+            let default_shader_program = match shaders::load_and_compile(&gl, shaders::DEFAULT_VERTEX_SHADER, shaders::DEFAULT_FRAGMENT_SHADER) {
+                Ok(value) => value,
+                Err(message) => panic!("Default shader compilation error: {}", message),
+            };
+            (gl.glUseProgram)(default_shader_program);
+
+            RendererContext { gl, gl_context, default_shader_program }
+        }
+    }
+
+    pub fn set_viewport(&self, width: i32, height: i32) {
+        unsafe {
+            (self.gl.glViewport)(0, 0, width, height);
         }
     }
 
@@ -60,6 +76,14 @@ impl RendererContext {
             (self.gl.glClearColor)(color.r, color.g, color.b, color.a);
             (self.gl.glClear)(opengl::GL_COLOR_BUFFER_BIT);
         }
+    }
+
+    pub fn create_sprite(&self) -> Sprite {
+        Sprite::new(&self.gl)
+    }
+
+    pub fn draw(&self, sprite: &Sprite) {
+        sprite.draw(&self.gl);
     }
 
     pub fn release(&self) {

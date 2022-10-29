@@ -6,6 +6,9 @@ use lemao_math::color::Color;
 
 fn main() {
     let window = WindowContext::new("Test", 800, 600);
+    let renderer = window.get_renderer();
+
+    let sprite = renderer.create_sprite();
     let mut is_running = true;
 
     while is_running {
@@ -28,7 +31,8 @@ fn main() {
             println!("Pressed Space");
         }
 
-        window.clear(Color::new(0.0, 0.0, 0.1, 1.0));
+        renderer.clear(Color::new(0.0, 0.0, 0.1, 1.0));
+        renderer.draw(&sprite);
         window.swap_buffers();
     }
 }
