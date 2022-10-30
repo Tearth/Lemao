@@ -3,6 +3,32 @@ use std::ops::Div;
 use std::ops::Mul;
 use std::ops::Sub;
 
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct Vec2<T> {
+    pub x: T,
+    pub y: T,
+}
+
+impl<T> Vec2<T> {
+    pub fn new(x: T, y: T) -> Self {
+        Self { x, y }
+    }
+
+    pub fn as_ptr(&self) -> *const T {
+        self as *const _ as *const T
+    }
+}
+
+impl<T> Default for Vec2<T>
+where
+    T: Default,
+{
+    fn default() -> Self {
+        Self { x: Default::default(), y: Default::default() }
+    }
+}
+
 macro_rules! implement {
     ($type:ident) => {
         impl Vec2<$type> {
@@ -46,32 +72,6 @@ macro_rules! implement {
             }
         }
     };
-}
-
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub struct Vec2<T> {
-    pub x: T,
-    pub y: T,
-}
-
-impl<T> Vec2<T> {
-    pub fn new(x: T, y: T) -> Self {
-        Self { x, y }
-    }
-
-    pub fn as_ptr(&self) -> *const T {
-        self as *const _ as *const T
-    }
-}
-
-impl<T> Default for Vec2<T>
-where
-    T: Default,
-{
-    fn default() -> Self {
-        Self { x: Default::default(), y: Default::default() }
-    }
 }
 
 implement!(u8);
