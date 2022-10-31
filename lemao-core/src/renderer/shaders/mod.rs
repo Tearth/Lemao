@@ -1,5 +1,5 @@
 use lemao_opengl::bindings::opengl;
-use lemao_opengl::context::OpenGLContext;
+use lemao_opengl::pointers::OpenGLPointers;
 use std::ffi::CString;
 use std::ptr;
 
@@ -7,7 +7,7 @@ pub const ERROR_LENGTH: usize = 1024;
 pub const DEFAULT_VERTEX_SHADER: &str = include_str!("./default.vert");
 pub const DEFAULT_FRAGMENT_SHADER: &str = include_str!("./default.frag");
 
-pub fn load(gl: &OpenGLContext, vertex_shader: &str, fragment_shader: &str) -> Result<u32, String> {
+pub fn load(gl: &OpenGLPointers, vertex_shader: &str, fragment_shader: &str) -> Result<u32, String> {
     unsafe {
         let mut success = 0;
 
@@ -59,6 +59,6 @@ pub fn load(gl: &OpenGLContext, vertex_shader: &str, fragment_shader: &str) -> R
     }
 }
 
-pub fn load_default(gl: &OpenGLContext) -> Result<u32, String> {
+pub fn load_default(gl: &OpenGLPointers) -> Result<u32, String> {
     load(gl, DEFAULT_VERTEX_SHADER, DEFAULT_FRAGMENT_SHADER)
 }

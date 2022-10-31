@@ -4,7 +4,7 @@ use std::ffi::CString;
 use std::mem;
 
 #[allow(non_snake_case)]
-pub struct OpenGLContext {
+pub struct OpenGLPointers {
     pub glAttachShader: opengl::PFNGLATTACHSHADERPROC,
     pub glBindBuffer: opengl::PFNGLBINDBUFFERPROC,
     pub glBindTexture: opengl::PFNGLBINDTEXTUREPROC,
@@ -16,7 +16,10 @@ pub struct OpenGLContext {
     pub glCompileShader: opengl::PFNGLCOMPILESHADERPROC,
     pub glCreateProgram: opengl::PFNGLCREATEPROGRAMPROC,
     pub glCreateShader: opengl::PFNGLCREATESHADERPROC,
+    pub glDeleteBuffers: opengl::PFNGLDELETEBUFFERSPROC,
+    pub glDeleteTextures: opengl::PFNGLDELETETEXTURESPROC,
     pub glDeleteShader: opengl::PFNGLDELETESHADERPROC,
+    pub glDeleteVertexArrays: opengl::PFNGLDELETEVERTEXARRAYSPROC,
     pub glDrawArrays: opengl::PFNGLDRAWARRAYSPROC,
     pub glDrawElements: opengl::PFNGLDRAWELEMENTSPROC,
     pub glEnable: opengl::PFNGLENABLEPROC,
@@ -41,7 +44,7 @@ pub struct OpenGLContext {
     pub glViewport: opengl::PFNGLVIEWPORTPROC,
 }
 
-impl Default for OpenGLContext {
+impl Default for OpenGLPointers {
     fn default() -> Self {
         unsafe {
             let opengl32_dll_cstr = CString::new("opengl32.dll").unwrap();
@@ -59,7 +62,10 @@ impl Default for OpenGLContext {
                 glCreateProgram: get_wgl_proc_address::<opengl::PFNGLCREATEPROGRAMPROC>("glCreateProgram"),
                 glCompileShader: get_wgl_proc_address::<opengl::PFNGLCOMPILESHADERPROC>("glCompileShader"),
                 glCreateShader: get_wgl_proc_address::<opengl::PFNGLCREATESHADERPROC>("glCreateShader"),
+                glDeleteBuffers: get_wgl_proc_address::<opengl::PFNGLDELETEBUFFERSPROC>("glDeleteBuffers"),
+                glDeleteTextures: get_proc_address::<opengl::PFNGLDELETETEXTURESPROC>("glDeleteTextures", opengl32_dll_handle),
                 glDeleteShader: get_wgl_proc_address::<opengl::PFNGLDELETESHADERPROC>("glDeleteShader"),
+                glDeleteVertexArrays: get_wgl_proc_address::<opengl::PFNGLDELETEVERTEXARRAYSPROC>("glDeleteVertexArrays"),
                 glDrawArrays: get_proc_address::<opengl::PFNGLDRAWARRAYSPROC>("glDrawArrays", opengl32_dll_handle),
                 glDrawElements: get_proc_address::<opengl::PFNGLDRAWELEMENTSPROC>("glDrawElements", opengl32_dll_handle),
                 glEnable: get_proc_address::<opengl::PFNGLENABLEPROC>("glEnable", opengl32_dll_handle),

@@ -1,7 +1,7 @@
-use lemao_opengl::context::OpenGLContext;
+use lemao_opengl::pointers::OpenGLPointers;
 
 pub mod sprite;
 
 pub trait Drawable {
-    fn draw(&self, gl: &OpenGLContext);
+    fn draw(&self, gl: &OpenGLPointers);
 }

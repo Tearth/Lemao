@@ -6,13 +6,13 @@ use lemao_math::color::Color;
 use lemao_math::mat4x4::Mat4x4;
 use lemao_math::vec3::Vec3;
 use lemao_opengl::bindings::opengl;
-use lemao_opengl::context::OpenGLContext;
+use lemao_opengl::pointers::OpenGLPointers;
 use lemao_winapi::bindings::winapi;
 use std::ffi::CString;
 use std::mem;
 
 pub struct RendererContext {
-    pub gl: OpenGLContext,
+    pub gl: OpenGLPointers,
     pub gl_context: winapi::HGLRC,
     pub default_shader_program: u32,
 }
@@ -83,10 +83,6 @@ impl RendererContext {
             (self.gl.glClearColor)(color.r, color.g, color.b, color.a);
             (self.gl.glClear)(opengl::GL_COLOR_BUFFER_BIT);
         }
-    }
-
-    pub fn create_sprite(&self, loaded_texture: &Texture) -> Sprite {
-        Sprite::new(&self.gl, loaded_texture)
     }
 
     pub fn draw(&self, drawable: &dyn Drawable) {

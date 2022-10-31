@@ -1,6 +1,7 @@
 use std::ops::Add;
 use std::ops::Div;
 use std::ops::Mul;
+use std::ops::Neg;
 use std::ops::Sub;
 
 #[repr(C)]
@@ -52,6 +53,13 @@ macro_rules! implement {
             }
         }
 
+        impl Mul for Vec3<$type> {
+            type Output = Self;
+            fn mul(self, rhs: Self) -> Self::Output {
+                Self::Output { x: self.x * rhs.x, y: self.y * rhs.y, z: self.z * rhs.z }
+            }
+        }
+
         impl Mul<$type> for Vec3<$type> {
             type Output = Vec3<$type>;
             fn mul(self, rhs: $type) -> Self::Output {
@@ -72,18 +80,20 @@ macro_rules! implement {
                 Self::Output { x: self.x / rhs, y: self.y / rhs, z: self.z / rhs }
             }
         }
+
+        impl Neg for Vec3<$type> {
+            type Output = Self;
+            fn neg(self) -> Self::Output {
+                Self::Output { x: -self.x, y: -self.y, z: -self.z }
+            }
+        }
     };
 }
 
-implement!(u8);
 implement!(i8);
-implement!(u16);
 implement!(i16);
-implement!(u32);
 implement!(i32);
 implement!(f32);
-implement!(u64);
 implement!(i64);
 implement!(f64);
-implement!(usize);
 implement!(isize);
