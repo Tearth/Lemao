@@ -5,6 +5,7 @@ use std::mem;
 use std::ptr;
 use crate::renderer::textures::Texture;
 use crate::renderer::textures::TextureFormat;
+use super::*;
 
 pub struct Sprite {
     pub vao_index: u32,
@@ -17,13 +18,13 @@ impl Sprite {
             let mut vao_index = 0;
             (gl.glGenVertexArrays)(1, &mut vao_index);
             (gl.glBindVertexArray)(vao_index);
-            
+
             #[rustfmt::skip]
             let vertices: [f32; 20] = [
-                120.0, 120.0, 0.0,      1.0, 1.0, 
-                120.0, -120.0, 0.0,     1.0, 0.0,
-                -120.0, -120.0, 0.0,    0.0, 0.0,
-                -120.0, 120.0, 0.0,     0.0, 1.0,
+                ((texture_data.width as f32) / 2.0), ((texture_data.height as f32) / 2.0), 0.0, 1.0, 1.0, 
+                ((texture_data.width as f32) / 2.0), -((texture_data.height as f32) / 2.0), 0.0, 1.0, 0.0,
+                -((texture_data.width as f32) / 2.0), -((texture_data.height as f32) / 2.0), 0.0, 0.0, 0.0,
+                -((texture_data.width as f32) / 2.0), ((texture_data.height as f32) / 2.0), 0.0, 0.0, 1.0,
             ];
             let indices: [u32; 6] = [0, 1, 3, 1, 2, 3];
 
@@ -74,8 +75,8 @@ impl Sprite {
                 opengl::GL_TEXTURE_2D,
                 0,
                 format as i32,
-                240,
-                240,
+                texture_data.width as i32,
+                texture_data.height as i32,
                 0,
                 format,
                 opengl::GL_UNSIGNED_BYTE,
@@ -86,8 +87,10 @@ impl Sprite {
             Sprite { vao_index, texture_index }
         }
     }
+}
 
-    pub fn draw(&self, gl: &OpenGLContext) {
+impl Drawable for Sprite {
+    fn draw(&self, gl: &OpenGLContext) {
         unsafe {
             (gl.glBindTexture)(opengl::GL_TEXTURE_2D, self.texture_index);
             (gl.glBindVertexArray)(self.vao_index);

@@ -1,4 +1,5 @@
-use super::objects::Sprite;
+use super::drawable::sprite::Sprite;
+use super::drawable::Drawable;
 use super::shaders;
 use super::textures::Texture;
 use lemao_math::color::Color;
@@ -88,7 +89,7 @@ impl RendererContext {
         Sprite::new(&self.gl, loaded_texture)
     }
 
-    pub fn draw(&self, sprite: &Sprite) {
+    pub fn draw(&self, drawable: &dyn Drawable) {
         unsafe {
             let view_cstr = CString::new("view").unwrap();
             let proj_cstr = CString::new("proj").unwrap();
@@ -107,7 +108,7 @@ impl RendererContext {
             let model_uniform_id = (self.gl.glGetUniformLocation)(self.default_shader_program, model_cstr.as_ptr());
             (self.gl.glUniformMatrix4fv)(model_uniform_id, 1, opengl::GL_TRUE as u8, model.as_ptr());
 
-            sprite.draw(&self.gl);
+            drawable.draw(&self.gl);
         }
     }
 

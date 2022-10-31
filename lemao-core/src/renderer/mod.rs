@@ -1,4 +1,4 @@
 pub mod context;
-pub mod objects;
+pub mod drawable;
 pub mod shaders;
 pub mod textures;
