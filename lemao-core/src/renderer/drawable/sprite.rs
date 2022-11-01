@@ -2,7 +2,9 @@ use super::*;
 use crate::renderer::context::RendererContext;
 use crate::renderer::textures::Texture;
 use crate::renderer::textures::TextureFormat;
+use lemao_math::mat4x4::Mat4x4;
 use lemao_math::vec2::Vec2;
+use lemao_math::vec3::Vec3;
 use lemao_opengl::bindings::opengl;
 use lemao_opengl::pointers::OpenGLPointers;
 use std::ffi::c_void;
@@ -157,8 +159,10 @@ impl Sprite {
 }
 
 impl Drawable for Sprite {
-    fn draw(&self) {
+    fn draw(&self, shader: &Rc<Shader>) {
         unsafe {
+            shader.as_ref().set_parameter("model", Mat4x4::translate(Vec3::new(self.position.x, self.position.y, 0.0)).as_ptr());
+
             (self.gl.glBindTexture)(opengl::GL_TEXTURE_2D, self.texture_index);
             (self.gl.glBindVertexArray)(self.vao_index);
             (self.gl.glDrawElements)(opengl::GL_TRIANGLES, 6, opengl::GL_UNSIGNED_INT, ptr::null());

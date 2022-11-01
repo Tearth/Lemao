@@ -89,13 +89,11 @@ impl RendererContext {
     pub fn draw(&self, drawable: &dyn Drawable) {
         let view = Mat4x4::translate(Vec3::new(0.0, 0.0, -3.0));
         let proj = Mat4x4::ortho(800.0, 600.0, 0.1, 100.0);
-        let model = Mat4x4::translate(Vec3::new(400.0, 300.0, 0.0));
 
         self.active_shader.as_ref().unwrap().set_parameter("view", view.as_ptr());
         self.active_shader.as_ref().unwrap().set_parameter("proj", proj.as_ptr());
-        self.active_shader.as_ref().unwrap().set_parameter("model", model.as_ptr());
 
-        drawable.draw();
+        drawable.draw(self.active_shader.as_ref().unwrap());
     }
 
     pub fn release(&self) {
