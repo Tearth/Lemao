@@ -8,8 +8,9 @@ use lemao_opengl::pointers::OpenGLPointers;
 use std::ffi::c_void;
 use std::mem;
 use std::ptr;
+use std::rc::Rc;
 
-pub struct Sprite<'r, 't> {
+pub struct Sprite {
     pub position: Vec2<f32>,
     pub scale: Vec2<f32>,
     pub rotation: f32,
@@ -21,12 +22,12 @@ pub struct Sprite<'r, 't> {
     ebo_index: u32,
     texture_index: u32,
 
-    texture: &'t Texture,
-    gl: &'r OpenGLPointers,
+    texture: Rc<Texture>,
+    gl: Rc<OpenGLPointers>,
 }
 
-impl<'r, 't> Sprite<'r, 't> {
-    pub fn new(renderer: &'r RendererContext, texture: &'t Texture) -> Self {
+impl Sprite {
+    pub fn new(renderer: &RendererContext, texture: Rc<Texture>) -> Self {
         let mut sprite = Sprite {
             position: Default::default(),
             scale: Default::default(),
@@ -39,8 +40,8 @@ impl<'r, 't> Sprite<'r, 't> {
             ebo_index: 0,
             texture_index: 0,
 
-            texture,
-            gl: &renderer.gl,
+            texture: texture.clone(),
+            gl: renderer.gl.clone(),
         };
         sprite.set_texture(texture);
 
@@ -48,10 +49,10 @@ impl<'r, 't> Sprite<'r, 't> {
     }
 
     pub fn get_texture(&self) -> &Texture {
-        self.texture
+        &self.texture
     }
 
-    pub fn set_texture(&mut self, texture: &Texture) {
+    pub fn set_texture(&mut self, texture: Rc<Texture>) {
         unsafe {
             if self.vao_index == 0 {
                 (self.gl.glGenVertexArrays)(1, &mut self.vao_index);
@@ -118,7 +119,7 @@ impl<'r, 't> Sprite<'r, 't> {
                 return;
             }
 
-            let vertices: [f32; 20] = self.get_vertices(anchor);
+            let vertices = self.get_vertices(anchor);
             let vertices_size = (mem::size_of::<f32>() * vertices.len()) as i64;
 
             (self.gl.glBindBuffer)(opengl::GL_ARRAY_BUFFER, self.vbo_index);
@@ -155,17 +156,17 @@ impl<'r, 't> Sprite<'r, 't> {
     }
 }
 
-impl<'r, 't> Drawable for Sprite<'r, 't> {
-    fn draw(&self, gl: &OpenGLPointers) {
+impl Drawable for Sprite {
+    fn draw(&self) {
         unsafe {
-            (gl.glBindTexture)(opengl::GL_TEXTURE_2D, self.texture_index);
-            (gl.glBindVertexArray)(self.vao_index);
-            (gl.glDrawElements)(opengl::GL_TRIANGLES, 6, opengl::GL_UNSIGNED_INT, ptr::null());
+            (self.gl.glBindTexture)(opengl::GL_TEXTURE_2D, self.texture_index);
+            (self.gl.glBindVertexArray)(self.vao_index);
+            (self.gl.glDrawElements)(opengl::GL_TRIANGLES, 6, opengl::GL_UNSIGNED_INT, ptr::null());
         }
     }
 }
 
-impl<'r, 't> Drop for Sprite<'r, 't> {
+impl Drop for Sprite {
     fn drop(&mut self) {
         unsafe {
             if self.vbo_index != 0 {

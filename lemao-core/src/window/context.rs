@@ -122,6 +122,7 @@ extern "C" fn wnd_proc(hwnd: winapi::HWND, message: winapi::UINT, w_param: winap
                 window.hwnd = hwnd;
                 window.hdc = hdc;
                 window.renderer = Some(RendererContext::new(hdc));
+                window.renderer.as_mut().unwrap().set_default_shader();
                 window.initialized = true;
             }
             winapi::WM_SIZE => {

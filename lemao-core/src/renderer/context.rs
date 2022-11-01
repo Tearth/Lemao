@@ -1,20 +1,19 @@
-use super::drawable::sprite::Sprite;
 use super::drawable::Drawable;
-use super::shaders;
-use super::textures::Texture;
+use super::shaders::Shader;
 use lemao_math::color::Color;
 use lemao_math::mat4x4::Mat4x4;
 use lemao_math::vec3::Vec3;
 use lemao_opengl::bindings::opengl;
 use lemao_opengl::pointers::OpenGLPointers;
 use lemao_winapi::bindings::winapi;
-use std::ffi::CString;
 use std::mem;
+use std::rc::Rc;
 
 pub struct RendererContext {
-    pub gl: OpenGLPointers,
+    pub gl: Rc<OpenGLPointers>,
     pub gl_context: winapi::HGLRC,
-    pub default_shader_program: u32,
+    pub default_shader: Rc<Shader>,
+    pub active_shader: Option<Rc<Shader>>,
 }
 
 impl RendererContext {
@@ -59,16 +58,13 @@ impl RendererContext {
                 panic!("{}", winapi::GetLastError());
             }
 
-            let gl = Default::default();
-            let default_shader_program = match shaders::load_default(&gl) {
-                Ok(value) => value,
+            let gl: Rc<OpenGLPointers> = Default::default();
+            let default_shader = match Shader::new_default(gl.clone()) {
+                Ok(value) => Rc::new(value),
                 Err(message) => panic!("Default shader compilation error: {}", message),
             };
-            (gl.glUseProgram)(default_shader_program);
-            (gl.glEnable)(opengl::GL_BLEND);
-            (gl.glBlendFunc)(opengl::GL_SRC_ALPHA, opengl::GL_ONE_MINUS_SRC_ALPHA);
 
-            RendererContext { gl, gl_context, default_shader_program }
+            RendererContext { gl, gl_context, default_shader, active_shader: None }
         }
     }
 
@@ -76,6 +72,11 @@ impl RendererContext {
         unsafe {
             (self.gl.glViewport)(0, 0, width, height);
         }
+    }
+
+    pub fn set_default_shader(&mut self) {
+        self.active_shader = Some(self.default_shader.clone());
+        self.default_shader.set_as_active();
     }
 
     pub fn clear(&self, color: Color) {
@@ -86,26 +87,15 @@ impl RendererContext {
     }
 
     pub fn draw(&self, drawable: &dyn Drawable) {
-        unsafe {
-            let view_cstr = CString::new("view").unwrap();
-            let proj_cstr = CString::new("proj").unwrap();
-            let model_cstr = CString::new("model").unwrap();
+        let view = Mat4x4::translate(Vec3::new(0.0, 0.0, -3.0));
+        let proj = Mat4x4::ortho(800.0, 600.0, 0.1, 100.0);
+        let model = Mat4x4::translate(Vec3::new(400.0, 300.0, 0.0));
 
-            let view = Mat4x4::translate(Vec3::new(0.0, 0.0, -3.0));
-            let proj = Mat4x4::ortho(800.0, 600.0, 0.1, 100.0);
-            let model = Mat4x4::translate(Vec3::new(400.0, 300.0, 0.0));
+        self.active_shader.as_ref().unwrap().set_parameter("view", view.as_ptr());
+        self.active_shader.as_ref().unwrap().set_parameter("proj", proj.as_ptr());
+        self.active_shader.as_ref().unwrap().set_parameter("model", model.as_ptr());
 
-            let view_uniform_id = (self.gl.glGetUniformLocation)(self.default_shader_program, view_cstr.as_ptr());
-            (self.gl.glUniformMatrix4fv)(view_uniform_id, 1, opengl::GL_TRUE as u8, view.as_ptr());
-
-            let proj_uniform_id = (self.gl.glGetUniformLocation)(self.default_shader_program, proj_cstr.as_ptr());
-            (self.gl.glUniformMatrix4fv)(proj_uniform_id, 1, opengl::GL_TRUE as u8, proj.as_ptr());
-
-            let model_uniform_id = (self.gl.glGetUniformLocation)(self.default_shader_program, model_cstr.as_ptr());
-            (self.gl.glUniformMatrix4fv)(model_uniform_id, 1, opengl::GL_TRUE as u8, model.as_ptr());
-
-            drawable.draw(&self.gl);
-        }
+        drawable.draw();
     }
 
     pub fn release(&self) {
