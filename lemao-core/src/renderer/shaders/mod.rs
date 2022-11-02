@@ -5,12 +5,15 @@ use std::ffi::CString;
 use std::ptr;
 use std::rc::Rc;
 
+pub mod storage;
+
 pub const MAX_UNIFORM_NAME_LENGTH: usize = 32;
 pub const ERROR_LENGTH: usize = 1024;
 pub const DEFAULT_VERTEX_SHADER: &str = include_str!("./default.vert");
 pub const DEFAULT_FRAGMENT_SHADER: &str = include_str!("./default.frag");
 
 pub struct Shader {
+    id: usize,
     program_id: u32,
     uniforms: HashMap<String, u32>,
 
@@ -94,7 +97,7 @@ impl Shader {
                 uniforms.insert(name, location as u32);
             }
 
-            Ok(Shader { program_id, uniforms, gl })
+            Ok(Shader { id: 0, program_id, uniforms, gl })
         }
     }
 

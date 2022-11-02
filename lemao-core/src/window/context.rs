@@ -1,10 +1,13 @@
 use super::input::InputEvent;
 use crate::renderer::context::RendererContext;
+use crate::renderer::textures::storage::TextureStorage;
 use lemao_winapi::bindings::winapi;
 use std::collections::VecDeque;
 use std::ffi::CString;
 use std::mem;
 use std::ptr;
+use std::sync::Arc;
+use std::sync::Mutex;
 use std::time::SystemTime;
 use std::time::UNIX_EPOCH;
 
@@ -162,8 +165,13 @@ impl WindowContext {
         }
     }
 
-    pub fn create_renderer(&self) -> RendererContext {
-        RendererContext::new(self.hdc)
+    pub fn create_renderer(&self, textures: Arc<Mutex<TextureStorage>>) -> RendererContext {
+        let mut renderer = RendererContext::new(self.hdc, textures);
+        renderer.init_storages();
+        renderer.init_default_shader();
+        renderer.set_default_shader();
+
+        renderer
     }
 
     pub fn swap_buffers(&self) {

@@ -32,7 +32,7 @@ pub struct Sprite {
 }
 
 impl Sprite {
-    pub fn new(renderer: &RendererContext, texture_id: usize) -> Self {
+    pub fn new(gl: Rc<OpenGLPointers>, texture: &Texture) -> Self {
         let mut sprite = Sprite {
             position: Default::default(),
             scale: Default::default(),
@@ -48,10 +48,10 @@ impl Sprite {
             width: 0,
             height: 0,
 
-            texture_id,
-            gl: renderer.gl.clone(),
+            texture_id: texture.id,
+            gl,
         };
-        sprite.set_texture(renderer.textures.get(texture_id));
+        sprite.set_texture(texture);
 
         sprite
     }
@@ -164,9 +164,9 @@ impl Sprite {
 }
 
 impl Drawable for Sprite {
-    fn draw(&self, shader: &Rc<Shader>) {
+    fn draw(&self, shader: &Shader) {
         unsafe {
-            shader.as_ref().set_parameter("model", Mat4x4::translate(Vec3::new(self.position.x, self.position.y, 0.0)).as_ptr());
+            shader.set_parameter("model", Mat4x4::translate(Vec3::new(self.position.x, self.position.y, 0.0)).as_ptr());
 
             (self.gl.glBindTexture)(opengl::GL_TEXTURE_2D, self.texture_index);
             (self.gl.glBindVertexArray)(self.vao_index);

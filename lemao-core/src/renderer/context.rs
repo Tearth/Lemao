@@ -1,7 +1,10 @@
 use crate::window::context::WindowContext;
 
 use super::drawable::Drawable;
-use super::shaders::Shader;
+use super::drawable::storage::SpriteStorage;
+use super::shaders::{Shader, self};
+use super::shaders::storage::ShaderStorage;
+use super::textures::Texture;
 use super::textures::storage::TextureStorage;
 use lemao_math::color::Color;
 use lemao_math::mat4x4::Mat4x4;
@@ -10,19 +13,22 @@ use lemao_opengl::bindings::{opengl, wgl};
 use lemao_opengl::pointers::OpenGLPointers;
 use lemao_winapi::bindings::winapi;
 use std::rc::Rc;
+use std::sync::{Mutex, Arc};
 use std::{mem, ptr};
 
 pub struct RendererContext {
     pub gl: Rc<OpenGLPointers>,
     pub gl_context: winapi::HGLRC,
-    pub default_shader: Rc<Shader>,
-    pub active_shader: Option<Rc<Shader>>,
+    pub default_shader_id: usize,
+    pub active_shader_id: usize,
 
-    pub textures: TextureStorage,
+    pub textures: Arc<Mutex<TextureStorage>>,
+    pub shaders: Option<ShaderStorage>,
+    pub sprites: Option<SpriteStorage>
 }
 
 impl RendererContext {
-    pub fn new(hdc: winapi::HDC) -> Self {
+    pub fn new(hdc: winapi::HDC, textures: Arc<Mutex<TextureStorage>>) -> Self {
         unsafe {
             let fake_window = WindowContext::new_fake();
             let fake_window_hdc = fake_window.hdc;
@@ -113,8 +119,17 @@ impl RendererContext {
                 Ok(value) => Rc::new(value),
                 Err(message) => panic!("Default shader compilation error: {}", message),
             };
-            RendererContext { gl, gl_context: gl_context as winapi::HGLRC, default_shader, active_shader: None, textures: TextureStorage::new() }
+            RendererContext { gl, gl_context: gl_context as winapi::HGLRC, default_shader_id: 0, active_shader_id: 0, textures, shaders: None, sprites: None }
         }
+    }
+
+    pub fn init_storages(&mut self) {
+        self.shaders = Some(ShaderStorage::new(self.gl.clone()));
+        self.sprites = Some(SpriteStorage::new(self.gl.clone()));
+    }
+
+    pub fn init_default_shader(&mut self) {
+        self.default_shader_id = self.shaders.as_mut().unwrap().load(shaders::DEFAULT_VERTEX_SHADER, shaders::DEFAULT_FRAGMENT_SHADER).unwrap();
     }
 
     pub fn set_viewport(&self, width: i32, height: i32) {
@@ -124,8 +139,15 @@ impl RendererContext {
     }
 
     pub fn set_default_shader(&mut self) {
-        self.active_shader = Some(self.default_shader.clone());
-        self.default_shader.set_as_active();
+        self.active_shader_id = self.default_shader_id;
+        self.shaders.as_ref().unwrap().get(self.active_shader_id).set_as_active();
+    }
+
+    pub fn create_sprite(&mut self, texture_id: usize) -> usize {
+        let textures_storage = self.textures.lock().unwrap();
+        let kaela_texture = textures_storage.get(texture_id);
+        
+        self.sprites.as_mut().unwrap().load(kaela_texture).unwrap()
     }
 
     pub fn clear(&self, color: Color) {
@@ -139,10 +161,11 @@ impl RendererContext {
         let view = Mat4x4::translate(Vec3::new(0.0, 0.0, -3.0));
         let proj = Mat4x4::ortho(800.0, 600.0, 0.1, 100.0);
 
-        self.active_shader.as_ref().unwrap().set_parameter("view", view.as_ptr());
-        self.active_shader.as_ref().unwrap().set_parameter("proj", proj.as_ptr());
+        let shader = self.shaders.as_ref().unwrap().get(self.active_shader_id);
+        shader.set_parameter("view", view.as_ptr());
+        shader.set_parameter("proj", proj.as_ptr());
 
-        drawable.draw(self.active_shader.as_ref().unwrap());
+        drawable.draw(shader);
     }
 
     pub fn release(&self) {
