@@ -1,23 +1,34 @@
 use super::input::InputEvent;
 use crate::renderer::context::RendererContext;
 use lemao_winapi::bindings::winapi;
+use std::collections::VecDeque;
 use std::ffi::CString;
 use std::mem;
-use std::pin::Pin;
 use std::ptr;
+use std::time::SystemTime;
+use std::time::UNIX_EPOCH;
 
 pub struct WindowContext {
-    hwnd: winapi::HWND,
-    hdc: winapi::HDC,
-    renderer: Option<RendererContext>,
+    pub(crate) hwnd: winapi::HWND,
+    pub(crate) hdc: winapi::HDC,
+    pub(crate) fake: bool,
 
     initialized: bool,
+    wnd_proc_events: VecDeque<WndProcEvent>,
+}
+
+pub struct WndProcEvent {
+    pub hwnd: winapi::HWND,
+    pub message: winapi::UINT,
+    pub w_param: winapi::WPARAM,
+    pub l_param: winapi::LPARAM,
 }
 
 impl WindowContext {
-    pub fn new(title: &str, width: i32, height: i32) -> Pin<Box<Self>> {
+    pub fn new(title: &str, width: i32, height: i32) -> Box<Self> {
         unsafe {
-            let class_cstr = CString::new("LemaoWindow").unwrap();
+            let timestamp = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis();
+            let class_cstr = CString::new(format!("LemaoWindow_{}", timestamp)).unwrap();
             let module_handle = winapi::GetModuleHandleA(ptr::null_mut());
 
             let wnd_class = winapi::WNDCLASS {
@@ -37,8 +48,7 @@ impl WindowContext {
                 panic!("{}", winapi::GetLastError());
             }
 
-            // We box and pin window context, so the pointer will be always valid
-            let mut context = Box::pin(Self { hwnd: ptr::null_mut(), hdc: ptr::null_mut(), renderer: None, initialized: false });
+            let mut context = Box::new(Self { hwnd: ptr::null_mut(), hdc: ptr::null_mut(), fake: false, initialized: false, wnd_proc_events: VecDeque::new() });
 
             let title_cstr = CString::new(title).unwrap();
             let hwnd = winapi::CreateWindowExA(
@@ -53,7 +63,7 @@ impl WindowContext {
                 ptr::null_mut(),
                 ptr::null_mut(),
                 module_handle,
-                &mut *context as *mut _ as winapi::LPVOID,
+                context.as_mut() as *mut _ as winapi::LPVOID,
             );
 
             if hwnd.is_null() {
@@ -67,28 +77,93 @@ impl WindowContext {
         }
     }
 
-    pub fn poll_event(&self) -> Option<InputEvent> {
+    pub(crate) fn new_fake() -> Box<Self> {
         unsafe {
-            let mut message: winapi::MSG = mem::zeroed();
-            if winapi::PeekMessageA(&mut message, ptr::null_mut(), 0, 0, winapi::PM_REMOVE) > 0 {
-                winapi::TranslateMessage(&message);
-                winapi::DispatchMessageA(&message);
+            let timestamp = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis();
+            let class_cstr = CString::new(format!("FAKE_{}", timestamp)).unwrap();
+            let module_handle = winapi::GetModuleHandleA(ptr::null_mut());
 
-                match message.message {
-                    winapi::WM_KEYDOWN => Some(message.into()),
-                    winapi::WM_KEYUP => Some(message.into()),
-                    winapi::WM_CHAR => Some(message.into()),
-                    winapi::WM_QUIT => Some(InputEvent::WindowClosed),
-                    _ => None,
-                }
-            } else {
-                None
+            let wnd_class = winapi::WNDCLASS {
+                lpfnWndProc: wnd_proc,
+                hInstance: module_handle,
+                hbrBackground: winapi::COLOR_BACKGROUND as winapi::HBRUSH,
+                lpszClassName: class_cstr.as_ptr(),
+                style: winapi::CS_OWNDC,
+                cbClsExtra: 0,
+                cbWndExtra: 0,
+                hIcon: ptr::null_mut(),
+                hCursor: ptr::null_mut(),
+                lpszMenuName: ptr::null_mut(),
+            };
+
+            if winapi::RegisterClassA(&wnd_class) == 0 {
+                panic!("{}", winapi::GetLastError());
             }
+
+            let mut context = Box::new(Self { hwnd: ptr::null_mut(), hdc: ptr::null_mut(), fake: true, initialized: false, wnd_proc_events: VecDeque::new() });
+
+            let title_cstr = CString::new("FAKE").unwrap();
+            let hwnd = winapi::CreateWindowExA(
+                0,
+                wnd_class.lpszClassName,
+                title_cstr.as_ptr(),
+                winapi::WS_OVERLAPPEDWINDOW,
+                0,
+                0,
+                0,
+                0,
+                ptr::null_mut(),
+                ptr::null_mut(),
+                module_handle,
+                context.as_mut() as *mut _ as winapi::LPVOID,
+            );
+
+            if hwnd.is_null() {
+                panic!("{}", winapi::GetLastError());
+            }
+
+            // Wait for WM_CREATE, where the context is initialized
+            while !context.initialized {}
+
+            context
         }
     }
 
-    pub fn get_renderer(&mut self) -> &mut RendererContext {
-        self.renderer.as_mut().unwrap()
+    pub fn poll_event(&mut self) -> Option<InputEvent> {
+        unsafe {
+            let mut event: winapi::MSG = mem::zeroed();
+
+            if winapi::PeekMessageA(&mut event, ptr::null_mut(), 0, 0, winapi::PM_REMOVE) > 0 {
+                winapi::TranslateMessage(&event);
+                winapi::DispatchMessageA(&event);
+
+                match event.message {
+                    winapi::WM_KEYDOWN => return Some(event.into()),
+                    winapi::WM_KEYUP => return Some(event.into()),
+                    winapi::WM_CHAR => return Some(event.into()),
+                    winapi::WM_QUIT => return Some(InputEvent::WindowClosed),
+                    _ => {}
+                }
+            }
+
+            if let Some(event) = self.wnd_proc_events.pop_back() {
+                match event.message {
+                    winapi::WM_SIZE => {
+                        let width = (event.l_param & 0xffff) as u32;
+                        let height = (event.l_param >> 16) as u32;
+
+                        return Some(InputEvent::WindowSizeChanged(width, height));
+                    }
+                    _ => return None,
+                }
+            }
+
+            None
+        }
+    }
+
+    pub fn create_renderer(&self) -> RendererContext {
+        RendererContext::new(self.hdc)
     }
 
     pub fn swap_buffers(&self) {
@@ -121,19 +196,13 @@ extern "C" fn wnd_proc(hwnd: winapi::HWND, message: winapi::UINT, w_param: winap
 
                 window.hwnd = hwnd;
                 window.hdc = hdc;
-                window.renderer = Some(RendererContext::new(hdc));
-                window.renderer.as_mut().unwrap().set_default_shader();
                 window.initialized = true;
             }
             winapi::WM_SIZE => {
                 let window_ptr = winapi::GetWindowLongPtrA(hwnd, winapi::GWLP_USERDATA);
                 let window = &mut *(window_ptr as *mut WindowContext);
-                let renderer = window.get_renderer();
 
-                let width = (l_param & 0xffff) as i32;
-                let height = (l_param >> 16) as i32;
-
-                renderer.set_viewport(width, height);
+                window.wnd_proc_events.push_back(WndProcEvent { hwnd, message, w_param, l_param });
             }
             winapi::WM_CLOSE => {
                 if winapi::DestroyWindow(hwnd) == 0 {
@@ -145,13 +214,14 @@ extern "C" fn wnd_proc(hwnd: winapi::HWND, message: winapi::UINT, w_param: winap
             winapi::WM_DESTROY => {
                 let window_ptr = winapi::GetWindowLongPtrA(hwnd, winapi::GWLP_USERDATA);
                 let window = &mut *(window_ptr as *mut WindowContext);
-                let renderer = window.get_renderer();
 
-                renderer.release();
                 window.hwnd = ptr::null_mut();
                 window.hdc = ptr::null_mut();
 
-                winapi::PostQuitMessage(0);
+                if !window.fake {
+                    winapi::PostQuitMessage(0);
+                }
+
                 return 0;
             }
             _ => {}

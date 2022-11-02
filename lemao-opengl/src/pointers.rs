@@ -1,4 +1,5 @@
 use crate::bindings::opengl;
+use crate::bindings::wgl;
 use lemao_winapi::bindings::winapi;
 use std::ffi::CString;
 use std::mem;
@@ -43,6 +44,9 @@ pub struct OpenGLPointers {
     pub glUseProgram: opengl::PFNGLUSEPROGRAMPROC,
     pub glVertexAttribPointer: opengl::PFNGLVERTEXATTRIBPOINTERPROC,
     pub glViewport: opengl::PFNGLVIEWPORTPROC,
+
+    pub wglChoosePixelFormatARB: wgl::PFNWGLCHOOSEPIXELFORMATARBPROC,
+    pub wglCreateContextAttribsARB: wgl::PFNWGLCREATECONTEXTATTRIBSARBPROC,
 }
 
 impl Default for OpenGLPointers {
@@ -90,6 +94,9 @@ impl Default for OpenGLPointers {
                 glUseProgram: get_wgl_proc_address::<opengl::PFNGLUSEPROGRAMPROC>("glUseProgram"),
                 glVertexAttribPointer: get_wgl_proc_address::<opengl::PFNGLVERTEXATTRIBPOINTERPROC>("glVertexAttribPointer"),
                 glViewport: get_proc_address::<opengl::PFNGLVIEWPORTPROC>("glViewport", opengl32_dll_handle),
+
+                wglChoosePixelFormatARB: get_wgl_proc_address::<wgl::PFNWGLCHOOSEPIXELFORMATARBPROC>("wglChoosePixelFormatARB"),
+                wglCreateContextAttribsARB: get_wgl_proc_address::<wgl::PFNWGLCREATECONTEXTATTRIBSARBPROC>("wglCreateContextAttribsARB"),
             }
         }
     }

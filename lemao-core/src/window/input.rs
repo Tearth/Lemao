@@ -2,6 +2,7 @@ use lemao_winapi::bindings::winapi;
 
 pub enum InputEvent {
     Unknown,
+    WindowSizeChanged(u32, u32),
     WindowClosed,
     KeyPressed(Key),
     KeyReleased(Key),
