@@ -1,5 +1,6 @@
 use super::drawable::Drawable;
 use super::shaders::Shader;
+use super::textures::storage::TextureStorage;
 use lemao_math::color::Color;
 use lemao_math::mat4x4::Mat4x4;
 use lemao_math::vec3::Vec3;
@@ -14,6 +15,8 @@ pub struct RendererContext {
     pub gl_context: winapi::HGLRC,
     pub default_shader: Rc<Shader>,
     pub active_shader: Option<Rc<Shader>>,
+
+    pub textures: TextureStorage,
 }
 
 impl RendererContext {
@@ -64,7 +67,7 @@ impl RendererContext {
                 Err(message) => panic!("Default shader compilation error: {}", message),
             };
 
-            RendererContext { gl, gl_context, default_shader, active_shader: None }
+            RendererContext { gl, gl_context, default_shader, active_shader: None, textures: TextureStorage::new() }
         }
     }
 

@@ -24,12 +24,15 @@ pub struct Sprite {
     ebo_index: u32,
     texture_index: u32,
 
-    texture: Rc<Texture>,
+    width: u32,
+    height: u32,
+
+    texture_id: usize,
     gl: Rc<OpenGLPointers>,
 }
 
 impl Sprite {
-    pub fn new(renderer: &RendererContext, texture: Rc<Texture>) -> Self {
+    pub fn new(renderer: &RendererContext, texture_id: usize) -> Self {
         let mut sprite = Sprite {
             position: Default::default(),
             scale: Default::default(),
@@ -42,19 +45,18 @@ impl Sprite {
             ebo_index: 0,
             texture_index: 0,
 
-            texture: texture.clone(),
+            width: 0,
+            height: 0,
+
+            texture_id,
             gl: renderer.gl.clone(),
         };
-        sprite.set_texture(texture);
+        sprite.set_texture(renderer.textures.get(texture_id));
 
         sprite
     }
 
-    pub fn get_texture(&self) -> &Texture {
-        &self.texture
-    }
-
-    pub fn set_texture(&mut self, texture: Rc<Texture>) {
+    pub fn set_texture(&mut self, texture: &Texture) {
         unsafe {
             if self.vao_index == 0 {
                 (self.gl.glGenVertexArrays)(1, &mut self.vao_index);
@@ -65,7 +67,7 @@ impl Sprite {
                 (self.gl.glGenBuffers)(1, &mut self.vbo_index);
             }
 
-            let vertices: [f32; 20] = self.get_vertices(Vec2::new(0.5, 0.5));
+            let vertices: [f32; 20] = self.get_vertices(Vec2::new(0.5, 0.5), texture.width, texture.height);
             let vertices_size = (mem::size_of::<f32>() * vertices.len()) as i64;
             let vertices_ptr = vertices.as_ptr() as *const c_void;
 
@@ -108,6 +110,9 @@ impl Sprite {
 
             (self.gl.glTexImage2D)(opengl::GL_TEXTURE_2D, 0, format as i32, texture_width, texture_height, 0, format, opengl::GL_UNSIGNED_BYTE, texture_ptr);
             (self.gl.glGenerateMipmap)(opengl::GL_TEXTURE_2D);
+
+            self.width = texture_width as u32;
+            self.height = texture_height as u32;
         }
     }
 
@@ -121,7 +126,7 @@ impl Sprite {
                 return;
             }
 
-            let vertices = self.get_vertices(anchor);
+            let vertices = self.get_vertices(anchor, self.width, self.height);
             let vertices_size = (mem::size_of::<f32>() * vertices.len()) as i64;
 
             (self.gl.glBindBuffer)(opengl::GL_ARRAY_BUFFER, self.vbo_index);
@@ -131,26 +136,26 @@ impl Sprite {
         }
     }
 
-    fn get_vertices(&self, anchor: Vec2<f32>) -> [f32; 20] {
-        let offset = anchor * Vec2::new(self.texture.width as f32, self.texture.height as f32);
+    fn get_vertices(&self, anchor: Vec2<f32>, width: u32, height: u32) -> [f32; 20] {
+        let offset = anchor * Vec2::new(width as f32, height as f32);
         [
             0.0 - offset.x,
             0.0 - offset.y,
             0.0,
             0.0,
             0.0,
-            (self.texture.width as f32) - offset.x,
+            (width as f32) - offset.x,
             0.0 - offset.y,
             0.0,
             1.0,
             0.0,
-            (self.texture.width as f32) - offset.x,
-            (self.texture.height as f32) - offset.y,
+            (width as f32) - offset.x,
+            (height as f32) - offset.y,
             0.0,
             1.0,
             1.0,
             0.0 - offset.x,
-            (self.texture.height as f32) - offset.y,
+            (height as f32) - offset.y,
             0.0,
             0.0,
             1.0,

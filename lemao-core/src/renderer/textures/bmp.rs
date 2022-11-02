@@ -78,5 +78,5 @@ pub fn load(path: &str) -> Result<Texture, String> {
         _ => return Err("Unsupported compression method, only BI_RGB and BI_BITFIELDS are supported".to_string()),
     }
 
-    Ok(Texture { width, height, format, data })
+    Ok(Texture { id: 0, width, height, format, data })
 }

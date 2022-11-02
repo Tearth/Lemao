@@ -87,8 +87,8 @@ impl WindowContext {
         }
     }
 
-    pub fn get_renderer(&self) -> &RendererContext {
-        self.renderer.as_ref().unwrap()
+    pub fn get_renderer(&mut self) -> &mut RendererContext {
+        self.renderer.as_mut().unwrap()
     }
 
     pub fn swap_buffers(&self) {
