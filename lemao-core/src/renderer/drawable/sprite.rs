@@ -1,5 +1,4 @@
 use super::*;
-use crate::renderer::context::RendererContext;
 use crate::renderer::textures::Texture;
 use crate::renderer::textures::TextureFormat;
 use lemao_math::mat4x4::Mat4x4;
@@ -13,19 +12,20 @@ use std::ptr;
 use std::rc::Rc;
 
 pub struct Sprite {
-    pub position: Vec2<f32>,
-    pub scale: Vec2<f32>,
-    pub rotation: f32,
+    id: usize,
 
-    anchor: Vec2<f32>,
-
-    vao_index: u32,
-    vbo_index: u32,
-    ebo_index: u32,
-    texture_index: u32,
+    position: Vec2<f32>,
+    scale: Vec2<f32>,
+    rotation: f32,
 
     width: u32,
     height: u32,
+    anchor: Vec2<f32>,
+
+    vao_gl_id: u32,
+    vbo_gl_id: u32,
+    ebo_gl_id: u32,
+    texture_gl_id: u32,
 
     texture_id: usize,
     gl: Rc<OpenGLPointers>,
@@ -34,55 +34,56 @@ pub struct Sprite {
 impl Sprite {
     pub fn new(gl: Rc<OpenGLPointers>, texture: &Texture) -> Self {
         let mut sprite = Sprite {
+            id: 0,
+
             position: Default::default(),
             scale: Default::default(),
             rotation: 0.0,
 
-            anchor: Default::default(),
-
-            vao_index: 0,
-            vbo_index: 0,
-            ebo_index: 0,
-            texture_index: 0,
-
             width: 0,
             height: 0,
-
+            anchor: Default::default(),
             texture_id: texture.id,
+
+            vao_gl_id: 0,
+            vbo_gl_id: 0,
+            ebo_gl_id: 0,
+            texture_gl_id: 0,
+
             gl,
         };
-        sprite.set_texture(texture);
 
+        sprite.set_texture(texture);
         sprite
     }
 
     pub fn set_texture(&mut self, texture: &Texture) {
         unsafe {
-            if self.vao_index == 0 {
-                (self.gl.glGenVertexArrays)(1, &mut self.vao_index);
+            if self.vao_gl_id == 0 {
+                (self.gl.glGenVertexArrays)(1, &mut self.vao_gl_id);
             }
-            (self.gl.glBindVertexArray)(self.vao_index);
+            (self.gl.glBindVertexArray)(self.vao_gl_id);
 
-            if self.vbo_index == 0 {
-                (self.gl.glGenBuffers)(1, &mut self.vbo_index);
+            if self.vbo_gl_id == 0 {
+                (self.gl.glGenBuffers)(1, &mut self.vbo_gl_id);
             }
 
             let vertices: [f32; 20] = self.get_vertices(Vec2::new(0.5, 0.5), texture.width, texture.height);
             let vertices_size = (mem::size_of::<f32>() * vertices.len()) as i64;
             let vertices_ptr = vertices.as_ptr() as *const c_void;
 
-            (self.gl.glBindBuffer)(opengl::GL_ARRAY_BUFFER, self.vbo_index);
+            (self.gl.glBindBuffer)(opengl::GL_ARRAY_BUFFER, self.vbo_gl_id);
             (self.gl.glBufferData)(opengl::GL_ARRAY_BUFFER, vertices_size, vertices_ptr, opengl::GL_STATIC_DRAW);
 
-            if self.ebo_index == 0 {
-                (self.gl.glGenBuffers)(1, &mut self.ebo_index);
+            if self.ebo_gl_id == 0 {
+                (self.gl.glGenBuffers)(1, &mut self.ebo_gl_id);
             }
 
             let indices: [u32; 6] = [0, 1, 2, 0, 2, 3];
             let indices_size = (mem::size_of::<u32>() * indices.len()) as i64;
             let indices_ptr = indices.as_ptr() as *const c_void;
 
-            (self.gl.glBindBuffer)(opengl::GL_ELEMENT_ARRAY_BUFFER, self.ebo_index);
+            (self.gl.glBindBuffer)(opengl::GL_ELEMENT_ARRAY_BUFFER, self.ebo_gl_id);
             (self.gl.glBufferData)(opengl::GL_ELEMENT_ARRAY_BUFFER, indices_size, indices_ptr, opengl::GL_STATIC_DRAW);
 
             let attrib_size = (5 * mem::size_of::<f32>()) as i32;
@@ -92,12 +93,12 @@ impl Sprite {
             (self.gl.glEnableVertexAttribArray)(0);
             (self.gl.glEnableVertexAttribArray)(1);
 
-            if self.texture_index != 0 {
-                (self.gl.glDeleteTextures)(1, &self.texture_index);
+            if self.texture_gl_id != 0 {
+                (self.gl.glDeleteTextures)(1, &self.texture_gl_id);
             }
 
-            (self.gl.glGenTextures)(1, &mut self.texture_index);
-            (self.gl.glBindTexture)(opengl::GL_TEXTURE_2D, self.texture_index);
+            (self.gl.glGenTextures)(1, &mut self.texture_gl_id);
+            (self.gl.glBindTexture)(opengl::GL_TEXTURE_2D, self.texture_gl_id);
             (self.gl.glTexParameteri)(opengl::GL_TEXTURE_2D, opengl::GL_TEXTURE_WRAP_S, opengl::GL_MIRRORED_REPEAT as i32);
             (self.gl.glTexParameteri)(opengl::GL_TEXTURE_2D, opengl::GL_TEXTURE_WRAP_T, opengl::GL_MIRRORED_REPEAT as i32);
             (self.gl.glTexParameteri)(opengl::GL_TEXTURE_2D, opengl::GL_TEXTURE_MIN_FILTER, opengl::GL_NEAREST as i32);
@@ -113,6 +114,7 @@ impl Sprite {
 
             self.width = texture_width as u32;
             self.height = texture_height as u32;
+            self.texture_id = texture.id;
         }
     }
 
@@ -122,14 +124,14 @@ impl Sprite {
 
     pub fn set_anchor(&mut self, anchor: Vec2<f32>) {
         unsafe {
-            if self.vbo_index == 0 {
+            if self.vbo_gl_id == 0 {
                 return;
             }
 
             let vertices = self.get_vertices(anchor, self.width, self.height);
             let vertices_size = (mem::size_of::<f32>() * vertices.len()) as i64;
 
-            (self.gl.glBindBuffer)(opengl::GL_ARRAY_BUFFER, self.vbo_index);
+            (self.gl.glBindBuffer)(opengl::GL_ARRAY_BUFFER, self.vbo_gl_id);
             (self.gl.glBufferData)(opengl::GL_ARRAY_BUFFER, vertices_size, vertices.as_ptr() as *const c_void, opengl::GL_STATIC_DRAW);
 
             self.anchor = anchor;
@@ -139,59 +141,99 @@ impl Sprite {
     fn get_vertices(&self, anchor: Vec2<f32>, width: u32, height: u32) -> [f32; 20] {
         let offset = anchor * Vec2::new(width as f32, height as f32);
         [
-            0.0 - offset.x,
-            0.0 - offset.y,
-            0.0,
-            0.0,
-            0.0,
-            (width as f32) - offset.x,
-            0.0 - offset.y,
-            0.0,
-            1.0,
-            0.0,
-            (width as f32) - offset.x,
-            (height as f32) - offset.y,
-            0.0,
-            1.0,
-            1.0,
-            0.0 - offset.x,
-            (height as f32) - offset.y,
-            0.0,
-            0.0,
-            1.0,
+            // Left-bottom
+            /* v.x */ 0.0 - offset.x,
+            /* v.y */ 0.0 - offset.y,
+            /* v.z */ 0.0,
+            /* t.u */ 0.0,
+            /* t.v */ 0.0,
+            // Right-bottom
+            /* v.x */ (width as f32) - offset.x,
+            /* v.y */ 0.0 - offset.y,
+            /* v.z */ 0.0,
+            /* t.u */ 1.0,
+            /* t.v */ 0.0,
+            // Right-top
+            /* v.x */ (width as f32) - offset.x,
+            /* v.y */ (height as f32) - offset.y,
+            /* v.z */ 0.0,
+            /* t.u */ 1.0,
+            /* t.v */ 1.0,
+            // Left-top
+            /* v.x */ 0.0 - offset.x,
+            /* v.y */ (height as f32) - offset.y,
+            /* v.z */ 0.0,
+            /* t.u */ 0.0,
+            /* t.v */ 1.0,
         ]
     }
 }
 
 impl Drawable for Sprite {
+    fn get_id(&self) -> usize {
+        self.id
+    }
+
+    fn set_id(&mut self, id: usize) {
+        self.id = id;
+    }
+
     fn draw(&self, shader: &Shader) {
         unsafe {
             shader.set_parameter("model", Mat4x4::translate(Vec3::new(self.position.x, self.position.y, 0.0)).as_ptr());
 
-            (self.gl.glBindTexture)(opengl::GL_TEXTURE_2D, self.texture_index);
-            (self.gl.glBindVertexArray)(self.vao_index);
+            (self.gl.glBindVertexArray)(self.vao_gl_id);
+            (self.gl.glBindTexture)(opengl::GL_TEXTURE_2D, self.texture_gl_id);
             (self.gl.glDrawElements)(opengl::GL_TRIANGLES, 6, opengl::GL_UNSIGNED_INT, ptr::null());
         }
+    }
+
+    fn get_position(&self) -> Vec2<f32> {
+        self.position
+    }
+
+    fn set_position(&mut self, position: Vec2<f32>) {
+        self.position = position;
+    }
+
+    fn move_toward(&mut self, delta: Vec2<f32>) {
+        self.position += delta;
+    }
+
+    fn get_scale(&self) -> Vec2<f32> {
+        self.scale
+    }
+
+    fn set_scale(&mut self, scale: Vec2<f32>) {
+        self.scale = scale;
+    }
+
+    fn get_rotation(&self) -> f32 {
+        self.rotation
+    }
+
+    fn set_rotation(&mut self, rotation: f32) {
+        self.rotation = rotation;
     }
 }
 
 impl Drop for Sprite {
     fn drop(&mut self) {
         unsafe {
-            if self.vbo_index != 0 {
-                (self.gl.glDeleteBuffers)(1, &mut self.vbo_index);
+            if self.vbo_gl_id != 0 {
+                (self.gl.glDeleteBuffers)(1, &mut self.vbo_gl_id);
             }
 
-            if self.ebo_index != 0 {
-                (self.gl.glDeleteBuffers)(1, &mut self.ebo_index);
+            if self.ebo_gl_id != 0 {
+                (self.gl.glDeleteBuffers)(1, &mut self.ebo_gl_id);
             }
 
-            if self.vao_index != 0 {
-                (self.gl.glDeleteVertexArrays)(1, &mut self.vao_index);
+            if self.vao_gl_id != 0 {
+                (self.gl.glDeleteVertexArrays)(1, &mut self.vao_gl_id);
             }
 
-            if self.texture_index != 0 {
-                (self.gl.glDeleteTextures)(1, &self.texture_index);
+            if self.texture_gl_id != 0 {
+                (self.gl.glDeleteTextures)(1, &self.texture_gl_id);
             }
         }
     }

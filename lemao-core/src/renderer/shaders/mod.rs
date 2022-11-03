@@ -13,7 +13,7 @@ pub const DEFAULT_VERTEX_SHADER: &str = include_str!("./default.vert");
 pub const DEFAULT_FRAGMENT_SHADER: &str = include_str!("./default.frag");
 
 pub struct Shader {
-    id: usize,
+    pub id: usize,
     program_id: u32,
     uniforms: HashMap<String, u32>,
 
@@ -32,10 +32,11 @@ impl Shader {
             let vertex_shader_cstr = CString::new(vertex_shader).unwrap();
             let vertex_shader_array = [vertex_shader_cstr.as_ptr()];
             let vertex_shader_id = (gl.glCreateShader)(opengl::GL_VERTEX_SHADER);
+
             (gl.glShaderSource)(vertex_shader_id, 1, vertex_shader_array.as_ptr() as *const *const i8, ptr::null());
             (gl.glCompileShader)(vertex_shader_id);
-
             (gl.glGetShaderiv)(vertex_shader_id, opengl::GL_COMPILE_STATUS, &mut success);
+
             if success == 0 {
                 let mut log = vec![0; ERROR_LENGTH];
                 let log_ptr = log.as_mut_ptr() as *mut i8;
@@ -47,10 +48,11 @@ impl Shader {
             let fragment_shader_cstr = CString::new(fragment_shader).unwrap();
             let fragment_shader_array = [fragment_shader_cstr.as_ptr()];
             let fragment_shader_id = (gl.glCreateShader)(opengl::GL_FRAGMENT_SHADER);
+
             (gl.glShaderSource)(fragment_shader_id, 1, fragment_shader_array.as_ptr() as *const *const i8, ptr::null());
             (gl.glCompileShader)(fragment_shader_id);
-
             (gl.glGetShaderiv)(fragment_shader_id, opengl::GL_COMPILE_STATUS, &mut success);
+
             if success == 0 {
                 let mut log = vec![0; ERROR_LENGTH];
                 let log_ptr = log.as_mut_ptr() as *mut i8;
@@ -63,8 +65,8 @@ impl Shader {
             (gl.glAttachShader)(program_id, vertex_shader_id);
             (gl.glAttachShader)(program_id, fragment_shader_id);
             (gl.glLinkProgram)(program_id);
-
             (gl.glGetProgramiv)(program_id, opengl::GL_LINK_STATUS, &mut success);
+
             if success == 0 {
                 let mut log = vec![0; ERROR_LENGTH];
                 let log_ptr = log.as_mut_ptr() as *mut i8;
@@ -77,9 +79,10 @@ impl Shader {
             (gl.glDeleteShader)(fragment_shader_id);
 
             let mut active_uniforms = 0;
+            let mut uniforms: HashMap<String, u32> = Default::default();
+
             (gl.glGetProgramiv)(program_id, opengl::GL_ACTIVE_UNIFORMS, &mut active_uniforms);
 
-            let mut uniforms: HashMap<String, u32> = Default::default();
             for index in 0..active_uniforms {
                 let mut r#type = 0;
                 let mut length = 0;

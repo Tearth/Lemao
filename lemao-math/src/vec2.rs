@@ -1,8 +1,10 @@
 use std::ops::Add;
+use std::ops::AddAssign;
 use std::ops::Div;
 use std::ops::Mul;
 use std::ops::Neg;
 use std::ops::Sub;
+use std::ops::SubAssign;
 
 #[repr(C)]
 #[derive(Copy, Clone)]
@@ -45,10 +47,22 @@ macro_rules! implement {
             }
         }
 
+        impl AddAssign for Vec2<$type> {
+            fn add_assign(&mut self, rhs: Self) {
+                *self = *self + rhs;
+            }
+        }
+
         impl Sub for Vec2<$type> {
             type Output = Self;
             fn sub(self, rhs: Self) -> Self::Output {
                 Self::Output { x: self.x - rhs.x, y: self.y - rhs.y }
+            }
+        }
+
+        impl SubAssign for Vec2<$type> {
+            fn sub_assign(&mut self, rhs: Self) {
+                *self = *self - rhs;
             }
         }
 

@@ -1,20 +1,23 @@
 use crate::window::context::WindowContext;
 
+use super::drawable::sprite::Sprite;
+use super::drawable::storage::DrawableStorage;
 use super::drawable::Drawable;
-use super::drawable::storage::SpriteStorage;
-use super::shaders::{Shader, self};
 use super::shaders::storage::ShaderStorage;
-use super::textures::Texture;
+use super::shaders::Shader;
 use super::textures::storage::TextureStorage;
 use lemao_math::color::Color;
 use lemao_math::mat4x4::Mat4x4;
 use lemao_math::vec3::Vec3;
-use lemao_opengl::bindings::{opengl, wgl};
+use lemao_opengl::bindings::opengl;
+use lemao_opengl::bindings::wgl;
 use lemao_opengl::pointers::OpenGLPointers;
 use lemao_winapi::bindings::winapi;
+use std::mem;
+use std::ptr;
 use std::rc::Rc;
-use std::sync::{Mutex, Arc};
-use std::{mem, ptr};
+use std::sync::Arc;
+use std::sync::Mutex;
 
 pub struct RendererContext {
     pub gl: Rc<OpenGLPointers>,
@@ -22,9 +25,9 @@ pub struct RendererContext {
     pub default_shader_id: usize,
     pub active_shader_id: usize,
 
-    pub textures: Arc<Mutex<TextureStorage>>,
-    pub shaders: Option<ShaderStorage>,
-    pub sprites: Option<SpriteStorage>
+    textures: Arc<Mutex<TextureStorage>>,
+    shaders: Option<ShaderStorage>,
+    drawables: Option<DrawableStorage>,
 }
 
 impl RendererContext {
@@ -77,15 +80,21 @@ impl RendererContext {
             winapi::wglDeleteContext(fake_gl_context);
             fake_window.close();
 
-            #[rustfmt::skip]
             let mut attributes = [
-                wgl::WGL_DRAW_TO_WINDOW_ARB, opengl::GL_TRUE,
-                wgl::WGL_SUPPORT_OPENGL_ARB, opengl::GL_TRUE,
-                wgl::WGL_DOUBLE_BUFFER_ARB, opengl::GL_TRUE,
-                wgl::WGL_PIXEL_TYPE_ARB, wgl::WGL_TYPE_RGBA_ARB,
-                wgl::WGL_COLOR_BITS_ARB, 32,
-                wgl::WGL_DEPTH_BITS_ARB, 24,
-                wgl::WGL_STENCIL_BITS_ARB, 8,
+                wgl::WGL_DRAW_TO_WINDOW_ARB,
+                opengl::GL_TRUE,
+                wgl::WGL_SUPPORT_OPENGL_ARB,
+                opengl::GL_TRUE,
+                wgl::WGL_DOUBLE_BUFFER_ARB,
+                opengl::GL_TRUE,
+                wgl::WGL_PIXEL_TYPE_ARB,
+                wgl::WGL_TYPE_RGBA_ARB,
+                wgl::WGL_COLOR_BITS_ARB,
+                32,
+                wgl::WGL_DEPTH_BITS_ARB,
+                24,
+                wgl::WGL_STENCIL_BITS_ARB,
+                8,
                 0,
             ];
 
@@ -101,12 +110,7 @@ impl RendererContext {
                 panic!("{}", winapi::GetLastError());
             }
 
-            #[rustfmt::skip]
-            let mut attributes = [
-                wgl::WGL_CONTEXT_MAJOR_VERSION_ARB, 3, 
-                wgl::WGL_CONTEXT_MINOR_VERSION_ARB, 2, 
-                0
-            ];
+            let mut attributes = [wgl::WGL_CONTEXT_MAJOR_VERSION_ARB, 3, wgl::WGL_CONTEXT_MINOR_VERSION_ARB, 2, 0];
             let attributes_ptr = attributes.as_mut_ptr() as *const i32;
 
             let gl_context = (gl.wglCreateContextAttribsARB)(hdc as wgl::HDC, ptr::null_mut(), attributes_ptr);
@@ -114,22 +118,26 @@ impl RendererContext {
                 panic!("{}", winapi::GetLastError());
             }
 
-            let gl: Rc<OpenGLPointers> = Default::default();
-            let default_shader = match Shader::new_default(gl.clone()) {
-                Ok(value) => Rc::new(value),
-                Err(message) => panic!("Default shader compilation error: {}", message),
-            };
-            RendererContext { gl, gl_context: gl_context as winapi::HGLRC, default_shader_id: 0, active_shader_id: 0, textures, shaders: None, sprites: None }
+            RendererContext {
+                gl: Default::default(),
+                gl_context: gl_context as winapi::HGLRC,
+                default_shader_id: 0,
+                active_shader_id: 0,
+                textures,
+                shaders: None,
+                drawables: None,
+            }
         }
     }
 
     pub fn init_storages(&mut self) {
-        self.shaders = Some(ShaderStorage::new(self.gl.clone()));
-        self.sprites = Some(SpriteStorage::new(self.gl.clone()));
+        self.shaders = Some(Default::default());
+        self.drawables = Some(Default::default());
     }
 
     pub fn init_default_shader(&mut self) {
-        self.default_shader_id = self.shaders.as_mut().unwrap().load(shaders::DEFAULT_VERTEX_SHADER, shaders::DEFAULT_FRAGMENT_SHADER).unwrap();
+        let shader = Shader::new_default(self.gl.clone()).unwrap();
+        self.default_shader_id = self.shaders.as_mut().unwrap().store(shader).unwrap();
     }
 
     pub fn set_viewport(&self, width: i32, height: i32) {
@@ -145,9 +153,18 @@ impl RendererContext {
 
     pub fn create_sprite(&mut self, texture_id: usize) -> usize {
         let textures_storage = self.textures.lock().unwrap();
-        let kaela_texture = textures_storage.get(texture_id);
-        
-        self.sprites.as_mut().unwrap().load(kaela_texture).unwrap()
+        let texture = textures_storage.get(texture_id);
+        let sprite = Box::new(Sprite::new(self.gl.clone(), texture));
+
+        self.drawables.as_mut().unwrap().store(sprite).unwrap()
+    }
+
+    pub fn get_drawable(&self, drawable_id: usize) -> &dyn Drawable {
+        self.drawables.as_ref().unwrap().get(drawable_id)
+    }
+
+    pub fn get_drawable_mut(&mut self, drawable_id: usize) -> &mut dyn Drawable {
+        self.drawables.as_mut().unwrap().get_mut(drawable_id)
     }
 
     pub fn clear(&self, color: Color) {
@@ -157,7 +174,7 @@ impl RendererContext {
         }
     }
 
-    pub fn draw(&self, drawable: &dyn Drawable) {
+    pub fn draw(&self, drawable_id: usize) {
         let view = Mat4x4::translate(Vec3::new(0.0, 0.0, -3.0));
         let proj = Mat4x4::ortho(800.0, 600.0, 0.1, 100.0);
 
@@ -165,7 +182,7 @@ impl RendererContext {
         shader.set_parameter("view", view.as_ptr());
         shader.set_parameter("proj", proj.as_ptr());
 
-        drawable.draw(shader);
+        self.get_drawable(drawable_id).draw(shader);
     }
 
     pub fn release(&self) {

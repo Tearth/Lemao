@@ -21,10 +21,8 @@ pub struct WindowContext {
 }
 
 pub struct WndProcEvent {
-    pub hwnd: winapi::HWND,
-    pub message: winapi::UINT,
-    pub w_param: winapi::WPARAM,
-    pub l_param: winapi::LPARAM,
+    message: winapi::UINT,
+    l_param: winapi::LPARAM,
 }
 
 impl WindowContext {
@@ -210,7 +208,7 @@ extern "C" fn wnd_proc(hwnd: winapi::HWND, message: winapi::UINT, w_param: winap
                 let window_ptr = winapi::GetWindowLongPtrA(hwnd, winapi::GWLP_USERDATA);
                 let window = &mut *(window_ptr as *mut WindowContext);
 
-                window.wnd_proc_events.push_back(WndProcEvent { hwnd, message, w_param, l_param });
+                window.wnd_proc_events.push_back(WndProcEvent { message, l_param });
             }
             winapi::WM_CLOSE => {
                 if winapi::DestroyWindow(hwnd) == 0 {

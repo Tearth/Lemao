@@ -19,7 +19,6 @@ impl Mat4x4 {
         ]}
     }
 
-    #[rustfmt::skip]
     pub fn ortho(width: f32, height: f32, near: f32, far: f32) -> Self {
         let mut matrix: Mat4x4 = Default::default();
         matrix[0] = 2.0 / width;

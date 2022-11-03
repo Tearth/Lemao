@@ -1,38 +1,29 @@
-use lemao_opengl::pointers::OpenGLPointers;
+use super::*;
 
-use crate::renderer::textures::Texture;
-
-use super::{sprite::Sprite, *};
-
-pub struct SpriteStorage {
-    data: Vec<Option<Sprite>>,
-    gl: Rc<OpenGLPointers>,
+#[derive(Default)]
+pub struct DrawableStorage {
+    data: Vec<Option<Box<dyn Drawable>>>,
 }
 
-impl SpriteStorage {
-    pub fn new(gl: Rc<OpenGLPointers>) -> Self {
-        Self { data: Vec::new(), gl }
-    }
-
-    pub fn load(&mut self, texture: &Texture) -> Result<usize, String> {
+impl DrawableStorage {
+    pub fn store(&mut self, mut drawable: Box<dyn Drawable>) -> Result<usize, String> {
         let id = self.data.len();
-        let mut sprite = Sprite::new(self.gl.clone(), texture);
-
-        self.data.push(Some(sprite));
+        drawable.set_id(id);
+        self.data.push(Some(drawable));
 
         Ok(id)
     }
 
-    pub fn get(&self, id: usize) -> &Sprite {
+    pub fn get(&self, id: usize) -> &dyn Drawable {
         match &self.data[id] {
-            Some(sprite) => sprite,
+            Some(drawable) => drawable.as_ref(),
             None => panic!(""),
         }
     }
 
-    pub fn get_mut(&mut self, id: usize) -> &mut Sprite {
+    pub fn get_mut(&mut self, id: usize) -> &mut dyn Drawable {
         match &mut self.data[id] {
-            Some(sprite) => sprite,
+            Some(drawable) => drawable.as_mut(),
             None => panic!(""),
         }
     }
