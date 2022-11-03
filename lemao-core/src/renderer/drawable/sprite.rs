@@ -37,7 +37,7 @@ impl Sprite {
             id: 0,
 
             position: Default::default(),
-            scale: Default::default(),
+            scale: Vec2::new(1.0, 1.0),
             rotation: 0.0,
 
             width: 0,
@@ -180,7 +180,12 @@ impl Drawable for Sprite {
 
     fn draw(&self, shader: &Shader) {
         unsafe {
-            shader.set_parameter("model", Mat4x4::translate(Vec3::new(self.position.x, self.position.y, 0.0)).as_ptr());
+            let translation = Mat4x4::translate(Vec3::new(self.position.x, self.position.y, 0.0));
+            let scale = Mat4x4::scale(Vec3::new(self.scale.x, self.scale.y, 1.0));
+            let rotation = Mat4x4::rotate(self.rotation);
+            let model = translation * rotation * scale;
+
+            shader.set_parameter("model", model.as_ptr());
 
             (self.gl.glBindVertexArray)(self.vao_gl_id);
             (self.gl.glBindTexture)(opengl::GL_TEXTURE_2D, self.texture_gl_id);
@@ -214,6 +219,10 @@ impl Drawable for Sprite {
 
     fn set_rotation(&mut self, rotation: f32) {
         self.rotation = rotation;
+    }
+
+    fn rotate(&mut self, delta: f32) {
+        self.rotation += delta;
     }
 }
 

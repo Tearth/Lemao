@@ -19,4 +19,5 @@ pub trait Drawable {
 
     fn get_rotation(&self) -> f32;
     fn set_rotation(&mut self, rotation: f32);
+    fn rotate(&mut self, delta: f32);
 }
