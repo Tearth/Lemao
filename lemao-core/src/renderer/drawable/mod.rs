@@ -10,12 +10,12 @@ pub trait Drawable {
 
     fn draw(&self, shader: &Shader);
 
-    fn get_position(&self) -> Vec2<f32>;
-    fn set_position(&mut self, position: Vec2<f32>);
-    fn move_toward(&mut self, delta: Vec2<f32>);
+    fn get_position(&self) -> Vec2;
+    fn set_position(&mut self, position: Vec2);
+    fn move_toward(&mut self, delta: Vec2);
 
-    fn get_scale(&self) -> Vec2<f32>;
-    fn set_scale(&mut self, scale: Vec2<f32>);
+    fn get_scale(&self) -> Vec2;
+    fn set_scale(&mut self, scale: Vec2);
 
     fn get_rotation(&self) -> f32;
     fn set_rotation(&mut self, rotation: f32);

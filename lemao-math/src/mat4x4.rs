@@ -34,7 +34,7 @@ impl Mat4x4 {
         matrix
     }
 
-    pub fn translate(translation: Vec3<f32>) -> Self {
+    pub fn translate(translation: Vec3) -> Self {
         let mut matrix: Mat4x4 = Mat4x4::identity();
         matrix[3] = translation.x;
         matrix[7] = translation.y;
@@ -45,15 +45,15 @@ impl Mat4x4 {
 
     pub fn rotate(rotation: f32) -> Self {
         let mut matrix: Mat4x4 = Mat4x4::identity();
-        matrix[0] = rotation.cos();
-        matrix[1] = -rotation.sin();
+        matrix[0] = -rotation.cos();
+        matrix[1] = rotation.sin();
         matrix[4] = rotation.sin();
         matrix[5] = rotation.cos();
 
         matrix
     }
 
-    pub fn scale(scale: Vec3<f32>) -> Self {
+    pub fn scale(scale: Vec3) -> Self {
         let mut matrix: Mat4x4 = Mat4x4::identity();
         matrix[0] = scale.x;
         matrix[5] = scale.y;

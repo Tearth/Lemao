@@ -14,13 +14,13 @@ use std::rc::Rc;
 pub struct Sprite {
     id: usize,
 
-    position: Vec2<f32>,
-    scale: Vec2<f32>,
+    position: Vec2,
+    scale: Vec2,
     rotation: f32,
 
     width: u32,
     height: u32,
-    anchor: Vec2<f32>,
+    anchor: Vec2,
 
     vao_gl_id: u32,
     vbo_gl_id: u32,
@@ -118,11 +118,11 @@ impl Sprite {
         }
     }
 
-    pub fn get_anchor(&self) -> Vec2<f32> {
+    pub fn get_anchor(&self) -> Vec2 {
         self.anchor
     }
 
-    pub fn set_anchor(&mut self, anchor: Vec2<f32>) {
+    pub fn set_anchor(&mut self, anchor: Vec2) {
         unsafe {
             if self.vbo_gl_id == 0 {
                 return;
@@ -138,7 +138,7 @@ impl Sprite {
         }
     }
 
-    fn get_vertices(&self, anchor: Vec2<f32>, width: u32, height: u32) -> [f32; 20] {
+    fn get_vertices(&self, anchor: Vec2, width: u32, height: u32) -> [f32; 20] {
         let offset = anchor * Vec2::new(width as f32, height as f32);
         [
             // Left-bottom
@@ -193,23 +193,23 @@ impl Drawable for Sprite {
         }
     }
 
-    fn get_position(&self) -> Vec2<f32> {
+    fn get_position(&self) -> Vec2 {
         self.position
     }
 
-    fn set_position(&mut self, position: Vec2<f32>) {
+    fn set_position(&mut self, position: Vec2) {
         self.position = position;
     }
 
-    fn move_toward(&mut self, delta: Vec2<f32>) {
+    fn move_toward(&mut self, delta: Vec2) {
         self.position += delta;
     }
 
-    fn get_scale(&self) -> Vec2<f32> {
+    fn get_scale(&self) -> Vec2 {
         self.scale
     }
 
-    fn set_scale(&mut self, scale: Vec2<f32>) {
+    fn set_scale(&mut self, scale: Vec2) {
         self.scale = scale;
     }
 
