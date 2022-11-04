@@ -8,6 +8,7 @@ use crate::utils::log;
 use crate::window::context::WindowContext;
 use lemao_math::color::Color;
 use lemao_math::mat4x4::Mat4x4;
+use lemao_math::vec2::Vec2;
 use lemao_math::vec3::Vec3;
 use lemao_opengl::bindings::opengl;
 use lemao_opengl::bindings::wgl;
@@ -25,6 +26,8 @@ pub struct RendererContext {
     pub gl_context: winapi::HGLRC,
     pub default_shader_id: usize,
     pub active_shader_id: usize,
+
+    viewport_size: Vec2,
 
     textures: Arc<Mutex<TextureStorage>>,
     shaders: Option<ShaderStorage>,
@@ -140,6 +143,9 @@ impl RendererContext {
                 gl_context: gl_context as winapi::HGLRC,
                 default_shader_id: 0,
                 active_shader_id: 0,
+
+                viewport_size: Default::default(),
+
                 textures,
                 shaders: None,
                 drawables: None,
@@ -166,9 +172,20 @@ impl RendererContext {
         Ok(())
     }
 
-    pub fn set_viewport(&self, width: i32, height: i32) {
+    pub fn set_viewport(&mut self, width: u32, height: u32) {
         unsafe {
-            (self.gl.glViewport)(0, 0, width, height);
+            (self.gl.glViewport)(0, 0, width as i32, height as i32);
+
+            self.viewport_size = Vec2::new(width as f32, height as f32);
+            let proj = Mat4x4::ortho(width as f32, height as f32, 0.1, 100.0);
+            let shader = match self.shaders.as_ref().unwrap().get(self.active_shader_id) {
+                Some(shader) => shader,
+                None => {
+                    log::error(&format!("Shader with id {} not found, can;t set the viewport", self.active_shader_id));
+                    return;
+                }
+            };
+            shader.set_parameter("proj", proj.as_ptr());
         }
     }
 
@@ -213,8 +230,6 @@ impl RendererContext {
 
     pub fn draw(&self, drawable_id: usize) {
         let view = Mat4x4::translate(Vec3::new(0.0, 0.0, -3.0));
-        let proj = Mat4x4::ortho(800.0, 600.0, 0.1, 100.0);
-
         let shader = match self.shaders.as_ref().unwrap().get(self.active_shader_id) {
             Some(shader) => shader,
             None => {
@@ -223,7 +238,6 @@ impl RendererContext {
             }
         };
         shader.set_parameter("view", view.as_ptr());
-        shader.set_parameter("proj", proj.as_ptr());
 
         let drawable = match self.get_drawable(drawable_id) {
             Some(drawable) => drawable,

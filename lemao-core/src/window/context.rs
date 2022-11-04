@@ -228,7 +228,7 @@ extern "C" fn wnd_proc(hwnd: winapi::HWND, message: winapi::UINT, w_param: winap
                 let window_ptr = winapi::GetWindowLongPtrA(hwnd, winapi::GWLP_USERDATA);
                 let window = &mut *(window_ptr as *mut WindowContext);
 
-                window.wnd_proc_events.push_back(WndProcEvent { message, l_param });
+                window.wnd_proc_events.push_front(WndProcEvent { message, l_param });
             }
             winapi::WM_CLOSE => {
                 log::debug(&format!("Received WM_CLOSE for window with handle {:?}", hwnd));
