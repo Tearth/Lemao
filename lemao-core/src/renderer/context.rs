@@ -15,6 +15,7 @@ use lemao_opengl::bindings::wgl;
 use lemao_opengl::pointers::OpenGLPointers;
 use lemao_winapi::bindings::winapi;
 use std::ffi::c_void;
+use std::fs;
 use std::mem;
 use std::ptr;
 use std::rc::Rc;
@@ -184,17 +185,44 @@ impl RendererContext {
         }
     }
 
-    pub fn set_default_shader(&mut self) {
-        let shader = match self.shaders.as_ref().unwrap().get(self.default_shader_id) {
+    pub fn create_shader(&mut self, vertex_shader_path: &str, fragment_shader_path: &str) -> Result<usize, String> {
+        let vertex_shader = match fs::read_to_string(vertex_shader_path) {
+            Ok(content) => content,
+            Err(message) => return Err(format!("Error while loading vertex shader: {}", message)),
+        };
+
+        let fragment_shader = match fs::read_to_string(fragment_shader_path) {
+            Ok(content) => content,
+            Err(message) => return Err(format!("Error while loading fragment shader: {}", message)),
+        };
+
+        let shader = Shader::new_from_string(self.gl.clone(), &vertex_shader, &fragment_shader)?;
+        Ok(self.shaders.as_mut().unwrap().store(shader))
+    }
+
+    pub fn get_shader(&self, shader_id: usize) -> Option<&Shader> {
+        self.shaders.as_ref().unwrap().get(shader_id)
+    }
+
+    pub fn get_shader_mut(&mut self, shader_id: usize) -> Option<&mut Shader> {
+        self.shaders.as_mut().unwrap().get_mut(shader_id)
+    }
+
+    pub fn set_shader_as_active(&mut self, shader_id: usize) {
+        let shader = match self.shaders.as_mut().unwrap().get_mut(shader_id) {
             Some(shader) => shader,
             None => {
-                log::error(&format!("Default sader with id {} not found, can't set it as active", self.default_shader_id));
+                log::error(&format!("Shader with id {} not found, can't set it as active", shader_id));
                 return;
             }
         };
 
         self.active_shader_id = shader.id;
         shader.set_as_active();
+    }
+
+    pub fn set_default_shader(&mut self) {
+        self.set_shader_as_active(self.default_shader_id)
     }
 
     pub fn create_camera(&mut self, position: Vec2, size: Vec2) -> Result<usize, String> {
@@ -218,11 +246,11 @@ impl RendererContext {
         self.cameras.as_mut().unwrap().get_mut(self.active_camera_id)
     }
 
-    pub fn set_camera(&mut self, camera_id: usize) {
+    pub fn set_camera_as_active(&mut self, camera_id: usize) {
         let mut camera = match self.cameras.as_mut().unwrap().get_mut(camera_id) {
             Some(camera) => camera,
             None => {
-                log::error(&format!("Camera with id {} not found, can't set the viewport", camera_id));
+                log::error(&format!("Camera with id {} not found, can't set it as active", camera_id));
                 return;
             }
         };
