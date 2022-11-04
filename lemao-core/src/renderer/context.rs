@@ -1,3 +1,5 @@
+use super::cameras::storage::CameraStorage;
+use super::cameras::Camera;
 use super::drawable::sprite::Sprite;
 use super::drawable::storage::DrawableStorage;
 use super::drawable::Drawable;
@@ -7,9 +9,7 @@ use super::textures::storage::TextureStorage;
 use crate::utils::log;
 use crate::window::context::WindowContext;
 use lemao_math::color::Color;
-use lemao_math::mat4x4::Mat4x4;
 use lemao_math::vec2::Vec2;
-use lemao_math::vec3::Vec3;
 use lemao_opengl::bindings::opengl;
 use lemao_opengl::bindings::wgl;
 use lemao_opengl::pointers::OpenGLPointers;
@@ -24,12 +24,12 @@ use std::sync::Mutex;
 pub struct RendererContext {
     pub gl: Rc<OpenGLPointers>,
     pub gl_context: winapi::HGLRC,
+    pub active_camera_id: usize,
     pub default_shader_id: usize,
     pub active_shader_id: usize,
 
-    viewport_size: Vec2,
-
     textures: Arc<Mutex<TextureStorage>>,
+    cameras: Option<CameraStorage>,
     shaders: Option<ShaderStorage>,
     drawables: Option<DrawableStorage>,
 }
@@ -141,14 +141,14 @@ impl RendererContext {
             Ok(RendererContext {
                 gl: Default::default(),
                 gl_context: gl_context as winapi::HGLRC,
+                active_camera_id: 0,
                 default_shader_id: 0,
                 active_shader_id: 0,
-
-                viewport_size: Default::default(),
 
                 textures,
                 shaders: None,
                 drawables: None,
+                cameras: None,
             })
         }
     }
@@ -161,8 +161,14 @@ impl RendererContext {
     }
 
     pub fn init_storages(&mut self) {
+        self.cameras = Some(Default::default());
         self.shaders = Some(Default::default());
         self.drawables = Some(Default::default());
+    }
+
+    pub fn init_default_camera(&mut self) {
+        let camera = Camera::new(Default::default(), Default::default());
+        self.active_camera_id = self.cameras.as_mut().unwrap().store(camera);
     }
 
     pub fn init_default_shader(&mut self) -> Result<(), String> {
@@ -175,17 +181,6 @@ impl RendererContext {
     pub fn set_viewport(&mut self, width: u32, height: u32) {
         unsafe {
             (self.gl.glViewport)(0, 0, width as i32, height as i32);
-
-            self.viewport_size = Vec2::new(width as f32, height as f32);
-            let proj = Mat4x4::ortho(width as f32, height as f32, 0.1, 100.0);
-            let shader = match self.shaders.as_ref().unwrap().get(self.active_shader_id) {
-                Some(shader) => shader,
-                None => {
-                    log::error(&format!("Shader with id {} not found, can;t set the viewport", self.active_shader_id));
-                    return;
-                }
-            };
-            shader.set_parameter("proj", proj.as_ptr());
         }
     }
 
@@ -200,6 +195,19 @@ impl RendererContext {
 
         self.active_shader_id = shader.id;
         shader.set_as_active();
+    }
+
+    pub fn create_camera(&mut self, position: Vec2, size: Vec2) -> Result<usize, String> {
+        let camera = Camera::new(position, size);
+        Ok(self.cameras.as_mut().unwrap().store(camera))
+    }
+
+    pub fn get_camera(&self, camera_id: usize) -> Option<&Camera> {
+        self.cameras.as_ref().unwrap().get(camera_id)
+    }
+
+    pub fn get_camera_mut(&mut self, camera_id: usize) -> Option<&mut Camera> {
+        self.cameras.as_mut().unwrap().get_mut(camera_id)
     }
 
     pub fn create_sprite(&mut self, texture_id: usize) -> Result<usize, String> {
@@ -228,8 +236,15 @@ impl RendererContext {
         }
     }
 
-    pub fn draw(&self, drawable_id: usize) {
-        let view = Mat4x4::translate(Vec3::new(0.0, 0.0, -3.0));
+    pub fn draw(&mut self, drawable_id: usize) {
+        let mut camera = match self.cameras.as_mut().unwrap().get_mut(self.active_camera_id) {
+            Some(camera) => camera,
+            None => {
+                log::error(&format!("Camera with id {} not found, can;t set the viewport", self.active_camera_id));
+                return;
+            }
+        };
+
         let shader = match self.shaders.as_ref().unwrap().get(self.active_shader_id) {
             Some(shader) => shader,
             None => {
@@ -237,7 +252,12 @@ impl RendererContext {
                 return;
             }
         };
-        shader.set_parameter("view", view.as_ptr());
+
+        if camera.dirty {
+            shader.set_parameter("proj", camera.get_projection_matrix().as_ptr());
+            shader.set_parameter("view", camera.get_view_matrix().as_ptr());
+            camera.dirty = false;
+        }
 
         let drawable = match self.get_drawable(drawable_id) {
             Some(drawable) => drawable,
