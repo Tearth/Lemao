@@ -210,6 +210,27 @@ impl RendererContext {
         self.cameras.as_mut().unwrap().get_mut(camera_id)
     }
 
+    pub fn get_active_camera(&self) -> Option<&Camera> {
+        self.cameras.as_ref().unwrap().get(self.active_camera_id)
+    }
+
+    pub fn get_active_camera_mut(&mut self) -> Option<&mut Camera> {
+        self.cameras.as_mut().unwrap().get_mut(self.active_camera_id)
+    }
+
+    pub fn set_camera(&mut self, camera_id: usize) {
+        let mut camera = match self.cameras.as_mut().unwrap().get_mut(camera_id) {
+            Some(camera) => camera,
+            None => {
+                log::error(&format!("Camera with id {} not found, can't set the viewport", camera_id));
+                return;
+            }
+        };
+
+        self.active_camera_id = camera.id;
+        camera.dirty = true;
+    }
+
     pub fn create_sprite(&mut self, texture_id: usize) -> Result<usize, String> {
         let textures_storage = self.textures.lock().unwrap();
         let texture = match textures_storage.get(texture_id) {
@@ -240,7 +261,7 @@ impl RendererContext {
         let mut camera = match self.cameras.as_mut().unwrap().get_mut(self.active_camera_id) {
             Some(camera) => camera,
             None => {
-                log::error(&format!("Camera with id {} not found, can;t set the viewport", self.active_camera_id));
+                log::error(&format!("Camera with id {} not found, can't set the viewport", self.active_camera_id));
                 return;
             }
         };
