@@ -9,7 +9,7 @@ pub struct Texture {
     pub data: Vec<u8>,
 }
 
-#[derive(Eq, PartialEq)]
+#[derive(Eq, PartialEq, Debug)]
 pub enum TextureFormat {
     RGB,
     RGBA,

@@ -1,4 +1,5 @@
 use super::*;
+use crate::utils::log;
 
 #[derive(Default)]
 pub struct TextureStorage {
@@ -12,6 +13,8 @@ impl TextureStorage {
 
         texture.id = id;
         self.data.push(Some(texture));
+
+        log::debug(&format!("Stored a new texture {} with id {}", path, id));
 
         Ok(id)
     }

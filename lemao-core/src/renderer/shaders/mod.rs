@@ -1,3 +1,4 @@
+use crate::utils::log;
 use lemao_opengl::bindings::opengl;
 use lemao_opengl::pointers::OpenGLPointers;
 use std::collections::HashMap;
@@ -27,11 +28,14 @@ impl Shader {
 
     pub fn new_from_string(gl: Rc<OpenGLPointers>, vertex_shader: &str, fragment_shader: &str) -> Result<Self, String> {
         unsafe {
-            let mut success = 0;
+            log::debug(&format!("Loading a new vertex shader with length {} and fragment shader with length {}", vertex_shader.len(), fragment_shader.len()));
 
+            let mut success = 0;
             let vertex_shader_cstr = CString::new(vertex_shader).unwrap();
             let vertex_shader_array = [vertex_shader_cstr.as_ptr()];
             let vertex_shader_id = (gl.glCreateShader)(opengl::GL_VERTEX_SHADER);
+
+            log::debug(&format!("Compiling vertex shader with gl_id {}", vertex_shader_id));
 
             (gl.glShaderSource)(vertex_shader_id, 1, vertex_shader_array.as_ptr() as *const *const i8, ptr::null());
             (gl.glCompileShader)(vertex_shader_id);
@@ -42,12 +46,16 @@ impl Shader {
                 let log_ptr = log.as_mut_ptr() as *mut i8;
                 (gl.glGetShaderInfoLog)(vertex_shader_id, ERROR_LENGTH as i32, ptr::null_mut(), log_ptr);
 
-                return Err(String::from_utf8(log).unwrap());
+                return Err(format!("Vertex shader compilation error: {}", String::from_utf8(log).unwrap()));
+            } else {
+                log::debug(&format!("Compilation of vertex shader with gl_id {} done", vertex_shader_id));
             }
 
             let fragment_shader_cstr = CString::new(fragment_shader).unwrap();
             let fragment_shader_array = [fragment_shader_cstr.as_ptr()];
             let fragment_shader_id = (gl.glCreateShader)(opengl::GL_FRAGMENT_SHADER);
+
+            log::debug(&format!("Compiling fragment shader with gl_id {}", fragment_shader_id));
 
             (gl.glShaderSource)(fragment_shader_id, 1, fragment_shader_array.as_ptr() as *const *const i8, ptr::null());
             (gl.glCompileShader)(fragment_shader_id);
@@ -58,10 +66,14 @@ impl Shader {
                 let log_ptr = log.as_mut_ptr() as *mut i8;
                 (gl.glGetShaderInfoLog)(fragment_shader_id, ERROR_LENGTH as i32, ptr::null_mut(), log_ptr);
 
-                return Err(String::from_utf8(log).unwrap());
+                return Err(format!("Fragment shader compilation error: {}", String::from_utf8(log).unwrap()));
+            } else {
+                log::debug(&format!("Compilation of fragment shader with gl_id {} done", fragment_shader_id));
             }
 
             let program_id = (gl.glCreateProgram)();
+            log::debug(&format!("Linking program shader with gl_id {}", program_id));
+
             (gl.glAttachShader)(program_id, vertex_shader_id);
             (gl.glAttachShader)(program_id, fragment_shader_id);
             (gl.glLinkProgram)(program_id);
@@ -72,7 +84,9 @@ impl Shader {
                 let log_ptr = log.as_mut_ptr() as *mut i8;
                 (gl.glGetProgramInfoLog)(program_id, 1024, ptr::null_mut(), log_ptr);
 
-                return Err(String::from_utf8(log).unwrap());
+                return Err(format!("Program shader linking error: {}", String::from_utf8(log).unwrap()));
+            } else {
+                log::debug(&format!("Linking of program shader with gl_id {} done", program_id));
             }
 
             (gl.glDeleteShader)(vertex_shader_id);
@@ -82,7 +96,6 @@ impl Shader {
             let mut uniforms: HashMap<String, u32> = Default::default();
 
             (gl.glGetProgramiv)(program_id, opengl::GL_ACTIVE_UNIFORMS, &mut active_uniforms);
-
             for index in 0..active_uniforms {
                 let mut r#type = 0;
                 let mut length = 0;
@@ -92,14 +105,15 @@ impl Shader {
 
                 (gl.glGetActiveUniform)(program_id, index as u32, MAX_UNIFORM_NAME_LENGTH as i32, &mut length, &mut size, &mut r#type, name_ptr);
 
-                let name = String::from_utf8(name).unwrap();
-                let name = name.trim_end_matches(char::from_u32(0).unwrap()).to_string();
+                let name = String::from_utf8(name).unwrap().trim_end_matches(char::from_u32(0).unwrap()).to_string();
                 let name_cstr = CString::new(name.clone()).unwrap();
                 let location = (gl.glGetUniformLocation)(3, name_cstr.as_ptr());
 
+                log::debug(&format!("Found a new uniform parameter: name={}, location={}, size={}", name, location, size));
                 uniforms.insert(name, location as u32);
             }
 
+            log::debug(&format!("Creating a new program shader with gl_id {} done", program_id));
             Ok(Shader { id: 0, program_id, uniforms, gl })
         }
     }

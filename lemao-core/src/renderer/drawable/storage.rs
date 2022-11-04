@@ -6,12 +6,12 @@ pub struct DrawableStorage {
 }
 
 impl DrawableStorage {
-    pub fn store(&mut self, mut drawable: Box<dyn Drawable>) -> Result<usize, String> {
+    pub fn store(&mut self, mut drawable: Box<dyn Drawable>) -> usize {
         let id = self.data.len();
         drawable.set_id(id);
         self.data.push(Some(drawable));
 
-        Ok(id)
+        id
     }
 
     pub fn get(&self, id: usize) -> &dyn Drawable {

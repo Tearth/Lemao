@@ -6,12 +6,12 @@ pub struct ShaderStorage {
 }
 
 impl ShaderStorage {
-    pub fn store(&mut self, mut shader: Shader) -> Result<usize, String> {
+    pub fn store(&mut self, mut shader: Shader) -> usize {
         let id = self.data.len();
         shader.id = id;
         self.data.push(Some(shader));
 
-        Ok(id)
+        id
     }
 
     pub fn get(&self, id: usize) -> &Shader {

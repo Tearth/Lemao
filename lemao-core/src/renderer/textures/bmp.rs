@@ -1,5 +1,6 @@
 use super::*;
 use crate::utils::binary;
+use crate::utils::log;
 use std::fs::File;
 use std::io::Read;
 
@@ -8,13 +9,17 @@ pub fn load(path: &str) -> Result<Texture, String> {
     // BMP specification: https://en.wikipedia.org/wiki/BMP_file_format //
     //////////////////////////////////////////////////////////////////////
 
+    log::debug(&format!("Loading a new BMP file {}", path));
+
     let mut file = match File::open(path) {
         Ok(file) => file,
-        Err(_) => return Err("File not found".to_string()),
+        Err(_) => return Err(format!("File {} not found", path)),
     };
 
     let mut bmp = Vec::new();
-    file.read_to_end(&mut bmp).unwrap();
+    if let Err(message) = file.read_to_end(&mut bmp) {
+        return Err(format!("Error while reading file: {}", message));
+    }
 
     if binary::read_le_u16(&bmp, 0) != 0x4d42 {
         return Err("Invalid signature, not recognized as BMP file".to_string());
@@ -46,9 +51,9 @@ pub fn load(path: &str) -> Result<Texture, String> {
                 let g = binary::read_u8(&bmp, ((data_address + i * 3) + 1) as usize);
                 let b = binary::read_u8(&bmp, ((data_address + i * 3) + 2) as usize);
 
-                data.push(b as u8);
-                data.push(g as u8);
-                data.push(r as u8);
+                data.push(b);
+                data.push(g);
+                data.push(r);
             }
         }
         3 => {
@@ -77,6 +82,8 @@ pub fn load(path: &str) -> Result<Texture, String> {
         }
         _ => return Err("Unsupported compression method, only BI_RGB and BI_BITFIELDS are supported".to_string()),
     }
+
+    log::debug(&format!("BMP load done with width {}, height {}, format {:?}, length {}", width, height, format, data.len()));
 
     Ok(Texture { id: 0, width, height, format, data })
 }
