@@ -14,10 +14,25 @@ impl ShaderStorage {
         id
     }
 
-    pub fn get(&self, id: usize) -> &Shader {
+    pub fn get(&self, id: usize) -> Option<&Shader> {
+        if id >= self.data.len() {
+            return None;
+        }
+
         match &self.data[id] {
-            Some(shader) => shader,
-            None => panic!(""),
+            Some(shader) => Some(shader),
+            None => None,
+        }
+    }
+
+    pub fn get_mut(&mut self, id: usize) -> Option<&mut Shader> {
+        if id >= self.data.len() {
+            return None;
+        }
+
+        match &mut self.data[id] {
+            Some(shader) => Some(shader),
+            None => None,
         }
     }
 }

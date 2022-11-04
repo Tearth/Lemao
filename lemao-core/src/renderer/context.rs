@@ -173,23 +173,34 @@ impl RendererContext {
     }
 
     pub fn set_default_shader(&mut self) {
-        self.active_shader_id = self.default_shader_id;
-        self.shaders.as_ref().unwrap().get(self.active_shader_id).set_as_active();
+        let shader = match self.shaders.as_ref().unwrap().get(self.default_shader_id) {
+            Some(shader) => shader,
+            None => {
+                log::error(&format!("Default sader with id {} not found, can't set it as active", self.default_shader_id));
+                return;
+            }
+        };
+
+        self.active_shader_id = shader.id;
+        shader.set_as_active();
     }
 
-    pub fn create_sprite(&mut self, texture_id: usize) -> usize {
+    pub fn create_sprite(&mut self, texture_id: usize) -> Result<usize, String> {
         let textures_storage = self.textures.lock().unwrap();
-        let texture = textures_storage.get(texture_id);
+        let texture = match textures_storage.get(texture_id) {
+            Some(texture) => texture,
+            None => return Err(format!("Texture with id {} not found, the sprite can't be created", texture_id)),
+        };
         let sprite = Box::new(Sprite::new(self.gl.clone(), texture));
 
-        self.drawables.as_mut().unwrap().store(sprite)
+        Ok(self.drawables.as_mut().unwrap().store(sprite))
     }
 
-    pub fn get_drawable(&self, drawable_id: usize) -> &dyn Drawable {
+    pub fn get_drawable(&self, drawable_id: usize) -> Option<&dyn Drawable> {
         self.drawables.as_ref().unwrap().get(drawable_id)
     }
 
-    pub fn get_drawable_mut(&mut self, drawable_id: usize) -> &mut dyn Drawable {
+    pub fn get_drawable_mut(&mut self, drawable_id: usize) -> Option<&mut dyn Drawable> {
         self.drawables.as_mut().unwrap().get_mut(drawable_id)
     }
 
@@ -204,11 +215,24 @@ impl RendererContext {
         let view = Mat4x4::translate(Vec3::new(0.0, 0.0, -3.0));
         let proj = Mat4x4::ortho(800.0, 600.0, 0.1, 100.0);
 
-        let shader = self.shaders.as_ref().unwrap().get(self.active_shader_id);
+        let shader = match self.shaders.as_ref().unwrap().get(self.active_shader_id) {
+            Some(shader) => shader,
+            None => {
+                log::error(&format!("Shader with id {} not found, so the drawable object with id {} can't be drawn", self.active_shader_id, drawable_id));
+                return;
+            }
+        };
         shader.set_parameter("view", view.as_ptr());
         shader.set_parameter("proj", proj.as_ptr());
 
-        self.get_drawable(drawable_id).draw(shader);
+        let drawable = match self.get_drawable(drawable_id) {
+            Some(drawable) => drawable,
+            None => {
+                log::error(&format!("Drawable object with id {} not found, so it can't be drawn", drawable_id));
+                return;
+            }
+        };
+        drawable.draw(shader);
     }
 
     pub fn release(&self) {

@@ -14,17 +14,25 @@ impl DrawableStorage {
         id
     }
 
-    pub fn get(&self, id: usize) -> &dyn Drawable {
+    pub fn get(&self, id: usize) -> Option<&dyn Drawable> {
+        if id >= self.data.len() {
+            return None;
+        }
+
         match &self.data[id] {
-            Some(drawable) => drawable.as_ref(),
-            None => panic!(""),
+            Some(drawable) => Some(drawable.as_ref()),
+            None => None,
         }
     }
 
-    pub fn get_mut(&mut self, id: usize) -> &mut dyn Drawable {
+    pub fn get_mut(&mut self, id: usize) -> Option<&mut dyn Drawable> {
+        if id >= self.data.len() {
+            return None;
+        }
+
         match &mut self.data[id] {
-            Some(drawable) => drawable.as_mut(),
-            None => panic!(""),
+            Some(drawable) => Some(drawable.as_mut()),
+            None => None,
         }
     }
 }

@@ -184,7 +184,7 @@ impl WindowContext {
         let mut renderer = RendererContext::new(self.hdc, textures)?;
         renderer.init();
         renderer.init_storages();
-        renderer.init_default_shader();
+        renderer.init_default_shader()?;
         renderer.set_default_shader();
 
         Ok(renderer)
