@@ -40,7 +40,7 @@ pub fn load(path: &str) -> Result<Font, String> {
     let mut data = Vec::new();
     for y in 0..height {
         for x in 0..width {
-            let index = x + (height - y - 1) * height;
+            let index = x + (height - y - 1) * width;
             let (r, g, b, a) = match bits_per_pixel {
                 8 => (0xff, 0xff, 0xff, binary::read_u8(&bff, (276 + index) as usize)),
                 24 => (
