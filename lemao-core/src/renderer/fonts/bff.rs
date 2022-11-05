@@ -41,11 +41,22 @@ pub fn load(path: &str) -> Result<Font, String> {
     for y in 0..height {
         for x in 0..width {
             let index = x + (height - y - 1) * height;
-
-            let r = binary::read_u8(&bff, (276 + index * 4 + 0) as usize);
-            let g = binary::read_u8(&bff, (276 + index * 4 + 1) as usize);
-            let b = binary::read_u8(&bff, (276 + index * 4 + 2) as usize);
-            let a = binary::read_u8(&bff, (276 + index * 4 + 3) as usize);
+            let (r, g, b, a) = match bits_per_pixel {
+                8 => (0xff, 0xff, 0xff, binary::read_u8(&bff, (276 + index) as usize)),
+                24 => (
+                    binary::read_u8(&bff, (276 + index * 3 + 0) as usize),
+                    binary::read_u8(&bff, (276 + index * 3 + 1) as usize),
+                    binary::read_u8(&bff, (276 + index * 3 + 2) as usize),
+                    0xff,
+                ),
+                32 => (
+                    binary::read_u8(&bff, (276 + index * 4 + 0) as usize),
+                    binary::read_u8(&bff, (276 + index * 4 + 1) as usize),
+                    binary::read_u8(&bff, (276 + index * 4 + 2) as usize),
+                    binary::read_u8(&bff, (276 + index * 4 + 3) as usize),
+                ),
+                _ => return Err("Unsupported format, only 8, 24 and 32 bits per pixel are allowed".to_string()),
+            };
 
             data.push(r);
             data.push(g);
