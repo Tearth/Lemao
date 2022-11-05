@@ -27,7 +27,7 @@ pub struct WndProcEvent {
 }
 
 impl WindowContext {
-    pub fn new(title: &str, width: i32, height: i32) -> Result<Box<Self>, String> {
+    pub fn new(title: &str, width: u32, height: u32) -> Result<Box<Self>, String> {
         unsafe {
             let timestamp = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis();
             let class_cstr = CString::new(format!("LemaoWindow_{}", timestamp)).unwrap();
@@ -64,8 +64,8 @@ impl WindowContext {
                 winapi::WS_OVERLAPPEDWINDOW | winapi::WS_VISIBLE,
                 0,
                 0,
-                width,
-                height,
+                width as i32,
+                height as i32,
                 ptr::null_mut(),
                 ptr::null_mut(),
                 module_handle,

@@ -1,8 +1,0 @@
-[package]
-name = "lemao-bin"
-version = "1.0.0"
-edition = "2021"
-
-[dependencies]
-lemao-core = { path = "../lemao-core" }
-lemao-math = { path = "../lemao-math" }

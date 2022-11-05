@@ -1,9 +1,10 @@
 [workspace]
 members = [
-    "lemao-bin",
     "lemao-bindgen",
     "lemao-core",
     "lemao-math",
     "lemao-opengl",
     "lemao-winapi",
+
+    "examples/benchmark",
 ]
