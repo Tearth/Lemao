@@ -33,27 +33,20 @@ pub fn load(path: &str) -> Result<Texture, String> {
     let data_address = binary::read_le_u32(&bmp, 10);
     let width = binary::read_le_u32(&bmp, 18);
     let height = binary::read_le_u32(&bmp, 22);
-
-    let bits_per_pixel = binary::read_le_u16(&bmp, 28);
-    let format = match bits_per_pixel {
-        24 => TextureFormat::RGB,
-        32 => TextureFormat::RGBA,
-        _ => return Err("Unsupported format, only 24 and 32 bits per pixel are allowed".to_string()),
-    };
-
     let compression_method = binary::read_le_u32(&bmp, 30);
 
     let mut data = Vec::new();
     match compression_method {
         0 => {
             for i in 0..(width * height) {
-                let r = binary::read_u8(&bmp, ((data_address + i * 3) + 0) as usize);
+                let b = binary::read_u8(&bmp, ((data_address + i * 3) + 0) as usize);
                 let g = binary::read_u8(&bmp, ((data_address + i * 3) + 1) as usize);
-                let b = binary::read_u8(&bmp, ((data_address + i * 3) + 2) as usize);
+                let r = binary::read_u8(&bmp, ((data_address + i * 3) + 2) as usize);
 
-                data.push(b);
-                data.push(g);
                 data.push(r);
+                data.push(g);
+                data.push(b);
+                data.push(0xff);
             }
         }
         3 => {
@@ -83,7 +76,7 @@ pub fn load(path: &str) -> Result<Texture, String> {
         _ => return Err("Unsupported compression method, only BI_RGB and BI_BITFIELDS are supported".to_string()),
     }
 
-    log::debug(&format!("BMP load done with width {}, height {}, format {:?}, length {}", width, height, format, data.len()));
+    log::debug(&format!("BMP load done with width {}, height {}, length {}", width, height, data.len()));
 
-    Ok(Texture { id: 0, width, height, format, data })
+    Ok(Texture { id: 0, width, height, data })
 }

@@ -1,6 +1,5 @@
 use super::*;
 use crate::renderer::textures::Texture;
-use crate::renderer::textures::TextureFormat;
 use crate::utils::log;
 use lemao_math::mat4x4::Mat4x4;
 use lemao_math::vec2::Vec2;
@@ -116,7 +115,7 @@ impl Sprite {
             (self.gl.glTexParameteri)(opengl::GL_TEXTURE_2D, opengl::GL_TEXTURE_MIN_FILTER, opengl::GL_NEAREST as i32);
             (self.gl.glTexParameteri)(opengl::GL_TEXTURE_2D, opengl::GL_TEXTURE_MAG_FILTER, opengl::GL_LINEAR as i32);
 
-            let format = if texture.format == TextureFormat::RGB { opengl::GL_RGB } else { opengl::GL_RGBA };
+            let format = opengl::GL_RGBA;
             let texture_width = texture.width as i32;
             let texture_height = texture.height as i32;
             let texture_ptr = texture.data.as_ptr() as *const c_void;
