@@ -3,6 +3,7 @@ use lemao_math::vec2::Vec2;
 
 pub mod sprite;
 pub mod storage;
+pub mod text;
 
 pub trait Drawable {
     fn get_id(&self) -> usize;

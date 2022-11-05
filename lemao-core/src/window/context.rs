@@ -1,5 +1,6 @@
 use super::input::InputEvent;
 use crate::renderer::context::RendererContext;
+use crate::renderer::fonts::storage::FontStorage;
 use crate::renderer::textures::storage::TextureStorage;
 use crate::utils::log;
 use lemao_winapi::bindings::winapi;
@@ -180,8 +181,8 @@ impl WindowContext {
         }
     }
 
-    pub fn create_renderer(&self, textures: Arc<Mutex<TextureStorage>>) -> Result<RendererContext, String> {
-        let mut renderer = RendererContext::new(self.hdc, textures)?;
+    pub fn create_renderer(&self, textures: Arc<Mutex<TextureStorage>>, fonts: Arc<Mutex<FontStorage>>) -> Result<RendererContext, String> {
+        let mut renderer = RendererContext::new(self.hdc, textures, fonts)?;
         renderer.init();
         renderer.init_storages();
         renderer.init_default_camera();

@@ -2,7 +2,11 @@ use super::cameras::storage::CameraStorage;
 use super::cameras::Camera;
 use super::drawable::sprite::Sprite;
 use super::drawable::storage::DrawableStorage;
+use super::drawable::text::Text;
 use super::drawable::Drawable;
+use super::fonts::bff;
+use super::fonts::storage::FontStorage;
+use super::fonts::Font;
 use super::shaders::storage::ShaderStorage;
 use super::shaders::Shader;
 use super::textures::storage::TextureStorage;
@@ -30,13 +34,14 @@ pub struct RendererContext {
     pub active_shader_id: usize,
 
     textures: Arc<Mutex<TextureStorage>>,
+    fonts: Arc<Mutex<FontStorage>>,
     cameras: Option<CameraStorage>,
     shaders: Option<ShaderStorage>,
     drawables: Option<DrawableStorage>,
 }
 
 impl RendererContext {
-    pub fn new(hdc: winapi::HDC, textures: Arc<Mutex<TextureStorage>>) -> Result<Self, String> {
+    pub fn new(hdc: winapi::HDC, textures: Arc<Mutex<TextureStorage>>, fonts: Arc<Mutex<FontStorage>>) -> Result<Self, String> {
         unsafe {
             log::debug(&format!("Initializing a new renderer for device handle {:?}", hdc));
 
@@ -147,6 +152,7 @@ impl RendererContext {
                 active_shader_id: 0,
 
                 textures,
+                fonts,
                 shaders: None,
                 drawables: None,
                 cameras: None,
@@ -260,14 +266,25 @@ impl RendererContext {
     }
 
     pub fn create_sprite(&mut self, texture_id: usize) -> Result<usize, String> {
-        let textures_storage = self.textures.lock().unwrap();
-        let texture = match textures_storage.get(texture_id) {
+        let texture_storage = self.textures.lock().unwrap();
+        let texture = match texture_storage.get(texture_id) {
             Some(texture) => texture,
             None => return Err(format!("Texture with id {} not found, the sprite can't be created", texture_id)),
         };
         let sprite = Box::new(Sprite::new(self.gl.clone(), texture));
 
         Ok(self.drawables.as_mut().unwrap().store(sprite))
+    }
+
+    pub fn create_text(&mut self, font_id: usize) -> Result<usize, String> {
+        let font_storage = self.fonts.lock().unwrap();
+        let font = match font_storage.get(font_id) {
+            Some(font) => font,
+            None => return Err(format!("Font with id {} not found, the text can't be created", font_id)),
+        };
+        let text = Box::new(Text::new(self.gl.clone(), font));
+
+        Ok(self.drawables.as_mut().unwrap().store(text))
     }
 
     pub fn get_drawable(&self, drawable_id: usize) -> Option<&dyn Drawable> {

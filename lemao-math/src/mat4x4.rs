@@ -45,8 +45,8 @@ impl Mat4x4 {
 
     pub fn rotate(rotation: f32) -> Self {
         let mut matrix: Mat4x4 = Mat4x4::identity();
-        matrix[0] = -rotation.cos();
-        matrix[1] = rotation.sin();
+        matrix[0] = rotation.cos();
+        matrix[1] = -rotation.sin();
         matrix[4] = rotation.sin();
         matrix[5] = rotation.cos();
 
