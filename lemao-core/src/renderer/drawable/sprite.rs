@@ -7,6 +7,7 @@ use lemao_math::vec2::Vec2;
 use lemao_math::vec3::Vec3;
 use lemao_opengl::bindings::opengl;
 use lemao_opengl::pointers::OpenGLPointers;
+use std::any::Any;
 use std::ffi::c_void;
 use std::mem;
 use std::ptr;
@@ -237,6 +238,14 @@ impl Drawable for Sprite {
 
     fn rotate(&mut self, delta: f32) {
         self.rotation += delta;
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+
+    fn as_any_mut(&mut self) -> &mut dyn Any {
+        self
     }
 }
 

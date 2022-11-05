@@ -21,4 +21,7 @@ pub trait Drawable {
     fn get_rotation(&self) -> f32;
     fn set_rotation(&mut self, rotation: f32);
     fn rotate(&mut self, delta: f32);
+
+    fn as_any(&self) -> &dyn std::any::Any;
+    fn as_any_mut(&mut self) -> &mut dyn std::any::Any;
 }

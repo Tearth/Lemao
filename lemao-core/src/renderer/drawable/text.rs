@@ -1,13 +1,12 @@
 use super::*;
 use crate::renderer::fonts::Font;
-use crate::renderer::textures::Texture;
-use crate::renderer::textures::TextureFormat;
 use crate::utils::log;
 use lemao_math::mat4x4::Mat4x4;
 use lemao_math::vec2::Vec2;
 use lemao_math::vec3::Vec3;
 use lemao_opengl::bindings::opengl;
 use lemao_opengl::pointers::OpenGLPointers;
+use std::any::Any;
 use std::ffi::c_void;
 use std::mem;
 use std::ptr;
@@ -72,7 +71,6 @@ impl Text {
         };
 
         text.set_texture(font);
-        text.set_text("Get some help");
         text
     }
 
@@ -133,7 +131,7 @@ impl Text {
             self.height = texture_height as u32;
             self.font_id = font.id;
 
-            log::debug(&format!("Texture setting for sprite with id {} done", self.id));
+            log::debug(&format!("Texture setting for text with id {} done", self.id));
         }
     }
 
@@ -171,16 +169,13 @@ impl Text {
             }
 
             let text_width = offset;
-            let text_height = self.font_cell_height;
+            let text_height = self.font_cell_height as f32;
+            let anchor_offset = self.anchor * Vec2::new(text_width, text_height);
 
-            //
-            self.anchor = Vec2::new(0.5, 0.5);
-            let anchor_offset = self.anchor * Vec2::new(text_width as f32, text_height as f32);
             for index in 0..(vertices.len() / 5) {
                 vertices[index * 5 + 0] -= anchor_offset.x;
                 vertices[index * 5 + 1] -= anchor_offset.y;
             }
-            //
 
             let vertices_size = (mem::size_of::<f32>() * vertices.len()) as i64;
             let vertices_ptr = vertices.as_ptr() as *const c_void;
@@ -203,22 +198,8 @@ impl Text {
     }
 
     pub fn set_anchor(&mut self, anchor: Vec2) {
-        /*
-        unsafe {
-            if self.vbo_gl_id == 0 {
-                log::error(&format!("Can't set anchor for non-initialized sprite with id {}", self.id));
-                return;
-            }
-
-            let vertices = self.get_vertices(anchor, self.width, self.height);
-            let vertices_size = (mem::size_of::<f32>() * vertices.len()) as i64;
-
-            (self.gl.glBindBuffer)(opengl::GL_ARRAY_BUFFER, self.vbo_gl_id);
-            (self.gl.glBufferData)(opengl::GL_ARRAY_BUFFER, vertices_size, vertices.as_ptr() as *const c_void, opengl::GL_STATIC_DRAW);
-
-            self.anchor = anchor;
-        }
-        */
+        self.anchor = anchor;
+        self.set_text(&self.text.clone());
     }
 
     fn get_vertices(&self, width: u32, height: u32, offset: f32, uv: Vec2, uv_size: Vec2) -> [f32; 20] {
@@ -305,6 +286,14 @@ impl Drawable for Text {
 
     fn rotate(&mut self, delta: f32) {
         self.rotation += delta;
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+
+    fn as_any_mut(&mut self) -> &mut dyn Any {
+        self
     }
 }
 

@@ -4,9 +4,7 @@ use super::drawable::sprite::Sprite;
 use super::drawable::storage::DrawableStorage;
 use super::drawable::text::Text;
 use super::drawable::Drawable;
-use super::fonts::bff;
 use super::fonts::storage::FontStorage;
-use super::fonts::Font;
 use super::shaders::storage::ShaderStorage;
 use super::shaders::Shader;
 use super::textures::storage::TextureStorage;
@@ -291,8 +289,22 @@ impl RendererContext {
         self.drawables.as_ref().unwrap().get(drawable_id)
     }
 
+    pub fn get_drawable_with_type<T: 'static>(&self, drawable_id: usize) -> Option<&T> {
+        match self.get_drawable(drawable_id) {
+            Some(drawable) => drawable.as_any().downcast_ref::<T>(),
+            None => None,
+        }
+    }
+
     pub fn get_drawable_mut(&mut self, drawable_id: usize) -> Option<&mut dyn Drawable> {
         self.drawables.as_mut().unwrap().get_mut(drawable_id)
+    }
+
+    pub fn get_drawable_with_type_mut<T: 'static>(&mut self, drawable_id: usize) -> Option<&mut T> {
+        match self.get_drawable_mut(drawable_id) {
+            Some(drawable) => drawable.as_any_mut().downcast_mut::<T>(),
+            None => None,
+        }
     }
 
     pub fn clear(&self, color: Color) {
