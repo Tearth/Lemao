@@ -22,6 +22,7 @@ pub struct Sprite {
     width: u32,
     height: u32,
     anchor: Vec2,
+    color: Color,
 
     vao_gl_id: u32,
     vbo_gl_id: u32,
@@ -44,6 +45,7 @@ impl Sprite {
             width: 0,
             height: 0,
             anchor: Default::default(),
+            color: Color::new(1.0, 1.0, 1.0, 1.0),
             texture_id: texture.id,
 
             vao_gl_id: 0,
@@ -75,7 +77,7 @@ impl Sprite {
                 log::debug(&format!("Created a new VBO buffer with gl_id {}", self.vbo_gl_id));
             }
 
-            let vertices: [f32; 20] = self.get_vertices(Vec2::new(0.5, 0.5), texture.width, texture.height);
+            let vertices = self.get_vertices(Vec2::new(0.5, 0.5), texture.width, texture.height, self.color);
             let vertices_size = (mem::size_of::<f32>() * vertices.len()) as i64;
             let vertices_ptr = vertices.as_ptr() as *const c_void;
 
@@ -95,12 +97,14 @@ impl Sprite {
             (self.gl.glBindBuffer)(opengl::GL_ELEMENT_ARRAY_BUFFER, self.ebo_gl_id);
             (self.gl.glBufferData)(opengl::GL_ELEMENT_ARRAY_BUFFER, indices_size, indices_ptr, opengl::GL_STATIC_DRAW);
 
-            let attrib_size = (5 * mem::size_of::<f32>()) as i32;
+            let attrib_size = (9 * mem::size_of::<f32>()) as i32;
             (self.gl.glVertexAttribPointer)(0, 3, opengl::GL_FLOAT, opengl::GL_FALSE as u8, attrib_size, ptr::null_mut());
-            (self.gl.glVertexAttribPointer)(1, 2, opengl::GL_FLOAT, opengl::GL_FALSE as u8, attrib_size, (3 * mem::size_of::<f32>()) as *const c_void);
+            (self.gl.glVertexAttribPointer)(1, 4, opengl::GL_FLOAT, opengl::GL_FALSE as u8, attrib_size, (3 * mem::size_of::<f32>()) as *const c_void);
+            (self.gl.glVertexAttribPointer)(2, 2, opengl::GL_FLOAT, opengl::GL_FALSE as u8, attrib_size, (7 * mem::size_of::<f32>()) as *const c_void);
 
             (self.gl.glEnableVertexAttribArray)(0);
             (self.gl.glEnableVertexAttribArray)(1);
+            (self.gl.glEnableVertexAttribArray)(2);
 
             if self.texture_gl_id != 0 {
                 log::debug("Deleting old texture");
@@ -131,52 +135,47 @@ impl Sprite {
         }
     }
 
-    pub fn get_anchor(&self) -> Vec2 {
-        self.anchor
-    }
-
-    pub fn set_anchor(&mut self, anchor: Vec2) {
-        unsafe {
-            if self.vbo_gl_id == 0 {
-                log::error(&format!("Can't set anchor for non-initialized sprite with id {}", self.id));
-                return;
-            }
-
-            let vertices = self.get_vertices(anchor, self.width, self.height);
-            let vertices_size = (mem::size_of::<f32>() * vertices.len()) as i64;
-
-            (self.gl.glBindBuffer)(opengl::GL_ARRAY_BUFFER, self.vbo_gl_id);
-            (self.gl.glBufferData)(opengl::GL_ARRAY_BUFFER, vertices_size, vertices.as_ptr() as *const c_void, opengl::GL_STATIC_DRAW);
-
-            self.anchor = anchor;
-        }
-    }
-
-    fn get_vertices(&self, anchor: Vec2, width: u32, height: u32) -> [f32; 20] {
+    fn get_vertices(&self, anchor: Vec2, width: u32, height: u32, color: Color) -> [f32; 36] {
         let offset = anchor * Vec2::new(width as f32, height as f32);
         [
             // Left-bottom
             /* v.x */ 0.0 - offset.x,
             /* v.y */ 0.0 - offset.y,
             /* v.z */ 0.0,
+            /* c.r */ color.r,
+            /* c.g */ color.g,
+            /* c.b */ color.b,
+            /* c.a */ color.a,
             /* t.u */ 0.0,
             /* t.v */ 0.0,
             // Right-bottom
             /* v.x */ (width as f32) - offset.x,
             /* v.y */ 0.0 - offset.y,
             /* v.z */ 0.0,
+            /* c.r */ color.r,
+            /* c.g */ color.g,
+            /* c.b */ color.b,
+            /* c.a */ color.a,
             /* t.u */ 1.0,
             /* t.v */ 0.0,
             // Right-top
             /* v.x */ (width as f32) - offset.x,
             /* v.y */ (height as f32) - offset.y,
             /* v.z */ 0.0,
+            /* c.r */ color.r,
+            /* c.g */ color.g,
+            /* c.b */ color.b,
+            /* c.a */ color.a,
             /* t.u */ 1.0,
             /* t.v */ 1.0,
             // Left-top
             /* v.x */ 0.0 - offset.x,
             /* v.y */ (height as f32) - offset.y,
             /* v.z */ 0.0,
+            /* c.r */ color.r,
+            /* c.g */ color.g,
+            /* c.b */ color.b,
+            /* c.a */ color.a,
             /* t.u */ 0.0,
             /* t.v */ 1.0,
         ]
@@ -237,6 +236,48 @@ impl Drawable for Sprite {
 
     fn rotate(&mut self, delta: f32) {
         self.rotation += delta;
+    }
+
+    fn get_anchor(&self) -> Vec2 {
+        self.anchor
+    }
+
+    fn set_anchor(&mut self, anchor: Vec2) {
+        unsafe {
+            if self.vbo_gl_id == 0 {
+                log::error(&format!("Can't set anchor for non-initialized sprite with id {}", self.id));
+                return;
+            }
+
+            let vertices = self.get_vertices(anchor, self.width, self.height, self.color);
+            let vertices_size = (mem::size_of::<f32>() * vertices.len()) as i64;
+
+            (self.gl.glBindBuffer)(opengl::GL_ARRAY_BUFFER, self.vbo_gl_id);
+            (self.gl.glBufferData)(opengl::GL_ARRAY_BUFFER, vertices_size, vertices.as_ptr() as *const c_void, opengl::GL_STATIC_DRAW);
+
+            self.anchor = anchor;
+        }
+    }
+
+    fn get_color(&self) -> Color {
+        self.color
+    }
+
+    fn set_color(&mut self, color: Color) {
+        unsafe {
+            if self.vbo_gl_id == 0 {
+                log::error(&format!("Can't set anchor for non-initialized sprite with id {}", self.id));
+                return;
+            }
+
+            let vertices = self.get_vertices(self.anchor, self.width, self.height, color);
+            let vertices_size = (mem::size_of::<f32>() * vertices.len()) as i64;
+
+            (self.gl.glBindBuffer)(opengl::GL_ARRAY_BUFFER, self.vbo_gl_id);
+            (self.gl.glBufferData)(opengl::GL_ARRAY_BUFFER, vertices_size, vertices.as_ptr() as *const c_void, opengl::GL_STATIC_DRAW);
+
+            self.color = color;
+        }
     }
 
     fn as_any(&self) -> &dyn Any {

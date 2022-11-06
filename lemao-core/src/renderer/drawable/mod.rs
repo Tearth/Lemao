@@ -1,5 +1,5 @@
 use super::shaders::Shader;
-use lemao_math::vec2::Vec2;
+use lemao_math::{color::Color, vec2::Vec2};
 
 pub mod sprite;
 pub mod storage;
@@ -21,6 +21,12 @@ pub trait Drawable {
     fn get_rotation(&self) -> f32;
     fn set_rotation(&mut self, rotation: f32);
     fn rotate(&mut self, delta: f32);
+
+    fn get_anchor(&self) -> Vec2;
+    fn set_anchor(&mut self, anchor: Vec2);
+
+    fn get_color(&self) -> Color;
+    fn set_color(&mut self, color: Color);
 
     fn as_any(&self) -> &dyn std::any::Any;
     fn as_any_mut(&mut self) -> &mut dyn std::any::Any;

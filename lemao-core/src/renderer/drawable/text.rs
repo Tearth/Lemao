@@ -22,6 +22,7 @@ pub struct Text {
     width: u32,
     height: u32,
     anchor: Vec2,
+    color: Color,
     text: String,
 
     vao_gl_id: u32,
@@ -52,6 +53,7 @@ impl Text {
             width: 0,
             height: 0,
             anchor: Default::default(),
+            color: Color::new(1.0, 1.0, 1.0, 1.0),
             text: Default::default(),
 
             vao_gl_id: 0,
@@ -99,12 +101,14 @@ impl Text {
             }
             (self.gl.glBindBuffer)(opengl::GL_ELEMENT_ARRAY_BUFFER, self.ebo_gl_id);
 
-            let attrib_size = (5 * mem::size_of::<f32>()) as i32;
+            let attrib_size = (9 * mem::size_of::<f32>()) as i32;
             (self.gl.glVertexAttribPointer)(0, 3, opengl::GL_FLOAT, opengl::GL_FALSE as u8, attrib_size, ptr::null_mut());
-            (self.gl.glVertexAttribPointer)(1, 2, opengl::GL_FLOAT, opengl::GL_FALSE as u8, attrib_size, (3 * mem::size_of::<f32>()) as *const c_void);
+            (self.gl.glVertexAttribPointer)(1, 4, opengl::GL_FLOAT, opengl::GL_FALSE as u8, attrib_size, (3 * mem::size_of::<f32>()) as *const c_void);
+            (self.gl.glVertexAttribPointer)(2, 2, opengl::GL_FLOAT, opengl::GL_FALSE as u8, attrib_size, (7 * mem::size_of::<f32>()) as *const c_void);
 
             (self.gl.glEnableVertexAttribArray)(0);
             (self.gl.glEnableVertexAttribArray)(1);
+            (self.gl.glEnableVertexAttribArray)(2);
 
             if self.texture_gl_id != 0 {
                 log::debug("Deleting old texture");
@@ -153,7 +157,7 @@ impl Text {
                 let uv = Vec2::new(row as f32 * uv_width, 1.0 - col as f32 * uv_height - uv_height);
                 let uv_size = Vec2::new(uv_width, uv_height);
 
-                vertices.extend_from_slice(&self.get_vertices(self.font_cell_width, self.font_cell_height, offset, uv, uv_size));
+                vertices.extend_from_slice(&self.get_vertices(self.font_cell_width, self.font_cell_height, offset, uv, uv_size, self.color));
 
                 let indices_offset = (index * 4) as u32;
                 indices.extend_from_slice(&[
@@ -172,9 +176,9 @@ impl Text {
             let text_height = self.font_cell_height as f32;
             let anchor_offset = self.anchor * Vec2::new(text_width, text_height);
 
-            for index in 0..(vertices.len() / 5) {
-                vertices[index * 5 + 0] -= anchor_offset.x;
-                vertices[index * 5 + 1] -= anchor_offset.y;
+            for index in 0..(vertices.len() / 9) {
+                vertices[index * 9 + 0] -= anchor_offset.x;
+                vertices[index * 9 + 1] -= anchor_offset.y;
             }
 
             let vertices_size = (mem::size_of::<f32>() * vertices.len()) as i64;
@@ -193,39 +197,46 @@ impl Text {
         }
     }
 
-    pub fn get_anchor(&self) -> Vec2 {
-        self.anchor
-    }
-
-    pub fn set_anchor(&mut self, anchor: Vec2) {
-        self.anchor = anchor;
-        self.set_text(&self.text.clone());
-    }
-
-    fn get_vertices(&self, width: u32, height: u32, offset: f32, uv: Vec2, uv_size: Vec2) -> [f32; 20] {
+    fn get_vertices(&self, width: u32, height: u32, offset: f32, uv: Vec2, uv_size: Vec2, color: Color) -> [f32; 36] {
         [
             // Left-bottom
             /* v.x */ 0.0 + offset,
             /* v.y */ 0.0,
             /* v.z */ 0.0,
+            /* c.r */ color.r,
+            /* c.g */ color.g,
+            /* c.b */ color.b,
+            /* c.a */ color.a,
             /* t.u */ uv.x,
             /* t.v */ uv.y,
             // Right-bottom
             /* v.x */ (width as f32) + offset,
             /* v.y */ 0.0,
             /* v.z */ 0.0,
+            /* c.r */ color.r,
+            /* c.g */ color.g,
+            /* c.b */ color.b,
+            /* c.a */ color.a,
             /* t.u */ uv.x + uv_size.x,
             /* t.v */ uv.y,
             // Right-top
             /* v.x */ (width as f32) + offset,
             /* v.y */ (height as f32),
             /* v.z */ 0.0,
+            /* c.r */ color.r,
+            /* c.g */ color.g,
+            /* c.b */ color.b,
+            /* c.a */ color.a,
             /* t.u */ uv.x + uv_size.x,
             /* t.v */ uv.y + uv_size.y,
             // Left-top
             /* v.x */ 0.0 + offset,
             /* v.y */ (height as f32),
             /* v.z */ 0.0,
+            /* c.r */ color.r,
+            /* c.g */ color.g,
+            /* c.b */ color.b,
+            /* c.a */ color.a,
             /* t.u */ uv.x,
             /* t.v */ uv.y + uv_size.y,
         ]
@@ -286,6 +297,24 @@ impl Drawable for Text {
 
     fn rotate(&mut self, delta: f32) {
         self.rotation += delta;
+    }
+
+    fn get_anchor(&self) -> Vec2 {
+        self.anchor
+    }
+
+    fn set_anchor(&mut self, anchor: Vec2) {
+        self.anchor = anchor;
+        self.set_text(&self.text.clone());
+    }
+
+    fn get_color(&self) -> Color {
+        self.color
+    }
+
+    fn set_color(&mut self, color: Color) {
+        self.color = color;
+        self.set_text(&self.text.clone());
     }
 
     fn as_any(&self) -> &dyn Any {

@@ -64,7 +64,7 @@ pub fn main() {
 
                     renderer.set_viewport(width, height);
                     renderer.get_camera_mut(0).unwrap().set_viewport(window_size);
-                    renderer.get_drawable_mut(text_id).unwrap().set_position(Vec2::new(10.0, window_size.y - 10.0));
+                    renderer.get_drawable_mut(text_id).unwrap().set_position(Vec2::new(5.0, window_size.y - 0.0));
                 }
                 InputEvent::WindowClosed => {
                     is_running = false;
