@@ -3,6 +3,7 @@ members = [
     "lemao-bindgen",
     "lemao-core",
     "lemao-math",
+    "lemao-openal",
     "lemao-opengl",
     "lemao-winapi",
 
