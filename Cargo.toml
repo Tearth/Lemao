@@ -7,5 +7,6 @@ members = [
     "lemao-opengl",
     "lemao-winapi",
 
+    "examples/audio",
     "examples/benchmark",
 ]
