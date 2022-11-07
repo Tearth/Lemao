@@ -19,11 +19,11 @@ pub struct Text {
     scale: Vec2,
     rotation: f32,
 
-    width: u32,
-    height: u32,
+    size: Vec2,
     anchor: Vec2,
     color: Color,
     text: String,
+    line_height: u32,
 
     vao_gl_id: u32,
     vbo_gl_id: u32,
@@ -50,11 +50,11 @@ impl Text {
             scale: Vec2::new(1.0, 1.0),
             rotation: 0.0,
 
-            width: 0,
-            height: 0,
+            size: Default::default(),
             anchor: Default::default(),
             color: Color::new(1.0, 1.0, 1.0, 1.0),
             text: Default::default(),
+            line_height: font.cell_height,
 
             vao_gl_id: 0,
             vbo_gl_id: 0,
@@ -131,25 +131,36 @@ impl Text {
             (self.gl.glTexImage2D)(opengl::GL_TEXTURE_2D, 0, format as i32, texture_width, texture_height, 0, format, opengl::GL_UNSIGNED_BYTE, texture_ptr);
             (self.gl.glGenerateMipmap)(opengl::GL_TEXTURE_2D);
 
-            self.width = texture_width as u32;
-            self.height = texture_height as u32;
             self.font_id = font.id;
 
             log::debug(&format!("Texture setting for text with id {} done", self.id));
         }
     }
 
+    pub fn get_text(&self) -> &str {
+        &self.text
+    }
+
     pub fn set_text(&mut self, text: &str) {
         unsafe {
             let mut vertices = Vec::new();
             let mut indices = Vec::new();
-            let mut offset = 0.0;
+            let mut offset: Vec2 = Default::default();
+            let mut size: Vec2 = Vec2::new(0.0, self.line_height as f32);
 
             let characters_per_row = (self.font_width / self.font_cell_width) as u8;
             let uv_width = self.font_cell_width as f32 / self.font_width as f32;
             let uv_height = self.font_cell_height as f32 / self.font_height as f32;
+            let mut index = 0;
 
-            for (index, char) in text.chars().enumerate() {
+            for char in text.chars() {
+                if char == '\n' {
+                    offset.x = 0.0;
+                    offset.y -= self.line_height as f32;
+                    size.y += self.line_height as f32;
+                    continue;
+                }
+
                 let row = (char as u8 - self.font_base_character_offset) % characters_per_row;
                 let col = (char as u8 - self.font_base_character_offset) / characters_per_row;
 
@@ -169,16 +180,15 @@ impl Text {
                     3 + indices_offset,
                 ]);
 
-                offset += character_width as f32;
+                offset += Vec2::new(character_width as f32, 0.0);
+                size.x = size.x.max(offset.x);
+                index += 1;
             }
 
-            let text_width = offset;
-            let text_height = self.font_cell_height as f32;
-            let anchor_offset = self.anchor * Vec2::new(text_width, text_height);
-
+            let anchor_offset = self.anchor * size;
             for index in 0..(vertices.len() / 9) {
                 vertices[index * 9 + 0] -= anchor_offset.x;
-                vertices[index * 9 + 1] -= anchor_offset.y;
+                vertices[index * 9 + 1] += size.y - self.font_cell_height as f32 - anchor_offset.y;
             }
 
             let vertices_size = (mem::size_of::<f32>() * vertices.len()) as i64;
@@ -194,14 +204,28 @@ impl Text {
             (self.gl.glBufferData)(opengl::GL_ELEMENT_ARRAY_BUFFER, indices_size, indices_ptr, opengl::GL_STATIC_DRAW);
 
             self.text = text.to_string();
+            self.size = size;
         }
     }
 
-    fn get_vertices(&self, width: u32, height: u32, offset: f32, uv: Vec2, uv_size: Vec2, color: Color) -> [f32; 36] {
+    pub fn get_size(&self) -> Vec2 {
+        self.size
+    }
+
+    pub fn get_line_height(&self) -> u32 {
+        self.line_height
+    }
+
+    pub fn set_line_height(&mut self, line_height: u32) {
+        self.line_height = line_height;
+        self.set_text(&self.text.clone());
+    }
+
+    fn get_vertices(&self, width: u32, height: u32, offset: Vec2, uv: Vec2, uv_size: Vec2, color: Color) -> [f32; 36] {
         [
             // Left-bottom
-            /* v.x */ 0.0 + offset,
-            /* v.y */ 0.0,
+            /* v.x */ 0.0 + offset.x,
+            /* v.y */ 0.0 + offset.y,
             /* v.z */ 0.0,
             /* c.r */ color.r,
             /* c.g */ color.g,
@@ -210,8 +234,8 @@ impl Text {
             /* t.u */ uv.x,
             /* t.v */ uv.y,
             // Right-bottom
-            /* v.x */ (width as f32) + offset,
-            /* v.y */ 0.0,
+            /* v.x */ (width as f32) + offset.x,
+            /* v.y */ 0.0 + offset.y,
             /* v.z */ 0.0,
             /* c.r */ color.r,
             /* c.g */ color.g,
@@ -220,8 +244,8 @@ impl Text {
             /* t.u */ uv.x + uv_size.x,
             /* t.v */ uv.y,
             // Right-top
-            /* v.x */ (width as f32) + offset,
-            /* v.y */ (height as f32),
+            /* v.x */ (width as f32) + offset.x,
+            /* v.y */ (height as f32) + offset.y,
             /* v.z */ 0.0,
             /* c.r */ color.r,
             /* c.g */ color.g,
@@ -230,8 +254,8 @@ impl Text {
             /* t.u */ uv.x + uv_size.x,
             /* t.v */ uv.y + uv_size.y,
             // Left-top
-            /* v.x */ 0.0 + offset,
-            /* v.y */ (height as f32),
+            /* v.x */ 0.0 + offset.x,
+            /* v.y */ (height as f32) + offset.y,
             /* v.z */ 0.0,
             /* c.r */ color.r,
             /* c.g */ color.g,

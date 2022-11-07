@@ -32,6 +32,10 @@ impl Vec2 {
         Vec2::new(self.x / length, self.y / length)
     }
 
+    pub fn abs(&self) -> Self {
+        Vec2::new(self.x.abs(), self.y.abs())
+    }
+
     pub fn as_ptr(&self) -> *const f32 {
         self as *const _ as *const f32
     }
