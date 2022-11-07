@@ -1,4 +1,5 @@
 use lemao_core::renderer::drawable::text::Text;
+use lemao_core::renderer::drawable::Drawable;
 use lemao_core::renderer::fonts::storage::FontStorage;
 use lemao_core::renderer::textures::storage::TextureStorage;
 use lemao_core::window::context::WindowContext;
