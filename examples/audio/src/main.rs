@@ -51,7 +51,7 @@ Volume:
  F - down",
     );
     renderer.get_drawable_with_type_mut::<Text>(description_text_id).unwrap().set_anchor(Vec2::new(0.0, 1.0));
-    renderer.get_drawable_with_type_mut::<Text>(description_text_id).unwrap().set_line_height(32);
+    renderer.get_drawable_with_type_mut::<Text>(description_text_id).unwrap().set_line_height(20);
 
     let description_text_size = renderer.get_drawable_with_type_mut::<Text>(description_text_id).unwrap().get_size();
     renderer.get_drawable_with_type_mut::<Text>(status_text_id).unwrap().set_text("Status: stopped");
