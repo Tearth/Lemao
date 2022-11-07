@@ -12,12 +12,6 @@ use lemao_math::vec2::Vec2;
 use std::sync::Arc;
 use std::sync::Mutex;
 
-pub struct CellData {
-    pub sprite_id: usize,
-    pub position: Vec2,
-    pub velocity: Vec2,
-}
-
 pub fn main() {
     const DEFAULT_WINDOW_WIDTH: u32 = 800;
     const DEFAULT_WINDOW_HEIGHT: u32 = 600;
@@ -36,7 +30,7 @@ pub fn main() {
         Err(message) => panic!("{}", message),
     };
 
-    let mut renderer = match window.create_renderer(textures.clone(), fonts.clone()) {
+    let mut renderer = match window.create_renderer(textures, fonts.clone()) {
         Ok(renderer) => renderer,
         Err(message) => panic!("{}", message),
     };
