@@ -12,11 +12,12 @@ use std::sync::Arc;
 use std::sync::Mutex;
 
 pub fn main() {
+    let default_position = Vec2::new(0.0, 0.0);
     let default_size = Vec2::new(800.0, 600.0);
     let textures = Arc::new(Mutex::new(TextureStorage::default()));
     let fonts = Arc::new(Mutex::new(FontStorage::default()));
 
-    let mut window = match WindowContext::new("Window", WindowStyle::Window(Vec2::new(0.0, 0.0), default_size)) {
+    let mut window = match WindowContext::new("Window", WindowStyle::Window(default_position, default_size)) {
         Ok(window) => window,
         Err(message) => panic!("{}", message),
     };
@@ -45,8 +46,8 @@ pub fn main() {
     renderer.get_drawable_with_type_mut::<Text>(right_bottom_text_id).unwrap().set_text("Right bottom");
     renderer.get_drawable_with_type_mut::<Text>(window_status_text_id).unwrap().set_text("");
 
-    let mut old_position = Default::default();
-    let mut old_size = Default::default();
+    let mut old_position = default_position;
+    let mut old_size = default_size;
     let mut is_running = true;
 
     while is_running {
@@ -74,15 +75,19 @@ pub fn main() {
                     style_changed = true;
                 }
                 InputEvent::KeyPressed(Key::Key2) => {
-                    old_position = window.get_position();
-                    old_size = window.get_size();
+                    if let WindowStyle::Window(_, _) = window.get_style() {
+                        old_position = window.get_position();
+                        old_size = window.get_size();
+                    }
                     style_changed = true;
 
                     window.set_style(WindowStyle::Borderless);
                 }
                 InputEvent::KeyPressed(Key::Key3) => {
-                    old_position = window.get_position();
-                    old_size = window.get_size();
+                    if let WindowStyle::Window(_, _) = window.get_style() {
+                        old_position = window.get_position();
+                        old_size = window.get_size();
+                    }
                     style_changed = true;
 
                     window.set_style(WindowStyle::Fullscreen);
