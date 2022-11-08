@@ -29,6 +29,7 @@ pub struct Text {
     vbo_gl_id: u32,
     ebo_gl_id: u32,
     texture_gl_id: u32,
+    elements_count: u32,
 
     font_id: usize,
     font_width: u32,
@@ -60,6 +61,7 @@ impl Text {
             vbo_gl_id: 0,
             ebo_gl_id: 0,
             texture_gl_id: 0,
+            elements_count: 0,
 
             font_id: 0,
             font_width: font.width,
@@ -205,6 +207,7 @@ impl Text {
 
             self.text = text.to_string();
             self.size = size;
+            self.elements_count = indices.len() as u32;
         }
     }
 
@@ -287,7 +290,7 @@ impl Drawable for Text {
 
             (self.gl.glBindVertexArray)(self.vao_gl_id);
             (self.gl.glBindTexture)(opengl::GL_TEXTURE_2D, self.texture_gl_id);
-            (self.gl.glDrawElements)(opengl::GL_TRIANGLES, (self.text.len() * 6) as i32, opengl::GL_UNSIGNED_INT, ptr::null());
+            (self.gl.glDrawElements)(opengl::GL_TRIANGLES, self.elements_count as i32, opengl::GL_UNSIGNED_INT, ptr::null());
         }
     }
 
