@@ -3,6 +3,7 @@ use crate::renderer::context::RendererContext;
 use crate::renderer::fonts::storage::FontStorage;
 use crate::renderer::textures::storage::TextureStorage;
 use crate::utils::log;
+use lemao_math::vec2::Vec2;
 use lemao_winapi::bindings::winapi;
 use std::collections::VecDeque;
 use std::ffi::CString;
@@ -18,8 +19,17 @@ pub struct WindowContext {
     pub(crate) hdc: winapi::HDC,
     pub(crate) fake: bool,
 
+    style: WindowStyle,
+    size: Vec2,
     initialized: bool,
     wnd_proc_events: VecDeque<WndProcEvent>,
+}
+
+#[derive(Copy, Clone)]
+pub enum WindowStyle {
+    Window(Vec2),
+    Borderless,
+    Fullscreen,
 }
 
 pub struct WndProcEvent {
@@ -28,7 +38,7 @@ pub struct WndProcEvent {
 }
 
 impl WindowContext {
-    pub fn new(title: &str, width: u32, height: u32) -> Result<Box<Self>, String> {
+    pub fn new(title: &str, style: WindowStyle) -> Result<Box<Self>, String> {
         unsafe {
             let timestamp = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis();
             let class_cstr = CString::new(format!("LemaoWindow_{}", timestamp)).unwrap();
@@ -53,7 +63,15 @@ impl WindowContext {
                 return Err(format!("Error while initializing a new window class, GetLastError()={}", winapi::GetLastError()));
             }
 
-            let mut context = Box::new(Self { hwnd: ptr::null_mut(), hdc: ptr::null_mut(), fake: false, initialized: false, wnd_proc_events: VecDeque::new() });
+            let mut context = Box::new(Self {
+                hwnd: ptr::null_mut(),
+                hdc: ptr::null_mut(),
+                fake: false,
+                style,
+                size: Default::default(),
+                initialized: false,
+                wnd_proc_events: VecDeque::new(),
+            });
             let title_cstr = CString::new(title).unwrap();
 
             log::debug(&format!("Initializing a new window instance {:?}", title_cstr));
@@ -62,11 +80,11 @@ impl WindowContext {
                 0,
                 wnd_class.lpszClassName,
                 title_cstr.as_ptr(),
-                winapi::WS_OVERLAPPEDWINDOW | winapi::WS_VISIBLE,
+                winapi::WS_OVERLAPPEDWINDOW,
                 0,
                 0,
-                width as i32,
-                height as i32,
+                0,
+                0,
                 ptr::null_mut(),
                 ptr::null_mut(),
                 module_handle,
@@ -84,6 +102,7 @@ impl WindowContext {
             while !context.initialized {}
             log::debug(&format!("Initialization of window with handle {:?} done", hwnd));
 
+            context.set_style(context.style);
             Ok(context)
         }
     }
@@ -113,7 +132,15 @@ impl WindowContext {
                 return Err(format!("Error while initializing a new window class, GetLastError()={}", winapi::GetLastError()));
             }
 
-            let mut context = Box::new(Self { hwnd: ptr::null_mut(), hdc: ptr::null_mut(), fake: true, initialized: false, wnd_proc_events: VecDeque::new() });
+            let mut context = Box::new(Self {
+                hwnd: ptr::null_mut(),
+                hdc: ptr::null_mut(),
+                fake: true,
+                style: WindowStyle::Window(Vec2::new(0.0, 0.0)),
+                size: Default::default(),
+                initialized: false,
+                wnd_proc_events: VecDeque::new(),
+            });
             let title_cstr = CString::new("LemaoWindowInit").unwrap();
 
             log::debug(&format!("Initializing a new fake window instance {:?}", title_cstr));
@@ -178,6 +205,7 @@ impl WindowContext {
                     winapi::WM_SIZE => {
                         let width = (event.l_param & 0xffff) as u32;
                         let height = (event.l_param >> 16) as u32;
+                        self.size = Vec2::new(width as f32, height as f32);
 
                         return Some(InputEvent::WindowSizeChanged(width, height));
                     }
@@ -198,6 +226,61 @@ impl WindowContext {
         renderer.set_default_shader();
 
         Ok(renderer)
+    }
+
+    pub fn get_size(&self) -> Vec2 {
+        self.size
+    }
+
+    pub fn set_style(&mut self, style: WindowStyle) {
+        unsafe {
+            if let WindowStyle::Fullscreen = style {
+                if winapi::ChangeDisplaySettingsA(ptr::null_mut(), 0) != winapi::DISP_CHANGE_SUCCESSFUL as i32 {
+                    let x = 10;
+                }
+            }
+
+            match style {
+                WindowStyle::Window(size) => {
+                    let mut rect = winapi::tagRECT { left: 0, top: 0, right: size.x as i32, bottom: size.y as i32 };
+                    winapi::SetWindowLongPtrA(self.hwnd, winapi::GWL_STYLE, (winapi::WS_OVERLAPPEDWINDOW | winapi::WS_VISIBLE) as i64);
+                    winapi::AdjustWindowRect(&mut rect, winapi::WS_OVERLAPPEDWINDOW, 0);
+                    winapi::MoveWindow(self.hwnd, 0, 0, rect.right - rect.left, rect.bottom - rect.top, 1);
+                }
+                WindowStyle::Borderless => {
+                    let mut rect = mem::zeroed();
+                    winapi::GetWindowRect(winapi::GetDesktopWindow(), &mut rect);
+                    winapi::SetWindowLongPtrA(
+                        self.hwnd,
+                        winapi::GWL_STYLE,
+                        (winapi::WS_SYSMENU | winapi::WS_POPUP | winapi::WS_CLIPCHILDREN | winapi::WS_CLIPSIBLINGS | winapi::WS_VISIBLE) as i64,
+                    );
+                    winapi::MoveWindow(self.hwnd, 0, 0, rect.right - rect.left, rect.bottom - rect.top, 1);
+                }
+                WindowStyle::Fullscreen => {
+                    let mut rect = mem::zeroed();
+                    winapi::GetWindowRect(winapi::GetDesktopWindow(), &mut rect);
+                    winapi::SetWindowLongPtrA(
+                        self.hwnd,
+                        winapi::GWL_STYLE,
+                        (winapi::WS_SYSMENU | winapi::WS_POPUP | winapi::WS_CLIPCHILDREN | winapi::WS_CLIPSIBLINGS | winapi::WS_VISIBLE) as i64,
+                    );
+                    winapi::MoveWindow(self.hwnd, 0, 0, rect.right - rect.left, rect.bottom - rect.top, 1);
+
+                    let mut mode: winapi::DEVMODE = mem::zeroed();
+                    mode.dmSize = mem::size_of::<winapi::DEVMODE>() as u16;
+                    mode.dmPelsWidth = (rect.right - rect.left) as u32;
+                    mode.dmPelsHeight = (rect.bottom - rect.top) as u32;
+                    mode.dmBitsPerPel = 32;
+                    mode.dmFields = winapi::DM_PELSWIDTH | winapi::DM_PELSHEIGHT | winapi::DM_BITSPERPEL;
+                    if winapi::ChangeDisplaySettingsA(&mut mode, winapi::CDS_FULLSCREEN) != winapi::DISP_CHANGE_SUCCESSFUL as i32 {
+                        let x = 10;
+                    }
+                }
+            }
+
+            self.style = style;
+        }
     }
 
     pub fn swap_buffers(&self) {

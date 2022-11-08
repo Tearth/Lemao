@@ -1,7 +1,6 @@
-use lemao_winapi::bindings::winapi::{self, tagCURSORINFO};
-use std::{mem, ptr};
-
 use super::context::WindowContext;
+use lemao_winapi::bindings::winapi;
+use std::mem;
 
 pub enum InputEvent {
     Unknown,
