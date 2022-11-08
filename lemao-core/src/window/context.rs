@@ -20,14 +20,15 @@ pub struct WindowContext {
     pub(crate) fake: bool,
 
     style: WindowStyle,
+    position: Vec2,
     size: Vec2,
     initialized: bool,
     wnd_proc_events: VecDeque<WndProcEvent>,
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub enum WindowStyle {
-    Window(Vec2),
+    Window(Vec2, Vec2),
     Borderless,
     Fullscreen,
 }
@@ -68,6 +69,7 @@ impl WindowContext {
                 hdc: ptr::null_mut(),
                 fake: false,
                 style,
+                position: Default::default(),
                 size: Default::default(),
                 initialized: false,
                 wnd_proc_events: VecDeque::new(),
@@ -136,7 +138,8 @@ impl WindowContext {
                 hwnd: ptr::null_mut(),
                 hdc: ptr::null_mut(),
                 fake: true,
-                style: WindowStyle::Window(Vec2::new(0.0, 0.0)),
+                style: WindowStyle::Window(Vec2::new(0.0, 0.0), Vec2::new(0.0, 0.0)),
+                position: Default::default(),
                 size: Default::default(),
                 initialized: false,
                 wnd_proc_events: VecDeque::new(),
@@ -202,6 +205,16 @@ impl WindowContext {
 
             if let Some(event) = self.wnd_proc_events.pop_back() {
                 match event.message {
+                    winapi::WM_MOVE => {
+                        let mut rect = winapi::tagRECT { left: 0, top: 0, right: 0, bottom: 0 };
+                        winapi::AdjustWindowRect(&mut rect, winapi::WS_OVERLAPPEDWINDOW | winapi::WS_VISIBLE, 0);
+
+                        let x = (event.l_param & 0xffff) as i32 + rect.left;
+                        let y = (event.l_param >> 16) as i32 + rect.top;
+                        self.position = Vec2::new(x as f32, y as f32);
+
+                        return Some(InputEvent::WindowMoved(x, y));
+                    }
                     winapi::WM_SIZE => {
                         let width = (event.l_param & 0xffff) as u32;
                         let height = (event.l_param >> 16) as u32;
@@ -228,8 +241,16 @@ impl WindowContext {
         Ok(renderer)
     }
 
+    pub fn get_position(&self) -> Vec2 {
+        self.position
+    }
+
     pub fn get_size(&self) -> Vec2 {
         self.size
+    }
+
+    pub fn get_style(&self) -> WindowStyle {
+        self.style
     }
 
     pub fn set_style(&mut self, style: WindowStyle) {
@@ -241,11 +262,11 @@ impl WindowContext {
             }
 
             match style {
-                WindowStyle::Window(size) => {
+                WindowStyle::Window(position, size) => {
                     let mut rect = winapi::tagRECT { left: 0, top: 0, right: size.x as i32, bottom: size.y as i32 };
                     winapi::SetWindowLongPtrA(self.hwnd, winapi::GWL_STYLE, (winapi::WS_OVERLAPPEDWINDOW | winapi::WS_VISIBLE) as i64);
                     winapi::AdjustWindowRect(&mut rect, winapi::WS_OVERLAPPEDWINDOW, 0);
-                    winapi::MoveWindow(self.hwnd, 0, 0, rect.right - rect.left, rect.bottom - rect.top, 1);
+                    winapi::MoveWindow(self.hwnd, position.x as i32, position.y as i32, rect.right - rect.left, rect.bottom - rect.top, 1);
                 }
                 WindowStyle::Borderless => {
                     let mut rect = mem::zeroed();
@@ -317,7 +338,7 @@ extern "C" fn wnd_proc(hwnd: winapi::HWND, message: winapi::UINT, w_param: winap
                 window.hdc = hdc;
                 window.initialized = true;
             }
-            winapi::WM_SIZE => {
+            winapi::WM_MOVE | winapi::WM_SIZE => {
                 let window_ptr = winapi::GetWindowLongPtrA(hwnd, winapi::GWLP_USERDATA);
                 let window = &mut *(window_ptr as *mut WindowContext);
 

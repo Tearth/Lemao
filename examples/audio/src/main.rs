@@ -26,10 +26,11 @@ pub fn main() {
     let textures = Arc::new(Mutex::new(TextureStorage::default()));
     let fonts = Arc::new(Mutex::new(FontStorage::default()));
 
-    let mut window = match WindowContext::new("Audio", WindowStyle::Window(Vec2::new(DEFAULT_WINDOW_WIDTH as f32, DEFAULT_WINDOW_HEIGHT as f32))) {
-        Ok(window) => window,
-        Err(message) => panic!("{}", message),
-    };
+    let mut window =
+        match WindowContext::new("Audio", WindowStyle::Window(Vec2::new(0.0, 0.0), Vec2::new(DEFAULT_WINDOW_WIDTH as f32, DEFAULT_WINDOW_HEIGHT as f32))) {
+            Ok(window) => window,
+            Err(message) => panic!("{}", message),
+        };
 
     let mut renderer = match window.create_renderer(textures, fonts.clone()) {
         Ok(renderer) => renderer,

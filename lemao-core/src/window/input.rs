@@ -4,6 +4,7 @@ use std::mem;
 
 pub enum InputEvent {
     Unknown,
+    WindowMoved(i32, i32),
     WindowSizeChanged(u32, u32),
     WindowClosed,
     KeyPressed(Key),
