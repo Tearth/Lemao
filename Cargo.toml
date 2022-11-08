@@ -9,4 +9,5 @@ members = [
 
     "examples/audio",
     "examples/benchmark",
+    "examples/window",
 ]
