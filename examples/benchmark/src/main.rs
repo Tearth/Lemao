@@ -3,6 +3,7 @@ use lemao_core::renderer::drawable::Drawable;
 use lemao_core::renderer::fonts::storage::FontStorage;
 use lemao_core::renderer::textures::storage::TextureStorage;
 use lemao_core::window::context::WindowContext;
+use lemao_core::window::context::WindowStyle;
 use lemao_core::window::input::InputEvent;
 use lemao_math::color::Color;
 use lemao_math::vec2::Vec2;
@@ -25,7 +26,7 @@ pub fn main() {
     let textures = Arc::new(Mutex::new(TextureStorage::default()));
     let fonts = Arc::new(Mutex::new(FontStorage::default()));
 
-    let mut window = match WindowContext::new("Benchmark", DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT) {
+    let mut window = match WindowContext::new("Benchmark", WindowStyle::Window(Vec2::new(DEFAULT_WINDOW_WIDTH as f32, DEFAULT_WINDOW_HEIGHT as f32))) {
         Ok(window) => window,
         Err(message) => panic!("{}", message),
     };
