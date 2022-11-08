@@ -1,5 +1,5 @@
-use lemao_winapi::bindings::winapi;
-use std::mem;
+use lemao_winapi::bindings::winapi::{self, tagCURSORINFO};
+use std::{mem, ptr};
 
 use super::context::WindowContext;
 
@@ -120,6 +120,25 @@ pub fn get_cursor_position(window: &WindowContext) -> (i32, i32) {
         winapi::ScreenToClient(window.hwnd, &mut point);
 
         (point.x, point.y)
+    }
+}
+
+pub fn set_cursor_visibility(visible: bool) {
+    unsafe {
+        match visible {
+            true => while winapi::ShowCursor(1) < 0 {},
+            false => while winapi::ShowCursor(0) >= 0 {},
+        };
+    }
+}
+
+pub fn is_cursor_visible() -> bool {
+    unsafe {
+        let mut cursor_info: winapi::tagCURSORINFO = mem::zeroed();
+        cursor_info.cbSize = mem::size_of::<winapi::tagCURSORINFO>() as u32;
+        winapi::GetCursorInfo(&mut cursor_info);
+
+        cursor_info.flags != 0
     }
 }
 
