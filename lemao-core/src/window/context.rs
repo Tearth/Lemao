@@ -160,6 +160,14 @@ impl WindowContext {
                     winapi::WM_KEYDOWN => return Some(event.into()),
                     winapi::WM_KEYUP => return Some(event.into()),
                     winapi::WM_CHAR => return Some(event.into()),
+                    winapi::WM_LBUTTONDOWN => return Some(event.into()),
+                    winapi::WM_MBUTTONDOWN => return Some(event.into()),
+                    winapi::WM_RBUTTONDOWN => return Some(event.into()),
+                    winapi::WM_LBUTTONUP => return Some(event.into()),
+                    winapi::WM_MBUTTONUP => return Some(event.into()),
+                    winapi::WM_RBUTTONUP => return Some(event.into()),
+                    winapi::WM_MOUSEMOVE => return Some(event.into()),
+                    winapi::WM_MOUSEWHEEL => return Some(event.into()),
                     winapi::WM_QUIT => return Some(InputEvent::WindowClosed),
                     _ => {}
                 }

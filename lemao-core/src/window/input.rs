@@ -1,4 +1,7 @@
 use lemao_winapi::bindings::winapi;
+use std::mem;
+
+use super::context::WindowContext;
 
 pub enum InputEvent {
     Unknown,
@@ -7,6 +10,10 @@ pub enum InputEvent {
     KeyPressed(Key),
     KeyReleased(Key),
     CharPressed(char),
+    MouseButtonPressed(MouseButton),
+    MouseButtonReleased(MouseButton),
+    MouseMoved(i32, i32),
+    MouseWheelRotated(i32),
 }
 
 #[derive(Debug)]
@@ -71,12 +78,28 @@ pub enum Key {
     Num9 = 0x69,
 }
 
+#[derive(Debug)]
+pub enum MouseButton {
+    Unknown = 0x00,
+    Left = 0x01,
+    Right = 0x02,
+    Middle = 0x04,
+}
+
 impl From<winapi::MSG> for InputEvent {
     fn from(message: winapi::MSG) -> InputEvent {
         match message.message {
             winapi::WM_KEYDOWN => InputEvent::KeyPressed(virtual_key_to_key(message.wParam)),
             winapi::WM_KEYUP => InputEvent::KeyReleased(virtual_key_to_key(message.wParam)),
             winapi::WM_CHAR => InputEvent::CharPressed(char::from_u32(message.wParam as u32).unwrap()),
+            winapi::WM_LBUTTONDOWN => InputEvent::MouseButtonPressed(MouseButton::Left),
+            winapi::WM_RBUTTONDOWN => InputEvent::MouseButtonPressed(MouseButton::Right),
+            winapi::WM_MBUTTONDOWN => InputEvent::MouseButtonPressed(MouseButton::Middle),
+            winapi::WM_LBUTTONUP => InputEvent::MouseButtonReleased(MouseButton::Left),
+            winapi::WM_RBUTTONUP => InputEvent::MouseButtonReleased(MouseButton::Right),
+            winapi::WM_MBUTTONUP => InputEvent::MouseButtonReleased(MouseButton::Middle),
+            winapi::WM_MOUSEMOVE => InputEvent::MouseMoved((message.lParam as i32) & 0xffff, (message.lParam as i32) >> 16),
+            winapi::WM_MOUSEWHEEL => InputEvent::MouseWheelRotated((message.wParam as i32) >> 16),
             _ => InputEvent::Unknown,
         }
     }
@@ -84,6 +107,20 @@ impl From<winapi::MSG> for InputEvent {
 
 pub fn is_key_pressed(key: Key) -> bool {
     unsafe { ((winapi::GetKeyState(key as i32) as u16) & 0x8000) != 0 }
+}
+
+pub fn is_mouse_button_pressed(button: MouseButton) -> bool {
+    unsafe { ((winapi::GetKeyState(button as i32) as u16) & 0x8000) != 0 }
+}
+
+pub fn get_cursor_position(window: &WindowContext) -> (i32, i32) {
+    unsafe {
+        let mut point = mem::zeroed();
+        winapi::GetCursorPos(&mut point);
+        winapi::ScreenToClient(window.hwnd, &mut point);
+
+        (point.x, point.y)
+    }
 }
 
 fn virtual_key_to_key(virtual_key: u64) -> Key {
