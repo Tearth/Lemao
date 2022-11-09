@@ -1,6 +1,5 @@
 use super::*;
 use crate::utils::binary;
-use crate::utils::log;
 use std::fs::File;
 use std::io::Read;
 
@@ -8,8 +7,6 @@ pub fn load(path: &str) -> Result<Texture, String> {
     //////////////////////////////////////////////////////////////////////
     // BMP specification: https://en.wikipedia.org/wiki/BMP_file_format //
     //////////////////////////////////////////////////////////////////////
-
-    log::debug(&format!("Loading a new BMP file {}", path));
 
     let mut file = match File::open(path) {
         Ok(file) => file,
@@ -75,8 +72,6 @@ pub fn load(path: &str) -> Result<Texture, String> {
         }
         _ => return Err("Unsupported compression method, only BI_RGB and BI_BITFIELDS are supported".to_string()),
     }
-
-    log::debug(&format!("BMP load done with width {}, height {}, length {}", width, height, data.len()));
 
     Ok(Texture { id: 0, width, height, data })
 }

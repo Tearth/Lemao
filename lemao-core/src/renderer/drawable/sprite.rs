@@ -1,6 +1,5 @@
 use super::*;
 use crate::renderer::textures::Texture;
-use crate::utils::log;
 use lemao_math::mat4x4::Mat4x4;
 use lemao_math::vec2::Vec2;
 use lemao_math::vec3::Vec3;
@@ -62,19 +61,13 @@ impl Sprite {
 
     pub fn set_texture(&mut self, texture: &Texture) {
         unsafe {
-            log::debug(&format!("Setting a new texture with gl_id {} for the sprite with id {}", texture.id, self.id));
-
             if self.vao_gl_id == 0 {
-                log::debug("Creating a new VAO buffer");
                 (self.gl.glGenVertexArrays)(1, &mut self.vao_gl_id);
-                log::debug(&format!("Created a new VAO buffer with gl_id {}", self.vao_gl_id));
             }
             (self.gl.glBindVertexArray)(self.vao_gl_id);
 
             if self.vbo_gl_id == 0 {
-                log::debug("Creating a new VBO buffer");
                 (self.gl.glGenBuffers)(1, &mut self.vbo_gl_id);
-                log::debug(&format!("Created a new VBO buffer with gl_id {}", self.vbo_gl_id));
             }
 
             let vertices = self.get_vertices(Vec2::new(0.5, 0.5), texture.width, texture.height, self.color);
@@ -85,9 +78,7 @@ impl Sprite {
             (self.gl.glBufferData)(opengl::GL_ARRAY_BUFFER, vertices_size, vertices_ptr, opengl::GL_STATIC_DRAW);
 
             if self.ebo_gl_id == 0 {
-                log::debug("Creating a new EBO buffer");
                 (self.gl.glGenBuffers)(1, &mut self.ebo_gl_id);
-                log::debug(&format!("Created a new EBO buffer with gl_id {}", self.ebo_gl_id));
             }
 
             let indices: [u32; 6] = [0, 1, 2, 0, 2, 3];
@@ -107,9 +98,7 @@ impl Sprite {
             (self.gl.glEnableVertexAttribArray)(2);
 
             if self.texture_gl_id != 0 {
-                log::debug("Deleting old texture");
                 (self.gl.glDeleteTextures)(1, &self.texture_gl_id);
-                log::debug(&format!("Texture with gl_id {} deleted", self.ebo_gl_id));
             }
 
             (self.gl.glGenTextures)(1, &mut self.texture_gl_id);
@@ -130,8 +119,6 @@ impl Sprite {
             self.width = texture_width as u32;
             self.height = texture_height as u32;
             self.texture_id = texture.id;
-
-            log::debug(&format!("Texture setting for sprite with id {} done", self.id));
         }
     }
 
@@ -245,7 +232,6 @@ impl Drawable for Sprite {
     fn set_anchor(&mut self, anchor: Vec2) {
         unsafe {
             if self.vbo_gl_id == 0 {
-                log::error(&format!("Can't set anchor for non-initialized sprite with id {}", self.id));
                 return;
             }
 
@@ -266,7 +252,6 @@ impl Drawable for Sprite {
     fn set_color(&mut self, color: Color) {
         unsafe {
             if self.vbo_gl_id == 0 {
-                log::error(&format!("Can't set anchor for non-initialized sprite with id {}", self.id));
                 return;
             }
 
@@ -293,27 +278,19 @@ impl Drop for Sprite {
     fn drop(&mut self) {
         unsafe {
             if self.vbo_gl_id != 0 {
-                log::debug(&format!("Deleting VBO buffer with gl_id {}", self.vbo_gl_id));
                 (self.gl.glDeleteBuffers)(1, &mut self.vbo_gl_id);
-                log::debug("Deleting VBO buffer done");
             }
 
             if self.ebo_gl_id != 0 {
-                log::debug(&format!("Deleting EBO buffer with gl_id {}", self.ebo_gl_id));
                 (self.gl.glDeleteBuffers)(1, &mut self.ebo_gl_id);
-                log::debug("Deleting EBO buffer done");
             }
 
             if self.vao_gl_id != 0 {
-                log::debug(&format!("Deleting VAO buffer with gl_id {}", self.vao_gl_id));
                 (self.gl.glDeleteVertexArrays)(1, &mut self.vao_gl_id);
-                log::debug("Deleting VAO buffer done");
             }
 
             if self.texture_gl_id != 0 {
-                log::debug(&format!("Deleting texture with gl_id {}", self.texture_gl_id));
                 (self.gl.glDeleteTextures)(1, &self.texture_gl_id);
-                log::debug("Deleting texture done");
             }
         }
     }

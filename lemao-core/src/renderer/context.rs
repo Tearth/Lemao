@@ -8,7 +8,6 @@ use super::fonts::storage::FontStorage;
 use super::shaders::storage::ShaderStorage;
 use super::shaders::Shader;
 use super::textures::storage::TextureStorage;
-use crate::utils::log;
 use crate::window::context::WindowContext;
 use lemao_math::color::Color;
 use lemao_math::vec2::Vec2;
@@ -41,8 +40,6 @@ pub struct RendererContext {
 impl RendererContext {
     pub fn new(hdc: winapi::HDC, textures: Arc<Mutex<TextureStorage>>, fonts: Arc<Mutex<FontStorage>>) -> Result<Self, String> {
         unsafe {
-            log::debug(&format!("Initializing a new renderer for device handle {:?}", hdc));
-
             let fake_window = WindowContext::new_fake()?;
             let fake_window_hdc = fake_window.hdc;
 
@@ -75,25 +72,17 @@ impl RendererContext {
                 dwDamageMask: 0,
             };
 
-            log::debug("Setting pixel format for fake window");
-
             let pixel_format = winapi::ChoosePixelFormat(fake_window_hdc, &pixel_format_descriptor);
             if winapi::SetPixelFormat(fake_window_hdc, pixel_format, &pixel_format_descriptor) == 0 {
                 return Err(format!("Error while setting pixel format for fake window, GetLastError()={}", winapi::GetLastError()));
             }
-
-            log::debug("Creating fake OpenGL context");
 
             let fake_gl_context: winapi::HGLRC = winapi::wglCreateContext(fake_window_hdc);
             if winapi::wglMakeCurrent(fake_window_hdc, fake_gl_context) == 0 {
                 return Err(format!("Error while creating fake OpenGL context, GetLastError()={}", winapi::GetLastError()));
             }
 
-            log::debug("Loading OpenGL pointers");
-
             let gl: Rc<OpenGLPointers> = Default::default();
-
-            log::debug("Destroying fake OpenGL context");
 
             winapi::wglDeleteContext(fake_gl_context);
             fake_window.close();
@@ -120,13 +109,9 @@ impl RendererContext {
             let mut formats_count = 0;
             let attributes_ptr = attributes.as_mut_ptr() as *const i32;
 
-            log::debug("Loading available pixel formats for the desired window");
-
             if (gl.wglChoosePixelFormatARB)(hdc as wgl::HDC, attributes_ptr, ptr::null_mut(), 1, &mut pixel_format, &mut formats_count) == 0 {
                 return Err(format!("Error while loading available pixel formats for desired window, GetLastError()={}", winapi::GetLastError()));
             }
-
-            log::debug("Setting pixel format for the desired window");
 
             if winapi::SetPixelFormat(hdc, pixel_format, &pixel_format_descriptor) == 0 {
                 return Err(format!("Error while setting pixel format for desired window, GetLastError()={}", winapi::GetLastError()));
@@ -134,8 +119,6 @@ impl RendererContext {
 
             let mut attributes = [wgl::WGL_CONTEXT_MAJOR_VERSION_ARB, 3, wgl::WGL_CONTEXT_MINOR_VERSION_ARB, 2, 0];
             let attributes_ptr = attributes.as_mut_ptr() as *const i32;
-
-            log::debug("Creating OpenGL context for the desired window");
 
             let gl_context = (gl.wglCreateContextAttribsARB)(hdc as wgl::HDC, ptr::null_mut(), attributes_ptr);
             if winapi::wglMakeCurrent(hdc, gl_context as winapi::HGLRC) == 0 {
@@ -212,20 +195,20 @@ impl RendererContext {
         self.shaders.as_mut().unwrap().get_mut(shader_id)
     }
 
-    pub fn set_shader_as_active(&mut self, shader_id: usize) {
+    pub fn set_shader_as_active(&mut self, shader_id: usize) -> Result<(), String> {
         let shader = match self.shaders.as_mut().unwrap().get_mut(shader_id) {
             Some(shader) => shader,
             None => {
-                log::error(&format!("Shader with id {} not found, can't set it as active", shader_id));
-                return;
+                return Err(format!("Shader with id {} not found, can't set it as active", shader_id));
             }
         };
 
         self.active_shader_id = shader.id;
         shader.set_as_active();
+        Ok(())
     }
 
-    pub fn set_default_shader(&mut self) {
+    pub fn set_default_shader(&mut self) -> Result<(), String> {
         self.set_shader_as_active(self.default_shader_id)
     }
 
@@ -250,17 +233,17 @@ impl RendererContext {
         self.cameras.as_mut().unwrap().get_mut(self.active_camera_id)
     }
 
-    pub fn set_camera_as_active(&mut self, camera_id: usize) {
+    pub fn set_camera_as_active(&mut self, camera_id: usize) -> Result<(), String> {
         let mut camera = match self.cameras.as_mut().unwrap().get_mut(camera_id) {
             Some(camera) => camera,
             None => {
-                log::error(&format!("Camera with id {} not found, can't set it as active", camera_id));
-                return;
+                return Err(format!("Camera with id {} not found, can't set it as active", camera_id));
             }
         };
 
         self.active_camera_id = camera.id;
         camera.dirty = true;
+        Ok(())
     }
 
     pub fn create_sprite(&mut self, texture_id: usize) -> Result<usize, String> {
@@ -314,20 +297,18 @@ impl RendererContext {
         }
     }
 
-    pub fn draw(&mut self, drawable_id: usize) {
+    pub fn draw(&mut self, drawable_id: usize) -> Result<(), String> {
         let mut camera = match self.cameras.as_mut().unwrap().get_mut(self.active_camera_id) {
             Some(camera) => camera,
             None => {
-                log::error(&format!("Camera with id {} not found, can't set the viewport", self.active_camera_id));
-                return;
+                return Err(format!("Camera with id {} not found, can't set the viewport", self.active_camera_id));
             }
         };
 
         let shader = match self.shaders.as_ref().unwrap().get(self.active_shader_id) {
             Some(shader) => shader,
             None => {
-                log::error(&format!("Shader with id {} not found, so the drawable object with id {} can't be drawn", self.active_shader_id, drawable_id));
-                return;
+                return Err(format!("Shader with id {} not found, so the drawable object with id {} can't be drawn", self.active_shader_id, drawable_id));
             }
         };
 
@@ -340,17 +321,17 @@ impl RendererContext {
         let drawable = match self.get_drawable(drawable_id) {
             Some(drawable) => drawable,
             None => {
-                log::error(&format!("Drawable object with id {} not found, so it can't be drawn", drawable_id));
-                return;
+                return Err(format!("Drawable object with id {} not found, so it can't be drawn", drawable_id));
             }
         };
         drawable.draw(shader);
+        Ok(())
     }
 
     pub fn release(&self) {
         unsafe {
             if winapi::wglDeleteContext(self.gl_context) == 0 {
-                log::error(&format!("Error while releasing OpenGL context, GetLastError()={}", winapi::GetLastError()));
+                // log::error(&format!("Error while releasing OpenGL context, GetLastError()={}", winapi::GetLastError()));
             }
         }
     }
@@ -365,6 +346,13 @@ unsafe extern "C" fn gl_error(
     message: *const i8,
     user_param: *const c_void,
 ) {
-    log::error(&format!("OpenGL error: source={}, type={}, id={}, severity={}, user_param={:?}", source, r#type, id, severity, user_param));
-    log::error(&String::from_raw_parts(message as *mut u8, length as usize, length as usize));
+    panic!(
+        "OpenGL error: source={}, type={}, id={}, severity={}, user_param={:?}, message={}",
+        source,
+        r#type,
+        id,
+        severity,
+        user_param,
+        &String::from_raw_parts(message as *mut u8, length as usize, length as usize)
+    );
 }

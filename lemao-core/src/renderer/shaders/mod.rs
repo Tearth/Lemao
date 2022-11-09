@@ -1,4 +1,3 @@
-use crate::utils::log;
 use lemao_opengl::bindings::opengl;
 use lemao_opengl::pointers::OpenGLPointers;
 use std::collections::HashMap;
@@ -28,14 +27,10 @@ impl Shader {
 
     pub fn new_from_string(gl: Rc<OpenGLPointers>, vertex_shader: &str, fragment_shader: &str) -> Result<Self, String> {
         unsafe {
-            log::debug(&format!("Loading a new vertex shader with length {} and fragment shader with length {}", vertex_shader.len(), fragment_shader.len()));
-
             let mut success = 0;
             let vertex_shader_cstr = CString::new(vertex_shader).unwrap();
             let vertex_shader_array = [vertex_shader_cstr.as_ptr()];
             let vertex_shader_id = (gl.glCreateShader)(opengl::GL_VERTEX_SHADER);
-
-            log::debug(&format!("Compiling vertex shader with gl_id {}", vertex_shader_id));
 
             (gl.glShaderSource)(vertex_shader_id, 1, vertex_shader_array.as_ptr() as *const *const i8, ptr::null());
             (gl.glCompileShader)(vertex_shader_id);
@@ -47,15 +42,11 @@ impl Shader {
                 (gl.glGetShaderInfoLog)(vertex_shader_id, ERROR_LENGTH as i32, ptr::null_mut(), log_ptr);
 
                 return Err(format!("Vertex shader compilation error: {}", String::from_utf8(log).unwrap()));
-            } else {
-                log::debug(&format!("Compilation of vertex shader with gl_id {} done", vertex_shader_id));
             }
 
             let fragment_shader_cstr = CString::new(fragment_shader).unwrap();
             let fragment_shader_array = [fragment_shader_cstr.as_ptr()];
             let fragment_shader_id = (gl.glCreateShader)(opengl::GL_FRAGMENT_SHADER);
-
-            log::debug(&format!("Compiling fragment shader with gl_id {}", fragment_shader_id));
 
             (gl.glShaderSource)(fragment_shader_id, 1, fragment_shader_array.as_ptr() as *const *const i8, ptr::null());
             (gl.glCompileShader)(fragment_shader_id);
@@ -67,12 +58,9 @@ impl Shader {
                 (gl.glGetShaderInfoLog)(fragment_shader_id, ERROR_LENGTH as i32, ptr::null_mut(), log_ptr);
 
                 return Err(format!("Fragment shader compilation error: {}", String::from_utf8(log).unwrap()));
-            } else {
-                log::debug(&format!("Compilation of fragment shader with gl_id {} done", fragment_shader_id));
             }
 
             let program_id = (gl.glCreateProgram)();
-            log::debug(&format!("Linking program shader with gl_id {}", program_id));
 
             (gl.glAttachShader)(program_id, vertex_shader_id);
             (gl.glAttachShader)(program_id, fragment_shader_id);
@@ -85,8 +73,6 @@ impl Shader {
                 (gl.glGetProgramInfoLog)(program_id, 1024, ptr::null_mut(), log_ptr);
 
                 return Err(format!("Program shader linking error: {}", String::from_utf8(log).unwrap()));
-            } else {
-                log::debug(&format!("Linking of program shader with gl_id {} done", program_id));
             }
 
             (gl.glDeleteShader)(vertex_shader_id);
@@ -109,11 +95,9 @@ impl Shader {
                 let name_cstr = CString::new(name.clone()).unwrap();
                 let location = (gl.glGetUniformLocation)(3, name_cstr.as_ptr());
 
-                log::debug(&format!("Found a new uniform parameter: name={}, location={}, size={}", name, location, size));
                 uniforms.insert(name, location as u32);
             }
 
-            log::debug(&format!("Creating a new program shader with gl_id {} done", program_id));
             Ok(Shader { id: 0, program_id, uniforms, gl })
         }
     }

@@ -1,6 +1,5 @@
 use super::*;
 use crate::renderer::fonts::Font;
-use crate::utils::log;
 use lemao_math::mat4x4::Mat4x4;
 use lemao_math::vec2::Vec2;
 use lemao_math::vec3::Vec3;
@@ -80,26 +79,18 @@ impl Text {
 
     pub fn set_texture(&mut self, font: &Font) {
         unsafe {
-            log::debug(&format!("Setting a new texture with gl_id {} for the sprite with id {}", font.id, self.id));
-
             if self.vao_gl_id == 0 {
-                log::debug("Creating a new VAO buffer");
                 (self.gl.glGenVertexArrays)(1, &mut self.vao_gl_id);
-                log::debug(&format!("Created a new VAO buffer with gl_id {}", self.vao_gl_id));
             }
             (self.gl.glBindVertexArray)(self.vao_gl_id);
 
             if self.vbo_gl_id == 0 {
-                log::debug("Creating a new VBO buffer");
                 (self.gl.glGenBuffers)(1, &mut self.vbo_gl_id);
-                log::debug(&format!("Created a new VBO buffer with gl_id {}", self.vbo_gl_id));
             }
             (self.gl.glBindBuffer)(opengl::GL_ARRAY_BUFFER, self.vbo_gl_id);
 
             if self.ebo_gl_id == 0 {
-                log::debug("Creating a new EBO buffer");
                 (self.gl.glGenBuffers)(1, &mut self.ebo_gl_id);
-                log::debug(&format!("Created a new EBO buffer with gl_id {}", self.ebo_gl_id));
             }
             (self.gl.glBindBuffer)(opengl::GL_ELEMENT_ARRAY_BUFFER, self.ebo_gl_id);
 
@@ -113,9 +104,7 @@ impl Text {
             (self.gl.glEnableVertexAttribArray)(2);
 
             if self.texture_gl_id != 0 {
-                log::debug("Deleting old texture");
                 (self.gl.glDeleteTextures)(1, &self.texture_gl_id);
-                log::debug(&format!("Texture with gl_id {} deleted", self.ebo_gl_id));
             }
 
             (self.gl.glGenTextures)(1, &mut self.texture_gl_id);
@@ -134,8 +123,6 @@ impl Text {
             (self.gl.glGenerateMipmap)(opengl::GL_TEXTURE_2D);
 
             self.font_id = font.id;
-
-            log::debug(&format!("Texture setting for text with id {} done", self.id));
         }
     }
 
@@ -357,27 +344,19 @@ impl Drop for Text {
     fn drop(&mut self) {
         unsafe {
             if self.vbo_gl_id != 0 {
-                log::debug(&format!("Deleting VBO buffer with gl_id {}", self.vbo_gl_id));
                 (self.gl.glDeleteBuffers)(1, &mut self.vbo_gl_id);
-                log::debug("Deleting VBO buffer done");
             }
 
             if self.ebo_gl_id != 0 {
-                log::debug(&format!("Deleting EBO buffer with gl_id {}", self.ebo_gl_id));
                 (self.gl.glDeleteBuffers)(1, &mut self.ebo_gl_id);
-                log::debug("Deleting EBO buffer done");
             }
 
             if self.vao_gl_id != 0 {
-                log::debug(&format!("Deleting VAO buffer with gl_id {}", self.vao_gl_id));
                 (self.gl.glDeleteVertexArrays)(1, &mut self.vao_gl_id);
-                log::debug("Deleting VAO buffer done");
             }
 
             if self.texture_gl_id != 0 {
-                log::debug(&format!("Deleting texture with gl_id {}", self.texture_gl_id));
                 (self.gl.glDeleteTextures)(1, &self.texture_gl_id);
-                log::debug("Deleting texture done");
             }
         }
     }

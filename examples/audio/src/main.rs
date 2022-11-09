@@ -1,5 +1,6 @@
 use lemao_core::audio::context::AudioContext;
 use lemao_core::audio::samples::storage::SampleStorage;
+use lemao_core::audio::samples::wav;
 use lemao_core::renderer::drawable::text::Text;
 use lemao_core::renderer::drawable::Drawable;
 use lemao_core::renderer::fonts::storage::FontStorage;
@@ -20,7 +21,7 @@ pub fn main() {
     let samples = Arc::new(Mutex::new(SampleStorage::default()));
     let mut audio = AudioContext::new(samples.clone()).unwrap();
 
-    let chopin_sample_id = samples.lock().unwrap().load("./assets/chopin.wav").unwrap();
+    let chopin_sample_id = samples.lock().unwrap().store(wav::load("./assets/chopin.wav").unwrap()).unwrap();
     let chopin_sound_id = audio.create_sound(chopin_sample_id).unwrap();
 
     let textures = Arc::new(Mutex::new(TextureStorage::default()));

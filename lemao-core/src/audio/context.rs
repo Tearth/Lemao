@@ -1,5 +1,3 @@
-use crate::utils::log;
-
 use super::{
     samples::storage::SampleStorage,
     sounds::{storage::SoundStorage, Sound},
@@ -42,9 +40,8 @@ impl AudioContext {
             Some(sample) => sample,
             None => return Err(format!("Sample with id {} not found, the sound can't be created", sample_id)),
         };
-        let sound = Sound::new(sample);
 
-        Ok(self.sounds.store(sound))
+        Ok(self.sounds.store(Sound::new(sample)?)?)
     }
 
     pub fn get_sound(&self, sound_id: usize) -> Option<&Sound> {
@@ -111,15 +108,11 @@ impl Drop for AudioContext {
     fn drop(&mut self) {
         unsafe {
             if !self.context.is_null() {
-                // log::debug(&format!("Deleting audio context al_id {}", self.context.id));
                 openal::alcDestroyContext(self.context);
-                log::debug("Deleting audio context done");
             }
 
             if !self.device.is_null() {
-                // log::debug(&format!("Deleting audio device al_id {}", self.device));
                 openal::alcCloseDevice(self.device);
-                log::debug("Deleting audio device done");
             }
         }
     }

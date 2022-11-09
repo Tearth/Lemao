@@ -2,7 +2,6 @@ use super::input::InputEvent;
 use crate::renderer::context::RendererContext;
 use crate::renderer::fonts::storage::FontStorage;
 use crate::renderer::textures::storage::TextureStorage;
-use crate::utils::log;
 use lemao_math::vec2::Vec2;
 use lemao_winapi::bindings::winapi;
 use std::collections::VecDeque;
@@ -45,8 +44,6 @@ impl WindowContext {
             let class_cstr = CString::new(format!("LemaoWindow_{}", timestamp)).unwrap();
             let module_handle = winapi::GetModuleHandleA(ptr::null_mut());
 
-            log::debug(&format!("Initializing a new window class {:?}", class_cstr));
-
             let wnd_class = winapi::WNDCLASS {
                 lpfnWndProc: wnd_proc,
                 hInstance: module_handle,
@@ -76,8 +73,6 @@ impl WindowContext {
             });
             let title_cstr = CString::new(title).unwrap();
 
-            log::debug(&format!("Initializing a new window instance {:?}", title_cstr));
-
             let hwnd = winapi::CreateWindowExA(
                 0,
                 wnd_class.lpszClassName,
@@ -97,12 +92,8 @@ impl WindowContext {
                 return Err(format!("Error while initializing a new window instance, GetLastError()={}", winapi::GetLastError()));
             }
 
-            log::debug(&format!("New window handle: {:?}", hwnd));
-            log::debug("Waiting for WM_CREATE and the rest of initialization");
-
             // Wait for WM_CREATE, where the context is initialized
             while !context.initialized {}
-            log::debug(&format!("Initialization of window with handle {:?} done", hwnd));
 
             context.set_style(context.style);
             Ok(context)
@@ -114,8 +105,6 @@ impl WindowContext {
             let timestamp = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis();
             let class_cstr = CString::new(format!("LemaoWindowInit_{}", timestamp)).unwrap();
             let module_handle = winapi::GetModuleHandleA(ptr::null_mut());
-
-            log::debug(&format!("Initializing a new fake window class {:?}", class_cstr));
 
             let wnd_class = winapi::WNDCLASS {
                 lpfnWndProc: wnd_proc,
@@ -146,8 +135,6 @@ impl WindowContext {
             });
             let title_cstr = CString::new("LemaoWindowInit").unwrap();
 
-            log::debug(&format!("Initializing a new fake window instance {:?}", title_cstr));
-
             let hwnd = winapi::CreateWindowExA(
                 0,
                 wnd_class.lpszClassName,
@@ -167,12 +154,8 @@ impl WindowContext {
                 return Err(format!("Error while initializing a new fake window instance, GetLastError()={}", winapi::GetLastError()));
             }
 
-            log::debug(&format!("New window handle: {:?}", hwnd));
-            log::debug("Waiting for WM_CREATE and the rest of initialization");
-
             // Wait for WM_CREATE, where the context is initialized
             while !context.initialized {}
-            log::debug(&format!("Initialization of fake window with handle {:?} done", hwnd));
 
             Ok(context)
         }
@@ -306,17 +289,15 @@ impl WindowContext {
 
     pub fn swap_buffers(&self) {
         unsafe {
-            if !self.hdc.is_null() && winapi::SwapBuffers(self.hdc) == 0 {
-                log::error(&format!("Error while swapping buffers, GetLastError()={}", winapi::GetLastError()));
+            if !self.hdc.is_null() {
+                winapi::SwapBuffers(self.hdc);
             }
         }
     }
 
     pub fn close(&self) {
         unsafe {
-            if winapi::DestroyWindow(self.hwnd) == 0 {
-                log::error(&format!("Error while destroying window, GetLastError()={}", winapi::GetLastError()));
-            }
+            winapi::DestroyWindow(self.hwnd);
         }
     }
 }
@@ -325,8 +306,6 @@ extern "C" fn wnd_proc(hwnd: winapi::HWND, message: winapi::UINT, w_param: winap
     unsafe {
         match message {
             winapi::WM_CREATE => {
-                log::debug(&format!("Received WM_CREATE for window with handle {:?}", hwnd));
-
                 let create_struct = &mut *(l_param as *mut winapi::CREATESTRUCT);
                 let window = &mut *(create_struct.lpCreateParams as *mut WindowContext);
                 let hdc: winapi::HDC = winapi::GetDC(hwnd);
@@ -345,8 +324,6 @@ extern "C" fn wnd_proc(hwnd: winapi::HWND, message: winapi::UINT, w_param: winap
                 window.wnd_proc_events.push_front(WndProcEvent { message, l_param });
             }
             winapi::WM_CLOSE => {
-                log::debug(&format!("Received WM_CLOSE for window with handle {:?}", hwnd));
-
                 if winapi::DestroyWindow(hwnd) == 0 {
                     panic!("{}", winapi::GetLastError());
                 }
@@ -354,8 +331,6 @@ extern "C" fn wnd_proc(hwnd: winapi::HWND, message: winapi::UINT, w_param: winap
                 return 0;
             }
             winapi::WM_DESTROY => {
-                log::debug(&format!("Received WM_DESTROY for window with handle {:?}", hwnd));
-
                 let window_ptr = winapi::GetWindowLongPtrA(hwnd, winapi::GWLP_USERDATA);
                 let window = &mut *(window_ptr as *mut WindowContext);
 

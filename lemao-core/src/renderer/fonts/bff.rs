@@ -1,6 +1,5 @@
 use super::*;
 use crate::utils::binary;
-use crate::utils::log;
 use std::fs::File;
 use std::io::Read;
 
@@ -8,8 +7,6 @@ pub fn load(path: &str) -> Result<Font, String> {
     /////////////////////////////////////////////////////////////////////////////////////////////////
     // BFF specification: https://documentation.help/Codehead-Bitmap-Font-Generator/bffformat.html //
     /////////////////////////////////////////////////////////////////////////////////////////////////
-
-    log::debug(&format!("Loading a new BFF file {}", path));
 
     let mut file = match File::open(path) {
         Ok(file) => file,

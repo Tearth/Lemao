@@ -6,10 +6,8 @@ pub struct SampleStorage {
 }
 
 impl SampleStorage {
-    pub fn load(&mut self, path: &str) -> Result<usize, String> {
+    pub fn store(&mut self, mut sample: Sample) -> Result<usize, String> {
         let id = self.data.len();
-        let mut sample = wav::load(path)?;
-
         sample.id = id;
         self.data.push(Some(sample));
 
@@ -25,5 +23,13 @@ impl SampleStorage {
             Some(sample) => Some(sample),
             None => None,
         }
+    }
+
+    pub fn remove(&mut self, id: usize) -> Result<(), String> {
+        if id >= self.data.len() {
+            return Err(format!("Sample with id {} doesn't exist, so it can't be removed", id));
+        }
+
+        Ok(self.data[id] = None)
     }
 }
