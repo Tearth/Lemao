@@ -6,12 +6,12 @@ pub struct SampleStorage {
 }
 
 impl SampleStorage {
-    pub fn store(&mut self, mut sample: Sample) -> Result<usize, String> {
+    pub fn store(&mut self, mut sample: Sample) -> usize {
         let id = self.data.len();
         sample.id = id;
         self.data.push(Some(sample));
 
-        Ok(id)
+        id
     }
 
     pub fn get(&self, id: usize) -> Option<&Sample> {

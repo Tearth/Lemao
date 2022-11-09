@@ -6,12 +6,12 @@ pub struct SoundStorage {
 }
 
 impl SoundStorage {
-    pub fn store(&mut self, mut sound: Sound) -> Result<usize, String> {
+    pub fn store(&mut self, mut sound: Sound) -> usize {
         let id = self.data.len();
         sound.id = id;
         self.data.push(Some(sound));
 
-        Ok(id)
+        id
     }
 
     pub fn get(&self, id: usize) -> Option<&Sound> {

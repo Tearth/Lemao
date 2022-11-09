@@ -6,16 +6,6 @@ pub struct FontStorage {
 }
 
 impl FontStorage {
-    pub fn load(&mut self, path: &str) -> Result<usize, String> {
-        let id = self.data.len();
-        let mut font = bff::load(path)?;
-
-        font.id = id;
-        self.data.push(Some(font));
-
-        Ok(id)
-    }
-
     pub fn store(&mut self, mut font: Font) -> usize {
         let id = self.data.len();
         font.id = id;

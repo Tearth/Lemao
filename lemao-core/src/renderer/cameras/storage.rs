@@ -19,10 +19,7 @@ impl CameraStorage {
             return None;
         }
 
-        match &self.data[id] {
-            Some(camera) => Some(camera),
-            None => None,
-        }
+        self.data[id].as_ref()
     }
 
     pub fn get_mut(&mut self, id: usize) -> Option<&mut Camera> {
@@ -30,9 +27,15 @@ impl CameraStorage {
             return None;
         }
 
-        match &mut self.data[id] {
-            Some(camera) => Some(camera),
-            None => None,
+        self.data[id].as_mut()
+    }
+
+    pub fn remove(&mut self, id: usize) -> Result<(), String> {
+        if id >= self.data.len() {
+            return Err(format!("Camera with id {} not found", id));
         }
+        self.data[id] = None;
+
+        Ok(())
     }
 }

@@ -6,12 +6,12 @@ pub struct TextureStorage {
 }
 
 impl TextureStorage {
-    pub fn store(&mut self, mut texture: Texture) -> Result<usize, String> {
+    pub fn store(&mut self, mut texture: Texture) -> usize {
         let id = self.data.len();
         texture.id = id;
         self.data.push(Some(texture));
 
-        Ok(id)
+        id
     }
 
     pub fn get(&self, id: usize) -> Option<&Texture> {

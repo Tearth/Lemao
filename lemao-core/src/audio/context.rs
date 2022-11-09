@@ -48,7 +48,7 @@ impl AudioContext {
             None => return Err(format!("Sample with id {} not found", sample_id)),
         };
 
-        self.sounds.store(Sound::new(sample)?)
+        Ok(self.sounds.store(Sound::new(sample)?))
     }
 
     pub fn get_sound(&self, sound_id: usize) -> Option<&Sound> {

@@ -5,11 +5,10 @@ use lemao_math::vec3::Vec3;
 pub mod storage;
 
 pub struct Camera {
-    pub id: usize,
-    pub position: Vec2,
-    pub size: Vec2,
-
-    pub dirty: bool,
+    id: usize,
+    position: Vec2,
+    size: Vec2,
+    dirty: bool,
 }
 
 impl Camera {
@@ -17,12 +16,8 @@ impl Camera {
         Self { id: 0, position, size, dirty: false }
     }
 
-    pub fn get_projection_matrix(&self) -> Mat4x4 {
-        Mat4x4::ortho(self.size.x, self.size.y, 0.1, 100.0)
-    }
-
-    pub fn get_view_matrix(&self) -> Mat4x4 {
-        Mat4x4::translate(Vec3::new(-self.position.x, -self.position.y, -1.0))
+    pub fn get_id(&self) -> usize {
+        self.id
     }
 
     pub fn get_position(&self) -> Vec2 {
@@ -39,8 +34,28 @@ impl Camera {
         self.dirty = true;
     }
 
-    pub fn set_viewport(&mut self, size: Vec2) {
+    pub fn get_size(&self) -> Vec2 {
+        self.size
+    }
+
+    pub fn set_size(&mut self, size: Vec2) {
         self.size = size;
         self.dirty = true;
+    }
+
+    pub fn get_dirty_flag(&self) -> bool {
+        self.dirty
+    }
+
+    pub fn set_dirty_flag(&mut self, value: bool) {
+        self.dirty = value;
+    }
+
+    pub fn get_projection_matrix(&self) -> Mat4x4 {
+        Mat4x4::ortho(self.size.x, self.size.y, 0.1, 100.0)
+    }
+
+    pub fn get_view_matrix(&self) -> Mat4x4 {
+        Mat4x4::translate(Vec3::new(-self.position.x, -self.position.y, -1.0))
     }
 }

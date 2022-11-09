@@ -241,8 +241,9 @@ impl RendererContext {
             }
         };
 
-        self.active_camera_id = camera.id;
-        camera.dirty = true;
+        self.active_camera_id = camera_id;
+        camera.set_dirty_flag(true);
+
         Ok(())
     }
 
@@ -312,10 +313,10 @@ impl RendererContext {
             }
         };
 
-        if camera.dirty {
+        if camera.get_dirty_flag() {
             shader.set_parameter("proj", camera.get_projection_matrix().as_ptr());
             shader.set_parameter("view", camera.get_view_matrix().as_ptr());
-            camera.dirty = false;
+            camera.set_dirty_flag(false);
         }
 
         let drawable = match self.get_drawable(drawable_id) {

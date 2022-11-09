@@ -5,8 +5,7 @@ use std::ffi::c_void;
 pub mod storage;
 
 pub struct Sound {
-    pub id: usize,
-
+    id: usize,
     sample_id: usize,
     source_id: u32,
     buffer_id: u32,
@@ -18,6 +17,10 @@ impl Sound {
         sound.set_sample(sample)?;
 
         Ok(sound)
+    }
+
+    pub fn get_id(&self) -> usize {
+        self.id
     }
 
     pub fn get_sample(&self) -> usize {
