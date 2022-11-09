@@ -19,17 +19,15 @@ impl SampleStorage {
             return None;
         }
 
-        match &self.data[id] {
-            Some(sample) => Some(sample),
-            None => None,
-        }
+        self.data[id].as_ref()
     }
 
     pub fn remove(&mut self, id: usize) -> Result<(), String> {
         if id >= self.data.len() {
-            return Err(format!("Sample with id {} doesn't exist, so it can't be removed", id));
+            return Err(format!("Sample with id {} not found", id));
         }
+        self.data[id] = None;
 
-        Ok(self.data[id] = None)
+        Ok(())
     }
 }

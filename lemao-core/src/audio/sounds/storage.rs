@@ -19,17 +19,23 @@ impl SoundStorage {
             return None;
         }
 
-        match &self.data[id] {
-            Some(sound) => Some(sound),
-            None => None,
+        self.data[id].as_ref()
+    }
+
+    pub fn get_mut(&mut self, id: usize) -> Option<&mut Sound> {
+        if id >= self.data.len() {
+            return None;
         }
+
+        self.data[id].as_mut()
     }
 
     pub fn remove(&mut self, id: usize) -> Result<(), String> {
         if id >= self.data.len() {
-            return Err(format!("Sound with id {} doesn't exist, so it can't be removed", id));
+            return Err(format!("Sound with id {} not found", id));
         }
+        self.data[id] = None;
 
-        Ok(self.data[id] = None)
+        Ok(())
     }
 }

@@ -1,6 +1,7 @@
 use super::*;
 use crate::utils::binary;
-use std::{fs::File, io::Read};
+use std::fs::File;
+use std::io::Read;
 
 pub fn load(path: &str) -> Result<Sample, String> {
     ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -41,15 +42,24 @@ pub fn load(path: &str) -> Result<Sample, String> {
             // Format chunk
             0x20746D66 => {
                 let chunk_size = binary::read_le_u32(&wav, index + 4);
-                let compression_code = binary::read_le_u16(&wav, index + 8);
 
+                let compression_code = binary::read_le_u16(&wav, index + 8);
                 if compression_code != 1 {
-                    return Err("Only PCM/uncompressed is supported".to_string());
+                    return Err("Only PCM/uncompressed WAV is supported".to_string());
                 }
 
-                channels_count = binary::read_le_u16(&wav, index + 10);
+                channels_count = binary::read_le_u16(&wav, index + 10) as u32;
+                if channels_count != 1 && channels_count != 2 {
+                    return Err("Only mono and stereo WAV is supported".to_string());
+                }
+
                 frequency = binary::read_le_u32(&wav, index + 12);
-                bits_per_sample = binary::read_le_u16(&wav, index + 22);
+
+                bits_per_sample = binary::read_le_u16(&wav, index + 22) as u32;
+                if bits_per_sample != 8 && bits_per_sample != 16 {
+                    return Err("Only 8 and 16 bits per sample WAVs are supported".to_string());
+                }
+
                 index += chunk_size as usize;
             }
             // Data chunk
@@ -65,5 +75,5 @@ pub fn load(path: &str) -> Result<Sample, String> {
         }
     }
 
-    Ok(Sample { id: 0, channels_count, frequency, bits_per_sample, data: data.to_vec() })
+    Ok(Sample::new(channels_count, frequency, bits_per_sample, data.to_vec()))
 }

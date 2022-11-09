@@ -1,12 +1,10 @@
-use super::{
-    samples::storage::SampleStorage,
-    sounds::{storage::SoundStorage, Sound},
-};
+use super::samples::storage::SampleStorage;
+use super::sounds::storage::SoundStorage;
+use super::sounds::Sound;
 use lemao_openal::bindings::openal;
-use std::{
-    ptr,
-    sync::{Arc, Mutex},
-};
+use std::ptr;
+use std::sync::Arc;
+use std::sync::Mutex;
 
 pub struct AudioContext {
     device: *mut openal::ALCdevice_struct,
@@ -19,16 +17,25 @@ impl AudioContext {
     pub fn new(samples: Arc<Mutex<SampleStorage>>) -> Result<Self, String> {
         unsafe {
             let device_id = openal::alcOpenDevice(ptr::null());
-            if device_id.is_null() {
-                return Err("Error while creating a new device".to_string());
+            let error = openal::alcGetError(device_id);
+
+            if device_id.is_null() || error != openal::AL_NO_ERROR as i32 {
+                return Err(format!("Error while creating a new device: {}", error));
             }
 
             let context_id = openal::alcCreateContext(device_id, ptr::null_mut());
-            if context_id.is_null() {
-                return Err("Error while creating a new context".to_string());
+            let error = openal::alcGetError(device_id);
+
+            if context_id.is_null() || error != openal::AL_NO_ERROR as i32 {
+                return Err(format!("Error while creating a new context: {}", error));
             }
 
-            openal::alcMakeContextCurrent(context_id);
+            let success = openal::alcMakeContextCurrent(context_id);
+            let error = openal::alcGetError(device_id);
+
+            if success == 0 || error != openal::AL_NO_ERROR as i32 {
+                return Err(format!("Error while making context as current: {}", error));
+            }
 
             Ok(Self { device: device_id, context: context_id, samples, sounds: Default::default() })
         }
@@ -38,68 +45,37 @@ impl AudioContext {
         let sample_storage = self.samples.lock().unwrap();
         let sample = match sample_storage.get(sample_id) {
             Some(sample) => sample,
-            None => return Err(format!("Sample with id {} not found, the sound can't be created", sample_id)),
+            None => return Err(format!("Sample with id {} not found", sample_id)),
         };
 
-        Ok(self.sounds.store(Sound::new(sample)?)?)
+        self.sounds.store(Sound::new(sample)?)
     }
 
     pub fn get_sound(&self, sound_id: usize) -> Option<&Sound> {
         self.sounds.get(sound_id)
     }
 
-    pub fn get_volume(&self, sound_id: usize) -> f32 {
-        unsafe {
-            let sound = self.get_sound(sound_id).unwrap();
-            let mut volume = 0.0;
-
-            openal::alGetSourcef(sound.source_id, openal::AL_GAIN as i32, &mut volume);
-            volume
+    pub fn get_sound_scope<F>(&self, sound_id: usize, scope: F) -> Result<(), String>
+    where
+        F: Fn(&Sound) -> Result<(), String>,
+    {
+        match self.sounds.get(sound_id) {
+            Some(sound) => scope(sound),
+            None => return Err(format!("Sound with id {} not found", sound_id)),
         }
     }
 
-    pub fn set_volume(&self, sound_id: usize, volume: f32) {
-        unsafe {
-            let sound = self.get_sound(sound_id).unwrap();
-            openal::alSourcef(sound.source_id, openal::AL_GAIN as i32, volume);
-        }
+    pub fn get_sound_mut(&mut self, sound_id: usize) -> Option<&mut Sound> {
+        self.sounds.get_mut(sound_id)
     }
 
-    pub fn is_playing(&self, sound_id: usize) -> bool {
-        unsafe {
-            let sound = self.get_sound(sound_id).unwrap();
-            let mut state = 0;
-
-            openal::alGetSourcei(sound.source_id, openal::AL_SOURCE_STATE as i32, &mut state);
-            state == openal::AL_PLAYING as i32
-        }
-    }
-
-    pub fn play(&self, sound_id: usize) {
-        unsafe {
-            let sound = self.get_sound(sound_id).unwrap();
-            openal::alSourcePlay(sound.source_id);
-        }
-    }
-
-    pub fn pause(&self, sound_id: usize) {
-        unsafe {
-            let sound = self.get_sound(sound_id).unwrap();
-            openal::alSourcePause(sound.source_id);
-        }
-    }
-
-    pub fn stop(&self, sound_id: usize) {
-        unsafe {
-            let sound = self.get_sound(sound_id).unwrap();
-            openal::alSourceStop(sound.source_id);
-        }
-    }
-
-    pub fn rewind(&self, sound_id: usize) {
-        unsafe {
-            let sound = self.get_sound(sound_id).unwrap();
-            openal::alSourceRewind(sound.source_id);
+    pub fn get_sound_scope_mut<F>(&mut self, sound_id: usize, mut scope: F) -> Result<(), String>
+    where
+        F: FnMut(&mut Sound) -> Result<(), String>,
+    {
+        match self.sounds.get_mut(sound_id) {
+            Some(sound) => scope(sound),
+            None => return Err(format!("Sound with id {} not found", sound_id)),
         }
     }
 }
@@ -107,6 +83,8 @@ impl AudioContext {
 impl Drop for AudioContext {
     fn drop(&mut self) {
         unsafe {
+            openal::alcMakeContextCurrent(ptr::null_mut());
+
             if !self.context.is_null() {
                 openal::alcDestroyContext(self.context);
             }
