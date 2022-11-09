@@ -29,10 +29,7 @@ impl FontStorage {
             return None;
         }
 
-        match &self.data[id] {
-            Some(font) => Some(font),
-            None => None,
-        }
+        self.data[id].as_ref()
     }
 
     pub fn get_mut(&mut self, id: usize) -> Option<&mut Font> {
@@ -40,9 +37,15 @@ impl FontStorage {
             return None;
         }
 
-        match &mut self.data[id] {
-            Some(font) => Some(font),
-            None => None,
+        self.data[id].as_mut()
+    }
+
+    pub fn remove(&mut self, id: usize) -> Result<(), String> {
+        if id >= self.data.len() {
+            return Err(format!("Font with id {} doesn't exist, can't be removed", id));
         }
+        self.data[id] = None;
+
+        Ok(())
     }
 }

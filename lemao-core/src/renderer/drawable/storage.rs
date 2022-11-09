@@ -35,4 +35,13 @@ impl DrawableStorage {
             None => None,
         }
     }
+
+    pub fn remove(&mut self, id: usize) -> Result<(), String> {
+        if id >= self.data.len() {
+            return Err(format!("Drawable with id {} doesn't exist, can't be removed", id));
+        }
+        self.data[id] = None;
+
+        Ok(())
+    }
 }

@@ -19,10 +19,7 @@ impl ShaderStorage {
             return None;
         }
 
-        match &self.data[id] {
-            Some(shader) => Some(shader),
-            None => None,
-        }
+        self.data[id].as_ref()
     }
 
     pub fn get_mut(&mut self, id: usize) -> Option<&mut Shader> {
@@ -30,9 +27,15 @@ impl ShaderStorage {
             return None;
         }
 
-        match &mut self.data[id] {
-            Some(shader) => Some(shader),
-            None => None,
+        self.data[id].as_mut()
+    }
+
+    pub fn remove(&mut self, id: usize) -> Result<(), String> {
+        if id >= self.data.len() {
+            return Err(format!("Shader with id {} doesn't exist, can't be removed", id));
         }
+        self.data[id] = None;
+
+        Ok(())
     }
 }

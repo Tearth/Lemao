@@ -6,10 +6,8 @@ pub struct TextureStorage {
 }
 
 impl TextureStorage {
-    pub fn load(&mut self, path: &str) -> Result<usize, String> {
+    pub fn store(&mut self, mut texture: Texture) -> Result<usize, String> {
         let id = self.data.len();
-        let mut texture = bmp::load(path)?;
-
         texture.id = id;
         self.data.push(Some(texture));
 
@@ -21,9 +19,15 @@ impl TextureStorage {
             return None;
         }
 
-        match &self.data[id] {
-            Some(texture) => Some(texture),
-            None => None,
+        self.data[id].as_ref()
+    }
+
+    pub fn remove(&mut self, id: usize) -> Result<(), String> {
+        if id >= self.data.len() {
+            return Err(format!("Texture with id {} doesn't exist, can't be removed", id));
         }
+        self.data[id] = None;
+
+        Ok(())
     }
 }
