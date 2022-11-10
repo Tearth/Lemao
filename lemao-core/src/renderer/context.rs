@@ -186,21 +186,16 @@ impl RendererContext {
         Ok(self.shaders.as_mut().unwrap().store(shader))
     }
 
-    pub fn get_shader(&self, shader_id: usize) -> Option<&Shader> {
+    pub fn get_shader(&self, shader_id: usize) -> Result<&Shader, String> {
         self.shaders.as_ref().unwrap().get(shader_id)
     }
 
-    pub fn get_shader_mut(&mut self, shader_id: usize) -> Option<&mut Shader> {
+    pub fn get_shader_mut(&mut self, shader_id: usize) -> Result<&mut Shader, String> {
         self.shaders.as_mut().unwrap().get_mut(shader_id)
     }
 
     pub fn set_shader_as_active(&mut self, shader_id: usize) -> Result<(), String> {
-        let shader = match self.shaders.as_mut().unwrap().get_mut(shader_id) {
-            Some(shader) => shader,
-            None => {
-                return Err(format!("Shader with id {} not found", shader_id));
-            }
-        };
+        let shader = self.shaders.as_mut().unwrap().get_mut(shader_id)?;
 
         self.active_shader_id = shader_id;
         shader.set_as_active();
@@ -216,29 +211,24 @@ impl RendererContext {
         Ok(self.cameras.as_mut().unwrap().store(camera))
     }
 
-    pub fn get_camera(&self, camera_id: usize) -> Option<&Camera> {
+    pub fn get_camera(&self, camera_id: usize) -> Result<&Camera, String> {
         self.cameras.as_ref().unwrap().get(camera_id)
     }
 
-    pub fn get_camera_mut(&mut self, camera_id: usize) -> Option<&mut Camera> {
+    pub fn get_camera_mut(&mut self, camera_id: usize) -> Result<&mut Camera, String> {
         self.cameras.as_mut().unwrap().get_mut(camera_id)
     }
 
-    pub fn get_active_camera(&self) -> Option<&Camera> {
+    pub fn get_active_camera(&self) -> Result<&Camera, String> {
         self.cameras.as_ref().unwrap().get(self.active_camera_id)
     }
 
-    pub fn get_active_camera_mut(&mut self) -> Option<&mut Camera> {
+    pub fn get_active_camera_mut(&mut self) -> Result<&mut Camera, String> {
         self.cameras.as_mut().unwrap().get_mut(self.active_camera_id)
     }
 
     pub fn set_camera_as_active(&mut self, camera_id: usize) -> Result<(), String> {
-        let camera = match self.cameras.as_mut().unwrap().get_mut(camera_id) {
-            Some(camera) => camera,
-            None => {
-                return Err(format!("Camera with id {} not found", camera_id));
-            }
-        };
+        let camera = self.cameras.as_mut().unwrap().get_mut(camera_id)?;
 
         self.active_camera_id = camera_id;
         camera.set_dirty_flag(true);
@@ -248,10 +238,7 @@ impl RendererContext {
 
     pub fn create_sprite(&mut self, texture_id: usize) -> Result<usize, String> {
         let texture_storage = self.textures.lock().unwrap();
-        let texture = match texture_storage.get(texture_id) {
-            Some(texture) => texture,
-            None => return Err(format!("Texture with id {} not found", texture_id)),
-        };
+        let texture = texture_storage.get(texture_id)?;
         let sprite = Box::new(Sprite::new(self.gl.clone(), texture));
 
         Ok(self.drawables.as_mut().unwrap().store(sprite))
@@ -259,35 +246,26 @@ impl RendererContext {
 
     pub fn create_text(&mut self, font_id: usize) -> Result<usize, String> {
         let font_storage = self.fonts.lock().unwrap();
-        let font = match font_storage.get(font_id) {
-            Some(font) => font,
-            None => return Err(format!("Font with id {} not found", font_id)),
-        };
+        let font = font_storage.get(font_id)?;
         let text = Box::new(Text::new(self.gl.clone(), font));
 
         Ok(self.drawables.as_mut().unwrap().store(text))
     }
 
-    pub fn get_drawable(&self, drawable_id: usize) -> Option<&dyn Drawable> {
+    pub fn get_drawable(&self, drawable_id: usize) -> Result<&dyn Drawable, String> {
         self.drawables.as_ref().unwrap().get(drawable_id)
     }
 
-    pub fn get_drawable_with_type<T: 'static>(&self, drawable_id: usize) -> Option<&T> {
-        match self.get_drawable(drawable_id) {
-            Some(drawable) => drawable.as_any().downcast_ref::<T>(),
-            None => None,
-        }
+    pub fn get_drawable_with_type<T: 'static>(&self, drawable_id: usize) -> Result<&T, String> {
+        self.get_drawable(drawable_id)?.as_any().downcast_ref::<T>().ok_or(format!("Drawable object with id {} cannot be downcasted", drawable_id))
     }
 
-    pub fn get_drawable_mut(&mut self, drawable_id: usize) -> Option<&mut dyn Drawable> {
+    pub fn get_drawable_mut(&mut self, drawable_id: usize) -> Result<&mut dyn Drawable, String> {
         self.drawables.as_mut().unwrap().get_mut(drawable_id)
     }
 
-    pub fn get_drawable_with_type_mut<T: 'static>(&mut self, drawable_id: usize) -> Option<&mut T> {
-        match self.get_drawable_mut(drawable_id) {
-            Some(drawable) => drawable.as_any_mut().downcast_mut::<T>(),
-            None => None,
-        }
+    pub fn get_drawable_with_type_mut<T: 'static>(&mut self, drawable_id: usize) -> Result<&mut T, String> {
+        self.get_drawable_mut(drawable_id)?.as_any_mut().downcast_mut::<T>().ok_or(format!("Drawable object with id {} cannot be downcasted", drawable_id))
     }
 
     pub fn clear(&self, color: Color) {
@@ -298,19 +276,8 @@ impl RendererContext {
     }
 
     pub fn draw(&mut self, drawable_id: usize) -> Result<(), String> {
-        let camera = match self.cameras.as_mut().unwrap().get_mut(self.active_camera_id) {
-            Some(camera) => camera,
-            None => {
-                return Err(format!("Camera with id {} not found", self.active_camera_id));
-            }
-        };
-
-        let shader = match self.shaders.as_ref().unwrap().get(self.active_shader_id) {
-            Some(shader) => shader,
-            None => {
-                return Err(format!("Shader with id {} not found", self.active_shader_id));
-            }
-        };
+        let camera = self.cameras.as_mut().unwrap().get_mut(self.active_camera_id)?;
+        let shader = self.shaders.as_ref().unwrap().get(self.active_shader_id)?;
 
         if camera.get_dirty_flag() {
             shader.set_parameter("proj", camera.get_projection_matrix().as_ptr())?;
@@ -318,13 +285,7 @@ impl RendererContext {
             camera.set_dirty_flag(false);
         }
 
-        let drawable = match self.get_drawable(drawable_id) {
-            Some(drawable) => drawable,
-            None => {
-                return Err(format!("Drawable object with id {} not found", drawable_id));
-            }
-        };
-        drawable.draw(shader)?;
+        self.get_drawable(drawable_id)?.draw(shader)?;
         Ok(())
     }
 

@@ -14,12 +14,12 @@ impl TextureStorage {
         id
     }
 
-    pub fn get(&self, id: usize) -> Option<&Texture> {
+    pub fn get(&self, id: usize) -> Result<&Texture, String> {
         if id >= self.data.len() {
-            return None;
+            return Err(format!("Texture with id {} not found", id));
         }
 
-        self.data[id].as_ref()
+        self.data[id].as_ref().ok_or(format!("Texture with id {} not found", id))
     }
 
     pub fn remove(&mut self, id: usize) -> Result<(), String> {

@@ -1,3 +1,5 @@
+#![allow(warnings, clippy::all)]
+
 //! Generate Rust bindings for C and C++ libraries.
 //!
 //! Provide a C/C++ header file, receive Rust FFI code to call into C/C++
@@ -7,12 +9,12 @@
 //!
 //! See the [Users Guide](https://rust-lang.github.io/rust-bindgen/) for
 //! additional documentation.
-#![deny(missing_docs)]
-#![deny(unused_extern_crates)]
+// #![deny(missing_docs)]
+// #![deny(unused_extern_crates)]
 // To avoid rather annoying warnings when matching with CXCursor_xxx as a
 // constant.
-#![allow(non_upper_case_globals)]
-#![allow(clippy::unused_peekable)]
+// #![allow(non_upper_case_globals)]
+// #![allow(clippy::unused_peekable)]
 // `quote!` nests quite deeply.
 #![recursion_limit = "128"]
 
@@ -67,13 +69,9 @@ doc_mod!(ir, ir_docs);
 doc_mod!(parse, parse_docs);
 doc_mod!(regex_set, regex_set_docs);
 
-pub use crate::codegen::{
-    AliasVariation, EnumVariation, MacroTypeVariation, NonCopyUnionStyle,
-};
+pub use crate::codegen::{AliasVariation, EnumVariation, MacroTypeVariation, NonCopyUnionStyle};
 use crate::features::RustFeatures;
-pub use crate::features::{
-    RustTarget, LATEST_STABLE_RUST, RUST_TARGET_STRINGS,
-};
+pub use crate::features::{RustTarget, LATEST_STABLE_RUST, RUST_TARGET_STRINGS};
 use crate::ir::context::{BindgenContext, ItemId};
 use crate::ir::item::Item;
 use crate::parse::{ClangItemParser, ParseError};
@@ -96,10 +94,7 @@ pub(crate) use std::collections::hash_map::Entry;
 pub const DEFAULT_ANON_FIELDS_PREFIX: &str = "__bindgen_anon_";
 
 fn file_is_cpp(name_file: &str) -> bool {
-    name_file.ends_with(".hpp") ||
-        name_file.ends_with(".hxx") ||
-        name_file.ends_with(".hh") ||
-        name_file.ends_with(".h++")
+    name_file.ends_with(".hpp") || name_file.ends_with(".hxx") || name_file.ends_with(".hh") || name_file.ends_with(".h++")
 }
 
 fn args_are_cpp(clang_args: &[String]) -> bool {
@@ -235,11 +230,10 @@ pub fn builder() -> Builder {
 
 fn get_extra_clang_args() -> Vec<String> {
     // Add any extra arguments from the environment to the clang command line.
-    let extra_clang_args =
-        match get_target_dependent_env_var("BINDGEN_EXTRA_CLANG_ARGS") {
-            None => return vec![],
-            Some(s) => s,
-        };
+    let extra_clang_args = match get_target_dependent_env_var("BINDGEN_EXTRA_CLANG_ARGS") {
+        None => return vec![],
+        Some(s) => s,
+    };
     // Try to parse it with shell quoting. If we fail, make it one single big argument.
     if let Some(strings) = shlex::split(&extra_clang_args) {
         return strings;
@@ -263,9 +257,7 @@ impl Builder {
         // FIXME(emilio): This is a bit hacky, maybe we should stop re-using the
         // RustFeatures to store the "disable_untagged_union" call, and make it
         // a different flag that we check elsewhere / in generate().
-        if !self.options.rust_features.untagged_union &&
-            RustFeatures::from(self.options.rust_target).untagged_union
-        {
+        if !self.options.rust_features.untagged_union && RustFeatures::from(self.options.rust_target).untagged_union {
             output_vector.push("--disable-untagged-union".into());
         }
 
@@ -273,20 +265,10 @@ impl Builder {
             output_vector.push("--default-enum-style".into());
             output_vector.push(
                 match self.options.default_enum_style {
-                    codegen::EnumVariation::Rust {
-                        non_exhaustive: false,
-                    } => "rust",
-                    codegen::EnumVariation::Rust {
-                        non_exhaustive: true,
-                    } => "rust_non_exhaustive",
-                    codegen::EnumVariation::NewType {
-                        is_bitfield: true,
-                        ..
-                    } => "bitfield",
-                    codegen::EnumVariation::NewType {
-                        is_bitfield: false,
-                        is_global,
-                    } => {
+                    codegen::EnumVariation::Rust { non_exhaustive: false } => "rust",
+                    codegen::EnumVariation::Rust { non_exhaustive: true } => "rust_non_exhaustive",
+                    codegen::EnumVariation::NewType { is_bitfield: true, .. } => "bitfield",
+                    codegen::EnumVariation::NewType { is_bitfield: false, is_global } => {
                         if is_global {
                             "newtype_global"
                         } else {
@@ -302,21 +284,17 @@ impl Builder {
 
         if self.options.default_macro_constant_type != Default::default() {
             output_vector.push("--default-macro-constant-type".into());
-            output_vector
-                .push(self.options.default_macro_constant_type.as_str().into());
+            output_vector.push(self.options.default_macro_constant_type.as_str().into());
         }
 
         if self.options.default_alias_style != Default::default() {
             output_vector.push("--default-alias-style".into());
-            output_vector
-                .push(self.options.default_alias_style.as_str().into());
+            output_vector.push(self.options.default_alias_style.as_str().into());
         }
 
         if self.options.default_non_copy_union_style != Default::default() {
             output_vector.push("--default-non-copy-union-style".into());
-            output_vector.push(
-                self.options.default_non_copy_union_style.as_str().into(),
-            );
+            output_vector.push(self.options.default_non_copy_union_style.as_str().into());
         }
 
         let regex_sets = &[
@@ -324,22 +302,13 @@ impl Builder {
             (&self.options.newtype_enums, "--newtype-enum"),
             (&self.options.newtype_global_enums, "--newtype-global-enum"),
             (&self.options.rustified_enums, "--rustified-enum"),
-            (
-                &self.options.rustified_non_exhaustive_enums,
-                "--rustified-enum-non-exhaustive",
-            ),
-            (
-                &self.options.constified_enum_modules,
-                "--constified-enum-module",
-            ),
+            (&self.options.rustified_non_exhaustive_enums, "--rustified-enum-non-exhaustive"),
+            (&self.options.constified_enum_modules, "--constified-enum-module"),
             (&self.options.constified_enums, "--constified-enum"),
             (&self.options.type_alias, "--type-alias"),
             (&self.options.new_type_alias, "--new-type-alias"),
             (&self.options.new_type_alias_deref, "--new-type-alias-deref"),
-            (
-                &self.options.bindgen_wrapper_union,
-                "--bindgen-wrapper-union",
-            ),
+            (&self.options.bindgen_wrapper_union, "--bindgen-wrapper-union"),
             (&self.options.manually_drop_union, "--manually-drop-union"),
             (&self.options.blocklisted_types, "--blocklist-type"),
             (&self.options.blocklisted_functions, "--blocklist-function"),
@@ -526,9 +495,7 @@ impl Builder {
             output_vector.push("--use-array-pointers-in-arguments".into());
         }
 
-        if let Some(ref wasm_import_module_name) =
-            self.options.wasm_import_module_name
-        {
+        if let Some(ref wasm_import_module_name) = self.options.wasm_import_module_name {
             output_vector.push("--wasm-import-module-name".into());
             output_vector.push(wasm_import_module_name.clone());
         }
@@ -570,12 +537,7 @@ impl Builder {
             output_vector.push("--no-rustfmt-bindings".into());
         }
 
-        if let Some(path) = self
-            .options
-            .rustfmt_configuration_file
-            .as_ref()
-            .and_then(|f| f.to_str())
-        {
+        if let Some(path) = self.options.rustfmt_configuration_file.as_ref().and_then(|f| f.to_str()) {
             output_vector.push("--rustfmt-configuration-file".into());
             output_vector.push(path.into());
         }
@@ -627,9 +589,7 @@ impl Builder {
 
         // To pass more than one header, we need to pass all but the last
         // header via the `-include` clang arg
-        for header in &self.options.input_headers
-            [..self.options.input_headers.len().saturating_sub(1)]
-        {
+        for header in &self.options.input_headers[..self.options.input_headers.len().saturating_sub(1)] {
             output_vector.push("-include".to_string());
             output_vector.push(header.clone());
         }
@@ -665,15 +625,8 @@ impl Builder {
     }
 
     /// Add a depfile output which will be written alongside the generated bindings.
-    pub fn depfile<H: Into<String>, D: Into<PathBuf>>(
-        mut self,
-        output_module: H,
-        depfile: D,
-    ) -> Builder {
-        self.options.depfile = Some(deps::DepfileSpec {
-            output_module: output_module.into(),
-            depfile_path: depfile.into(),
-        });
+    pub fn depfile<H: Into<String>, D: Into<PathBuf>>(mut self, output_module: H, depfile: D) -> Builder {
+        self.options.depfile = Some(deps::DepfileSpec { output_module: output_module.into(), depfile_path: depfile.into() });
         self
     }
 
@@ -689,9 +642,7 @@ impl Builder {
             .to_str()
             .expect("Cannot convert current directory name to string")
             .to_owned();
-        self.options
-            .input_header_contents
-            .push((absolute_path, contents.into()));
+        self.options.input_header_contents.push((absolute_path, contents.into()));
         self
     }
 
@@ -979,10 +930,7 @@ impl Builder {
     }
 
     /// Set the default style of code to generate for enums
-    pub fn default_enum_style(
-        mut self,
-        arg: codegen::EnumVariation,
-    ) -> Builder {
+    pub fn default_enum_style(mut self, arg: codegen::EnumVariation) -> Builder {
         self.options.default_enum_style = arg;
         self
     }
@@ -1045,10 +993,7 @@ impl Builder {
     /// **Use this with caution**, creating this in unsafe code
     /// (including FFI) with an invalid value will invoke undefined behaviour.
     /// You may want to use the newtype enum style instead.
-    pub fn rustified_non_exhaustive_enum<T: AsRef<str>>(
-        mut self,
-        arg: T,
-    ) -> Builder {
+    pub fn rustified_non_exhaustive_enum<T: AsRef<str>>(mut self, arg: T) -> Builder {
         self.options.rustified_non_exhaustive_enums.insert(arg);
         self
     }
@@ -1071,19 +1016,13 @@ impl Builder {
     }
 
     /// Set the default type for macro constants
-    pub fn default_macro_constant_type(
-        mut self,
-        arg: codegen::MacroTypeVariation,
-    ) -> Builder {
+    pub fn default_macro_constant_type(mut self, arg: codegen::MacroTypeVariation) -> Builder {
         self.options.default_macro_constant_type = arg;
         self
     }
 
     /// Set the default style of code to generate for typedefs
-    pub fn default_alias_style(
-        mut self,
-        arg: codegen::AliasVariation,
-    ) -> Builder {
+    pub fn default_alias_style(mut self, arg: codegen::AliasVariation) -> Builder {
         self.options.default_alias_style = arg;
         self
     }
@@ -1119,10 +1058,7 @@ impl Builder {
     }
 
     /// Set the default style of code to generate for unions with a non-Copy member.
-    pub fn default_non_copy_union_style(
-        mut self,
-        arg: codegen::NonCopyUnionStyle,
-    ) -> Self {
+    pub fn default_non_copy_union_style(mut self, arg: codegen::NonCopyUnionStyle) -> Self {
         self.options.default_non_copy_union_style = arg;
         self
     }
@@ -1157,11 +1093,7 @@ impl Builder {
         T: Into<String>,
         U: Into<String>,
     {
-        self.options
-            .module_lines
-            .entry(mod_.into())
-            .or_insert_with(Vec::new)
-            .push(line.into());
+        self.options.module_lines.entry(mod_.into()).or_insert_with(Vec::new).push(line.into());
         self
     }
 
@@ -1172,11 +1104,7 @@ impl Builder {
         I: IntoIterator,
         I::Item: Into<String>,
     {
-        self.options
-            .module_lines
-            .entry(mod_.into())
-            .or_insert_with(Vec::new)
-            .extend(lines.into_iter().map(Into::into));
+        self.options.module_lines.entry(mod_.into()).or_insert_with(Vec::new).extend(lines.into_iter().map(Into::into));
         self
     }
 
@@ -1433,11 +1361,7 @@ impl Builder {
     /// Avoid generating any unstable Rust, such as Rust unions, in the generated bindings.
     #[deprecated(note = "please use `rust_target` instead")]
     pub fn unstable_rust(self, doit: bool) -> Self {
-        let rust_target = if doit {
-            RustTarget::Nightly
-        } else {
-            LATEST_STABLE_RUST
-        };
+        let rust_target = if doit { RustTarget::Nightly } else { LATEST_STABLE_RUST };
         self.rust_target(rust_target)
     }
 
@@ -1461,10 +1385,7 @@ impl Builder {
 
     /// Allows configuring types in different situations, see the
     /// [`ParseCallbacks`](./callbacks/trait.ParseCallbacks.html) documentation.
-    pub fn parse_callbacks(
-        mut self,
-        cb: Box<dyn callbacks::ParseCallbacks>,
-    ) -> Self {
+    pub fn parse_callbacks(mut self, cb: Box<dyn callbacks::ParseCallbacks>) -> Self {
         self.options.parse_callbacks = Some(Rc::from(cb));
         self
     }
@@ -1566,17 +1487,13 @@ impl Builder {
 
         // Transform input headers to arguments on the clang command line.
         self.options.clang_args.extend(
-            self.options.input_headers
-                [..self.options.input_headers.len().saturating_sub(1)]
-                .iter()
-                .flat_map(|header| ["-include".into(), header.to_string()]),
+            self.options.input_headers[..self.options.input_headers.len().saturating_sub(1)].iter().flat_map(|header| ["-include".into(), header.to_string()]),
         );
 
-        let input_unsaved_files =
-            std::mem::take(&mut self.options.input_header_contents)
-                .into_iter()
-                .map(|(name, contents)| clang::UnsavedFile::new(name, contents))
-                .collect::<Vec<_>>();
+        let input_unsaved_files = std::mem::take(&mut self.options.input_header_contents)
+            .into_iter()
+            .map(|(name, contents)| clang::UnsavedFile::new(name, contents))
+            .collect::<Vec<_>>();
 
         Bindings::generate(self.options, input_unsaved_files)
     }
@@ -1587,13 +1504,7 @@ impl Builder {
     /// issues. The resulting file will be named something like `__bindgen.i` or
     /// `__bindgen.ii`
     pub fn dump_preprocessed_input(&self) -> io::Result<()> {
-        let clang =
-            clang_sys::support::Clang::find(None, &[]).ok_or_else(|| {
-                io::Error::new(
-                    io::ErrorKind::Other,
-                    "Cannot find clang executable",
-                )
-            })?;
+        let clang = clang_sys::support::Clang::find(None, &[]).ok_or_else(|| io::Error::new(io::ErrorKind::Other, "Cannot find clang executable"))?;
 
         // The contents of a wrapper file that includes all the input header
         // files.
@@ -1622,11 +1533,7 @@ impl Builder {
             wrapper_contents.push_str(contents);
         }
 
-        let wrapper_path = PathBuf::from(if is_cpp {
-            "__bindgen.cpp"
-        } else {
-            "__bindgen.c"
-        });
+        let wrapper_path = PathBuf::from(if is_cpp { "__bindgen.cpp" } else { "__bindgen.c" });
 
         {
             let mut wrapper_file = File::create(&wrapper_path)?;
@@ -1634,12 +1541,7 @@ impl Builder {
         }
 
         let mut cmd = Command::new(&clang.path);
-        cmd.arg("-save-temps")
-            .arg("-E")
-            .arg("-C")
-            .arg("-c")
-            .arg(&wrapper_path)
-            .stdout(Stdio::piped());
+        cmd.arg("-save-temps").arg("-E").arg("-C").arg("-c").arg(&wrapper_path).stdout(Stdio::piped());
 
         for a in &self.options.clang_args {
             cmd.arg(a);
@@ -1652,20 +1554,13 @@ impl Builder {
         let mut child = cmd.spawn()?;
 
         let mut preprocessed = child.stdout.take().unwrap();
-        let mut file = File::create(if is_cpp {
-            "__bindgen.ii"
-        } else {
-            "__bindgen.i"
-        })?;
+        let mut file = File::create(if is_cpp { "__bindgen.ii" } else { "__bindgen.i" })?;
         io::copy(&mut preprocessed, &mut file)?;
 
         if child.wait()?.success() {
             Ok(())
         } else {
-            Err(io::Error::new(
-                io::ErrorKind::Other,
-                "clang exited with non-zero status",
-            ))
+            Err(io::Error::new(io::ErrorKind::Other, "clang exited with non-zero status"))
         }
     }
 
@@ -1718,19 +1613,13 @@ impl Builder {
     }
 
     /// Set the wasm import module name
-    pub fn wasm_import_module_name<T: Into<String>>(
-        mut self,
-        import_name: T,
-    ) -> Self {
+    pub fn wasm_import_module_name<T: Into<String>>(mut self, import_name: T) -> Self {
         self.options.wasm_import_module_name = Some(import_name.into());
         self
     }
 
     /// Specify the dynamic library name if we are generating bindings for a shared library.
-    pub fn dynamic_library_name<T: Into<String>>(
-        mut self,
-        dynamic_library_name: T,
-    ) -> Self {
+    pub fn dynamic_library_name<T: Into<String>>(mut self, dynamic_library_name: T) -> Self {
         self.options.dynamic_library_name = Some(dynamic_library_name.into());
         self
     }
@@ -2326,16 +2215,14 @@ pub struct Bindings {
     module: proc_macro2::TokenStream,
 }
 
-pub(crate) const HOST_TARGET: &str =
-    include_str!(concat!(env!("OUT_DIR"), "/host-target.txt"));
+pub(crate) const HOST_TARGET: &str = include_str!(concat!(env!("OUT_DIR"), "/host-target.txt"));
 
 // Some architecture triplets are different between rust and libclang, see #1211
 // and duplicates.
 fn rust_to_clang_target(rust_target: &str) -> String {
     if rust_target.starts_with("aarch64-apple-") {
         let mut clang_target = "arm64-apple-".to_owned();
-        clang_target
-            .push_str(rust_target.strip_prefix("aarch64-apple-").unwrap());
+        clang_target.push_str(rust_target.strip_prefix("aarch64-apple-").unwrap());
         return clang_target;
     } else if rust_target.starts_with("riscv64gc-") {
         let mut clang_target = "riscv64-".to_owned();
@@ -2373,27 +2260,19 @@ fn find_effective_target(clang_args: &[String]) -> (String, bool) {
 
 impl Bindings {
     /// Generate bindings for the given options.
-    pub(crate) fn generate(
-        mut options: BindgenOptions,
-        input_unsaved_files: Vec<clang::UnsavedFile>,
-    ) -> Result<Bindings, BindgenError> {
+    pub(crate) fn generate(mut options: BindgenOptions, input_unsaved_files: Vec<clang::UnsavedFile>) -> Result<Bindings, BindgenError> {
         ensure_libclang_is_loaded();
 
         #[cfg(feature = "runtime")]
-        debug!(
-            "Generating bindings, libclang at {}",
-            clang_sys::get_library().unwrap().path().display()
-        );
+        debug!("Generating bindings, libclang at {}", clang_sys::get_library().unwrap().path().display());
         #[cfg(not(feature = "runtime"))]
         debug!("Generating bindings, libclang linked");
 
         options.build();
 
-        let (effective_target, explicit_target) =
-            find_effective_target(&options.clang_args);
+        let (effective_target, explicit_target) = find_effective_target(&options.clang_args);
 
-        let is_host_build =
-            rust_to_clang_target(HOST_TARGET) == effective_target;
+        let is_host_build = rust_to_clang_target(HOST_TARGET) == effective_target;
 
         // NOTE: The is_host_build check wouldn't be sound normally in some
         // cases if we were to call a binary (if you have a 32-bit clang and are
@@ -2401,9 +2280,7 @@ impl Bindings {
         // opening libclang.so, it has to be the same architecture and thus the
         // check is fine.
         if !explicit_target && !is_host_build {
-            options
-                .clang_args
-                .insert(0, format!("--target={}", effective_target));
+            options.clang_args.insert(0, format!("--target={}", effective_target));
         };
 
         fn detect_include_paths(options: &mut BindgenOptions) {
@@ -2433,9 +2310,7 @@ impl Bindings {
                             return false;
                         }
 
-                        if arg.starts_with("-I") ||
-                            arg.starts_with("--include-directory=")
-                        {
+                        if arg.starts_with("-I") || arg.starts_with("--include-directory=") {
                             return false;
                         }
 
@@ -2445,15 +2320,9 @@ impl Bindings {
                     .collect::<Vec<_>>()
             };
 
-            debug!(
-                "Trying to find clang with flags: {:?}",
-                clang_args_for_clang_sys
-            );
+            debug!("Trying to find clang with flags: {:?}", clang_args_for_clang_sys);
 
-            let clang = match clang_sys::support::Clang::find(
-                None,
-                &clang_args_for_clang_sys,
-            ) {
+            let clang = match clang_sys::support::Clang::find(None, &clang_args_for_clang_sys) {
                 None => return,
                 Some(clang) => clang,
             };
@@ -2461,14 +2330,9 @@ impl Bindings {
             debug!("Found clang: {:?}", clang);
 
             // Whether we are working with C or C++ inputs.
-            let is_cpp = args_are_cpp(&options.clang_args) ||
-                options.input_headers.iter().any(|h| file_is_cpp(h));
+            let is_cpp = args_are_cpp(&options.clang_args) || options.input_headers.iter().any(|h| file_is_cpp(h));
 
-            let search_paths = if is_cpp {
-                clang.cpp_search_paths
-            } else {
-                clang.c_search_paths
-            };
+            let search_paths = if is_cpp { clang.cpp_search_paths } else { clang.c_search_paths };
 
             if let Some(search_paths) = search_paths {
                 for path in search_paths.into_iter() {
@@ -2500,9 +2364,7 @@ impl Bindings {
                     return Err(BindgenError::FolderAsHeader(path.into()));
                 }
                 if !can_read(&md.permissions()) {
-                    return Err(BindgenError::InsufficientPermissions(
-                        path.into(),
-                    ));
+                    return Err(BindgenError::InsufficientPermissions(path.into()));
                 }
                 let h = h.clone();
                 options.clang_args.push(h);
@@ -2524,13 +2386,7 @@ impl Bindings {
         let mut context = BindgenContext::new(options, &input_unsaved_files);
 
         if is_host_build {
-            debug_assert_eq!(
-                context.target_pointer_size(),
-                std::mem::size_of::<*mut ()>(),
-                "{:?} {:?}",
-                effective_target,
-                HOST_TARGET
-            );
+            debug_assert_eq!(context.target_pointer_size(), std::mem::size_of::<*mut ()>(), "{:?} {:?}", effective_target, HOST_TARGET);
         }
 
         {
@@ -2540,20 +2396,12 @@ impl Bindings {
 
         let (module, options, warnings) = codegen::codegen(context);
 
-        Ok(Bindings {
-            options,
-            warnings,
-            module,
-        })
+        Ok(Bindings { options, warnings, module })
     }
 
     /// Write these bindings as source text to a file.
     pub fn write_to_file<P: AsRef<Path>>(&self, path: P) -> io::Result<()> {
-        let file = OpenOptions::new()
-            .write(true)
-            .truncate(true)
-            .create(true)
-            .open(path.as_ref())?;
+        let file = OpenOptions::new().write(true).truncate(true).create(true).open(path.as_ref())?;
         self.write(Box::new(file))?;
         Ok(())
     }
@@ -2562,10 +2410,7 @@ impl Bindings {
     pub fn write<'a>(&self, mut writer: Box<dyn Write + 'a>) -> io::Result<()> {
         if !self.options.disable_header_comment {
             let version = option_env!("CARGO_PKG_VERSION");
-            let header = format!(
-                "/* automatically generated by rust-bindgen {} */\n\n",
-                version.unwrap_or("(unknown version)")
-            );
+            let header = format!("/* automatically generated by rust-bindgen {} */\n\n", version.unwrap_or("(unknown version)"));
             writer.write_all(header.as_bytes())?;
         }
 
@@ -2585,10 +2430,7 @@ impl Bindings {
                 writer.write_all(rustfmt_bindings.as_bytes())?;
             }
             Err(err) => {
-                eprintln!(
-                    "Failed to run rustfmt: {} (non-fatal, continuing)",
-                    err
-                );
+                eprintln!("Failed to run rustfmt: {} (non-fatal, continuing)", err);
                 writer.write_all(bindings.as_bytes())?;
             }
         }
@@ -2607,9 +2449,7 @@ impl Bindings {
         #[cfg(feature = "which-rustfmt")]
         match which::which("rustfmt") {
             Ok(p) => Ok(Cow::Owned(p)),
-            Err(e) => {
-                Err(io::Error::new(io::ErrorKind::Other, format!("{}", e)))
-            }
+            Err(e) => Err(io::Error::new(io::ErrorKind::Other, format!("{}", e))),
         }
         #[cfg(not(feature = "which-rustfmt"))]
         // No rustfmt binary was specified, so assume that the binary is called
@@ -2618,12 +2458,8 @@ impl Bindings {
     }
 
     /// Checks if rustfmt_bindings is set and runs rustfmt on the string
-    fn rustfmt_generated_string<'a>(
-        &self,
-        source: &'a str,
-    ) -> io::Result<Cow<'a, str>> {
-        let _t = time::Timer::new("rustfmt_generated_string")
-            .with_output(self.options.time_phases);
+    fn rustfmt_generated_string<'a>(&self, source: &'a str) -> io::Result<Cow<'a, str>> {
+        let _t = time::Timer::new("rustfmt_generated_string").with_output(self.options.time_phases);
 
         if !self.options.rustfmt_bindings {
             return Ok(Cow::Borrowed(source));
@@ -2634,12 +2470,7 @@ impl Bindings {
 
         cmd.stdin(Stdio::piped()).stdout(Stdio::piped());
 
-        if let Some(path) = self
-            .options
-            .rustfmt_configuration_file
-            .as_ref()
-            .and_then(|f| f.to_str())
-        {
+        if let Some(path) = self.options.rustfmt_configuration_file.as_ref().and_then(|f| f.to_str()) {
             cmd.args(["--config-path", path]);
         }
 
@@ -2669,18 +2500,12 @@ impl Bindings {
         match String::from_utf8(output) {
             Ok(bindings) => match status.code() {
                 Some(0) => Ok(Cow::Owned(bindings)),
-                Some(2) => Err(io::Error::new(
-                    io::ErrorKind::Other,
-                    "Rustfmt parsing errors.".to_string(),
-                )),
+                Some(2) => Err(io::Error::new(io::ErrorKind::Other, "Rustfmt parsing errors.".to_string())),
                 Some(3) => {
                     warn!("Rustfmt could not format some lines.");
                     Ok(Cow::Owned(bindings))
                 }
-                _ => Err(io::Error::new(
-                    io::ErrorKind::Other,
-                    "Internal rustfmt error".to_string(),
-                )),
+                _ => Err(io::Error::new(io::ErrorKind::Other, "Internal rustfmt error".to_string())),
             },
             _ => Ok(Cow::Owned(source)),
         }
@@ -2707,12 +2532,8 @@ impl Bindings {
 impl std::fmt::Display for Bindings {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut bytes = vec![];
-        self.write(Box::new(&mut bytes) as Box<dyn Write>)
-            .expect("writing to a vec cannot fail");
-        f.write_str(
-            std::str::from_utf8(&bytes)
-                .expect("we should only write bindings that are valid utf-8"),
-        )
+        self.write(Box::new(&mut bytes) as Box<dyn Write>).expect("writing to a vec cannot fail");
+        f.write_str(std::str::from_utf8(&bytes).expect("we should only write bindings that are valid utf-8"))
     }
 }
 
@@ -2723,11 +2544,7 @@ fn filter_builtins(ctx: &BindgenContext, cursor: &clang::Cursor) -> bool {
 }
 
 /// Parse one `Item` from the Clang cursor.
-fn parse_one(
-    ctx: &mut BindgenContext,
-    cursor: clang::Cursor,
-    parent: Option<ItemId>,
-) -> clang_sys::CXChildVisitResult {
+fn parse_one(ctx: &mut BindgenContext, cursor: clang::Cursor, parent: Option<ItemId>) -> clang_sys::CXChildVisitResult {
     if !filter_builtins(ctx, &cursor) {
         return CXChildVisit_Continue;
     }
@@ -2778,14 +2595,9 @@ fn parse(context: &mut BindgenContext) -> Result<(), BindgenError> {
     }
 
     let root = context.root_module();
-    context.with_module(root, |context| {
-        cursor.visit(|cursor| parse_one(context, cursor, None))
-    });
+    context.with_module(root, |context| cursor.visit(|cursor| parse_one(context, cursor, None)));
 
-    assert!(
-        context.current_module() == context.root_module(),
-        "How did this happen?"
-    );
+    assert!(context.current_module() == context.root_module(), "How did this happen?");
     Ok(())
 }
 
@@ -2804,26 +2616,17 @@ pub fn clang_version() -> ClangVersion {
 
     //Debian clang version 11.0.1-2
     let raw_v: String = clang::extract_clang_version();
-    let split_v: Option<Vec<&str>> = raw_v
-        .split_whitespace()
-        .find(|t| t.chars().next().map_or(false, |v| v.is_ascii_digit()))
-        .map(|v| v.split('.').collect());
+    let split_v: Option<Vec<&str>> = raw_v.split_whitespace().find(|t| t.chars().next().map_or(false, |v| v.is_ascii_digit())).map(|v| v.split('.').collect());
     if let Some(v) = split_v {
         if v.len() >= 2 {
             let maybe_major = v[0].parse::<u32>();
             let maybe_minor = v[1].parse::<u32>();
             if let (Ok(major), Ok(minor)) = (maybe_major, maybe_minor) {
-                return ClangVersion {
-                    parsed: Some((major, minor)),
-                    full: raw_v.clone(),
-                };
+                return ClangVersion { parsed: Some((major, minor)), full: raw_v.clone() };
             }
         }
     };
-    ClangVersion {
-        parsed: None,
-        full: raw_v.clone(),
-    }
+    ClangVersion { parsed: None, full: raw_v.clone() }
 }
 
 /// Looks for the env var `var_${TARGET}`, and falls back to just `var` when it is not found.
@@ -2832,9 +2635,7 @@ fn get_target_dependent_env_var(var: &str) -> Option<String> {
         if let Ok(v) = env::var(&format!("{}_{}", var, target)) {
             return Some(v);
         }
-        if let Ok(v) =
-            env::var(&format!("{}_{}", var, target.replace('-', "_")))
-        {
+        if let Ok(v) = env::var(&format!("{}_{}", var, target.replace('-', "_"))) {
             return Some(v);
         }
     }
@@ -2869,23 +2670,15 @@ fn commandline_flag_unit_test_function() {
     let bindings = crate::builder();
     let command_line_flags = bindings.command_line_flags();
 
-    let test_cases = vec![
-        "--rust-target",
-        "--no-derive-default",
-        "--generate",
-        "functions,types,vars,methods,constructors,destructors",
-    ]
-    .iter()
-    .map(|&x| x.into())
-    .collect::<Vec<String>>();
+    let test_cases = vec!["--rust-target", "--no-derive-default", "--generate", "functions,types,vars,methods,constructors,destructors"]
+        .iter()
+        .map(|&x| x.into())
+        .collect::<Vec<String>>();
 
     assert!(test_cases.iter().all(|x| command_line_flags.contains(x)));
 
     //Test 2
-    let bindings = crate::builder()
-        .header("input_header")
-        .allowlist_type("Distinct_Type")
-        .allowlist_function("safe_function");
+    let bindings = crate::builder().header("input_header").allowlist_type("Distinct_Type").allowlist_function("safe_function");
 
     let command_line_flags = bindings.command_line_flags();
     let test_cases = vec![
@@ -2914,8 +2707,5 @@ fn test_rust_to_clang_target() {
 
 #[test]
 fn test_rust_to_clang_target_riscv() {
-    assert_eq!(
-        rust_to_clang_target("riscv64gc-unknown-linux-gnu"),
-        "riscv64-unknown-linux-gnu"
-    )
+    assert_eq!(rust_to_clang_target("riscv64gc-unknown-linux-gnu"), "riscv64-unknown-linux-gnu")
 }

@@ -14,12 +14,12 @@ impl SampleStorage {
         id
     }
 
-    pub fn get(&self, id: usize) -> Option<&Sample> {
+    pub fn get(&self, id: usize) -> Result<&Sample, String> {
         if id >= self.data.len() {
-            return None;
+            return Err(format!("Sample with id {} not found", id));
         }
 
-        self.data[id].as_ref()
+        self.data[id].as_ref().ok_or(format!("Sample with id {} not found", id))
     }
 
     pub fn remove(&mut self, id: usize) -> Result<(), String> {

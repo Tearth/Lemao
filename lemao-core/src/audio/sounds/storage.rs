@@ -14,20 +14,20 @@ impl SoundStorage {
         id
     }
 
-    pub fn get(&self, id: usize) -> Option<&Sound> {
+    pub fn get(&self, id: usize) -> Result<&Sound, String> {
         if id >= self.data.len() {
-            return None;
+            return Err(format!("Sound with id {} not found", id));
         }
 
-        self.data[id].as_ref()
+        self.data[id].as_ref().ok_or(format!("Sound with id {} not found", id))
     }
 
-    pub fn get_mut(&mut self, id: usize) -> Option<&mut Sound> {
+    pub fn get_mut(&mut self, id: usize) -> Result<&mut Sound, String> {
         if id >= self.data.len() {
-            return None;
+            return Err(format!("Sound with id {} not found", id));
         }
 
-        self.data[id].as_mut()
+        self.data[id].as_mut().ok_or(format!("Sound with id {} not found", id))
     }
 
     pub fn remove(&mut self, id: usize) -> Result<(), String> {

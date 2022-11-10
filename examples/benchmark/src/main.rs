@@ -1,6 +1,8 @@
 use lemao_core::renderer::drawable::text::Text;
 use lemao_core::renderer::drawable::Drawable;
+use lemao_core::renderer::fonts::bff;
 use lemao_core::renderer::fonts::storage::FontStorage;
+use lemao_core::renderer::textures::bmp;
 use lemao_core::renderer::textures::storage::TextureStorage;
 use lemao_core::window::context::WindowContext;
 use lemao_core::window::context::WindowStyle;
@@ -17,7 +19,7 @@ pub struct CellData {
     pub velocity: Vec2,
 }
 
-pub fn main() {
+pub fn main() -> Result<(), String> {
     const DEFAULT_WINDOW_WIDTH: u32 = 800;
     const DEFAULT_WINDOW_HEIGHT: u32 = 600;
     const CELLS_COUNT: usize = 10000;
@@ -38,17 +40,18 @@ pub fn main() {
     };
 
     let mut cells = Vec::new();
-    let cell_texture_id = textures.lock().unwrap().load("./assets/cell.bmp").unwrap();
-    let cell_sprite_id = renderer.create_sprite(cell_texture_id).unwrap();
-    let font_id = fonts.lock().unwrap().load("./assets/inconsolata.bff").unwrap();
-    let text_id = renderer.create_text(font_id).unwrap();
+    let cell_texture_id = textures.lock().unwrap().store(bmp::load("./assets/cell.bmp")?);
+    let cell_sprite_id = renderer.create_sprite(cell_texture_id)?;
+    let font_id = fonts.lock().unwrap().store(bff::load("./assets/inconsolata.bff")?);
+    let text_id = renderer.create_text(font_id)?;
 
-    renderer.get_drawable_with_type_mut::<Text>(text_id).unwrap().set_text("FPS:0");
-    renderer.get_drawable_with_type_mut::<Text>(text_id).unwrap().set_anchor(Vec2::new(0.0, 1.0));
+    renderer.get_drawable_with_type_mut::<Text>(text_id)?.set_text("FPS:0");
+    renderer.get_drawable_with_type_mut::<Text>(text_id)?.set_anchor(Vec2::new(0.0, 1.0))?;
 
     for _ in 0..CELLS_COUNT {
         cells.push(CellData {
             sprite_id: cell_sprite_id,
+            // sprite_id: renderer.create_sprite(cell_texture_id)?,
             position: Vec2::new(fastrand::f32() * 800.0, fastrand::f32() * 600.0),
             velocity: Vec2 { x: MAX_SPEED * (fastrand::f32() * 2.0 - 1.0), y: MAX_SPEED * (fastrand::f32() * 2.0 - 1.0) },
         });
@@ -66,8 +69,8 @@ pub fn main() {
                     window_size = Vec2::new(width as f32, height as f32);
 
                     renderer.set_viewport(width, height);
-                    renderer.get_camera_mut(0).unwrap().set_viewport(window_size);
-                    renderer.get_drawable_mut(text_id).unwrap().set_position(Vec2::new(5.0, window_size.y - 0.0));
+                    renderer.get_camera_mut(0)?.set_size(window_size);
+                    renderer.get_drawable_mut(text_id)?.set_position(Vec2::new(5.0, window_size.y - 0.0));
                 }
                 InputEvent::WindowClosed => {
                     is_running = false;
@@ -79,7 +82,7 @@ pub fn main() {
         renderer.clear(Color::new(0.5, 0.5, 0.5, 1.0));
 
         for cell in &mut cells {
-            let sprite = renderer.get_drawable_mut(cell.sprite_id).unwrap();
+            let sprite = renderer.get_drawable_mut(cell.sprite_id)?;
             if cell.position.x <= 0.0 {
                 cell.velocity = Vec2::new(cell.velocity.x.abs(), cell.velocity.y);
             }
@@ -95,17 +98,19 @@ pub fn main() {
 
             cell.position += cell.velocity;
             sprite.set_position(cell.position);
-            renderer.draw(cell.sprite_id);
+            renderer.draw(cell.sprite_id)?;
         }
 
         if now.elapsed().as_millis() >= 1000 {
-            renderer.get_drawable_with_type_mut::<Text>(text_id).unwrap().set_text(&format!("FPS:{}", frames));
+            renderer.get_drawable_with_type_mut::<Text>(text_id)?.set_text(&format!("FPS:{}", frames));
             now = Instant::now();
             frames = 0;
         }
 
         frames += 1;
-        renderer.draw(text_id);
+        renderer.draw(text_id)?;
         window.swap_buffers();
     }
+
+    Ok(())
 }

@@ -14,20 +14,20 @@ impl FontStorage {
         id
     }
 
-    pub fn get(&self, id: usize) -> Option<&Font> {
+    pub fn get(&self, id: usize) -> Result<&Font, String> {
         if id >= self.data.len() {
-            return None;
+            return Err(format!("Font with id {} not found", id));
         }
 
-        self.data[id].as_ref()
+        self.data[id].as_ref().ok_or(format!("Font with id {} not found", id))
     }
 
-    pub fn get_mut(&mut self, id: usize) -> Option<&mut Font> {
+    pub fn get_mut(&mut self, id: usize) -> Result<&mut Font, String> {
         if id >= self.data.len() {
-            return None;
+            return Err(format!("Font with id {} not found", id));
         }
 
-        self.data[id].as_mut()
+        self.data[id].as_mut().ok_or(format!("Font with id {} not found", id))
     }
 
     pub fn remove(&mut self, id: usize) -> Result<(), String> {

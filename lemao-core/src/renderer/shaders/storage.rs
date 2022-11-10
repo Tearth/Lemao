@@ -14,20 +14,20 @@ impl ShaderStorage {
         id
     }
 
-    pub fn get(&self, id: usize) -> Option<&Shader> {
+    pub fn get(&self, id: usize) -> Result<&Shader, String> {
         if id >= self.data.len() {
-            return None;
+            return Err(format!("Shader with id {} not found", id));
         }
 
-        self.data[id].as_ref()
+        self.data[id].as_ref().ok_or(format!("Shader with id {} not found", id))
     }
 
-    pub fn get_mut(&mut self, id: usize) -> Option<&mut Shader> {
+    pub fn get_mut(&mut self, id: usize) -> Result<&mut Shader, String> {
         if id >= self.data.len() {
-            return None;
+            return Err(format!("Shader with id {} not found", id));
         }
 
-        self.data[id].as_mut()
+        self.data[id].as_mut().ok_or(format!("Shader with id {} not found", id))
     }
 
     pub fn remove(&mut self, id: usize) -> Result<(), String> {

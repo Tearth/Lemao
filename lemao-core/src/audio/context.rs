@@ -43,15 +43,12 @@ impl AudioContext {
 
     pub fn create_sound(&mut self, sample_id: usize) -> Result<usize, String> {
         let sample_storage = self.samples.lock().unwrap();
-        let sample = match sample_storage.get(sample_id) {
-            Some(sample) => sample,
-            None => return Err(format!("Sample with id {} not found", sample_id)),
-        };
+        let sample = sample_storage.get(sample_id)?;
 
         Ok(self.sounds.store(Sound::new(sample)?))
     }
 
-    pub fn get_sound(&self, sound_id: usize) -> Option<&Sound> {
+    pub fn get_sound(&self, sound_id: usize) -> Result<&Sound, String> {
         self.sounds.get(sound_id)
     }
 
@@ -59,13 +56,10 @@ impl AudioContext {
     where
         F: Fn(&Sound) -> Result<(), String>,
     {
-        match self.sounds.get(sound_id) {
-            Some(sound) => scope(sound),
-            None => return Err(format!("Sound with id {} not found", sound_id)),
-        }
+        scope(self.sounds.get(sound_id)?)
     }
 
-    pub fn get_sound_mut(&mut self, sound_id: usize) -> Option<&mut Sound> {
+    pub fn get_sound_mut(&mut self, sound_id: usize) -> Result<&mut Sound, String> {
         self.sounds.get_mut(sound_id)
     }
 
@@ -73,10 +67,7 @@ impl AudioContext {
     where
         F: FnMut(&mut Sound) -> Result<(), String>,
     {
-        match self.sounds.get_mut(sound_id) {
-            Some(sound) => scope(sound),
-            None => return Err(format!("Sound with id {} not found", sound_id)),
-        }
+        scope(self.sounds.get_mut(sound_id)?)
     }
 }
 

@@ -14,20 +14,20 @@ impl CameraStorage {
         id
     }
 
-    pub fn get(&self, id: usize) -> Option<&Camera> {
+    pub fn get(&self, id: usize) -> Result<&Camera, String> {
         if id >= self.data.len() {
-            return None;
+            return Err(format!("Camera with id {} not found", id));
         }
 
-        self.data[id].as_ref()
+        self.data[id].as_ref().ok_or(format!("Camera with id {} not found", id))
     }
 
-    pub fn get_mut(&mut self, id: usize) -> Option<&mut Camera> {
+    pub fn get_mut(&mut self, id: usize) -> Result<&mut Camera, String> {
         if id >= self.data.len() {
-            return None;
+            return Err(format!("Camera with id {} not found", id));
         }
 
-        self.data[id].as_mut()
+        self.data[id].as_mut().ok_or(format!("Camera with id {} not found", id))
     }
 
     pub fn remove(&mut self, id: usize) -> Result<(), String> {
