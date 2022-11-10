@@ -24,12 +24,11 @@ use std::sync::Arc;
 use std::sync::Mutex;
 
 pub struct RendererContext {
-    pub gl: Rc<OpenGLPointers>,
-    pub gl_context: winapi::HGLRC,
-    pub active_camera_id: usize,
-    pub default_shader_id: usize,
-    pub active_shader_id: usize,
-
+    gl: Rc<OpenGLPointers>,
+    gl_context: winapi::HGLRC,
+    active_camera_id: usize,
+    default_shader_id: usize,
+    active_shader_id: usize,
     textures: Arc<Mutex<TextureStorage>>,
     fonts: Arc<Mutex<FontStorage>>,
     cameras: Option<CameraStorage>,
@@ -199,11 +198,11 @@ impl RendererContext {
         let shader = match self.shaders.as_mut().unwrap().get_mut(shader_id) {
             Some(shader) => shader,
             None => {
-                return Err(format!("Shader with id {} not found, can't set it as active", shader_id));
+                return Err(format!("Shader with id {} not found", shader_id));
             }
         };
 
-        self.active_shader_id = shader.id;
+        self.active_shader_id = shader_id;
         shader.set_as_active();
         Ok(())
     }
@@ -234,10 +233,10 @@ impl RendererContext {
     }
 
     pub fn set_camera_as_active(&mut self, camera_id: usize) -> Result<(), String> {
-        let mut camera = match self.cameras.as_mut().unwrap().get_mut(camera_id) {
+        let camera = match self.cameras.as_mut().unwrap().get_mut(camera_id) {
             Some(camera) => camera,
             None => {
-                return Err(format!("Camera with id {} not found, can't set it as active", camera_id));
+                return Err(format!("Camera with id {} not found", camera_id));
             }
         };
 
@@ -251,7 +250,7 @@ impl RendererContext {
         let texture_storage = self.textures.lock().unwrap();
         let texture = match texture_storage.get(texture_id) {
             Some(texture) => texture,
-            None => return Err(format!("Texture with id {} not found, the sprite can't be created", texture_id)),
+            None => return Err(format!("Texture with id {} not found", texture_id)),
         };
         let sprite = Box::new(Sprite::new(self.gl.clone(), texture));
 
@@ -262,7 +261,7 @@ impl RendererContext {
         let font_storage = self.fonts.lock().unwrap();
         let font = match font_storage.get(font_id) {
             Some(font) => font,
-            None => return Err(format!("Font with id {} not found, the text can't be created", font_id)),
+            None => return Err(format!("Font with id {} not found", font_id)),
         };
         let text = Box::new(Text::new(self.gl.clone(), font));
 
@@ -299,41 +298,43 @@ impl RendererContext {
     }
 
     pub fn draw(&mut self, drawable_id: usize) -> Result<(), String> {
-        let mut camera = match self.cameras.as_mut().unwrap().get_mut(self.active_camera_id) {
+        let camera = match self.cameras.as_mut().unwrap().get_mut(self.active_camera_id) {
             Some(camera) => camera,
             None => {
-                return Err(format!("Camera with id {} not found, can't set the viewport", self.active_camera_id));
+                return Err(format!("Camera with id {} not found", self.active_camera_id));
             }
         };
 
         let shader = match self.shaders.as_ref().unwrap().get(self.active_shader_id) {
             Some(shader) => shader,
             None => {
-                return Err(format!("Shader with id {} not found, so the drawable object with id {} can't be drawn", self.active_shader_id, drawable_id));
+                return Err(format!("Shader with id {} not found", self.active_shader_id));
             }
         };
 
         if camera.get_dirty_flag() {
-            shader.set_parameter("proj", camera.get_projection_matrix().as_ptr());
-            shader.set_parameter("view", camera.get_view_matrix().as_ptr());
+            shader.set_parameter("proj", camera.get_projection_matrix().as_ptr())?;
+            shader.set_parameter("view", camera.get_view_matrix().as_ptr())?;
             camera.set_dirty_flag(false);
         }
 
         let drawable = match self.get_drawable(drawable_id) {
             Some(drawable) => drawable,
             None => {
-                return Err(format!("Drawable object with id {} not found, so it can't be drawn", drawable_id));
+                return Err(format!("Drawable object with id {} not found", drawable_id));
             }
         };
-        drawable.draw(shader);
+        drawable.draw(shader)?;
         Ok(())
     }
 
-    pub fn release(&self) {
+    pub fn release(&self) -> Result<(), String> {
         unsafe {
             if winapi::wglDeleteContext(self.gl_context) == 0 {
-                // log::error(&format!("Error while releasing OpenGL context, GetLastError()={}", winapi::GetLastError()));
+                return Err(format!("Error while releasing OpenGL context, GetLastError()={}", winapi::GetLastError()));
             }
+
+            Ok(())
         }
     }
 }

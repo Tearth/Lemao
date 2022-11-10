@@ -95,7 +95,7 @@ impl WindowContext {
             // Wait for WM_CREATE, where the context is initialized
             while !context.initialized {}
 
-            context.set_style(context.style);
+            context.set_style(context.style)?;
             Ok(context)
         }
     }
@@ -219,7 +219,7 @@ impl WindowContext {
         renderer.init_storages();
         renderer.init_default_camera();
         renderer.init_default_shader()?;
-        renderer.set_default_shader();
+        renderer.set_default_shader()?;
 
         Ok(renderer)
     }
@@ -236,11 +236,11 @@ impl WindowContext {
         self.style
     }
 
-    pub fn set_style(&mut self, style: WindowStyle) {
+    pub fn set_style(&mut self, style: WindowStyle) -> Result<(), String> {
         unsafe {
             if let WindowStyle::Fullscreen = style {
                 if winapi::ChangeDisplaySettingsA(ptr::null_mut(), 0) != winapi::DISP_CHANGE_SUCCESSFUL as i32 {
-                    let x = 10;
+                    return Err("Error while changing display data".to_string());
                 }
             }
 
@@ -278,12 +278,14 @@ impl WindowContext {
                     mode.dmBitsPerPel = 32;
                     mode.dmFields = winapi::DM_PELSWIDTH | winapi::DM_PELSHEIGHT | winapi::DM_BITSPERPEL;
                     if winapi::ChangeDisplaySettingsA(&mut mode, winapi::CDS_FULLSCREEN) != winapi::DISP_CHANGE_SUCCESSFUL as i32 {
-                        let x = 10;
+                        return Err("Error while changing display data".to_string());
                     }
                 }
             }
 
             self.style = style;
+
+            Ok(())
         }
     }
 

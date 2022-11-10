@@ -62,5 +62,5 @@ pub fn load(path: &str) -> Result<Font, String> {
         }
     }
 
-    Ok(Font { id: 0, width, height, cell_width, cell_height, base_character_offset, character_widths, data })
+    Ok(Font::new(width, height, cell_width, cell_height, base_character_offset, character_widths, data))
 }

@@ -13,10 +13,9 @@ pub const DEFAULT_VERTEX_SHADER: &str = include_str!("./default.vert");
 pub const DEFAULT_FRAGMENT_SHADER: &str = include_str!("./default.frag");
 
 pub struct Shader {
-    pub id: usize,
+    id: usize,
     program_id: u32,
     uniforms: HashMap<String, u32>,
-
     gl: Rc<OpenGLPointers>,
 }
 

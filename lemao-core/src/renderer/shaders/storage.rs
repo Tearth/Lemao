@@ -32,7 +32,7 @@ impl ShaderStorage {
 
     pub fn remove(&mut self, id: usize) -> Result<(), String> {
         if id >= self.data.len() {
-            return Err(format!("Shader with id {} doesn't exist, can't be removed", id));
+            return Err(format!("Shader with id {} not found", id));
         }
         self.data[id] = None;
 
