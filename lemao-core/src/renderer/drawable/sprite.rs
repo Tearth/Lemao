@@ -13,22 +13,18 @@ use std::rc::Rc;
 
 pub struct Sprite {
     id: usize,
-
     position: Vec2,
     scale: Vec2,
     rotation: f32,
-
     width: u32,
     height: u32,
     anchor: Vec2,
     color: Color,
-
+    texture_id: usize,
     vao_gl_id: u32,
     vbo_gl_id: u32,
     ebo_gl_id: u32,
     texture_gl_id: u32,
-
-    texture_id: usize,
     gl: Rc<OpenGLPointers>,
 }
 
@@ -36,27 +32,27 @@ impl Sprite {
     pub fn new(gl: Rc<OpenGLPointers>, texture: &Texture) -> Self {
         let mut sprite = Sprite {
             id: 0,
-
             position: Default::default(),
             scale: Vec2::new(1.0, 1.0),
             rotation: 0.0,
-
             width: 0,
             height: 0,
             anchor: Default::default(),
             color: Color::new(1.0, 1.0, 1.0, 1.0),
             texture_id: texture.id,
-
             vao_gl_id: 0,
             vbo_gl_id: 0,
             ebo_gl_id: 0,
             texture_gl_id: 0,
-
             gl,
         };
 
         sprite.set_texture(texture);
         sprite
+    }
+
+    pub fn get_texture(&self) -> usize {
+        self.texture_id
     }
 
     pub fn set_texture(&mut self, texture: &Texture) {
@@ -178,21 +174,6 @@ impl Drawable for Sprite {
         self.id = id;
     }
 
-    fn draw(&self, shader: &Shader) {
-        unsafe {
-            let translation = Mat4x4::translate(Vec3::new(self.position.x, self.position.y, 0.0));
-            let scale = Mat4x4::scale(Vec3::new(self.scale.x, self.scale.y, 1.0));
-            let rotation = Mat4x4::rotate(self.rotation);
-            let model = translation * rotation * scale;
-
-            shader.set_parameter("model", model.as_ptr());
-
-            (self.gl.glBindVertexArray)(self.vao_gl_id);
-            (self.gl.glBindTexture)(opengl::GL_TEXTURE_2D, self.texture_gl_id);
-            (self.gl.glDrawElements)(opengl::GL_TRIANGLES, 6, opengl::GL_UNSIGNED_INT, ptr::null());
-        }
-    }
-
     fn get_position(&self) -> Vec2 {
         self.position
     }
@@ -201,7 +182,7 @@ impl Drawable for Sprite {
         self.position = position;
     }
 
-    fn move_toward(&mut self, delta: Vec2) {
+    fn move_delta(&mut self, delta: Vec2) {
         self.position += delta;
     }
 
@@ -229,10 +210,10 @@ impl Drawable for Sprite {
         self.anchor
     }
 
-    fn set_anchor(&mut self, anchor: Vec2) {
+    fn set_anchor(&mut self, anchor: Vec2) -> Result<(), String> {
         unsafe {
             if self.vbo_gl_id == 0 {
-                return;
+                return Err("Sprite not initialized".to_string());
             }
 
             let vertices = self.get_vertices(anchor, self.width, self.height, self.color);
@@ -242,6 +223,7 @@ impl Drawable for Sprite {
             (self.gl.glBufferData)(opengl::GL_ARRAY_BUFFER, vertices_size, vertices.as_ptr() as *const c_void, opengl::GL_STATIC_DRAW);
 
             self.anchor = anchor;
+            Ok(())
         }
     }
 
@@ -249,10 +231,10 @@ impl Drawable for Sprite {
         self.color
     }
 
-    fn set_color(&mut self, color: Color) {
+    fn set_color(&mut self, color: Color) -> Result<(), String> {
         unsafe {
             if self.vbo_gl_id == 0 {
-                return;
+                return Err("Sprite not initialized".to_string());
             }
 
             let vertices = self.get_vertices(self.anchor, self.width, self.height, color);
@@ -262,6 +244,24 @@ impl Drawable for Sprite {
             (self.gl.glBufferData)(opengl::GL_ARRAY_BUFFER, vertices_size, vertices.as_ptr() as *const c_void, opengl::GL_STATIC_DRAW);
 
             self.color = color;
+            Ok(())
+        }
+    }
+
+    fn draw(&self, shader: &Shader) -> Result<(), String> {
+        unsafe {
+            let translation = Mat4x4::translate(Vec3::new(self.position.x, self.position.y, 0.0));
+            let scale = Mat4x4::scale(Vec3::new(self.scale.x, self.scale.y, 1.0));
+            let rotation = Mat4x4::rotate(self.rotation);
+            let model = translation * rotation * scale;
+
+            shader.set_parameter("model", model.as_ptr())?;
+
+            (self.gl.glBindVertexArray)(self.vao_gl_id);
+            (self.gl.glBindTexture)(opengl::GL_TEXTURE_2D, self.texture_gl_id);
+            (self.gl.glDrawElements)(opengl::GL_TRIANGLES, 6, opengl::GL_UNSIGNED_INT, ptr::null());
+
+            Ok(())
         }
     }
 

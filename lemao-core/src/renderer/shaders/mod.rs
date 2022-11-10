@@ -102,10 +102,15 @@ impl Shader {
         }
     }
 
-    pub fn set_parameter(&self, name: &str, data: *const f32) {
+    pub fn set_parameter(&self, name: &str, data: *const f32) -> Result<(), String> {
         unsafe {
-            let id = self.uniforms.get(name).unwrap();
+            let id = match self.uniforms.get(name) {
+                Some(parameter) => parameter,
+                None => return Err(format!("Shader parameter with name {} not found", name)),
+            };
             (self.gl.glUniformMatrix4fv)(*id as i32, 1, opengl::GL_TRUE as u8, data);
+
+            Ok(())
         }
     }
 

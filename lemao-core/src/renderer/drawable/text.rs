@@ -13,23 +13,19 @@ use std::rc::Rc;
 
 pub struct Text {
     id: usize,
-
     position: Vec2,
     scale: Vec2,
     rotation: f32,
-
     size: Vec2,
     anchor: Vec2,
     color: Color,
     text: String,
     line_height: u32,
-
     vao_gl_id: u32,
     vbo_gl_id: u32,
     ebo_gl_id: u32,
     texture_gl_id: u32,
     elements_count: u32,
-
     font_id: usize,
     font_width: u32,
     font_height: u32,
@@ -37,7 +33,6 @@ pub struct Text {
     font_cell_height: u32,
     font_base_character_offset: u8,
     font_character_widths: Vec<u8>,
-
     gl: Rc<OpenGLPointers>,
 }
 
@@ -45,23 +40,19 @@ impl Text {
     pub fn new(gl: Rc<OpenGLPointers>, font: &Font) -> Self {
         let mut text = Text {
             id: 0,
-
             position: Default::default(),
             scale: Vec2::new(1.0, 1.0),
             rotation: 0.0,
-
             size: Default::default(),
             anchor: Default::default(),
             color: Color::new(1.0, 1.0, 1.0, 1.0),
             text: Default::default(),
             line_height: font.cell_height,
-
             vao_gl_id: 0,
             vbo_gl_id: 0,
             ebo_gl_id: 0,
             texture_gl_id: 0,
             elements_count: 0,
-
             font_id: 0,
             font_width: font.width,
             font_height: font.height,
@@ -69,15 +60,18 @@ impl Text {
             font_cell_height: font.cell_height,
             font_base_character_offset: font.base_character_offset,
             font_character_widths: font.character_widths.clone(),
-
             gl,
         };
 
-        text.set_texture(font);
+        text.set_font(font);
         text
     }
 
-    pub fn set_texture(&mut self, font: &Font) {
+    pub fn get_font(&self) -> usize {
+        self.font_id
+    }
+
+    pub fn set_font(&mut self, font: &Font) {
         unsafe {
             if self.vao_gl_id == 0 {
                 (self.gl.glGenVertexArrays)(1, &mut self.vao_gl_id);
@@ -140,6 +134,7 @@ impl Text {
             let characters_per_row = (self.font_width / self.font_cell_width) as u8;
             let uv_width = self.font_cell_width as f32 / self.font_width as f32;
             let uv_height = self.font_cell_height as f32 / self.font_height as f32;
+            let uv_size = Vec2::new(uv_width, uv_height);
             let mut index = 0;
 
             for char in text.chars() {
@@ -155,7 +150,6 @@ impl Text {
 
                 let character_width = self.font_character_widths[char as usize];
                 let uv = Vec2::new(row as f32 * uv_width, 1.0 - col as f32 * uv_height - uv_height);
-                let uv_size = Vec2::new(uv_width, uv_height);
 
                 vertices.extend_from_slice(&self.get_vertices(self.font_cell_width, self.font_cell_height, offset, uv, uv_size, self.color));
 
@@ -266,21 +260,6 @@ impl Drawable for Text {
         self.id = id;
     }
 
-    fn draw(&self, shader: &Shader) {
-        unsafe {
-            let translation = Mat4x4::translate(Vec3::new(self.position.x, self.position.y, 0.0));
-            let scale = Mat4x4::scale(Vec3::new(self.scale.x, self.scale.y, 1.0));
-            let rotation = Mat4x4::rotate(self.rotation);
-            let model = translation * rotation * scale;
-
-            shader.set_parameter("model", model.as_ptr());
-
-            (self.gl.glBindVertexArray)(self.vao_gl_id);
-            (self.gl.glBindTexture)(opengl::GL_TEXTURE_2D, self.texture_gl_id);
-            (self.gl.glDrawElements)(opengl::GL_TRIANGLES, self.elements_count as i32, opengl::GL_UNSIGNED_INT, ptr::null());
-        }
-    }
-
     fn get_position(&self) -> Vec2 {
         self.position
     }
@@ -289,7 +268,7 @@ impl Drawable for Text {
         self.position = position;
     }
 
-    fn move_toward(&mut self, delta: Vec2) {
+    fn move_delta(&mut self, delta: Vec2) {
         self.position += delta;
     }
 
@@ -317,18 +296,47 @@ impl Drawable for Text {
         self.anchor
     }
 
-    fn set_anchor(&mut self, anchor: Vec2) {
+    fn set_anchor(&mut self, anchor: Vec2) -> Result<(), String> {
+        if self.vbo_gl_id == 0 {
+            return Err("Sprite not initialized".to_string());
+        }
+
         self.anchor = anchor;
         self.set_text(&self.text.clone());
+
+        Ok(())
     }
 
     fn get_color(&self) -> Color {
         self.color
     }
 
-    fn set_color(&mut self, color: Color) {
+    fn set_color(&mut self, color: Color) -> Result<(), String> {
+        if self.vbo_gl_id == 0 {
+            return Err("Sprite not initialized".to_string());
+        }
+
         self.color = color;
         self.set_text(&self.text.clone());
+
+        Ok(())
+    }
+
+    fn draw(&self, shader: &Shader) -> Result<(), String> {
+        unsafe {
+            let translation = Mat4x4::translate(Vec3::new(self.position.x, self.position.y, 0.0));
+            let scale = Mat4x4::scale(Vec3::new(self.scale.x, self.scale.y, 1.0));
+            let rotation = Mat4x4::rotate(self.rotation);
+            let model = translation * rotation * scale;
+
+            shader.set_parameter("model", model.as_ptr())?;
+
+            (self.gl.glBindVertexArray)(self.vao_gl_id);
+            (self.gl.glBindTexture)(opengl::GL_TEXTURE_2D, self.texture_gl_id);
+            (self.gl.glDrawElements)(opengl::GL_TRIANGLES, self.elements_count as i32, opengl::GL_UNSIGNED_INT, ptr::null());
+
+            Ok(())
+        }
     }
 
     fn as_any(&self) -> &dyn Any {
