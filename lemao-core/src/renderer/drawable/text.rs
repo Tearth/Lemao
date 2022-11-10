@@ -1,4 +1,5 @@
 use super::*;
+use crate::renderer::context::RendererContext;
 use crate::renderer::fonts::Font;
 use lemao_math::mat4x4::Mat4x4;
 use lemao_math::vec2::Vec2;
@@ -37,7 +38,7 @@ pub struct Text {
 }
 
 impl Text {
-    pub fn new(gl: Rc<OpenGLPointers>, font: &Font) -> Self {
+    pub fn new(renderer: &RendererContext, font: &Font) -> Self {
         let mut text = Text {
             id: 0,
             position: Default::default(),
@@ -60,7 +61,7 @@ impl Text {
             font_cell_height: font.cell_height,
             font_base_character_offset: font.base_character_offset,
             font_character_widths: font.character_widths.clone(),
-            gl,
+            gl: renderer.gl.clone(),
         };
 
         text.set_font(font);
@@ -97,26 +98,8 @@ impl Text {
             (self.gl.glEnableVertexAttribArray)(1);
             (self.gl.glEnableVertexAttribArray)(2);
 
-            if self.texture_gl_id != 0 {
-                (self.gl.glDeleteTextures)(1, &self.texture_gl_id);
-            }
-
-            (self.gl.glGenTextures)(1, &mut self.texture_gl_id);
-            (self.gl.glBindTexture)(opengl::GL_TEXTURE_2D, self.texture_gl_id);
-            (self.gl.glTexParameteri)(opengl::GL_TEXTURE_2D, opengl::GL_TEXTURE_WRAP_S, opengl::GL_MIRRORED_REPEAT as i32);
-            (self.gl.glTexParameteri)(opengl::GL_TEXTURE_2D, opengl::GL_TEXTURE_WRAP_T, opengl::GL_MIRRORED_REPEAT as i32);
-            (self.gl.glTexParameteri)(opengl::GL_TEXTURE_2D, opengl::GL_TEXTURE_MIN_FILTER, opengl::GL_NEAREST as i32);
-            (self.gl.glTexParameteri)(opengl::GL_TEXTURE_2D, opengl::GL_TEXTURE_MAG_FILTER, opengl::GL_LINEAR as i32);
-
-            let format = opengl::GL_RGBA;
-            let texture_width = font.width as i32;
-            let texture_height = font.height as i32;
-            let texture_ptr = font.data.as_ptr() as *const c_void;
-
-            (self.gl.glTexImage2D)(opengl::GL_TEXTURE_2D, 0, format as i32, texture_width, texture_height, 0, format, opengl::GL_UNSIGNED_BYTE, texture_ptr);
-            (self.gl.glGenerateMipmap)(opengl::GL_TEXTURE_2D);
-
             self.font_id = font.id;
+            self.texture_gl_id = font.texture_gl_id;
         }
     }
 
@@ -361,10 +344,6 @@ impl Drop for Text {
 
             if self.vao_gl_id != 0 {
                 (self.gl.glDeleteVertexArrays)(1, &mut self.vao_gl_id);
-            }
-
-            if self.texture_gl_id != 0 {
-                (self.gl.glDeleteTextures)(1, &self.texture_gl_id);
             }
         }
     }

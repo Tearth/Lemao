@@ -24,7 +24,7 @@ use std::sync::Arc;
 use std::sync::Mutex;
 
 pub struct RendererContext {
-    gl: Rc<OpenGLPointers>,
+    pub(crate) gl: Rc<OpenGLPointers>,
     gl_context: winapi::HGLRC,
     active_camera_id: usize,
     default_shader_id: usize,
@@ -159,7 +159,7 @@ impl RendererContext {
     }
 
     pub fn init_default_shader(&mut self) -> Result<(), String> {
-        let shader = Shader::new_default(self.gl.clone())?;
+        let shader = Shader::new_default(self)?;
         self.default_shader_id = self.shaders.as_mut().unwrap().store(shader);
 
         Ok(())
@@ -182,7 +182,7 @@ impl RendererContext {
             Err(message) => return Err(format!("Error while loading fragment shader: {}", message)),
         };
 
-        let shader = Shader::new_from_string(self.gl.clone(), &vertex_shader, &fragment_shader)?;
+        let shader = Shader::new_from_string(self, &vertex_shader, &fragment_shader)?;
         Ok(self.shaders.as_mut().unwrap().store(shader))
     }
 
@@ -239,7 +239,7 @@ impl RendererContext {
     pub fn create_sprite(&mut self, texture_id: usize) -> Result<usize, String> {
         let texture_storage = self.textures.lock().unwrap();
         let texture = texture_storage.get(texture_id)?;
-        let sprite = Box::new(Sprite::new(self.gl.clone(), texture));
+        let sprite = Box::new(Sprite::new(self, texture));
 
         Ok(self.drawables.as_mut().unwrap().store(sprite))
     }
@@ -247,7 +247,7 @@ impl RendererContext {
     pub fn create_text(&mut self, font_id: usize) -> Result<usize, String> {
         let font_storage = self.fonts.lock().unwrap();
         let font = font_storage.get(font_id)?;
-        let text = Box::new(Text::new(self.gl.clone(), font));
+        let text = Box::new(Text::new(self, font));
 
         Ok(self.drawables.as_mut().unwrap().store(text))
     }

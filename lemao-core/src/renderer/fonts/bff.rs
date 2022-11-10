@@ -3,7 +3,7 @@ use crate::utils::binary;
 use std::fs::File;
 use std::io::Read;
 
-pub fn load(path: &str) -> Result<Font, String> {
+pub fn load(renderer: &RendererContext, path: &str) -> Result<Font, String> {
     /////////////////////////////////////////////////////////////////////////////////////////////////
     // BFF specification: https://documentation.help/Codehead-Bitmap-Font-Generator/bffformat.html //
     /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -62,5 +62,5 @@ pub fn load(path: &str) -> Result<Font, String> {
         }
     }
 
-    Ok(Font::new(width, height, cell_width, cell_height, base_character_offset, character_widths, data))
+    Ok(Font::new(renderer, width, height, cell_width, cell_height, base_character_offset, character_widths, data))
 }

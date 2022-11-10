@@ -3,7 +3,7 @@ use crate::utils::binary;
 use std::fs::File;
 use std::io::Read;
 
-pub fn load(path: &str) -> Result<Texture, String> {
+pub fn load(renderer: &RendererContext, path: &str) -> Result<Texture, String> {
     //////////////////////////////////////////////////////////////////////
     // BMP specification: https://en.wikipedia.org/wiki/BMP_file_format //
     //////////////////////////////////////////////////////////////////////
@@ -73,5 +73,5 @@ pub fn load(path: &str) -> Result<Texture, String> {
         _ => return Err("Unsupported compression method, only BI_RGB and BI_BITFIELDS are supported".to_string()),
     }
 
-    Ok(Texture::new(width, height, data))
+    Ok(Texture::new(renderer, width, height, data))
 }

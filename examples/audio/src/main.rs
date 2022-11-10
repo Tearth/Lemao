@@ -40,7 +40,7 @@ pub fn main() -> Result<(), String> {
         Err(message) => panic!("{}", message),
     };
 
-    let font_id = fonts.lock().unwrap().store(bff::load("./assets/inconsolata.bff")?);
+    let font_id = fonts.lock().unwrap().store(bff::load(&renderer, "./assets/inconsolata.bff")?);
     let description_text_id = renderer.create_text(font_id)?;
     let status_text_id = renderer.create_text(font_id)?;
 

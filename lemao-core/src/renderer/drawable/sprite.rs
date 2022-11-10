@@ -1,4 +1,5 @@
 use super::*;
+use crate::renderer::context::RendererContext;
 use crate::renderer::textures::Texture;
 use lemao_math::mat4x4::Mat4x4;
 use lemao_math::vec2::Vec2;
@@ -29,7 +30,7 @@ pub struct Sprite {
 }
 
 impl Sprite {
-    pub fn new(gl: Rc<OpenGLPointers>, texture: &Texture) -> Self {
+    pub fn new(renderer: &RendererContext, texture: &Texture) -> Self {
         let mut sprite = Sprite {
             id: 0,
             position: Default::default(),
@@ -44,7 +45,7 @@ impl Sprite {
             vbo_gl_id: 0,
             ebo_gl_id: 0,
             texture_gl_id: 0,
-            gl,
+            gl: renderer.gl.clone(),
         };
 
         sprite.set_texture(texture);
@@ -93,28 +94,10 @@ impl Sprite {
             (self.gl.glEnableVertexAttribArray)(1);
             (self.gl.glEnableVertexAttribArray)(2);
 
-            if self.texture_gl_id != 0 {
-                (self.gl.glDeleteTextures)(1, &self.texture_gl_id);
-            }
-
-            (self.gl.glGenTextures)(1, &mut self.texture_gl_id);
-            (self.gl.glBindTexture)(opengl::GL_TEXTURE_2D, self.texture_gl_id);
-            (self.gl.glTexParameteri)(opengl::GL_TEXTURE_2D, opengl::GL_TEXTURE_WRAP_S, opengl::GL_MIRRORED_REPEAT as i32);
-            (self.gl.glTexParameteri)(opengl::GL_TEXTURE_2D, opengl::GL_TEXTURE_WRAP_T, opengl::GL_MIRRORED_REPEAT as i32);
-            (self.gl.glTexParameteri)(opengl::GL_TEXTURE_2D, opengl::GL_TEXTURE_MIN_FILTER, opengl::GL_NEAREST as i32);
-            (self.gl.glTexParameteri)(opengl::GL_TEXTURE_2D, opengl::GL_TEXTURE_MAG_FILTER, opengl::GL_LINEAR as i32);
-
-            let format = opengl::GL_RGBA;
-            let texture_width = texture.width as i32;
-            let texture_height = texture.height as i32;
-            let texture_ptr = texture.data.as_ptr() as *const c_void;
-
-            (self.gl.glTexImage2D)(opengl::GL_TEXTURE_2D, 0, format as i32, texture_width, texture_height, 0, format, opengl::GL_UNSIGNED_BYTE, texture_ptr);
-            (self.gl.glGenerateMipmap)(opengl::GL_TEXTURE_2D);
-
-            self.width = texture_width as u32;
-            self.height = texture_height as u32;
+            self.width = texture.width;
+            self.height = texture.height;
             self.texture_id = texture.id;
+            self.texture_gl_id = texture.texture_gl_id;
         }
     }
 
@@ -287,10 +270,6 @@ impl Drop for Sprite {
 
             if self.vao_gl_id != 0 {
                 (self.gl.glDeleteVertexArrays)(1, &mut self.vao_gl_id);
-            }
-
-            if self.texture_gl_id != 0 {
-                (self.gl.glDeleteTextures)(1, &self.texture_gl_id);
             }
         }
     }

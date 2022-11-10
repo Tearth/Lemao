@@ -5,6 +5,8 @@ use std::ffi::CString;
 use std::ptr;
 use std::rc::Rc;
 
+use super::context::RendererContext;
+
 pub mod storage;
 
 pub const MAX_UNIFORM_NAME_LENGTH: usize = 32;
@@ -20,12 +22,14 @@ pub struct Shader {
 }
 
 impl Shader {
-    pub fn new_default(gl: Rc<OpenGLPointers>) -> Result<Self, String> {
-        Shader::new_from_string(gl, DEFAULT_VERTEX_SHADER, DEFAULT_FRAGMENT_SHADER)
+    pub fn new_default(renderer: &RendererContext) -> Result<Self, String> {
+        Shader::new_from_string(renderer, DEFAULT_VERTEX_SHADER, DEFAULT_FRAGMENT_SHADER)
     }
 
-    pub fn new_from_string(gl: Rc<OpenGLPointers>, vertex_shader: &str, fragment_shader: &str) -> Result<Self, String> {
+    pub fn new_from_string(renderer: &RendererContext, vertex_shader: &str, fragment_shader: &str) -> Result<Self, String> {
         unsafe {
+            let gl = renderer.gl.clone();
+
             let mut success = 0;
             let vertex_shader_cstr = CString::new(vertex_shader).unwrap();
             let vertex_shader_array = [vertex_shader_cstr.as_ptr()];

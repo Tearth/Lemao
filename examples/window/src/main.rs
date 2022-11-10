@@ -28,7 +28,7 @@ pub fn main() -> Result<(), String> {
         Err(message) => panic!("{}", message),
     };
 
-    let font_id = fonts.lock().unwrap().store(bff::load("./assets/inconsolata.bff")?);
+    let font_id = fonts.lock().unwrap().store(bff::load(&renderer, "./assets/inconsolata.bff")?);
     let left_top_text_id = renderer.create_text(font_id)?;
     let right_top_text_id = renderer.create_text(font_id)?;
     let left_bottom_text_id = renderer.create_text(font_id)?;
