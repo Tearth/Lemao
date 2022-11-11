@@ -220,6 +220,7 @@ impl WindowContext {
         renderer.init_default_camera();
         renderer.init_default_shader()?;
         renderer.set_default_shader()?;
+        renderer.init_default_shape();
 
         Ok(renderer)
     }

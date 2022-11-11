@@ -7,10 +7,13 @@ use super::drawable::Drawable;
 use super::fonts::storage::FontStorage;
 use super::shaders::storage::ShaderStorage;
 use super::shaders::Shader;
+use super::shapes::storage::ShapeStorage;
+use super::shapes::Shape;
 use super::textures::storage::TextureStorage;
 use crate::window::context::WindowContext;
 use lemao_math::color::Color;
 use lemao_math::vec2::Vec2;
+use lemao_math::vec3::Vec3;
 use lemao_opengl::bindings::opengl;
 use lemao_opengl::bindings::wgl;
 use lemao_opengl::pointers::OpenGLPointers;
@@ -29,11 +32,13 @@ pub struct RendererContext {
     active_camera_id: usize,
     default_shader_id: usize,
     active_shader_id: usize,
+    default_shape_id: usize,
     textures: Arc<Mutex<TextureStorage>>,
     fonts: Arc<Mutex<FontStorage>>,
     cameras: Option<CameraStorage>,
     shaders: Option<ShaderStorage>,
     drawables: Option<DrawableStorage>,
+    shapes: Option<ShapeStorage>,
 }
 
 impl RendererContext {
@@ -130,12 +135,14 @@ impl RendererContext {
                 active_camera_id: 0,
                 default_shader_id: 0,
                 active_shader_id: 0,
+                default_shape_id: 0,
 
                 textures,
                 fonts,
                 shaders: None,
                 drawables: None,
                 cameras: None,
+                shapes: None,
             })
         }
     }
@@ -151,6 +158,7 @@ impl RendererContext {
         self.cameras = Some(Default::default());
         self.shaders = Some(Default::default());
         self.drawables = Some(Default::default());
+        self.shapes = Some(Default::default());
     }
 
     pub fn init_default_camera(&mut self) {
@@ -163,6 +171,17 @@ impl RendererContext {
         self.default_shader_id = self.shaders.as_mut().unwrap().store(shader);
 
         Ok(())
+    }
+
+    pub fn init_default_shape(&mut self) {
+        let shape = Shape::new(
+            self,
+            vec![Vec3::new(0.0, 0.0, 0.0), Vec3::new(1.0, 0.0, 0.0), Vec3::new(1.0, 1.0, 0.0), Vec3::new(0.0, 1.0, 0.0)],
+            vec![0, 1, 2, 0, 2, 3],
+            vec![Vec2::new(0.0, 0.0), Vec2::new(1.0, 0.0), Vec2::new(1.0, 1.0), Vec2::new(0.0, 1.0)],
+            vec![Color::new(1.0, 1.0, 1.0, 1.0), Color::new(1.0, 1.0, 1.0, 1.0), Color::new(1.0, 1.0, 1.0, 1.0), Color::new(1.0, 1.0, 1.0, 1.0)],
+        );
+        self.default_shape_id = self.shapes.as_mut().unwrap().store(shape);
     }
 
     pub fn set_viewport(&mut self, width: u32, height: u32) {
@@ -237,9 +256,10 @@ impl RendererContext {
     }
 
     pub fn create_sprite(&mut self, texture_id: usize) -> Result<usize, String> {
+        let shape = self.shapes.as_ref().unwrap().get(self.default_shape_id)?;
         let texture_storage = self.textures.lock().unwrap();
         let texture = texture_storage.get(texture_id)?;
-        let sprite = Box::new(Sprite::new(self, texture));
+        let sprite = Box::new(Sprite::new(self, shape, texture));
 
         Ok(self.drawables.as_mut().unwrap().store(sprite))
     }

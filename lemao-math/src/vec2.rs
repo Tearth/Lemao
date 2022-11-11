@@ -20,7 +20,7 @@ impl Vec2 {
     }
 
     pub fn new_from_angle(angle: f32) -> Self {
-        Self { x: (PI / 2.0 - angle).cos(), y: (PI / 2.0 - angle).sin() }
+        Self { x: (PI / 2.0 + angle).cos(), y: (PI / 2.0 + angle).sin() }
     }
 
     pub fn length(&self) -> f32 {
