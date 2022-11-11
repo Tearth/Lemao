@@ -41,7 +41,6 @@ pub fn main() -> Result<(), String> {
 
     let mut cells = Vec::new();
     let cell_texture_id = textures.lock().unwrap().store(bmp::load(&renderer, "./assets/cell.bmp")?);
-    let cell_sprite_id = renderer.create_sprite(cell_texture_id)?;
     let font_id = fonts.lock().unwrap().store(bff::load(&renderer, "./assets/inconsolata.bff")?);
     let text_id = renderer.create_text(font_id)?;
 
@@ -50,7 +49,6 @@ pub fn main() -> Result<(), String> {
 
     for _ in 0..CELLS_COUNT {
         cells.push(CellData {
-            // sprite_id: cell_sprite_id,
             sprite_id: renderer.create_sprite(cell_texture_id)?,
             position: Vec2::new(fastrand::f32() * 800.0, fastrand::f32() * 600.0),
             velocity: Vec2 { x: MAX_SPEED * (fastrand::f32() * 2.0 - 1.0), y: MAX_SPEED * (fastrand::f32() * 2.0 - 1.0) },
