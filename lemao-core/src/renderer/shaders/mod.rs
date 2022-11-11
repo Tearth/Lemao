@@ -17,8 +17,13 @@ pub const DEFAULT_FRAGMENT_SHADER: &str = include_str!("./default.frag");
 pub struct Shader {
     id: usize,
     program_id: u32,
-    uniforms: HashMap<String, u32>,
+    uniforms: HashMap<String, ShaderParameter>,
     gl: Rc<OpenGLPointers>,
+}
+
+pub struct ShaderParameter {
+    pub location: u32,
+    pub r#type: u32,
 }
 
 impl Shader {
@@ -82,7 +87,7 @@ impl Shader {
             (gl.glDeleteShader)(fragment_shader_id);
 
             let mut active_uniforms = 0;
-            let mut uniforms: HashMap<String, u32> = Default::default();
+            let mut uniforms: HashMap<String, ShaderParameter> = Default::default();
 
             (gl.glGetProgramiv)(program_id, opengl::GL_ACTIVE_UNIFORMS, &mut active_uniforms);
             for index in 0..active_uniforms {
@@ -98,7 +103,7 @@ impl Shader {
                 let name_cstr = CString::new(name.clone()).unwrap();
                 let location = (gl.glGetUniformLocation)(3, name_cstr.as_ptr());
 
-                uniforms.insert(name, location as u32);
+                uniforms.insert(name, ShaderParameter { location: location as u32, r#type: r#type as u32 });
             }
 
             Ok(Shader { id: 0, program_id, uniforms, gl })
@@ -107,11 +112,20 @@ impl Shader {
 
     pub fn set_parameter(&self, name: &str, data: *const f32) -> Result<(), String> {
         unsafe {
-            let id = match self.uniforms.get(name) {
+            let parameter = match self.uniforms.get(name) {
                 Some(parameter) => parameter,
                 None => return Err(format!("Shader parameter with name {} not found", name)),
             };
-            (self.gl.glUniformMatrix4fv)(*id as i32, 1, opengl::GL_TRUE as u8, data);
+
+            match parameter.r#type {
+                opengl::GL_FLOAT_VEC4 => {
+                    (self.gl.glUniform4fv)(parameter.location as i32, 1, data);
+                }
+                opengl::GL_FLOAT_MAT4 => {
+                    (self.gl.glUniformMatrix4fv)(parameter.location as i32, 1, opengl::GL_TRUE as u8, data);
+                }
+                _ => return Err("Invalid shader parameter type".to_string()),
+            };
 
             Ok(())
         }

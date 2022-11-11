@@ -13,6 +13,10 @@ impl Color {
     pub fn new(r: f32, g: f32, b: f32, a: f32) -> Self {
         Color { r, g, b, a }
     }
+
+    pub fn as_ptr(&self) -> *const f32 {
+        self as *const _ as *const f32
+    }
 }
 
 impl Add for Color {

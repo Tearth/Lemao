@@ -151,12 +151,6 @@ impl Text {
                 index += 1;
             }
 
-            let anchor_offset = self.anchor * size;
-            for index in 0..(vertices.len() / 9) {
-                vertices[index * 9 + 0] -= anchor_offset.x;
-                vertices[index * 9 + 1] += size.y - self.font_cell_height as f32 - anchor_offset.y;
-            }
-
             let vertices_size = (mem::size_of::<f32>() * vertices.len()) as i64;
             let vertices_ptr = vertices.as_ptr() as *const c_void;
 
@@ -280,13 +274,7 @@ impl Drawable for Text {
     }
 
     fn set_anchor(&mut self, anchor: Vec2) -> Result<(), String> {
-        if self.vbo_gl_id == 0 {
-            return Err("Sprite not initialized".to_string());
-        }
-
         self.anchor = anchor;
-        self.set_text(&self.text.clone());
-
         Ok(())
     }
 
@@ -295,24 +283,22 @@ impl Drawable for Text {
     }
 
     fn set_color(&mut self, color: Color) -> Result<(), String> {
-        if self.vbo_gl_id == 0 {
-            return Err("Sprite not initialized".to_string());
-        }
-
         self.color = color;
-        self.set_text(&self.text.clone());
-
         Ok(())
     }
 
     fn draw(&self, shader: &Shader) -> Result<(), String> {
         unsafe {
-            let translation = Mat4x4::translate(Vec3::new(self.position.x, self.position.y, 0.0));
+            let anchor_offset = Vec2::new(-self.anchor.x * self.size.x, self.size.y - self.font_cell_height as f32 - self.anchor.y * self.size.y);
+            let translation = Mat4x4::translate(Vec3::new(self.position.x + anchor_offset.x, self.position.y + anchor_offset.y, 0.0));
+            let anchor_positive_offset = Mat4x4::translate(Vec3::new(-anchor_offset.x, -anchor_offset.y, 0.0));
+            let anchor_negative_offset = Mat4x4::translate(Vec3::new(anchor_offset.x, anchor_offset.y, 0.0));
             let scale = Mat4x4::scale(Vec3::new(self.scale.x, self.scale.y, 1.0));
             let rotation = Mat4x4::rotate(self.rotation);
-            let model = translation * rotation * scale;
+            let model = translation * anchor_positive_offset * rotation * scale * anchor_negative_offset;
 
             shader.set_parameter("model", model.as_ptr())?;
+            shader.set_parameter("color", self.color.as_ptr())?;
 
             (self.gl.glBindVertexArray)(self.vao_gl_id);
             (self.gl.glBindTexture)(opengl::GL_TEXTURE_2D, self.texture_gl_id);

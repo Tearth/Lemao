@@ -117,20 +117,8 @@ impl Drawable for Sprite {
     }
 
     fn set_color(&mut self, color: Color) -> Result<(), String> {
-        unsafe {
-            /*if self.vbo_gl_id == 0 {
-                return Err("Sprite not initialized".to_string());
-            }
-
-            let vertices = self.get_vertices(self.anchor, self.width, self.height, color);
-            let vertices_size = (mem::size_of::<f32>() * vertices.len()) as i64;
-
-            (self.gl.glBindBuffer)(opengl::GL_ARRAY_BUFFER, self.vbo_gl_id);
-            (self.gl.glBufferData)(opengl::GL_ARRAY_BUFFER, vertices_size, vertices.as_ptr() as *const c_void, opengl::GL_STATIC_DRAW);
-
-            self.color = color;*/
-            Ok(())
-        }
+        self.color = color;
+        Ok(())
     }
 
     fn draw(&self, shader: &Shader) -> Result<(), String> {
@@ -143,6 +131,7 @@ impl Drawable for Sprite {
             let model = translation * anchor_positive_offset * rotation * scale * anchor_negative_offset;
 
             shader.set_parameter("model", model.as_ptr())?;
+            shader.set_parameter("color", self.color.as_ptr())?;
 
             (self.gl.glBindVertexArray)(self.shape_vao_gl_id);
             (self.gl.glBindTexture)(opengl::GL_TEXTURE_2D, self.texture_gl_id);
