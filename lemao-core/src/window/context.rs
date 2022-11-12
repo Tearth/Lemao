@@ -52,7 +52,7 @@ impl WindowContext {
                 style: winapi::CS_OWNDC,
                 cbClsExtra: 0,
                 cbWndExtra: 0,
-                hIcon: ptr::null_mut(),
+                hIcon: winapi::LoadIconA(ptr::null_mut(), 32512 as *const i8),
                 hCursor: winapi::LoadCursorA(ptr::null_mut(), 32512 as *const i8),
                 lpszMenuName: ptr::null_mut(),
             };
@@ -77,7 +77,7 @@ impl WindowContext {
                 0,
                 wnd_class.lpszClassName,
                 title_cstr.as_ptr(),
-                winapi::WS_OVERLAPPEDWINDOW,
+                winapi::WS_OVERLAPPEDWINDOW | winapi::WS_VISIBLE,
                 0,
                 0,
                 0,
