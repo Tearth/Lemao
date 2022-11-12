@@ -19,8 +19,6 @@ impl Texture {
             let gl = renderer.gl.clone();
             let mut texture_gl_id = 0;
 
-            (gl.glDeleteTextures)(1, &texture_gl_id);
-
             (gl.glGenTextures)(1, &mut texture_gl_id);
             (gl.glBindTexture)(opengl::GL_TEXTURE_2D, texture_gl_id);
             (gl.glTexParameteri)(opengl::GL_TEXTURE_2D, opengl::GL_TEXTURE_WRAP_S, opengl::GL_MIRRORED_REPEAT as i32);

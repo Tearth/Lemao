@@ -22,7 +22,7 @@ pub fn main() -> Result<(), String> {
     let samples = Arc::new(Mutex::new(SampleStorage::default()));
     let mut audio = AudioContext::new(samples.clone())?;
 
-    let chopin_sample_id = samples.lock().unwrap().store(wav::load("./assets/chopin.wav")?);
+    let chopin_sample_id = samples.lock().unwrap().store(wav::load(&audio, "./assets/chopin.wav")?);
     let chopin_sound_id = audio.create_sound(chopin_sample_id)?;
     let chopin_sound = audio.get_sound_mut(chopin_sound_id)?;
 
