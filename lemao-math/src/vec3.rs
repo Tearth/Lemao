@@ -1,3 +1,4 @@
+use crate::vec2::Vec2;
 use std::ops::Add;
 use std::ops::AddAssign;
 use std::ops::Div;
@@ -82,5 +83,11 @@ impl Neg for Vec3 {
     type Output = Self;
     fn neg(self) -> Self::Output {
         Self::Output { x: -self.x, y: -self.y, z: -self.z }
+    }
+}
+
+impl From<Vec2> for Vec3 {
+    fn from(value: Vec2) -> Self {
+        Vec3::new(value.x, value.y, 0.0)
     }
 }

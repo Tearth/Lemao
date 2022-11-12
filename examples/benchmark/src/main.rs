@@ -45,7 +45,7 @@ pub fn main() -> Result<(), String> {
     let text_id = renderer.create_text(font_id)?;
 
     renderer.get_drawable_with_type_mut::<Text>(text_id)?.set_text("FPS:0");
-    renderer.get_drawable_with_type_mut::<Text>(text_id)?.set_anchor(Vec2::new(0.0, 1.0))?;
+    renderer.get_drawable_with_type_mut::<Text>(text_id)?.set_anchor(Vec2::new(0.0, 1.0));
 
     for _ in 0..CELLS_COUNT {
         cells.push(CellData {

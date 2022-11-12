@@ -56,12 +56,12 @@ Volume:
  R - up
  F - down",
     );
-    description_text.set_anchor(Vec2::new(0.0, 1.0))?;
+    description_text.set_anchor(Vec2::new(0.0, 1.0));
     description_text.set_line_height(20);
 
     let status_text = renderer.get_drawable_with_type_mut::<Text>(status_text_id)?;
     status_text.set_text("Status: stopped");
-    status_text.set_anchor(Vec2::new(0.0, 1.0))?;
+    status_text.set_anchor(Vec2::new(0.0, 1.0));
 
     let mut is_running = true;
     while is_running {

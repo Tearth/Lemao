@@ -35,11 +35,11 @@ pub fn main() -> Result<(), String> {
     let right_bottom_text_id = renderer.create_text(font_id)?;
     let window_status_text_id = renderer.create_text(font_id)?;
 
-    renderer.get_drawable_with_type_mut::<Text>(left_top_text_id)?.set_anchor(Vec2::new(0.0, 1.0))?;
-    renderer.get_drawable_with_type_mut::<Text>(right_top_text_id)?.set_anchor(Vec2::new(1.0, 1.0))?;
-    renderer.get_drawable_with_type_mut::<Text>(left_bottom_text_id)?.set_anchor(Vec2::new(0.0, 0.0))?;
-    renderer.get_drawable_with_type_mut::<Text>(right_bottom_text_id)?.set_anchor(Vec2::new(1.0, 0.0))?;
-    renderer.get_drawable_with_type_mut::<Text>(window_status_text_id)?.set_anchor(Vec2::new(0.0, 1.0))?;
+    renderer.get_drawable_with_type_mut::<Text>(left_top_text_id)?.set_anchor(Vec2::new(0.0, 1.0));
+    renderer.get_drawable_with_type_mut::<Text>(right_top_text_id)?.set_anchor(Vec2::new(1.0, 1.0));
+    renderer.get_drawable_with_type_mut::<Text>(left_bottom_text_id)?.set_anchor(Vec2::new(0.0, 0.0));
+    renderer.get_drawable_with_type_mut::<Text>(right_bottom_text_id)?.set_anchor(Vec2::new(1.0, 0.0));
+    renderer.get_drawable_with_type_mut::<Text>(window_status_text_id)?.set_anchor(Vec2::new(0.0, 1.0));
 
     renderer.get_drawable_with_type_mut::<Text>(left_top_text_id)?.set_text("Left top");
     renderer.get_drawable_with_type_mut::<Text>(right_top_text_id)?.set_text("Right top");

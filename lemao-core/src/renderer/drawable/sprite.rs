@@ -16,8 +16,7 @@ pub struct Sprite {
     position: Vec2,
     scale: Vec2,
     rotation: f32,
-    width: u32,
-    height: u32,
+    size: Vec2,
     anchor: Vec2,
     color: Color,
     texture_id: usize,
@@ -33,8 +32,7 @@ impl Sprite {
             position: Default::default(),
             scale: Vec2::new(1.0, 1.0),
             rotation: 0.0,
-            width: 0,
-            height: 0,
+            size: Default::default(),
             anchor: Default::default(),
             color: Color::new(1.0, 1.0, 1.0, 1.0),
             texture_id: texture.id,
@@ -52,13 +50,10 @@ impl Sprite {
     }
 
     pub fn set_texture(&mut self, texture: &Texture) {
-        unsafe {
-            self.width = texture.width;
-            self.height = texture.height;
-            self.texture_id = texture.id;
-            self.texture_gl_id = texture.texture_gl_id;
-            self.set_anchor(Vec2::new(0.5, 0.5));
-        }
+        self.texture_id = texture.id;
+        self.texture_gl_id = texture.texture_gl_id;
+        self.size = Vec2::new(texture.width as f32, texture.height as f32);
+        self.set_anchor(Vec2::new(0.5, 0.5));
     }
 }
 
@@ -107,28 +102,25 @@ impl Drawable for Sprite {
         self.anchor
     }
 
-    fn set_anchor(&mut self, anchor: Vec2) -> Result<(), String> {
+    fn set_anchor(&mut self, anchor: Vec2) {
         self.anchor = anchor;
-        Ok(())
     }
 
     fn get_color(&self) -> Color {
         self.color
     }
 
-    fn set_color(&mut self, color: Color) -> Result<(), String> {
+    fn set_color(&mut self, color: Color) {
         self.color = color;
-        Ok(())
     }
 
     fn draw(&self, shader: &Shader) -> Result<(), String> {
         unsafe {
-            let translation = Mat4x4::translate(Vec3::new(self.position.x, self.position.y, 0.0));
-            let anchor_positive_offset = Mat4x4::translate(Vec3::new(self.anchor.x, self.anchor.y, 0.0));
-            let anchor_negative_offset = Mat4x4::translate(Vec3::new(-self.anchor.x, -self.anchor.y, 0.0));
-            let scale = Mat4x4::scale(Vec3::new(self.scale.x * self.width as f32, self.scale.y * self.height as f32, 1.0));
+            let translation = Mat4x4::translate(Vec3::from(self.position));
+            let anchor_offset = Mat4x4::translate(-Vec3::from(self.anchor));
+            let scale = Mat4x4::scale(Vec3::from(self.scale * self.size));
             let rotation = Mat4x4::rotate(self.rotation);
-            let model = translation * anchor_positive_offset * rotation * scale * anchor_negative_offset;
+            let model = translation * rotation * scale * anchor_offset;
 
             shader.set_parameter("model", model.as_ptr())?;
             shader.set_parameter("color", self.color.as_ptr())?;

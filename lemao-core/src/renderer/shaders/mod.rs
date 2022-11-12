@@ -103,7 +103,7 @@ impl Shader {
                 let name_cstr = CString::new(name.clone()).unwrap();
                 let location = (gl.glGetUniformLocation)(3, name_cstr.as_ptr());
 
-                uniforms.insert(name, ShaderParameter { location: location as u32, r#type: r#type as u32 });
+                uniforms.insert(name, ShaderParameter { location: location as u32, r#type });
             }
 
             Ok(Shader { id: 0, program_id, uniforms, gl })

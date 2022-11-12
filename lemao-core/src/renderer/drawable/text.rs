@@ -151,6 +151,11 @@ impl Text {
                 index += 1;
             }
 
+            // Adjust vertices, so the default anchor is in the left-bottom corner
+            for index in 0..(vertices.len() / 9) {
+                vertices[index * 9 + 1] += size.y - self.font_cell_height as f32;
+            }
+
             let vertices_size = (mem::size_of::<f32>() * vertices.len()) as i64;
             let vertices_ptr = vertices.as_ptr() as *const c_void;
 
@@ -273,29 +278,25 @@ impl Drawable for Text {
         self.anchor
     }
 
-    fn set_anchor(&mut self, anchor: Vec2) -> Result<(), String> {
+    fn set_anchor(&mut self, anchor: Vec2) {
         self.anchor = anchor;
-        Ok(())
     }
 
     fn get_color(&self) -> Color {
         self.color
     }
 
-    fn set_color(&mut self, color: Color) -> Result<(), String> {
+    fn set_color(&mut self, color: Color) {
         self.color = color;
-        Ok(())
     }
 
     fn draw(&self, shader: &Shader) -> Result<(), String> {
         unsafe {
-            let anchor_offset = Vec2::new(-self.anchor.x * self.size.x, self.size.y - self.font_cell_height as f32 - self.anchor.y * self.size.y);
-            let translation = Mat4x4::translate(Vec3::new(self.position.x + anchor_offset.x, self.position.y + anchor_offset.y, 0.0));
-            let anchor_positive_offset = Mat4x4::translate(Vec3::new(-anchor_offset.x, -anchor_offset.y, 0.0));
-            let anchor_negative_offset = Mat4x4::translate(Vec3::new(anchor_offset.x, anchor_offset.y, 0.0));
-            let scale = Mat4x4::scale(Vec3::new(self.scale.x, self.scale.y, 1.0));
+            let translation = Mat4x4::translate(Vec3::from(self.position));
+            let anchor_offset = Mat4x4::translate(-Vec3::from(self.anchor * self.size));
+            let scale = Mat4x4::scale(Vec3::from(self.scale));
             let rotation = Mat4x4::rotate(self.rotation);
-            let model = translation * anchor_positive_offset * rotation * scale * anchor_negative_offset;
+            let model = translation * rotation * scale * anchor_offset;
 
             shader.set_parameter("model", model.as_ptr())?;
             shader.set_parameter("color", self.color.as_ptr())?;

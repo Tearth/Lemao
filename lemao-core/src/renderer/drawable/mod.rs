@@ -23,10 +23,10 @@ pub trait Drawable {
     fn rotate(&mut self, delta: f32);
 
     fn get_anchor(&self) -> Vec2;
-    fn set_anchor(&mut self, anchor: Vec2) -> Result<(), String>;
+    fn set_anchor(&mut self, anchor: Vec2);
 
     fn get_color(&self) -> Color;
-    fn set_color(&mut self, color: Color) -> Result<(), String>;
+    fn set_color(&mut self, color: Color);
 
     fn draw(&self, shader: &Shader) -> Result<(), String>;
 
