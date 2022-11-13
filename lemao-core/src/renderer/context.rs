@@ -106,6 +106,10 @@ impl RendererContext {
                 24,
                 wgl::WGL_STENCIL_BITS_ARB,
                 8,
+                wgl::WGL_SAMPLE_BUFFERS_ARB,
+                opengl::GL_TRUE,
+                wgl::WGL_SAMPLES_ARB,
+                4,
                 0,
             ];
 

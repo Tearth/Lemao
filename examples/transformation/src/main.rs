@@ -26,7 +26,7 @@ pub fn main() -> Result<(), String> {
         Ok(renderer) => renderer,
         Err(message) => panic!("{}", message),
     };
-    let kaela_rgb = textures.lock().unwrap().store(bmp::load(&renderer, "./assets/circle.bmp").unwrap());
+    let kaela_rgb = textures.lock().unwrap().store(bmp::load(&renderer, "./assets/rectangle.bmp").unwrap());
     let font_id = fonts.lock().unwrap().store(bff::load(&renderer, "./assets/inconsolata.bff")?);
     let sprite_id = renderer.create_text(font_id)?;
 
