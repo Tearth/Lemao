@@ -11,6 +11,7 @@ use super::shaders::Shader;
 use super::shapes::storage::ShapeStorage;
 use super::shapes::Shape;
 use super::textures::storage::TextureStorage;
+use super::textures::Texture;
 use crate::window::context::WindowContext;
 use lemao_math::color::Color;
 use lemao_math::vec2::Vec2;
@@ -35,6 +36,7 @@ pub struct RendererContext {
     active_shader_id: usize,
     default_sprite_shape_id: usize,
     default_line_shape_id: usize,
+    default_texture_id: usize,
     textures: Arc<Mutex<TextureStorage>>,
     fonts: Arc<Mutex<FontStorage>>,
     cameras: Option<CameraStorage>,
@@ -143,6 +145,7 @@ impl RendererContext {
                 active_shader_id: 0,
                 default_sprite_shape_id: 0,
                 default_line_shape_id: 0,
+                default_texture_id: 0,
 
                 textures,
                 fonts,
@@ -198,6 +201,11 @@ impl RendererContext {
             vec![Color::new(1.0, 1.0, 1.0, 1.0), Color::new(1.0, 1.0, 1.0, 1.0), Color::new(1.0, 1.0, 1.0, 1.0), Color::new(1.0, 1.0, 1.0, 1.0)],
         );
         self.default_line_shape_id = self.shapes.as_mut().unwrap().store(line_shape);
+    }
+
+    pub fn init_default_texture(&mut self) {
+        let texture = Texture::new(self, 1, 1, vec![255, 255, 255, 255]);
+        self.default_texture_id = self.textures.lock().unwrap().store(texture);
     }
 
     pub fn set_viewport(&mut self, width: u32, height: u32) {
@@ -290,7 +298,9 @@ impl RendererContext {
 
     pub fn create_line(&mut self, from: Vec2, to: Vec2) -> Result<usize, String> {
         let shape = self.shapes.as_ref().unwrap().get(self.default_line_shape_id)?;
-        let line = Box::new(Line::new(self, shape, from, to));
+        let texture_storage = self.textures.lock().unwrap();
+        let texture = texture_storage.get(self.default_texture_id)?;
+        let line = Box::new(Line::new(self, shape, texture, from, to));
 
         Ok(self.drawables.as_mut().unwrap().store(line))
     }

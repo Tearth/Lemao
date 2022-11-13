@@ -1,6 +1,7 @@
 use super::*;
 use crate::renderer::context::RendererContext;
 use crate::renderer::shapes::Shape;
+use crate::renderer::textures::Texture;
 use lemao_math::mat4x4::Mat4x4;
 use lemao_math::vec2::Vec2;
 use lemao_math::vec3::Vec3;
@@ -21,12 +22,14 @@ pub struct Line {
     from: Vec2,
     to: Vec2,
     thickness: f32,
+    texture_id: usize,
     shape_vao_gl_id: u32,
+    texture_gl_id: u32,
     gl: Rc<OpenGLPointers>,
 }
 
 impl Line {
-    pub fn new(renderer: &RendererContext, shape: &Shape, from: Vec2, to: Vec2) -> Self {
+    pub fn new(renderer: &RendererContext, shape: &Shape, texture: &Texture, from: Vec2, to: Vec2) -> Self {
         let mut line = Line {
             id: 0,
             position: Default::default(),
@@ -38,7 +41,9 @@ impl Line {
             from,
             to,
             thickness: 1.0,
+            texture_id: texture.id,
             shape_vao_gl_id: shape.vao_gl_id,
+            texture_gl_id: texture.texture_gl_id,
             gl: renderer.gl.clone(),
         };
 
@@ -149,7 +154,7 @@ impl Drawable for Line {
             shader.set_parameter("color", self.color.as_ptr())?;
 
             (self.gl.glBindVertexArray)(self.shape_vao_gl_id);
-            (self.gl.glBindTexture)(opengl::GL_TEXTURE_2D, 0);
+            (self.gl.glBindTexture)(opengl::GL_TEXTURE_2D, self.texture_gl_id);
             (self.gl.glDrawElements)(opengl::GL_TRIANGLES, 6, opengl::GL_UNSIGNED_INT, ptr::null());
 
             Ok(())
