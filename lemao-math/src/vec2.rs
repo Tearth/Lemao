@@ -36,6 +36,14 @@ impl Vec2 {
         Vec2::new(self.x.abs(), self.y.abs())
     }
 
+    pub fn signed_angle(&self, rhs: Vec2) -> f32 {
+        (self.x - rhs.x).atan2(rhs.y - self.y)
+    }
+
+    pub fn distance(&self, rhs: Vec2) -> f32 {
+        ((self.x - rhs.x).powi(2) + (self.y - rhs.y).powi(2)).sqrt()
+    }
+
     pub fn as_ptr(&self) -> *const f32 {
         self as *const _ as *const f32
     }

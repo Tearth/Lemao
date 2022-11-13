@@ -1,5 +1,6 @@
 use super::cameras::storage::CameraStorage;
 use super::cameras::Camera;
+use super::drawable::line::Line;
 use super::drawable::sprite::Sprite;
 use super::drawable::storage::DrawableStorage;
 use super::drawable::text::Text;
@@ -32,7 +33,8 @@ pub struct RendererContext {
     active_camera_id: usize,
     default_shader_id: usize,
     active_shader_id: usize,
-    default_shape_id: usize,
+    default_sprite_shape_id: usize,
+    default_line_shape_id: usize,
     textures: Arc<Mutex<TextureStorage>>,
     fonts: Arc<Mutex<FontStorage>>,
     cameras: Option<CameraStorage>,
@@ -109,7 +111,7 @@ impl RendererContext {
                 wgl::WGL_SAMPLE_BUFFERS_ARB,
                 opengl::GL_TRUE,
                 wgl::WGL_SAMPLES_ARB,
-                4,
+                16,
                 0,
             ];
 
@@ -139,7 +141,8 @@ impl RendererContext {
                 active_camera_id: 0,
                 default_shader_id: 0,
                 active_shader_id: 0,
-                default_shape_id: 0,
+                default_sprite_shape_id: 0,
+                default_line_shape_id: 0,
 
                 textures,
                 fonts,
@@ -177,15 +180,24 @@ impl RendererContext {
         Ok(())
     }
 
-    pub fn init_default_shape(&mut self) {
-        let shape = Shape::new(
+    pub fn init_default_shapes(&mut self) {
+        let sprite_shape = Shape::new(
             self,
             vec![Vec3::new(0.0, 0.0, 0.0), Vec3::new(1.0, 0.0, 0.0), Vec3::new(1.0, 1.0, 0.0), Vec3::new(0.0, 1.0, 0.0)],
             vec![0, 1, 2, 0, 2, 3],
             vec![Vec2::new(0.0, 0.0), Vec2::new(1.0, 0.0), Vec2::new(1.0, 1.0), Vec2::new(0.0, 1.0)],
             vec![Color::new(1.0, 1.0, 1.0, 1.0), Color::new(1.0, 1.0, 1.0, 1.0), Color::new(1.0, 1.0, 1.0, 1.0), Color::new(1.0, 1.0, 1.0, 1.0)],
         );
-        self.default_shape_id = self.shapes.as_mut().unwrap().store(shape);
+        self.default_sprite_shape_id = self.shapes.as_mut().unwrap().store(sprite_shape);
+
+        let line_shape = Shape::new(
+            self,
+            vec![Vec3::new(-0.5, 0.0, 0.0), Vec3::new(0.5, 0.0, 0.0), Vec3::new(0.5, 1.0, 0.0), Vec3::new(-0.5, 1.0, 0.0)],
+            vec![0, 1, 2, 0, 2, 3],
+            vec![Vec2::new(0.0, 0.0), Vec2::new(1.0, 0.0), Vec2::new(1.0, 1.0), Vec2::new(0.0, 1.0)],
+            vec![Color::new(1.0, 1.0, 1.0, 1.0), Color::new(1.0, 1.0, 1.0, 1.0), Color::new(1.0, 1.0, 1.0, 1.0), Color::new(1.0, 1.0, 1.0, 1.0)],
+        );
+        self.default_line_shape_id = self.shapes.as_mut().unwrap().store(line_shape);
     }
 
     pub fn set_viewport(&mut self, width: u32, height: u32) {
@@ -260,7 +272,7 @@ impl RendererContext {
     }
 
     pub fn create_sprite(&mut self, texture_id: usize) -> Result<usize, String> {
-        let shape = self.shapes.as_ref().unwrap().get(self.default_shape_id)?;
+        let shape = self.shapes.as_ref().unwrap().get(self.default_sprite_shape_id)?;
         let texture_storage = self.textures.lock().unwrap();
         let texture = texture_storage.get(texture_id)?;
         let sprite = Box::new(Sprite::new(self, shape, texture));
@@ -274,6 +286,13 @@ impl RendererContext {
         let text = Box::new(Text::new(self, font));
 
         Ok(self.drawables.as_mut().unwrap().store(text))
+    }
+
+    pub fn create_line(&mut self, from: Vec2, to: Vec2) -> Result<usize, String> {
+        let shape = self.shapes.as_ref().unwrap().get(self.default_line_shape_id)?;
+        let line = Box::new(Line::new(self, shape, from, to));
+
+        Ok(self.drawables.as_mut().unwrap().store(line))
     }
 
     pub fn get_drawable(&self, drawable_id: usize) -> Result<&dyn Drawable, String> {
