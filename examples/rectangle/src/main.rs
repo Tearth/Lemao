@@ -31,7 +31,7 @@ pub fn main() -> Result<(), String> {
     let font_id = fonts.lock().unwrap().store(bff::load(&renderer, "./assets/inconsolata.bff")?);
 
     let mut is_running = true;
-    let line_id = renderer.create_line(Vec2::new(200.0, 200.0), Vec2::new(400.0, 400.0)).unwrap();
+    let rectangle_id = renderer.create_rectangle(Vec2::new(100.0, 100.0)).unwrap();
     // renderer.get_drawable_mut(line_id).unwrap().set_scale(Vec2::new(1.0, 2.0));
     // renderer.get_drawable_mut(line_id).unwrap().set_anchor(Vec2::new(0.0, 0.0));
     //renderer.get_drawable_with_type_mut::<Line>(line_id).unwrap().set_thickness(10.0);
@@ -59,20 +59,8 @@ pub fn main() -> Result<(), String> {
             }
         }
 
-        if input::is_mouse_button_pressed(MouseButton::Left) {
-            let window_size = window.get_size();
-            let position = input::get_cursor_position(&window);
-            renderer.get_drawable_with_type_mut::<Line>(line_id).unwrap().set_to(Vec2::new(position.0 as f32, window_size.y - position.1 as f32));
-        }
-
-        if input::is_mouse_button_pressed(MouseButton::Right) {
-            let window_size = window.get_size();
-            let position = input::get_cursor_position(&window);
-            renderer.get_drawable_with_type_mut::<Line>(line_id).unwrap().set_from(Vec2::new(position.0 as f32, window_size.y - position.1 as f32));
-        }
-
         renderer.clear(Color::new(0.5, 0.5, 0.5, 1.0));
-        renderer.draw(line_id)?;
+        renderer.draw(rectangle_id)?;
         window.swap_buffers();
     }
 

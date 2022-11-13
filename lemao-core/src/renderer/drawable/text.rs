@@ -52,9 +52,9 @@ impl Text {
             vao_gl_id: 0,
             vbo_gl_id: 0,
             ebo_gl_id: 0,
-            texture_gl_id: 0,
+            texture_gl_id: font.texture_gl_id,
             elements_count: 0,
-            font_id: 0,
+            font_id: font.id,
             font_width: font.width,
             font_height: font.height,
             font_cell_width: font.cell_width,
@@ -64,7 +64,26 @@ impl Text {
             gl: renderer.gl.clone(),
         };
 
-        text.set_font(font);
+        unsafe {
+            (text.gl.glGenVertexArrays)(1, &mut text.vao_gl_id);
+            (text.gl.glBindVertexArray)(text.vao_gl_id);
+
+            (text.gl.glGenBuffers)(1, &mut text.vbo_gl_id);
+            (text.gl.glBindBuffer)(opengl::GL_ARRAY_BUFFER, text.vbo_gl_id);
+
+            (text.gl.glGenBuffers)(1, &mut text.ebo_gl_id);
+            (text.gl.glBindBuffer)(opengl::GL_ELEMENT_ARRAY_BUFFER, text.ebo_gl_id);
+
+            let attrib_size = (9 * mem::size_of::<f32>()) as i32;
+            (text.gl.glVertexAttribPointer)(0, 3, opengl::GL_FLOAT, opengl::GL_FALSE as u8, attrib_size, ptr::null_mut());
+            (text.gl.glVertexAttribPointer)(1, 4, opengl::GL_FLOAT, opengl::GL_FALSE as u8, attrib_size, (3 * mem::size_of::<f32>()) as *const c_void);
+            (text.gl.glVertexAttribPointer)(2, 2, opengl::GL_FLOAT, opengl::GL_FALSE as u8, attrib_size, (7 * mem::size_of::<f32>()) as *const c_void);
+
+            (text.gl.glEnableVertexAttribArray)(0);
+            (text.gl.glEnableVertexAttribArray)(1);
+            (text.gl.glEnableVertexAttribArray)(2);
+        }
+
         text
     }
 
@@ -73,34 +92,11 @@ impl Text {
     }
 
     pub fn set_font(&mut self, font: &Font) {
-        unsafe {
-            if self.vao_gl_id == 0 {
-                (self.gl.glGenVertexArrays)(1, &mut self.vao_gl_id);
-            }
-            (self.gl.glBindVertexArray)(self.vao_gl_id);
+        self.font_id = font.id;
+        self.texture_gl_id = font.texture_gl_id;
 
-            if self.vbo_gl_id == 0 {
-                (self.gl.glGenBuffers)(1, &mut self.vbo_gl_id);
-            }
-            (self.gl.glBindBuffer)(opengl::GL_ARRAY_BUFFER, self.vbo_gl_id);
-
-            if self.ebo_gl_id == 0 {
-                (self.gl.glGenBuffers)(1, &mut self.ebo_gl_id);
-            }
-            (self.gl.glBindBuffer)(opengl::GL_ELEMENT_ARRAY_BUFFER, self.ebo_gl_id);
-
-            let attrib_size = (9 * mem::size_of::<f32>()) as i32;
-            (self.gl.glVertexAttribPointer)(0, 3, opengl::GL_FLOAT, opengl::GL_FALSE as u8, attrib_size, ptr::null_mut());
-            (self.gl.glVertexAttribPointer)(1, 4, opengl::GL_FLOAT, opengl::GL_FALSE as u8, attrib_size, (3 * mem::size_of::<f32>()) as *const c_void);
-            (self.gl.glVertexAttribPointer)(2, 2, opengl::GL_FLOAT, opengl::GL_FALSE as u8, attrib_size, (7 * mem::size_of::<f32>()) as *const c_void);
-
-            (self.gl.glEnableVertexAttribArray)(0);
-            (self.gl.glEnableVertexAttribArray)(1);
-            (self.gl.glEnableVertexAttribArray)(2);
-
-            self.font_id = font.id;
-            self.texture_gl_id = font.texture_gl_id;
-        }
+        // We must regenerate mesh, since the font sizes could change
+        self.set_text(&self.text.clone());
     }
 
     pub fn get_text(&self) -> &str {

@@ -11,7 +11,7 @@ use std::any::Any;
 use std::ptr;
 use std::rc::Rc;
 
-pub struct Line {
+pub struct Rectangle {
     id: usize,
     position: Vec2,
     scale: Vec2,
@@ -19,73 +19,40 @@ pub struct Line {
     size: Vec2,
     anchor: Vec2,
     color: Color,
-    from: Vec2,
-    to: Vec2,
-    thickness: f32,
     texture_id: usize,
     shape_vao_gl_id: u32,
     texture_gl_id: u32,
     gl: Rc<OpenGLPointers>,
 }
 
-impl Line {
-    pub fn new(renderer: &RendererContext, shape: &Shape, texture: &Texture, from: Vec2, to: Vec2) -> Self {
-        let mut line = Line {
+impl Rectangle {
+    pub fn new(renderer: &RendererContext, shape: &Shape, texture: &Texture, size: Vec2) -> Self {
+        Rectangle {
             id: 0,
             position: Default::default(),
             scale: Vec2::new(1.0, 1.0),
-            rotation: 1.0,
-            size: Default::default(),
+            rotation: 0.0,
+            size,
             anchor: Default::default(),
             color: Color::new(1.0, 1.0, 1.0, 1.0),
-            from,
-            to,
-            thickness: 1.0,
             texture_id: texture.id,
             shape_vao_gl_id: shape.vao_gl_id,
             texture_gl_id: texture.texture_gl_id,
             gl: renderer.gl.clone(),
-        };
-
-        line.calculate_position_rotation_scale();
-        line
+        }
     }
 
-    pub fn get_from(&self) -> Vec2 {
-        self.from
+    pub fn get_texture(&self) -> usize {
+        self.texture_id
     }
 
-    pub fn set_from(&mut self, from: Vec2) {
-        self.from = from;
-        self.calculate_position_rotation_scale();
-    }
-
-    pub fn get_to(&self) -> Vec2 {
-        self.to
-    }
-
-    pub fn set_to(&mut self, to: Vec2) {
-        self.to = to;
-        self.calculate_position_rotation_scale();
-    }
-
-    pub fn get_thickness(&self) -> f32 {
-        self.thickness
-    }
-
-    pub fn set_thickness(&mut self, thickness: f32) {
-        self.thickness = thickness;
-        self.calculate_position_rotation_scale();
-    }
-
-    fn calculate_position_rotation_scale(&mut self) {
-        self.position = self.from + Vec2::new(0.5, 0.5);
-        self.rotation = Vec2::new(0.0, 1.0).signed_angle(self.to - self.from);
-        self.size = Vec2::new(self.thickness, self.from.distance(self.to));
+    pub fn set_texture(&mut self, texture: &Texture) {
+        self.texture_id = texture.id;
+        self.texture_gl_id = texture.texture_gl_id;
     }
 }
 
-impl Drawable for Line {
+impl Drawable for Rectangle {
     fn get_id(&self) -> usize {
         self.id
     }

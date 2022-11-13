@@ -10,6 +10,7 @@ members = [
     "examples/audio",
     "examples/benchmark",
     "examples/line",
+    "examples/rectangle",
     "examples/transformation",
     "examples/window",
 ]

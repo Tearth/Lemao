@@ -1,6 +1,7 @@
 use super::cameras::storage::CameraStorage;
 use super::cameras::Camera;
 use super::drawable::line::Line;
+use super::drawable::rectangle::Rectangle;
 use super::drawable::sprite::Sprite;
 use super::drawable::storage::DrawableStorage;
 use super::drawable::text::Text;
@@ -36,6 +37,7 @@ pub struct RendererContext {
     active_shader_id: usize,
     default_sprite_shape_id: usize,
     default_line_shape_id: usize,
+    default_rectangle_shape_id: usize,
     default_texture_id: usize,
     textures: Arc<Mutex<TextureStorage>>,
     fonts: Arc<Mutex<FontStorage>>,
@@ -145,6 +147,7 @@ impl RendererContext {
                 active_shader_id: 0,
                 default_sprite_shape_id: 0,
                 default_line_shape_id: 0,
+                default_rectangle_shape_id: 0,
                 default_texture_id: 0,
 
                 textures,
@@ -201,10 +204,19 @@ impl RendererContext {
             vec![Color::new(1.0, 1.0, 1.0, 1.0), Color::new(1.0, 1.0, 1.0, 1.0), Color::new(1.0, 1.0, 1.0, 1.0), Color::new(1.0, 1.0, 1.0, 1.0)],
         );
         self.default_line_shape_id = self.shapes.as_mut().unwrap().store(line_shape);
+
+        let rectangle_shape = Shape::new(
+            self,
+            vec![Vec3::new(0.0, 0.0, 0.0), Vec3::new(1.0, 0.0, 0.0), Vec3::new(1.0, 1.0, 0.0), Vec3::new(0.0, 1.0, 0.0)],
+            vec![0, 1, 2, 0, 2, 3],
+            vec![Vec2::new(0.0, 0.0), Vec2::new(1.0, 0.0), Vec2::new(1.0, 1.0), Vec2::new(0.0, 1.0)],
+            vec![Color::new(1.0, 1.0, 1.0, 1.0), Color::new(1.0, 1.0, 1.0, 1.0), Color::new(1.0, 1.0, 1.0, 1.0), Color::new(1.0, 1.0, 1.0, 1.0)],
+        );
+        self.default_rectangle_shape_id = self.shapes.as_mut().unwrap().store(rectangle_shape);
     }
 
     pub fn init_default_texture(&mut self) {
-        let texture = Texture::new(self, 1, 1, vec![255, 255, 255, 255]);
+        let texture = Texture::new(self, Vec2::new(1.0, 1.0), vec![255, 255, 255, 255]);
         self.default_texture_id = self.textures.lock().unwrap().store(texture);
     }
 
@@ -303,6 +315,15 @@ impl RendererContext {
         let line = Box::new(Line::new(self, shape, texture, from, to));
 
         Ok(self.drawables.as_mut().unwrap().store(line))
+    }
+
+    pub fn create_rectangle(&mut self, size: Vec2) -> Result<usize, String> {
+        let shape = self.shapes.as_ref().unwrap().get(self.default_rectangle_shape_id)?;
+        let texture_storage = self.textures.lock().unwrap();
+        let texture = texture_storage.get(self.default_texture_id)?;
+        let rectangle = Box::new(Rectangle::new(self, shape, texture, size));
+
+        Ok(self.drawables.as_mut().unwrap().store(rectangle))
     }
 
     pub fn get_drawable(&self, drawable_id: usize) -> Result<&dyn Drawable, String> {

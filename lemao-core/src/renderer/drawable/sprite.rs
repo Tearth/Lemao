@@ -32,12 +32,12 @@ impl Sprite {
             position: Default::default(),
             scale: Vec2::new(1.0, 1.0),
             rotation: 0.0,
-            size: Default::default(),
+            size: texture.size,
             anchor: Default::default(),
             color: Color::new(1.0, 1.0, 1.0, 1.0),
             texture_id: texture.id,
             shape_vao_gl_id: shape.vao_gl_id,
-            texture_gl_id: 0,
+            texture_gl_id: texture.texture_gl_id,
             gl: renderer.gl.clone(),
         };
 
@@ -52,8 +52,7 @@ impl Sprite {
     pub fn set_texture(&mut self, texture: &Texture) {
         self.texture_id = texture.id;
         self.texture_gl_id = texture.texture_gl_id;
-        self.size = Vec2::new(texture.width as f32, texture.height as f32);
-        self.set_anchor(Vec2::new(0.5, 0.5));
+        self.size = texture.size;
     }
 }
 

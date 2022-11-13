@@ -4,6 +4,7 @@ use lemao_math::vec2::Vec2;
 use std::any::Any;
 
 pub mod line;
+pub mod rectangle;
 pub mod sprite;
 pub mod storage;
 pub mod text;
