@@ -1,5 +1,6 @@
 use super::cameras::storage::CameraStorage;
 use super::cameras::Camera;
+use super::drawable::circle::Circle;
 use super::drawable::line::Line;
 use super::drawable::rectangle::Rectangle;
 use super::drawable::sprite::Sprite;
@@ -324,6 +325,14 @@ impl RendererContext {
         let rectangle = Box::new(Rectangle::new(self, shape, texture, size));
 
         Ok(self.drawables.as_mut().unwrap().store(rectangle))
+    }
+
+    pub fn create_circle(&mut self, radius: f32, sides: u32) -> Result<usize, String> {
+        let texture_storage = self.textures.lock().unwrap();
+        let texture = texture_storage.get(self.default_texture_id)?;
+        let circle = Box::new(Circle::new(self, texture, radius, sides));
+
+        Ok(self.drawables.as_mut().unwrap().store(circle))
     }
 
     pub fn get_drawable(&self, drawable_id: usize) -> Result<&dyn Drawable, String> {

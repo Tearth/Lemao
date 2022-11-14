@@ -3,6 +3,7 @@ use lemao_math::color::Color;
 use lemao_math::vec2::Vec2;
 use std::any::Any;
 
+pub mod circle;
 pub mod line;
 pub mod rectangle;
 pub mod sprite;
