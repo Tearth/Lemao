@@ -110,11 +110,11 @@ impl Circle {
             let mut indices = Vec::new();
             let mut angle = 0.0f32;
 
-            let position = Vec2::new(self.radius, self.radius);
+            let position = Vec2::new(0.5, 0.5);
             vertices.extend_from_slice(&self.get_vertices(position, position, Color::new(1.0, 1.0, 1.0, 1.0)));
 
             for n in 0..self.sides {
-                let position = Vec2::new(self.radius + angle.sin() * self.radius, self.radius + angle.cos() * self.radius);
+                let position = Vec2::new(angle.sin() + 0.5, angle.cos() + 0.5);
                 vertices.extend_from_slice(&self.get_vertices(position, position, Color::new(1.0, 1.0, 1.0, 1.0)));
 
                 if n > 0 {
@@ -133,6 +133,7 @@ impl Circle {
             }
 
             self.elements_count = indices.len() as u32;
+            self.size = Vec2::new(self.radius, self.radius);
 
             let vertices_size = (mem::size_of::<f32>() * vertices.len()) as i64;
             let vertices_ptr = vertices.as_ptr() as *const c_void;
@@ -224,8 +225,8 @@ impl Drawable for Circle {
     fn draw(&self, shader: &Shader) -> Result<(), String> {
         unsafe {
             let translation = Mat4x4::translate(Vec3::from(self.position));
-            let anchor_offset = Mat4x4::translate(-Vec3::from(self.anchor * self.size));
-            let scale = Mat4x4::scale(Vec3::from(self.scale));
+            let anchor_offset = Mat4x4::translate(-Vec3::from(self.anchor));
+            let scale = Mat4x4::scale(Vec3::from(self.scale * self.size));
             let rotation = Mat4x4::rotate(self.rotation);
             let model = translation * rotation * scale * anchor_offset;
 
