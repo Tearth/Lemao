@@ -131,7 +131,7 @@ impl RendererContext {
                 return Err(format!("Error while setting pixel format for desired window, GetLastError()={}", winapi::GetLastError()));
             }
 
-            let mut attributes = [wgl::WGL_CONTEXT_MAJOR_VERSION_ARB, 3, wgl::WGL_CONTEXT_MINOR_VERSION_ARB, 2, 0];
+            let mut attributes = [wgl::WGL_CONTEXT_MAJOR_VERSION_ARB, 3, wgl::WGL_CONTEXT_MINOR_VERSION_ARB, 3, 0];
             let attributes_ptr = attributes.as_mut_ptr() as *const i32;
 
             let gl_context = (gl.wglCreateContextAttribsARB)(hdc as wgl::HDC, ptr::null_mut(), attributes_ptr);
