@@ -56,8 +56,8 @@ pub fn main() -> Result<(), String> {
     status_text.set_anchor(Vec2::new(0.0, 1.0));
 
     let chopin_sound = audio.get_sound_mut(chopin_sound_id)?;
-
     let mut is_running = true;
+
     while is_running {
         while let Some(event) = window.poll_event() {
             match event {

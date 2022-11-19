@@ -50,8 +50,8 @@ pub fn main() -> Result<(), String> {
     }
 
     let mut now = Instant::now();
-    let mut is_running = true;
     let mut frames = 0;
+    let mut is_running = true;
 
     while is_running {
         while let Some(event) = window.poll_event() {

@@ -55,6 +55,7 @@ pub fn main() -> Result<(), String> {
 
     let mut last_update = Instant::now();
     let mut is_running = true;
+
     while is_running {
         let delta = last_update.elapsed().as_secs_f32();
         last_update = Instant::now();

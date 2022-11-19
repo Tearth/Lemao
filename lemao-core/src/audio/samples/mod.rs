@@ -16,7 +16,7 @@ pub struct Sample {
 }
 
 impl Sample {
-    pub fn new(audio: &AudioContext, channels_count: u32, frequency: u32, bits_per_sample: u32, data: Vec<u8>) -> Result<Self, String> {
+    pub fn new(_audio: &AudioContext, channels_count: u32, frequency: u32, bits_per_sample: u32, data: Vec<u8>) -> Result<Self, String> {
         unsafe {
             let format = match channels_count {
                 1 => match bits_per_sample {
