@@ -33,6 +33,7 @@ use std::sync::Mutex;
 pub struct RendererContext {
     pub(crate) gl: Rc<OpenGLPointers>,
     gl_context: winapi::HGLRC,
+    default_camera_id: usize,
     active_camera_id: usize,
     default_shader_id: usize,
     active_shader_id: usize,
@@ -143,6 +144,7 @@ impl RendererContext {
             Ok(RendererContext {
                 gl: Default::default(),
                 gl_context: gl_context as winapi::HGLRC,
+                default_camera_id: 0,
                 active_camera_id: 0,
                 default_shader_id: 0,
                 active_shader_id: 0,
@@ -177,7 +179,7 @@ impl RendererContext {
 
     pub fn init_default_camera(&mut self) {
         let camera = Camera::new(Default::default(), Default::default());
-        self.active_camera_id = self.cameras.as_mut().unwrap().store(camera);
+        self.default_camera_id = self.cameras.as_mut().unwrap().store(camera);
     }
 
     pub fn init_default_shader(&mut self) -> Result<(), String> {
@@ -290,6 +292,10 @@ impl RendererContext {
         camera.set_dirty_flag(true);
 
         Ok(())
+    }
+
+    pub fn set_default_camera(&mut self) -> Result<(), String> {
+        self.set_camera_as_active(self.default_camera_id)
     }
 
     pub fn create_sprite(&mut self, texture_id: usize) -> Result<usize, String> {

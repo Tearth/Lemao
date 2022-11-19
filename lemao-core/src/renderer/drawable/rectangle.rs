@@ -42,6 +42,14 @@ impl Rectangle {
         }
     }
 
+    pub fn get_size(&self) -> Vec2 {
+        self.size
+    }
+
+    pub fn set_size(&mut self, size: Vec2) {
+        self.size = size;
+    }
+
     pub fn get_texture(&self) -> usize {
         self.texture_id
     }

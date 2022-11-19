@@ -27,7 +27,7 @@ pub struct WindowContext {
 
 #[derive(Copy, Clone, Debug)]
 pub enum WindowStyle {
-    Window(Vec2, Vec2),
+    Window { position: Vec2, size: Vec2 },
     Borderless,
     Fullscreen,
 }
@@ -127,7 +127,7 @@ impl WindowContext {
                 hwnd: ptr::null_mut(),
                 hdc: ptr::null_mut(),
                 fake: true,
-                style: WindowStyle::Window(Vec2::new(0.0, 0.0), Vec2::new(0.0, 0.0)),
+                style: WindowStyle::Window { position: Vec2::new(0.0, 0.0), size: Vec2::new(0.0, 0.0) },
                 position: Default::default(),
                 size: Default::default(),
                 initialized: false,
@@ -218,6 +218,7 @@ impl WindowContext {
         renderer.init();
         renderer.init_storages();
         renderer.init_default_camera();
+        renderer.set_default_camera()?;
         renderer.init_default_shader()?;
         renderer.set_default_shader()?;
         renderer.init_default_shapes();
@@ -247,7 +248,7 @@ impl WindowContext {
             }
 
             match style {
-                WindowStyle::Window(position, size) => {
+                WindowStyle::Window { position, size } => {
                     let mut rect = winapi::tagRECT { left: 0, top: 0, right: size.x as i32, bottom: size.y as i32 };
                     winapi::SetWindowLongPtrA(self.hwnd, winapi::GWL_STYLE, (winapi::WS_OVERLAPPEDWINDOW | winapi::WS_VISIBLE) as i64);
                     winapi::AdjustWindowRect(&mut rect, winapi::WS_OVERLAPPEDWINDOW, 0);

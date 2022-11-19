@@ -15,38 +15,9 @@ use lemao_math::vec2::Vec2;
 use std::sync::Arc;
 use std::sync::Mutex;
 
-pub fn main() -> Result<(), String> {
-    const DEFAULT_WINDOW_WIDTH: u32 = 800;
-    const DEFAULT_WINDOW_HEIGHT: u32 = 600;
-
-    let samples = Arc::new(Mutex::new(SampleStorage::default()));
-    let mut audio = AudioContext::new(samples.clone())?;
-
-    let chopin_sample_id = samples.lock().unwrap().store(wav::load(&audio, "./assets/chopin.wav")?);
-    let chopin_sound_id = audio.create_sound(chopin_sample_id)?;
-    let chopin_sound = audio.get_sound_mut(chopin_sound_id)?;
-
-    let textures = Arc::new(Mutex::new(TextureStorage::default()));
-    let fonts = Arc::new(Mutex::new(FontStorage::default()));
-
-    let mut window =
-        match WindowContext::new("Audio", WindowStyle::Window(Vec2::new(0.0, 0.0), Vec2::new(DEFAULT_WINDOW_WIDTH as f32, DEFAULT_WINDOW_HEIGHT as f32))) {
-            Ok(window) => window,
-            Err(message) => panic!("{}", message),
-        };
-
-    let mut renderer = match window.create_renderer(textures, fonts.clone()) {
-        Ok(renderer) => renderer,
-        Err(message) => panic!("{}", message),
-    };
-
-    let font_id = fonts.lock().unwrap().store(bff::load(&renderer, "./assets/inconsolata.bff")?);
-    let description_text_id = renderer.create_text(font_id)?;
-    let status_text_id = renderer.create_text(font_id)?;
-
-    let description_text = renderer.get_drawable_with_type_mut::<Text>(description_text_id)?;
-    description_text.set_text(
-        "Music:
+#[rustfmt::skip]
+const DESCRIPTION: &str = 
+"Music:
  W - play
  S - stop
  A - pause
@@ -54,14 +25,37 @@ pub fn main() -> Result<(), String> {
  
 Volume:
  R - up
- F - down",
-    );
+ F - down";
+
+pub fn main() -> Result<(), String> {
+    let samples = Arc::new(Mutex::new(SampleStorage::default()));
+    let textures = Arc::new(Mutex::new(TextureStorage::default()));
+    let fonts = Arc::new(Mutex::new(FontStorage::default()));
+
+    let window_position = Default::default();
+    let window_size = Vec2::new(1366.0, 768.0);
+
+    let mut window = WindowContext::new("Audio", WindowStyle::Window { position: window_position, size: window_size })?;
+    let mut renderer = window.create_renderer(textures, fonts.clone())?;
+    let mut audio = AudioContext::new(samples.clone())?;
+
+    let font_id = fonts.lock().unwrap().store(bff::load(&renderer, "./assets/inconsolata.bff")?);
+    let chopin_sample_id = samples.lock().unwrap().store(wav::load(&audio, "./assets/chopin.wav")?);
+
+    let description_text_id = renderer.create_text(font_id)?;
+    let status_text_id = renderer.create_text(font_id)?;
+    let chopin_sound_id = audio.create_sound(chopin_sample_id)?;
+
+    let description_text = renderer.get_drawable_with_type_mut::<Text>(description_text_id)?;
+    description_text.set_text(DESCRIPTION);
     description_text.set_anchor(Vec2::new(0.0, 1.0));
     description_text.set_line_height(20);
 
     let status_text = renderer.get_drawable_with_type_mut::<Text>(status_text_id)?;
     status_text.set_text("Status: stopped");
     status_text.set_anchor(Vec2::new(0.0, 1.0));
+
+    let chopin_sound = audio.get_sound_mut(chopin_sound_id)?;
 
     let mut is_running = true;
     while is_running {
@@ -71,16 +65,14 @@ Volume:
                     let description_text_size = renderer.get_drawable_with_type_mut::<Text>(description_text_id)?.get_size();
 
                     renderer.set_viewport(width, height);
-                    renderer.get_camera_mut(0)?.set_size(Vec2::new(width as f32, height as f32));
+                    renderer.get_active_camera_mut()?.set_size(Vec2::new(width as f32, height as f32));
                     renderer.get_drawable_mut(description_text_id)?.set_position(Vec2::new(5.0, height as f32 - 0.0));
                     renderer.get_drawable_mut(status_text_id)?.set_position(Vec2::new(5.0, height as f32 - description_text_size.y - 20.0));
                 }
                 InputEvent::WindowClosed => {
                     is_running = false;
                 }
-                InputEvent::KeyPressed(Key::KeyW) => {
-                    chopin_sound.play()?;
-                }
+                InputEvent::KeyPressed(Key::KeyW) => chopin_sound.play()?,
                 InputEvent::KeyPressed(Key::KeyS) => chopin_sound.stop()?,
                 InputEvent::KeyPressed(Key::KeyA) => chopin_sound.pause()?,
                 InputEvent::KeyPressed(Key::KeyD) => chopin_sound.rewind()?,
