@@ -1,6 +1,5 @@
 use super::*;
 use crate::renderer::context::RendererContext;
-use crate::renderer::fonts::Font;
 use crate::renderer::textures::Texture;
 use lemao_math::mat4x4::Mat4x4;
 use lemao_math::vec2::Vec2;
@@ -14,7 +13,13 @@ use std::ptr;
 use std::rc::Rc;
 
 pub struct Circle {
-    id: usize,
+    pub(crate) id: usize,
+    pub(crate) vao_gl_id: u32,
+    pub(crate) vbo_gl_id: u32,
+    pub(crate) ebo_gl_id: u32,
+    pub(crate) texture_gl_id: u32,
+    gl: Rc<OpenGLPointers>,
+
     position: Vec2,
     scale: Vec2,
     rotation: f32,
@@ -25,17 +30,18 @@ pub struct Circle {
     sides: u32,
     angle: f32,
     elements_count: u32,
-    vao_gl_id: u32,
-    vbo_gl_id: u32,
-    ebo_gl_id: u32,
-    texture_gl_id: u32,
-    gl: Rc<OpenGLPointers>,
 }
 
 impl Circle {
     pub fn new(renderer: &RendererContext, texture: &Texture, radius: f32, sides: u32) -> Self {
         let mut circle = Circle {
             id: 0,
+            vao_gl_id: 0,
+            vbo_gl_id: 0,
+            ebo_gl_id: 0,
+            texture_gl_id: texture.texture_gl_id,
+            gl: renderer.gl.clone(),
+
             position: Default::default(),
             scale: Vec2::new(1.0, 1.0),
             rotation: 0.0,
@@ -46,11 +52,6 @@ impl Circle {
             sides,
             angle: 2.0 * std::f32::consts::PI,
             elements_count: 0,
-            vao_gl_id: 0,
-            vbo_gl_id: 0,
-            ebo_gl_id: 0,
-            texture_gl_id: texture.texture_gl_id,
-            gl: renderer.gl.clone(),
         };
 
         unsafe {
@@ -75,6 +76,10 @@ impl Circle {
 
         circle.update();
         circle
+    }
+
+    pub fn get_id(&self) -> usize {
+        self.id
     }
 
     pub fn get_radius(&self) -> f32 {
@@ -166,14 +171,6 @@ impl Circle {
 }
 
 impl Drawable for Circle {
-    fn get_id(&self) -> usize {
-        self.id
-    }
-
-    fn set_id(&mut self, id: usize) {
-        self.id = id;
-    }
-
     fn get_position(&self) -> Vec2 {
         self.position
     }

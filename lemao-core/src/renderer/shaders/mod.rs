@@ -1,11 +1,10 @@
+use super::context::RendererContext;
 use lemao_opengl::bindings::opengl;
 use lemao_opengl::pointers::OpenGLPointers;
 use std::collections::HashMap;
 use std::ffi::CString;
 use std::ptr;
 use std::rc::Rc;
-
-use super::context::RendererContext;
 
 pub mod storage;
 
@@ -15,10 +14,11 @@ pub const DEFAULT_VERTEX_SHADER: &str = include_str!("./default.vert");
 pub const DEFAULT_FRAGMENT_SHADER: &str = include_str!("./default.frag");
 
 pub struct Shader {
-    id: usize,
-    program_id: u32,
-    uniforms: HashMap<String, ShaderParameter>,
+    pub(crate) id: usize,
+    pub(crate) program_id: u32,
     gl: Rc<OpenGLPointers>,
+
+    uniforms: HashMap<String, ShaderParameter>,
 }
 
 pub struct ShaderParameter {
@@ -110,6 +110,10 @@ impl Shader {
         }
     }
 
+    pub fn get_id(&self) -> usize {
+        self.id
+    }
+
     pub fn set_parameter(&self, name: &str, data: *const f32) -> Result<(), String> {
         unsafe {
             let parameter = match self.uniforms.get(name) {
@@ -136,6 +140,16 @@ impl Shader {
             (self.gl.glUseProgram)(self.program_id);
             (self.gl.glEnable)(opengl::GL_BLEND);
             (self.gl.glBlendFunc)(opengl::GL_SRC_ALPHA, opengl::GL_ONE_MINUS_SRC_ALPHA);
+        }
+    }
+}
+
+impl Drop for Shader {
+    fn drop(&mut self) {
+        unsafe {
+            if self.program_id != 0 {
+                (self.gl.glDeleteProgram)(self.program_id);
+            }
         }
     }
 }

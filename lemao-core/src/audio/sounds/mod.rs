@@ -4,15 +4,14 @@ use lemao_openal::bindings::openal;
 pub mod storage;
 
 pub struct Sound {
-    id: usize,
-    sample_id: usize,
-    source_id: u32,
-    buffer_id: u32,
+    pub(crate) id: usize,
+    pub(crate) sample_id: usize,
+    pub(crate) source_id: u32,
 }
 
 impl Sound {
     pub fn new(sample: &Sample) -> Result<Self, String> {
-        let mut sound = Sound { id: 0, sample_id: 0, source_id: 0, buffer_id: 0 };
+        let mut sound = Sound { id: 0, sample_id: 0, source_id: 0 };
         sound.set_sample(sample)?;
 
         Ok(sound)
@@ -22,13 +21,16 @@ impl Sound {
         self.id
     }
 
-    pub fn get_sample(&self) -> usize {
+    pub fn get_sample_id(&self) -> usize {
         self.sample_id
     }
 
     pub fn set_sample(&mut self, sample: &Sample) -> Result<(), String> {
         unsafe {
-            openal::alGenSources(1, &mut self.source_id);
+            if self.source_id == 0 {
+                openal::alGenSources(1, &mut self.source_id);
+            }
+
             openal::alSourcei(self.source_id, openal::AL_BUFFER as i32, sample.buffer_id as i32);
 
             self.sample_id = sample.id;

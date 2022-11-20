@@ -32,6 +32,7 @@ use std::sync::Mutex;
 
 pub struct RendererContext {
     pub(crate) gl: Rc<OpenGLPointers>,
+
     gl_context: winapi::HGLRC,
     default_camera_id: usize,
     active_camera_id: usize,
@@ -41,6 +42,7 @@ pub struct RendererContext {
     default_line_shape_id: usize,
     default_rectangle_shape_id: usize,
     default_texture_id: usize,
+
     textures: Arc<Mutex<TextureStorage>>,
     fonts: Arc<Mutex<FontStorage>>,
     cameras: Option<CameraStorage>,
@@ -143,6 +145,7 @@ impl RendererContext {
 
             Ok(RendererContext {
                 gl: Default::default(),
+
                 gl_context: gl_context as winapi::HGLRC,
                 default_camera_id: 0,
                 active_camera_id: 0,
@@ -298,21 +301,12 @@ impl RendererContext {
         self.set_camera_as_active(self.default_camera_id)
     }
 
-    pub fn create_sprite(&mut self, texture_id: usize) -> Result<usize, String> {
-        let shape = self.shapes.as_ref().unwrap().get(self.default_sprite_shape_id)?;
+    pub fn create_circle(&mut self, radius: f32, sides: u32) -> Result<usize, String> {
         let texture_storage = self.textures.lock().unwrap();
-        let texture = texture_storage.get(texture_id)?;
-        let sprite = Box::new(Sprite::new(self, shape, texture));
+        let texture = texture_storage.get(self.default_texture_id)?;
+        let circle = Box::new(Circle::new(self, texture, radius, sides));
 
-        Ok(self.drawables.as_mut().unwrap().store(sprite))
-    }
-
-    pub fn create_text(&mut self, font_id: usize) -> Result<usize, String> {
-        let font_storage = self.fonts.lock().unwrap();
-        let font = font_storage.get(font_id)?;
-        let text = Box::new(Text::new(self, font));
-
-        Ok(self.drawables.as_mut().unwrap().store(text))
+        Ok(self.drawables.as_mut().unwrap().store_circle(circle))
     }
 
     pub fn create_line(&mut self, from: Vec2, to: Vec2) -> Result<usize, String> {
@@ -321,7 +315,7 @@ impl RendererContext {
         let texture = texture_storage.get(self.default_texture_id)?;
         let line = Box::new(Line::new(self, shape, texture, from, to));
 
-        Ok(self.drawables.as_mut().unwrap().store(line))
+        Ok(self.drawables.as_mut().unwrap().store_line(line))
     }
 
     pub fn create_rectangle(&mut self, size: Vec2) -> Result<usize, String> {
@@ -330,15 +324,24 @@ impl RendererContext {
         let texture = texture_storage.get(self.default_texture_id)?;
         let rectangle = Box::new(Rectangle::new(self, shape, texture, size));
 
-        Ok(self.drawables.as_mut().unwrap().store(rectangle))
+        Ok(self.drawables.as_mut().unwrap().store_rectangle(rectangle))
     }
 
-    pub fn create_circle(&mut self, radius: f32, sides: u32) -> Result<usize, String> {
+    pub fn create_sprite(&mut self, texture_id: usize) -> Result<usize, String> {
+        let shape = self.shapes.as_ref().unwrap().get(self.default_sprite_shape_id)?;
         let texture_storage = self.textures.lock().unwrap();
-        let texture = texture_storage.get(self.default_texture_id)?;
-        let circle = Box::new(Circle::new(self, texture, radius, sides));
+        let texture = texture_storage.get(texture_id)?;
+        let sprite = Box::new(Sprite::new(self, shape, texture));
 
-        Ok(self.drawables.as_mut().unwrap().store(circle))
+        Ok(self.drawables.as_mut().unwrap().store_sprite(sprite))
+    }
+
+    pub fn create_text(&mut self, font_id: usize) -> Result<usize, String> {
+        let font_storage = self.fonts.lock().unwrap();
+        let font = font_storage.get(font_id)?;
+        let text = Box::new(Text::new(self, font));
+
+        Ok(self.drawables.as_mut().unwrap().store_text(text))
     }
 
     pub fn get_drawable(&self, drawable_id: usize) -> Result<&dyn Drawable, String> {

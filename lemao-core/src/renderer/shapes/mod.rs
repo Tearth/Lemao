@@ -12,10 +12,10 @@ use std::rc::Rc;
 pub mod storage;
 
 pub struct Shape {
-    pub id: usize,
-    pub vao_gl_id: u32,
-    vbo_gl_id: u32,
-    ebo_gl_id: u32,
+    pub(crate) id: usize,
+    pub(crate) vao_gl_id: u32,
+    pub(crate) vbo_gl_id: u32,
+    pub(crate) ebo_gl_id: u32,
     gl: Rc<OpenGLPointers>,
 }
 
@@ -70,6 +70,10 @@ impl Shape {
 
             Self { id: 0, vao_gl_id, vbo_gl_id, ebo_gl_id, gl }
         }
+    }
+
+    pub fn get_id(&self) -> usize {
+        self.id
     }
 }
 

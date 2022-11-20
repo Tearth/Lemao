@@ -52,22 +52,8 @@ impl AudioContext {
         self.sounds.get(sound_id)
     }
 
-    pub fn get_sound_scope<F>(&self, sound_id: usize, scope: F) -> Result<(), String>
-    where
-        F: Fn(&Sound) -> Result<(), String>,
-    {
-        scope(self.sounds.get(sound_id)?)
-    }
-
     pub fn get_sound_mut(&mut self, sound_id: usize) -> Result<&mut Sound, String> {
         self.sounds.get_mut(sound_id)
-    }
-
-    pub fn get_sound_scope_mut<F>(&mut self, sound_id: usize, mut scope: F) -> Result<(), String>
-    where
-        F: FnMut(&mut Sound) -> Result<(), String>,
-    {
-        scope(self.sounds.get_mut(sound_id)?)
     }
 }
 

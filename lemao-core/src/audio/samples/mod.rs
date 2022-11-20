@@ -6,13 +6,8 @@ pub mod storage;
 pub mod wav;
 
 pub struct Sample {
-    pub id: usize,
-    pub buffer_id: u32,
-
-    pub channels_count: u32,
-    pub frequency: u32,
-    pub bits_per_sample: u32,
-    pub data: Vec<u8>,
+    pub(crate) id: usize,
+    pub(crate) buffer_id: u32,
 }
 
 impl Sample {
@@ -42,8 +37,12 @@ impl Sample {
                 return Err(format!("OpenAL error, code {}", error));
             }
 
-            Ok(Self { id: 0, buffer_id, channels_count, frequency, bits_per_sample, data })
+            Ok(Self { id: 0, buffer_id })
         }
+    }
+
+    pub fn get_id(&self) -> usize {
+        self.id
     }
 }
 

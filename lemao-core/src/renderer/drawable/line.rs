@@ -12,7 +12,11 @@ use std::ptr;
 use std::rc::Rc;
 
 pub struct Line {
-    id: usize,
+    pub(crate) id: usize,
+    pub(crate) shape_vao_gl_id: u32,
+    pub(crate) texture_gl_id: u32,
+    gl: Rc<OpenGLPointers>,
+
     position: Vec2,
     scale: Vec2,
     rotation: f32,
@@ -22,16 +26,16 @@ pub struct Line {
     from: Vec2,
     to: Vec2,
     thickness: f32,
-    texture_id: usize,
-    shape_vao_gl_id: u32,
-    texture_gl_id: u32,
-    gl: Rc<OpenGLPointers>,
 }
 
 impl Line {
     pub fn new(renderer: &RendererContext, shape: &Shape, texture: &Texture, from: Vec2, to: Vec2) -> Self {
         let mut line = Line {
             id: 0,
+            shape_vao_gl_id: shape.vao_gl_id,
+            texture_gl_id: texture.texture_gl_id,
+            gl: renderer.gl.clone(),
+
             position: Default::default(),
             scale: Vec2::new(1.0, 1.0),
             rotation: 1.0,
@@ -41,14 +45,14 @@ impl Line {
             from,
             to,
             thickness: 1.0,
-            texture_id: texture.id,
-            shape_vao_gl_id: shape.vao_gl_id,
-            texture_gl_id: texture.texture_gl_id,
-            gl: renderer.gl.clone(),
         };
 
         line.calculate_position_rotation_scale();
         line
+    }
+
+    pub fn get_id(&self) -> usize {
+        self.id
     }
 
     pub fn get_from(&self) -> Vec2 {
@@ -86,14 +90,6 @@ impl Line {
 }
 
 impl Drawable for Line {
-    fn get_id(&self) -> usize {
-        self.id
-    }
-
-    fn set_id(&mut self, id: usize) {
-        self.id = id;
-    }
-
     fn get_position(&self) -> Vec2 {
         self.position
     }

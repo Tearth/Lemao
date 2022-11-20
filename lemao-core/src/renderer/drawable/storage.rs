@@ -1,3 +1,8 @@
+use super::circle::Circle;
+use super::line::Line;
+use super::rectangle::Rectangle;
+use super::sprite::Sprite;
+use super::text::Text;
 use super::*;
 
 #[derive(Default)]
@@ -6,10 +11,42 @@ pub struct DrawableStorage {
 }
 
 impl DrawableStorage {
-    pub fn store(&mut self, mut drawable: Box<dyn Drawable>) -> usize {
+    pub fn store_circle(&mut self, mut circle: Box<Circle>) -> usize {
         let id = self.data.len();
-        drawable.set_id(id);
-        self.data.push(Some(drawable));
+        circle.id = id;
+        self.data.push(Some(circle));
+
+        id
+    }
+
+    pub fn store_line(&mut self, mut line: Box<Line>) -> usize {
+        let id = self.data.len();
+        line.id = id;
+        self.data.push(Some(line));
+
+        id
+    }
+
+    pub fn store_rectangle(&mut self, mut rectangle: Box<Rectangle>) -> usize {
+        let id = self.data.len();
+        rectangle.id = id;
+        self.data.push(Some(rectangle));
+
+        id
+    }
+
+    pub fn store_sprite(&mut self, mut sprite: Box<Sprite>) -> usize {
+        let id = self.data.len();
+        sprite.id = id;
+        self.data.push(Some(sprite));
+
+        id
+    }
+
+    pub fn store_text(&mut self, mut text: Box<Text>) -> usize {
+        let id = self.data.len();
+        text.id = id;
+        self.data.push(Some(text));
 
         id
     }

@@ -12,59 +12,54 @@ use std::ptr;
 use std::rc::Rc;
 
 pub struct Sprite {
-    id: usize,
+    pub(crate) id: usize,
+    pub(crate) shape_vao_gl_id: u32,
+    pub(crate) texture_id: usize,
+    pub(crate) texture_gl_id: u32,
+    gl: Rc<OpenGLPointers>,
+
     position: Vec2,
     scale: Vec2,
     rotation: f32,
     size: Vec2,
     anchor: Vec2,
     color: Color,
-    texture_id: usize,
-    shape_vao_gl_id: u32,
-    texture_gl_id: u32,
-    gl: Rc<OpenGLPointers>,
 }
 
 impl Sprite {
     pub fn new(renderer: &RendererContext, shape: &Shape, texture: &Texture) -> Self {
-        let mut sprite = Sprite {
+        Sprite {
             id: 0,
+            shape_vao_gl_id: shape.vao_gl_id,
+            texture_id: texture.id,
+            texture_gl_id: texture.texture_gl_id,
+            gl: renderer.gl.clone(),
+
             position: Default::default(),
             scale: Vec2::new(1.0, 1.0),
             rotation: 0.0,
-            size: texture.size,
+            size: texture.get_size(),
             anchor: Default::default(),
             color: Color::new(1.0, 1.0, 1.0, 1.0),
-            texture_id: texture.id,
-            shape_vao_gl_id: shape.vao_gl_id,
-            texture_gl_id: texture.texture_gl_id,
-            gl: renderer.gl.clone(),
-        };
-
-        sprite.set_texture(texture);
-        sprite
+        }
     }
 
-    pub fn get_texture(&self) -> usize {
+    pub fn get_id(&self) -> usize {
+        self.id
+    }
+
+    pub fn get_texture_id(&self) -> usize {
         self.texture_id
     }
 
     pub fn set_texture(&mut self, texture: &Texture) {
         self.texture_id = texture.id;
         self.texture_gl_id = texture.texture_gl_id;
-        self.size = texture.size;
+        self.size = texture.get_size();
     }
 }
 
 impl Drawable for Sprite {
-    fn get_id(&self) -> usize {
-        self.id
-    }
-
-    fn set_id(&mut self, id: usize) {
-        self.id = id;
-    }
-
     fn get_position(&self) -> Vec2 {
         self.position
     }

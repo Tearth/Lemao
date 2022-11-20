@@ -62,5 +62,12 @@ pub fn load(renderer: &RendererContext, path: &str) -> Result<Font, String> {
         }
     }
 
-    Ok(Font::new(renderer, width, height, cell_width, cell_height, base_character_offset, character_widths, data))
+    Ok(Font::new(
+        renderer,
+        Vec2::new(width as f32, height as f32),
+        Vec2::new(cell_width as f32, cell_height as f32),
+        base_character_offset,
+        character_widths,
+        data,
+    ))
 }

@@ -13,7 +13,14 @@ use std::ptr;
 use std::rc::Rc;
 
 pub struct Text {
-    id: usize,
+    pub(crate) id: usize,
+    pub(crate) vao_gl_id: u32,
+    pub(crate) vbo_gl_id: u32,
+    pub(crate) ebo_gl_id: u32,
+    pub(crate) font_id: usize,
+    pub(crate) texture_gl_id: u32,
+    gl: Rc<OpenGLPointers>,
+
     position: Vec2,
     scale: Vec2,
     rotation: f32,
@@ -22,25 +29,25 @@ pub struct Text {
     color: Color,
     text: String,
     line_height: u32,
-    vao_gl_id: u32,
-    vbo_gl_id: u32,
-    ebo_gl_id: u32,
-    texture_gl_id: u32,
     elements_count: u32,
-    font_id: usize,
-    font_width: u32,
-    font_height: u32,
-    font_cell_width: u32,
-    font_cell_height: u32,
+
+    font_size: Vec2,
+    font_cell_size: Vec2,
     font_base_character_offset: u8,
     font_character_widths: Vec<u8>,
-    gl: Rc<OpenGLPointers>,
 }
 
 impl Text {
     pub fn new(renderer: &RendererContext, font: &Font) -> Self {
         let mut text = Text {
             id: 0,
+            vao_gl_id: 0,
+            vbo_gl_id: 0,
+            ebo_gl_id: 0,
+            font_id: font.id,
+            texture_gl_id: font.texture_gl_id,
+            gl: renderer.gl.clone(),
+
             position: Default::default(),
             scale: Vec2::new(1.0, 1.0),
             rotation: 0.0,
@@ -48,20 +55,13 @@ impl Text {
             anchor: Default::default(),
             color: Color::new(1.0, 1.0, 1.0, 1.0),
             text: Default::default(),
-            line_height: font.cell_height,
-            vao_gl_id: 0,
-            vbo_gl_id: 0,
-            ebo_gl_id: 0,
-            texture_gl_id: font.texture_gl_id,
+            line_height: font.get_cell_size().y as u32,
             elements_count: 0,
-            font_id: font.id,
-            font_width: font.width,
-            font_height: font.height,
-            font_cell_width: font.cell_width,
-            font_cell_height: font.cell_height,
-            font_base_character_offset: font.base_character_offset,
-            font_character_widths: font.character_widths.clone(),
-            gl: renderer.gl.clone(),
+
+            font_size: font.get_size(),
+            font_cell_size: font.get_cell_size(),
+            font_base_character_offset: font.get_base_character_offset(),
+            font_character_widths: font.get_character_widths(),
         };
 
         unsafe {
@@ -87,7 +87,11 @@ impl Text {
         text
     }
 
-    pub fn get_font(&self) -> usize {
+    pub fn get_id(&self) -> usize {
+        self.id
+    }
+
+    pub fn get_font_id(&self) -> usize {
         self.font_id
     }
 
@@ -97,6 +101,10 @@ impl Text {
 
         // We must regenerate mesh, since the font sizes could change
         self.set_text(&self.text.clone());
+    }
+
+    pub fn get_size(&self) -> Vec2 {
+        self.size
     }
 
     pub fn get_text(&self) -> &str {
@@ -110,9 +118,9 @@ impl Text {
             let mut offset: Vec2 = Default::default();
             let mut size: Vec2 = Vec2::new(0.0, self.line_height as f32);
 
-            let characters_per_row = (self.font_width / self.font_cell_width) as u8;
-            let uv_width = self.font_cell_width as f32 / self.font_width as f32;
-            let uv_height = self.font_cell_height as f32 / self.font_height as f32;
+            let characters_per_row = (self.font_size.x / self.font_cell_size.x) as u8;
+            let uv_width = self.font_cell_size.x / self.font_size.x;
+            let uv_height = self.font_cell_size.y / self.font_size.y;
             let uv_size = Vec2::new(uv_width, uv_height);
             let mut index = 0;
 
@@ -130,7 +138,7 @@ impl Text {
                 let character_width = self.font_character_widths[char as usize];
                 let uv = Vec2::new(row as f32 * uv_width, 1.0 - col as f32 * uv_height - uv_height);
 
-                vertices.extend_from_slice(&self.get_vertices(self.font_cell_width, self.font_cell_height, offset, uv, uv_size, self.color));
+                vertices.extend_from_slice(&self.get_vertices(self.font_cell_size.x as u32, self.font_cell_size.y as u32, offset, uv, uv_size, self.color));
 
                 let indices_offset = (index * 4) as u32;
                 indices.extend_from_slice(&[
@@ -149,7 +157,7 @@ impl Text {
 
             // Adjust vertices, so the default anchor is in the left-bottom corner
             for index in 0..(vertices.len() / 9) {
-                vertices[index * 9 + 1] += size.y - self.font_cell_height as f32;
+                vertices[index * 9 + 1] += size.y - self.font_cell_size.y;
             }
 
             let vertices_size = (mem::size_of::<f32>() * vertices.len()) as i64;
@@ -168,10 +176,6 @@ impl Text {
             self.size = size;
             self.elements_count = indices.len() as u32;
         }
-    }
-
-    pub fn get_size(&self) -> Vec2 {
-        self.size
     }
 
     pub fn get_line_height(&self) -> u32 {
@@ -230,14 +234,6 @@ impl Text {
 }
 
 impl Drawable for Text {
-    fn get_id(&self) -> usize {
-        self.id
-    }
-
-    fn set_id(&mut self, id: usize) {
-        self.id = id;
-    }
-
     fn get_position(&self) -> Vec2 {
         self.position
     }

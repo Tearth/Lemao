@@ -11,9 +11,6 @@ pub mod storage;
 pub mod text;
 
 pub trait Drawable {
-    fn get_id(&self) -> usize;
-    fn set_id(&mut self, id: usize);
-
     fn get_position(&self) -> Vec2;
     fn set_position(&mut self, position: Vec2);
     fn move_delta(&mut self, delta: Vec2);

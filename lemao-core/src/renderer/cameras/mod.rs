@@ -5,7 +5,8 @@ use lemao_math::vec3::Vec3;
 pub mod storage;
 
 pub struct Camera {
-    id: usize,
+    pub(crate) id: usize,
+
     position: Vec2,
     size: Vec2,
     dirty: bool,
@@ -43,19 +44,19 @@ impl Camera {
         self.dirty = true;
     }
 
-    pub fn get_dirty_flag(&self) -> bool {
+    pub(crate) fn get_dirty_flag(&self) -> bool {
         self.dirty
     }
 
-    pub fn set_dirty_flag(&mut self, value: bool) {
+    pub(crate) fn set_dirty_flag(&mut self, value: bool) {
         self.dirty = value;
     }
 
-    pub fn get_projection_matrix(&self) -> Mat4x4 {
+    pub(crate) fn get_projection_matrix(&self) -> Mat4x4 {
         Mat4x4::ortho(self.size.x, self.size.y, 0.1, 100.0)
     }
 
-    pub fn get_view_matrix(&self) -> Mat4x4 {
+    pub(crate) fn get_view_matrix(&self) -> Mat4x4 {
         Mat4x4::translate(Vec3::new(-self.position.x, -self.position.y, -1.0))
     }
 }

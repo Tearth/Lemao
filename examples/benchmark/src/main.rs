@@ -42,9 +42,12 @@ pub fn main() -> Result<(), String> {
 
     let mut cells = Vec::new();
     for _ in 0..CELLS_COUNT {
+        let sprite_id = renderer.create_sprite(cell_texture_id)?;
+        renderer.get_drawable_mut(sprite_id)?.set_anchor(Vec2::new(0.5, 0.5));
+
         cells.push(CellData {
-            sprite_id: renderer.create_sprite(cell_texture_id)?,
-            position: Vec2::new(fastrand::f32() * 800.0, fastrand::f32() * 600.0),
+            sprite_id,
+            position: Vec2::new(fastrand::f32() * window_size.x, fastrand::f32() * window_size.y),
             velocity: Vec2 { x: MAX_SPEED * (fastrand::f32() * 2.0 - 1.0), y: MAX_SPEED * (fastrand::f32() * 2.0 - 1.0) },
         });
     }
