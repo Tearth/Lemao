@@ -215,15 +215,7 @@ impl WindowContext {
 
     pub fn create_renderer(&self, textures: Arc<Mutex<TextureStorage>>, fonts: Arc<Mutex<FontStorage>>) -> Result<RendererContext, String> {
         let mut renderer = RendererContext::new(self.hdc, textures, fonts)?;
-        renderer.init();
-        renderer.init_storages();
-        renderer.init_default_camera();
-        renderer.set_default_camera()?;
-        renderer.init_default_shader()?;
-        renderer.set_default_shader()?;
-        renderer.init_default_shapes();
-        renderer.init_default_texture();
-
+        renderer.init()?;
         Ok(renderer)
     }
 

@@ -8,7 +8,7 @@ use std::ops::Sub;
 use std::ops::SubAssign;
 
 #[repr(C)]
-#[derive(Copy, Clone, Default, Debug)]
+#[derive(Copy, Clone, Default, Debug, PartialEq)]
 pub struct Vec2 {
     pub x: f32,
     pub y: f32,

@@ -1,5 +1,6 @@
 use super::shaders::Shader;
 use lemao_math::color::Color;
+use lemao_math::mat4x4::Mat4x4;
 use lemao_math::vec2::Vec2;
 use std::any::Any;
 
@@ -27,6 +28,10 @@ pub trait Drawable {
 
     fn get_color(&self) -> Color;
     fn set_color(&mut self, color: Color);
+
+    fn get_transformation_matrix(&self) -> Mat4x4;
+    fn get_shape_id(&self) -> Result<usize, String>;
+    fn get_texture_id(&self) -> usize;
 
     fn draw(&self, shader: &Shader) -> Result<(), String>;
 

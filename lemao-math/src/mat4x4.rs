@@ -1,10 +1,12 @@
 use crate::vec3::Vec3;
+use crate::vec4::Vec4;
 use std::ops::Add;
 use std::ops::Index;
 use std::ops::IndexMut;
 use std::ops::Mul;
 use std::ops::Sub;
 
+#[derive(Copy, Clone, Default, Debug, PartialEq)]
 pub struct Mat4x4 {
     data: [f32; 16],
 }
@@ -64,18 +66,6 @@ impl Mat4x4 {
 
     pub fn as_ptr(&self) -> *const f32 {
         self.data.as_ptr() as *const f32
-    }
-}
-
-impl Default for Mat4x4 {
-    #[rustfmt::skip]
-    fn default() -> Self {
-        Self { data: [
-            0.0, 0.0, 0.0, 0.0,
-            0.0, 0.0, 0.0, 0.0,
-            0.0, 0.0, 0.0, 0.0,
-            0.0, 0.0, 0.0, 0.0
-        ]}
     }
 }
 
@@ -151,6 +141,20 @@ impl Mul for Mat4x4 {
         }
 
         matrix
+    }
+}
+
+impl Mul<Vec4> for Mat4x4 {
+    type Output = Vec4;
+
+    fn mul(self, rhs: Vec4) -> Self::Output {
+        let mut vector = Vec4::new(0.0, 0.0, 0.0, 0.0);
+        vector.x = self[(0 * 4) + 0] * rhs.x + self[(0 * 4) + 1] * rhs.y + self[(0 * 4) + 2] * rhs.z + self[(0 * 4) + 3] * rhs.w;
+        vector.y = self[(1 * 4) + 0] * rhs.x + self[(1 * 4) + 1] * rhs.y + self[(1 * 4) + 2] * rhs.z + self[(1 * 4) + 3] * rhs.w;
+        vector.z = self[(2 * 4) + 0] * rhs.x + self[(2 * 4) + 1] * rhs.y + self[(2 * 4) + 2] * rhs.z + self[(2 * 4) + 3] * rhs.w;
+        vector.w = self[(3 * 4) + 0] * rhs.x + self[(3 * 4) + 1] * rhs.y + self[(3 * 4) + 2] * rhs.z + self[(3 * 4) + 3] * rhs.w;
+
+        vector
     }
 }
 

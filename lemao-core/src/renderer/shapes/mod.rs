@@ -17,6 +17,9 @@ pub struct Shape {
     pub(crate) vbo_gl_id: u32,
     pub(crate) ebo_gl_id: u32,
     gl: Rc<OpenGLPointers>,
+
+    vertices: Vec<f32>,
+    indices: Vec<u32>,
 }
 
 impl Shape {
@@ -68,12 +71,20 @@ impl Shape {
             (gl.glEnableVertexAttribArray)(1);
             (gl.glEnableVertexAttribArray)(2);
 
-            Self { id: 0, vao_gl_id, vbo_gl_id, ebo_gl_id, gl }
+            Self { id: 0, vao_gl_id, vbo_gl_id, ebo_gl_id, gl, vertices: data, indices }
         }
     }
 
     pub fn get_id(&self) -> usize {
         self.id
+    }
+
+    pub fn get_vertices(&self) -> Vec<f32> {
+        self.vertices.clone()
+    }
+
+    pub fn get_indices(&self) -> Vec<u32> {
+        self.indices.clone()
     }
 }
 

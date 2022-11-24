@@ -17,6 +17,7 @@ pub struct Circle {
     pub(crate) vao_gl_id: u32,
     pub(crate) vbo_gl_id: u32,
     pub(crate) ebo_gl_id: u32,
+    pub(crate) texture_id: usize,
     pub(crate) texture_gl_id: u32,
     gl: Rc<OpenGLPointers>,
 
@@ -39,6 +40,7 @@ impl Circle {
             vao_gl_id: 0,
             vbo_gl_id: 0,
             ebo_gl_id: 0,
+            texture_id: texture.id,
             texture_gl_id: texture.texture_gl_id,
             gl: renderer.gl.clone(),
 
@@ -219,13 +221,25 @@ impl Drawable for Circle {
         self.color = color;
     }
 
+    fn get_transformation_matrix(&self) -> Mat4x4 {
+        let translation = Mat4x4::translate(Vec3::from(self.position));
+        let anchor_offset = Mat4x4::translate(-Vec3::from(self.anchor));
+        let scale = Mat4x4::scale(Vec3::from(self.scale * self.size));
+        let rotation = Mat4x4::rotate(self.rotation);
+        translation * rotation * scale * anchor_offset
+    }
+
+    fn get_shape_id(&self) -> Result<usize, String> {
+        Err("Dynamic drawable doesn't use predefined shape".to_string())
+    }
+
+    fn get_texture_id(&self) -> usize {
+        self.texture_id
+    }
+
     fn draw(&self, shader: &Shader) -> Result<(), String> {
         unsafe {
-            let translation = Mat4x4::translate(Vec3::from(self.position));
-            let anchor_offset = Mat4x4::translate(-Vec3::from(self.anchor));
-            let scale = Mat4x4::scale(Vec3::from(self.scale * self.size));
-            let rotation = Mat4x4::rotate(self.rotation);
-            let model = translation * rotation * scale * anchor_offset;
+            let model = self.get_transformation_matrix();
 
             shader.set_parameter("model", model.as_ptr())?;
             shader.set_parameter("color", self.color.as_ptr())?;

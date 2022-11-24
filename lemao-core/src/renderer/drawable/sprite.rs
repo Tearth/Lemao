@@ -13,6 +13,7 @@ use std::rc::Rc;
 
 pub struct Sprite {
     pub(crate) id: usize,
+    pub(crate) shape_id: usize,
     pub(crate) shape_vao_gl_id: u32,
     pub(crate) texture_id: usize,
     pub(crate) texture_gl_id: u32,
@@ -30,6 +31,7 @@ impl Sprite {
     pub fn new(renderer: &RendererContext, shape: &Shape, texture: &Texture) -> Self {
         Sprite {
             id: 0,
+            shape_id: shape.id,
             shape_vao_gl_id: shape.vao_gl_id,
             texture_id: texture.id,
             texture_gl_id: texture.texture_gl_id,
@@ -108,13 +110,25 @@ impl Drawable for Sprite {
         self.color = color;
     }
 
+    fn get_transformation_matrix(&self) -> Mat4x4 {
+        let translation = Mat4x4::translate(Vec3::from(self.position));
+        let anchor_offset = Mat4x4::translate(-Vec3::from(self.anchor));
+        let scale = Mat4x4::scale(Vec3::from(self.scale * self.size));
+        let rotation = Mat4x4::rotate(self.rotation);
+        translation * rotation * scale * anchor_offset
+    }
+
+    fn get_shape_id(&self) -> Result<usize, String> {
+        Ok(self.shape_id)
+    }
+
+    fn get_texture_id(&self) -> usize {
+        self.texture_id
+    }
+
     fn draw(&self, shader: &Shader) -> Result<(), String> {
         unsafe {
-            let translation = Mat4x4::translate(Vec3::from(self.position));
-            let anchor_offset = Mat4x4::translate(-Vec3::from(self.anchor));
-            let scale = Mat4x4::scale(Vec3::from(self.scale * self.size));
-            let rotation = Mat4x4::rotate(self.rotation);
-            let model = translation * rotation * scale * anchor_offset;
+            let model = self.get_transformation_matrix();
 
             shader.set_parameter("model", model.as_ptr())?;
             shader.set_parameter("color", self.color.as_ptr())?;

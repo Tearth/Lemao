@@ -1,3 +1,4 @@
+use super::batcher::BatchRenderer;
 use super::cameras::storage::CameraStorage;
 use super::cameras::Camera;
 use super::drawable::circle::Circle;
@@ -49,6 +50,7 @@ pub struct RendererContext {
     shaders: Option<ShaderStorage>,
     drawables: Option<DrawableStorage>,
     shapes: Option<ShapeStorage>,
+    batch_renderer: Option<BatchRenderer>,
 }
 
 impl RendererContext {
@@ -162,15 +164,26 @@ impl RendererContext {
                 drawables: None,
                 cameras: None,
                 shapes: None,
+                batch_renderer: None,
             })
         }
     }
 
-    pub fn init(&self) {
+    pub fn init(&mut self) -> Result<(), String> {
+        #[cfg(debug_assertions)]
         unsafe {
             (self.gl.glEnable)(opengl::GL_DEBUG_OUTPUT);
             (self.gl.glDebugMessageCallback)(gl_error, ptr::null_mut());
         }
+
+        self.init_storages();
+        self.init_default_camera()?;
+        self.init_default_shader()?;
+        self.init_default_shapes();
+        self.init_default_texture();
+        self.init_batch_renderer();
+
+        Ok(())
     }
 
     pub fn init_storages(&mut self) {
@@ -180,14 +193,18 @@ impl RendererContext {
         self.shapes = Some(Default::default());
     }
 
-    pub fn init_default_camera(&mut self) {
+    pub fn init_default_camera(&mut self) -> Result<(), String> {
         let camera = Camera::new(Default::default(), Default::default());
         self.default_camera_id = self.cameras.as_mut().unwrap().store(camera);
+        self.set_default_camera()?;
+
+        Ok(())
     }
 
     pub fn init_default_shader(&mut self) -> Result<(), String> {
         let shader = Shader::new_default(self)?;
         self.default_shader_id = self.shaders.as_mut().unwrap().store(shader);
+        self.set_default_shader()?;
 
         Ok(())
     }
@@ -224,6 +241,10 @@ impl RendererContext {
     pub fn init_default_texture(&mut self) {
         let texture = Texture::new(self, Vec2::new(1.0, 1.0), vec![255, 255, 255, 255]);
         self.default_texture_id = self.textures.lock().unwrap().store(texture);
+    }
+
+    pub fn init_batch_renderer(&mut self) {
+        self.batch_renderer = Some(BatchRenderer::new(self, 1024 * 1024, 1024 * 100));
     }
 
     pub fn set_viewport(&mut self, width: u32, height: u32) {
@@ -360,6 +381,29 @@ impl RendererContext {
         self.get_drawable_mut(drawable_id)?.as_any_mut().downcast_mut::<T>().ok_or(format!("Drawable object with id {} cannot be downcasted", drawable_id))
     }
 
+    pub fn batcher_add_drawable(&mut self, drawable_id: usize) -> Result<(), String> {
+        let drawable = self.drawables.as_ref().unwrap().get(drawable_id)?;
+        let shape = self.shapes.as_ref().unwrap().get(drawable.get_shape_id()?)?;
+        let texture_storage = self.textures.lock().unwrap();
+        let texture = texture_storage.get(drawable.get_texture_id())?;
+        self.batch_renderer.as_mut().unwrap().add(drawable, shape, texture)?;
+
+        Ok(())
+    }
+
+    pub fn batcher_draw(&mut self) -> Result<(), String> {
+        let camera = self.cameras.as_mut().unwrap().get_mut(self.active_camera_id)?;
+        let shader = self.shaders.as_ref().unwrap().get(self.active_shader_id)?;
+
+        if camera.get_dirty_flag() {
+            shader.set_parameter("proj", camera.get_projection_matrix().as_ptr())?;
+            shader.set_parameter("view", camera.get_view_matrix().as_ptr())?;
+            camera.set_dirty_flag(false);
+        }
+
+        self.batch_renderer.as_mut().unwrap().draw(shader)
+    }
+
     pub fn clear(&self, color: Color) {
         unsafe {
             (self.gl.glClearColor)(color.r, color.g, color.b, color.a);
@@ -401,7 +445,7 @@ unsafe extern "C" fn gl_error(
     message: *const i8,
     user_param: *const c_void,
 ) {
-    panic!(
+    println!(
         "OpenGL error: source={}, type={}, id={}, severity={}, user_param={:?}, message={}",
         source,
         r#type,

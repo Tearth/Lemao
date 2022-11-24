@@ -1,0 +1,157 @@
+use super::context::RendererContext;
+use super::drawable::Drawable;
+use super::shaders::Shader;
+use super::shapes::Shape;
+use super::textures::Texture;
+use lemao_math::color::Color;
+use lemao_math::mat4x4::Mat4x4;
+use lemao_math::vec4::Vec4;
+use lemao_opengl::bindings::opengl;
+use lemao_opengl::pointers::OpenGLPointers;
+use std::ffi::c_void;
+use std::mem;
+use std::ptr;
+use std::rc::Rc;
+
+pub struct BatchRenderer {
+    pub(crate) vao_gl_id: u32,
+    pub(crate) vbo_gl_id: u32,
+    pub(crate) ebo_gl_id: u32,
+    gl: Rc<OpenGLPointers>,
+
+    max_vertices_count: usize,
+    max_indices_count: usize,
+    first_batch_added: bool,
+    vertices: Vec<f32>,
+    indices: Vec<u32>,
+    texture_gl_id: u32,
+    color: Color,
+    max_indice: u32,
+}
+
+impl BatchRenderer {
+    pub fn new(renderer: &RendererContext, max_vertices_count: usize, max_indices_count: usize) -> Self {
+        unsafe {
+            let gl = renderer.gl.clone();
+
+            let mut vao_gl_id = 0;
+            (gl.glGenVertexArrays)(1, &mut vao_gl_id);
+            (gl.glBindVertexArray)(vao_gl_id);
+
+            let data_size = (mem::size_of::<f32>() * max_vertices_count) as i64;
+
+            let mut vbo_gl_id = 0;
+            (gl.glGenBuffers)(1, &mut vbo_gl_id);
+            (gl.glBindBuffer)(opengl::GL_ARRAY_BUFFER, vbo_gl_id);
+            (gl.glBufferData)(opengl::GL_ARRAY_BUFFER, data_size, ptr::null(), opengl::GL_STATIC_DRAW);
+
+            let indices_size = (mem::size_of::<u32>() * max_indices_count) as i64;
+
+            let mut ebo_gl_id = 0;
+            (gl.glGenBuffers)(1, &mut ebo_gl_id);
+            (gl.glBindBuffer)(opengl::GL_ELEMENT_ARRAY_BUFFER, ebo_gl_id);
+            (gl.glBufferData)(opengl::GL_ELEMENT_ARRAY_BUFFER, indices_size, ptr::null(), opengl::GL_STATIC_DRAW);
+
+            let attrib_size = (9 * mem::size_of::<f32>()) as i32;
+            (gl.glVertexAttribPointer)(0, 3, opengl::GL_FLOAT, opengl::GL_FALSE as u8, attrib_size, ptr::null_mut());
+            (gl.glVertexAttribPointer)(1, 4, opengl::GL_FLOAT, opengl::GL_FALSE as u8, attrib_size, (3 * mem::size_of::<f32>()) as *const c_void);
+            (gl.glVertexAttribPointer)(2, 2, opengl::GL_FLOAT, opengl::GL_FALSE as u8, attrib_size, (7 * mem::size_of::<f32>()) as *const c_void);
+
+            (gl.glEnableVertexAttribArray)(0);
+            (gl.glEnableVertexAttribArray)(1);
+            (gl.glEnableVertexAttribArray)(2);
+
+            Self {
+                vao_gl_id,
+                vbo_gl_id,
+                ebo_gl_id,
+                gl,
+                max_vertices_count,
+                max_indices_count,
+                first_batch_added: false,
+                vertices: Vec::new(),
+                indices: Vec::new(),
+                texture_gl_id: 0,
+                color: Color::new(0.0, 0.0, 0.0, 1.0),
+                max_indice: 0,
+            }
+        }
+    }
+
+    pub fn add(&mut self, drawable: &dyn Drawable, shape: &Shape, texture: &Texture) -> Result<(), String> {
+        if self.first_batch_added {
+            if self.texture_gl_id != texture.texture_gl_id {
+                return Err("Invalid texture".to_string());
+            }
+
+            if self.color != drawable.get_color() {
+                return Err("Invalid color".to_string());
+            }
+        }
+
+        let mut vertices = shape.get_vertices();
+        if self.vertices.len() + vertices.len() > self.max_vertices_count {
+            return Err("Too many vertices".to_string());
+        }
+
+        let mut indices = shape.get_indices();
+        if self.indices.len() + indices.len() > self.max_indices_count {
+            return Err("Too many indices".to_string());
+        }
+
+        let transformation_matrix = drawable.get_transformation_matrix();
+        for index in 0..(vertices.len() / 9) {
+            let position = Vec4::new(vertices[index * 9 + 0], vertices[index * 9 + 1], vertices[index * 9 + 2], 1.0);
+            let transformed_position = transformation_matrix * position;
+
+            vertices[index * 9 + 0] = transformed_position.x;
+            vertices[index * 9 + 1] = transformed_position.y;
+            vertices[index * 9 + 2] = transformed_position.z;
+        }
+
+        let base_indice = self.max_indice;
+        for index in 0..indices.len() {
+            indices[index] += base_indice;
+            self.max_indice = self.max_indice.max(indices[index] + 1);
+        }
+
+        self.first_batch_added = true;
+        self.vertices.extend_from_slice(&vertices);
+        self.indices.extend_from_slice(&indices);
+        self.texture_gl_id = texture.texture_gl_id;
+        self.color = drawable.get_color();
+
+        Ok(())
+    }
+
+    pub fn draw(&mut self, shader: &Shader) -> Result<(), String> {
+        unsafe {
+            let data_size = (mem::size_of::<f32>() * self.vertices.len()) as i64;
+            let data_ptr = self.vertices.as_ptr() as *const c_void;
+
+            (self.gl.glBindVertexArray)(self.vao_gl_id);
+            (self.gl.glBindBuffer)(opengl::GL_ARRAY_BUFFER, self.vbo_gl_id);
+            (self.gl.glBufferData)(opengl::GL_ARRAY_BUFFER, data_size, data_ptr, opengl::GL_STATIC_DRAW);
+
+            let indices_size = (mem::size_of::<u32>() * self.indices.len()) as i64;
+            let indices_ptr = self.indices.as_ptr() as *const c_void;
+
+            (self.gl.glBindBuffer)(opengl::GL_ELEMENT_ARRAY_BUFFER, self.ebo_gl_id);
+            (self.gl.glBufferData)(opengl::GL_ELEMENT_ARRAY_BUFFER, indices_size, indices_ptr, opengl::GL_STATIC_DRAW);
+
+            shader.set_parameter("model", Mat4x4::identity().as_ptr())?;
+            shader.set_parameter("color", Color::new(1.0, 1.0, 1.0, 1.0).as_ptr())?;
+
+            (self.gl.glBindTexture)(opengl::GL_TEXTURE_2D, self.texture_gl_id);
+            (self.gl.glDrawElements)(opengl::GL_TRIANGLES, self.indices.len() as i32, opengl::GL_UNSIGNED_INT, ptr::null());
+
+            self.first_batch_added = false;
+            self.vertices.clear();
+            self.indices.clear();
+            self.texture_gl_id = 0;
+            self.max_indice = 0;
+
+            Ok(())
+        }
+    }
+}
