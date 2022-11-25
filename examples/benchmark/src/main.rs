@@ -92,7 +92,7 @@ pub fn main() -> Result<(), String> {
 
             cell.position += cell.velocity;
             sprite.set_position(cell.position);
-            renderer.draw(cell.sprite_id)?;
+            renderer.batcher_add_drawable(cell.sprite_id)?;
         }
 
         if now.elapsed().as_millis() >= 1000 {
@@ -102,6 +102,7 @@ pub fn main() -> Result<(), String> {
         }
 
         frames += 1;
+        renderer.batcher_draw()?;
         renderer.draw(fps_text_id)?;
         window.swap_buffers();
     }
