@@ -50,6 +50,10 @@ impl Rectangle {
         self.id
     }
 
+    pub fn get_texture_id(&self) -> usize {
+        self.texture_id
+    }
+
     pub fn get_size(&self) -> Vec2 {
         self.size
     }
@@ -116,12 +120,8 @@ impl Drawable for Rectangle {
         translation * rotation * scale * anchor_offset
     }
 
-    fn get_shape_id(&self) -> Result<usize, String> {
-        Ok(self.shape_id)
-    }
-
-    fn get_texture_id(&self) -> usize {
-        self.texture_id
+    fn get_batch(&self) -> Batch {
+        Batch::new(Some(self.shape_id), None, None, Some(self.texture_gl_id), Some(self.color))
     }
 
     fn draw(&self, shader: &Shader) -> Result<(), String> {

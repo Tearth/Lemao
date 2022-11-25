@@ -31,6 +31,8 @@ pub struct Circle {
     sides: u32,
     angle: f32,
     elements_count: u32,
+    vertices: Vec<f32>,
+    indices: Vec<u32>,
 }
 
 impl Circle {
@@ -54,6 +56,8 @@ impl Circle {
             sides,
             angle: 2.0 * std::f32::consts::PI,
             elements_count: 0,
+            vertices: Vec::new(),
+            indices: Vec::new(),
         };
 
         unsafe {
@@ -82,6 +86,10 @@ impl Circle {
 
     pub fn get_id(&self) -> usize {
         self.id
+    }
+
+    pub fn get_texture_id(&self) -> usize {
+        self.texture_id
     }
 
     pub fn get_radius(&self) -> f32 {
@@ -113,19 +121,20 @@ impl Circle {
 
     fn update(&mut self) {
         unsafe {
-            let mut vertices = Vec::new();
-            let mut indices = Vec::new();
             let mut angle = 0.0f32;
-
             let position = Vec2::new(0.5, 0.5);
-            vertices.extend_from_slice(&self.get_vertices(position, position, Color::new(1.0, 1.0, 1.0, 1.0)));
+
+            self.vertices.clear();
+            self.indices.clear();
+
+            self.vertices.extend_from_slice(&self.get_vertices(position, position, Color::new(1.0, 1.0, 1.0, 1.0)));
 
             for n in 0..self.sides {
                 let position = Vec2::new(angle.sin() + 0.5, angle.cos() + 0.5);
-                vertices.extend_from_slice(&self.get_vertices(position, position, Color::new(1.0, 1.0, 1.0, 1.0)));
+                self.vertices.extend_from_slice(&self.get_vertices(position, position, Color::new(1.0, 1.0, 1.0, 1.0)));
 
                 if n > 0 {
-                    indices.extend_from_slice(&[0, n, n + 1]);
+                    self.indices.extend_from_slice(&[0, n, n + 1]);
                 }
 
                 angle += 2.0 * std::f32::consts::PI / (self.sides as f32);
@@ -136,20 +145,20 @@ impl Circle {
             }
 
             if self.angle == 2.0 * std::f32::consts::PI {
-                indices.extend_from_slice(&[0, self.sides, 1]);
+                self.indices.extend_from_slice(&[0, self.sides, 1]);
             }
 
-            self.elements_count = indices.len() as u32;
+            self.elements_count = self.indices.len() as u32;
             self.size = Vec2::new(self.radius, self.radius);
 
-            let vertices_size = (mem::size_of::<f32>() * vertices.len()) as i64;
-            let vertices_ptr = vertices.as_ptr() as *const c_void;
+            let vertices_size = (mem::size_of::<f32>() * self.vertices.len()) as i64;
+            let vertices_ptr = self.vertices.as_ptr() as *const c_void;
 
             (self.gl.glBindBuffer)(opengl::GL_ARRAY_BUFFER, self.vbo_gl_id);
             (self.gl.glBufferData)(opengl::GL_ARRAY_BUFFER, vertices_size, vertices_ptr, opengl::GL_STATIC_DRAW);
 
-            let indices_size = (mem::size_of::<u32>() * indices.len()) as i64;
-            let indices_ptr = indices.as_ptr() as *const c_void;
+            let indices_size = (mem::size_of::<u32>() * self.indices.len()) as i64;
+            let indices_ptr = self.indices.as_ptr() as *const c_void;
 
             (self.gl.glBindBuffer)(opengl::GL_ELEMENT_ARRAY_BUFFER, self.ebo_gl_id);
             (self.gl.glBufferData)(opengl::GL_ELEMENT_ARRAY_BUFFER, indices_size, indices_ptr, opengl::GL_STATIC_DRAW);
@@ -229,12 +238,8 @@ impl Drawable for Circle {
         translation * rotation * scale * anchor_offset
     }
 
-    fn get_shape_id(&self) -> Result<usize, String> {
-        Err("Dynamic drawable doesn't use predefined shape".to_string())
-    }
-
-    fn get_texture_id(&self) -> usize {
-        self.texture_id
+    fn get_batch(&self) -> Batch {
+        Batch::new(None, Some(self.vertices.clone()), Some(self.indices.clone()), Some(self.texture_gl_id), Some(self.color))
     }
 
     fn draw(&self, shader: &Shader) -> Result<(), String> {

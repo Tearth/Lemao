@@ -1,3 +1,4 @@
+use super::batcher::Batch;
 use super::shaders::Shader;
 use lemao_math::color::Color;
 use lemao_math::mat4x4::Mat4x4;
@@ -30,8 +31,7 @@ pub trait Drawable {
     fn set_color(&mut self, color: Color);
 
     fn get_transformation_matrix(&self) -> Mat4x4;
-    fn get_shape_id(&self) -> Result<usize, String>;
-    fn get_texture_id(&self) -> usize;
+    fn get_batch(&self) -> Batch;
 
     fn draw(&self, shader: &Shader) -> Result<(), String>;
 

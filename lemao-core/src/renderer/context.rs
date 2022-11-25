@@ -383,11 +383,15 @@ impl RendererContext {
 
     pub fn batcher_add_drawable(&mut self, drawable_id: usize) -> Result<(), String> {
         let drawable = self.drawables.as_ref().unwrap().get(drawable_id)?;
-        let shape = self.shapes.as_ref().unwrap().get(drawable.get_shape_id()?)?;
-        let texture_storage = self.textures.lock().unwrap();
-        let texture = texture_storage.get(drawable.get_texture_id())?;
-        self.batch_renderer.as_mut().unwrap().add(drawable, shape, texture)?;
+        let mut batch = drawable.get_batch();
 
+        if let Some(shape_id) = batch.shape_id {
+            let shape = self.shapes.as_ref().unwrap().get(shape_id)?;
+            batch.vertices = Some(shape.get_vertices());
+            batch.indices = Some(shape.get_indices());
+        }
+
+        self.batch_renderer.as_mut().unwrap().add(drawable, &batch)?;
         Ok(())
     }
 

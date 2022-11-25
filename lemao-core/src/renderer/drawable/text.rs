@@ -18,7 +18,6 @@ pub struct Text {
     pub(crate) vbo_gl_id: u32,
     pub(crate) ebo_gl_id: u32,
     pub(crate) font_id: usize,
-    pub(crate) texture_id: usize,
     pub(crate) texture_gl_id: u32,
     gl: Rc<OpenGLPointers>,
 
@@ -31,6 +30,8 @@ pub struct Text {
     text: String,
     line_height: u32,
     elements_count: u32,
+    vertices: Vec<f32>,
+    indices: Vec<u32>,
 
     font_size: Vec2,
     font_cell_size: Vec2,
@@ -46,7 +47,6 @@ impl Text {
             vbo_gl_id: 0,
             ebo_gl_id: 0,
             font_id: font.id,
-            texture_id: 0,
             texture_gl_id: font.texture_gl_id,
             gl: renderer.gl.clone(),
 
@@ -59,6 +59,8 @@ impl Text {
             text: Default::default(),
             line_height: font.get_cell_size().y as u32,
             elements_count: 0,
+            vertices: Vec::new(),
+            indices: Vec::new(),
 
             font_size: font.get_size(),
             font_cell_size: font.get_cell_size(),
@@ -115,8 +117,6 @@ impl Text {
 
     pub fn set_text(&mut self, text: &str) {
         unsafe {
-            let mut vertices = Vec::new();
-            let mut indices = Vec::new();
             let mut offset: Vec2 = Default::default();
             let mut size: Vec2 = Vec2::new(0.0, self.line_height as f32);
 
@@ -125,6 +125,9 @@ impl Text {
             let uv_height = self.font_cell_size.y / self.font_size.y;
             let uv_size = Vec2::new(uv_width, uv_height);
             let mut index = 0;
+
+            self.vertices.clear();
+            self.indices.clear();
 
             for char in text.chars() {
                 if char == '\n' {
@@ -140,10 +143,17 @@ impl Text {
                 let character_width = self.font_character_widths[char as usize];
                 let uv = Vec2::new(row as f32 * uv_width, 1.0 - col as f32 * uv_height - uv_height);
 
-                vertices.extend_from_slice(&self.get_vertices(self.font_cell_size.x as u32, self.font_cell_size.y as u32, offset, uv, uv_size, self.color));
+                self.vertices.extend_from_slice(&self.get_vertices(
+                    self.font_cell_size.x as u32,
+                    self.font_cell_size.y as u32,
+                    offset,
+                    uv,
+                    uv_size,
+                    self.color,
+                ));
 
                 let indices_offset = (index * 4) as u32;
-                indices.extend_from_slice(&[
+                self.indices.extend_from_slice(&[
                     0 + indices_offset,
                     1 + indices_offset,
                     2 + indices_offset,
@@ -158,25 +168,25 @@ impl Text {
             }
 
             // Adjust vertices, so the default anchor is in the left-bottom corner
-            for index in 0..(vertices.len() / 9) {
-                vertices[index * 9 + 1] += size.y - self.font_cell_size.y;
+            for index in 0..(self.vertices.len() / 9) {
+                self.vertices[index * 9 + 1] += size.y - self.font_cell_size.y;
             }
 
-            let vertices_size = (mem::size_of::<f32>() * vertices.len()) as i64;
-            let vertices_ptr = vertices.as_ptr() as *const c_void;
+            let vertices_size = (mem::size_of::<f32>() * self.vertices.len()) as i64;
+            let vertices_ptr = self.vertices.as_ptr() as *const c_void;
 
             (self.gl.glBindBuffer)(opengl::GL_ARRAY_BUFFER, self.vbo_gl_id);
             (self.gl.glBufferData)(opengl::GL_ARRAY_BUFFER, vertices_size, vertices_ptr, opengl::GL_STATIC_DRAW);
 
-            let indices_size = (mem::size_of::<u32>() * indices.len()) as i64;
-            let indices_ptr = indices.as_ptr() as *const c_void;
+            let indices_size = (mem::size_of::<u32>() * self.indices.len()) as i64;
+            let indices_ptr = self.indices.as_ptr() as *const c_void;
 
             (self.gl.glBindBuffer)(opengl::GL_ELEMENT_ARRAY_BUFFER, self.ebo_gl_id);
             (self.gl.glBufferData)(opengl::GL_ELEMENT_ARRAY_BUFFER, indices_size, indices_ptr, opengl::GL_STATIC_DRAW);
 
             self.text = text.to_string();
             self.size = size;
-            self.elements_count = indices.len() as u32;
+            self.elements_count = self.indices.len() as u32;
         }
     }
 
@@ -292,12 +302,8 @@ impl Drawable for Text {
         translation * rotation * scale * anchor_offset
     }
 
-    fn get_shape_id(&self) -> Result<usize, String> {
-        Err("Dynamic drawable doesn't use predefined shape".to_string())
-    }
-
-    fn get_texture_id(&self) -> usize {
-        self.texture_id
+    fn get_batch(&self) -> Batch {
+        Batch::new(None, Some(self.vertices.clone()), Some(self.indices.clone()), Some(self.texture_gl_id), Some(self.color))
     }
 
     fn draw(&self, shader: &Shader) -> Result<(), String> {

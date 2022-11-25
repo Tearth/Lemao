@@ -1,8 +1,6 @@
 use super::context::RendererContext;
 use super::drawable::Drawable;
 use super::shaders::Shader;
-use super::shapes::Shape;
-use super::textures::Texture;
 use lemao_math::color::Color;
 use lemao_math::mat4x4::Mat4x4;
 use lemao_math::vec4::Vec4;
@@ -27,6 +25,14 @@ pub struct BatchRenderer {
     texture_gl_id: u32,
     color: Color,
     max_indice: u32,
+}
+
+pub struct Batch {
+    pub(crate) shape_id: Option<usize>,
+    pub(crate) vertices: Option<Vec<f32>>,
+    pub(crate) indices: Option<Vec<u32>>,
+    pub(crate) texture_gl_id: Option<u32>,
+    pub(crate) color: Option<Color>,
 }
 
 impl BatchRenderer {
@@ -78,23 +84,23 @@ impl BatchRenderer {
         }
     }
 
-    pub fn add(&mut self, drawable: &dyn Drawable, shape: &Shape, texture: &Texture) -> Result<(), String> {
+    pub fn add(&mut self, drawable: &dyn Drawable, batch: &Batch) -> Result<(), String> {
         if self.first_batch_added {
-            if self.texture_gl_id != texture.texture_gl_id {
+            if self.texture_gl_id != batch.texture_gl_id.unwrap() {
                 return Err("Invalid texture".to_string());
             }
 
-            if self.color != drawable.get_color() {
+            if self.color != batch.color.unwrap() {
                 return Err("Invalid color".to_string());
             }
         }
 
-        let mut vertices = shape.get_vertices();
+        let mut vertices = batch.vertices.as_ref().unwrap().clone();
         if self.vertices.len() + vertices.len() > self.max_vertices_count {
             return Err("Too many vertices".to_string());
         }
 
-        let mut indices = shape.get_indices();
+        let mut indices = batch.indices.as_ref().unwrap().clone();
         if self.indices.len() + indices.len() > self.max_indices_count {
             return Err("Too many indices".to_string());
         }
@@ -118,7 +124,7 @@ impl BatchRenderer {
         self.first_batch_added = true;
         self.vertices.extend_from_slice(&vertices);
         self.indices.extend_from_slice(&indices);
-        self.texture_gl_id = texture.texture_gl_id;
+        self.texture_gl_id = batch.texture_gl_id.unwrap();
         self.color = drawable.get_color();
 
         Ok(())
@@ -153,5 +159,11 @@ impl BatchRenderer {
 
             Ok(())
         }
+    }
+}
+
+impl Batch {
+    pub fn new(shape_id: Option<usize>, vertices: Option<Vec<f32>>, indices: Option<Vec<u32>>, texture_gl_id: Option<u32>, color: Option<Color>) -> Self {
+        Self { shape_id, vertices, indices, texture_gl_id, color }
     }
 }
