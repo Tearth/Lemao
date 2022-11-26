@@ -282,3 +282,21 @@ impl Drawable for Animation {
         self
     }
 }
+
+impl Drop for Animation {
+    fn drop(&mut self) {
+        unsafe {
+            if self.vbo_gl_id != 0 {
+                (self.gl.glDeleteBuffers)(1, &mut self.vbo_gl_id);
+            }
+
+            if self.ebo_gl_id != 0 {
+                (self.gl.glDeleteBuffers)(1, &mut self.ebo_gl_id);
+            }
+
+            if self.vao_gl_id != 0 {
+                (self.gl.glDeleteVertexArrays)(1, &mut self.vao_gl_id);
+            }
+        }
+    }
+}
