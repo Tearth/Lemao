@@ -125,7 +125,7 @@ impl BatchRenderer {
         self.vertices.extend_from_slice(&vertices);
         self.indices.extend_from_slice(&indices);
         self.texture_gl_id = batch.texture_gl_id.unwrap();
-        self.color = drawable.get_color();
+        self.color = batch.color.unwrap();
 
         Ok(())
     }

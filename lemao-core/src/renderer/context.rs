@@ -1,6 +1,7 @@
 use super::batcher::BatchRenderer;
 use super::cameras::storage::CameraStorage;
 use super::cameras::Camera;
+use super::drawable::animation::Animation;
 use super::drawable::circle::Circle;
 use super::drawable::line::Line;
 use super::drawable::rectangle::Rectangle;
@@ -39,9 +40,9 @@ pub struct RendererContext {
     active_camera_id: usize,
     default_shader_id: usize,
     active_shader_id: usize,
-    default_sprite_shape_id: usize,
     default_line_shape_id: usize,
     default_rectangle_shape_id: usize,
+    default_sprite_shape_id: usize,
     default_texture_id: usize,
 
     textures: Arc<Mutex<TextureStorage>>,
@@ -153,9 +154,9 @@ impl RendererContext {
                 active_camera_id: 0,
                 default_shader_id: 0,
                 active_shader_id: 0,
-                default_sprite_shape_id: 0,
                 default_line_shape_id: 0,
                 default_rectangle_shape_id: 0,
+                default_sprite_shape_id: 0,
                 default_texture_id: 0,
 
                 textures,
@@ -320,6 +321,14 @@ impl RendererContext {
 
     pub fn set_default_camera(&mut self) -> Result<(), String> {
         self.set_camera_as_active(self.default_camera_id)
+    }
+
+    pub fn create_animation(&mut self, texture_id: usize, tile_size: Vec2) -> Result<usize, String> {
+        let texture_storage = self.textures.lock().unwrap();
+        let texture = texture_storage.get(texture_id)?;
+        let animation = Box::new(Animation::new(self, texture, tile_size));
+
+        Ok(self.drawables.as_mut().unwrap().store_animation(animation))
     }
 
     pub fn create_circle(&mut self, radius: f32, sides: u32) -> Result<usize, String> {

@@ -1,3 +1,4 @@
+use super::animation::Animation;
 use super::circle::Circle;
 use super::line::Line;
 use super::rectangle::Rectangle;
@@ -11,6 +12,14 @@ pub struct DrawableStorage {
 }
 
 impl DrawableStorage {
+    pub fn store_animation(&mut self, mut animation: Box<Animation>) -> usize {
+        let id = self.data.len();
+        animation.id = id;
+        self.data.push(Some(animation));
+
+        id
+    }
+
     pub fn store_circle(&mut self, mut circle: Box<Circle>) -> usize {
         let id = self.data.len();
         circle.id = id;

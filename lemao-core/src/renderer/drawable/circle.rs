@@ -154,6 +154,7 @@ impl Circle {
             let vertices_size = (mem::size_of::<f32>() * self.vertices.len()) as i64;
             let vertices_ptr = self.vertices.as_ptr() as *const c_void;
 
+            (self.gl.glBindVertexArray)(self.vao_gl_id);
             (self.gl.glBindBuffer)(opengl::GL_ARRAY_BUFFER, self.vbo_gl_id);
             (self.gl.glBufferData)(opengl::GL_ARRAY_BUFFER, vertices_size, vertices_ptr, opengl::GL_STATIC_DRAW);
 
@@ -166,7 +167,7 @@ impl Circle {
     }
 
     #[rustfmt::skip]
-    fn get_vertices(&self, position: Vec2, uv: Vec2,  color: Color) -> [f32; 9] {
+    fn get_vertices(&self, position: Vec2, uv: Vec2, color: Color) -> [f32; 9] {
         [
             /* v.x */ position.x,
             /* v.y */ position.y,

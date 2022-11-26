@@ -5,6 +5,7 @@ use lemao_math::mat4x4::Mat4x4;
 use lemao_math::vec2::Vec2;
 use std::any::Any;
 
+pub mod animation;
 pub mod circle;
 pub mod line;
 pub mod rectangle;

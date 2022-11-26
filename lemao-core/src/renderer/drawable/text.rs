@@ -175,6 +175,7 @@ impl Text {
             let vertices_size = (mem::size_of::<f32>() * self.vertices.len()) as i64;
             let vertices_ptr = self.vertices.as_ptr() as *const c_void;
 
+            (self.gl.glBindVertexArray)(self.vao_gl_id);
             (self.gl.glBindBuffer)(opengl::GL_ARRAY_BUFFER, self.vbo_gl_id);
             (self.gl.glBufferData)(opengl::GL_ARRAY_BUFFER, vertices_size, vertices_ptr, opengl::GL_STATIC_DRAW);
 
