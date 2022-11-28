@@ -3,11 +3,15 @@ use crate::renderer::context::RendererContext;
 use crate::renderer::fonts::storage::FontStorage;
 use crate::renderer::textures::storage::TextureStorage;
 use lemao_math::vec2::Vec2;
+use lemao_opengl::bindings::opengl;
+use lemao_opengl::bindings::wgl;
+use lemao_opengl::pointers::OpenGLPointers;
 use lemao_winapi::bindings::winapi;
 use std::collections::VecDeque;
 use std::ffi::CString;
 use std::mem;
 use std::ptr;
+use std::rc::Rc;
 use std::sync::Arc;
 use std::sync::Mutex;
 use std::time::SystemTime;
@@ -17,6 +21,7 @@ pub struct WindowContext {
     pub(crate) hwnd: winapi::HWND,
     pub(crate) hdc: winapi::HDC,
     pub(crate) fake: bool,
+    gl_context: winapi::HGLRC,
 
     style: WindowStyle,
     position: Vec2,
@@ -65,6 +70,7 @@ impl WindowContext {
                 hwnd: ptr::null_mut(),
                 hdc: ptr::null_mut(),
                 fake: false,
+                gl_context: ptr::null_mut(),
                 style,
                 position: Default::default(),
                 size: Default::default(),
@@ -127,6 +133,7 @@ impl WindowContext {
                 hwnd: ptr::null_mut(),
                 hdc: ptr::null_mut(),
                 fake: true,
+                gl_context: ptr::null_mut(),
                 style: WindowStyle::Window { position: Vec2::new(0.0, 0.0), size: Vec2::new(0.0, 0.0) },
                 position: Default::default(),
                 size: Default::default(),
@@ -213,8 +220,101 @@ impl WindowContext {
         }
     }
 
-    pub fn create_renderer(&self, textures: Arc<Mutex<TextureStorage>>, fonts: Arc<Mutex<FontStorage>>) -> Result<RendererContext, String> {
-        let mut renderer = RendererContext::new(self.hdc, textures, fonts)?;
+    pub fn create_renderer(&mut self, textures: Arc<Mutex<TextureStorage>>, fonts: Arc<Mutex<FontStorage>>) -> Result<RendererContext, String> {
+        unsafe {
+            let fake_window = WindowContext::new_fake()?;
+            let fake_window_hdc = fake_window.hdc;
+
+            let pixel_format_descriptor = winapi::PIXELFORMATDESCRIPTOR {
+                nSize: mem::size_of::<winapi::PIXELFORMATDESCRIPTOR>() as u16,
+                nVersion: 1,
+                dwFlags: winapi::PFD_DRAW_TO_WINDOW | winapi::PFD_SUPPORT_OPENGL | winapi::PFD_DOUBLEBUFFER,
+                iPixelType: winapi::PFD_TYPE_RGBA as u8,
+                cColorBits: 32,
+                cRedBits: 0,
+                cRedShift: 0,
+                cGreenBits: 0,
+                cGreenShift: 0,
+                cBlueBits: 0,
+                cBlueShift: 0,
+                cAlphaBits: 0,
+                cAlphaShift: 0,
+                cAccumBits: 0,
+                cAccumRedBits: 0,
+                cAccumGreenBits: 0,
+                cAccumBlueBits: 0,
+                cAccumAlphaBits: 0,
+                cDepthBits: 24,
+                cStencilBits: 8,
+                cAuxBuffers: 0,
+                iLayerType: winapi::PFD_MAIN_PLANE as u8,
+                bReserved: 0,
+                dwLayerMask: 0,
+                dwVisibleMask: 0,
+                dwDamageMask: 0,
+            };
+
+            let pixel_format = winapi::ChoosePixelFormat(fake_window_hdc, &pixel_format_descriptor);
+            if winapi::SetPixelFormat(fake_window_hdc, pixel_format, &pixel_format_descriptor) == 0 {
+                return Err(format!("Error while setting pixel format for fake window, GetLastError()={}", winapi::GetLastError()));
+            }
+
+            let fake_gl_context: winapi::HGLRC = winapi::wglCreateContext(fake_window_hdc);
+            if winapi::wglMakeCurrent(fake_window_hdc, fake_gl_context) == 0 {
+                return Err(format!("Error while creating fake OpenGL context, GetLastError()={}", winapi::GetLastError()));
+            }
+
+            let gl: Rc<OpenGLPointers> = Default::default();
+
+            winapi::wglDeleteContext(fake_gl_context);
+            fake_window.close();
+
+            let mut attributes = [
+                wgl::WGL_DRAW_TO_WINDOW_ARB,
+                opengl::GL_TRUE,
+                wgl::WGL_SUPPORT_OPENGL_ARB,
+                opengl::GL_TRUE,
+                wgl::WGL_DOUBLE_BUFFER_ARB,
+                opengl::GL_TRUE,
+                wgl::WGL_PIXEL_TYPE_ARB,
+                wgl::WGL_TYPE_RGBA_ARB,
+                wgl::WGL_COLOR_BITS_ARB,
+                32,
+                wgl::WGL_DEPTH_BITS_ARB,
+                24,
+                wgl::WGL_STENCIL_BITS_ARB,
+                8,
+                wgl::WGL_SAMPLE_BUFFERS_ARB,
+                opengl::GL_TRUE,
+                wgl::WGL_SAMPLES_ARB,
+                16,
+                0,
+            ];
+
+            let mut pixel_format = 0;
+            let mut formats_count = 0;
+            let attributes_ptr = attributes.as_mut_ptr() as *const i32;
+
+            if (gl.wglChoosePixelFormatARB)(self.hdc as wgl::HDC, attributes_ptr, ptr::null_mut(), 1, &mut pixel_format, &mut formats_count) == 0 {
+                return Err(format!("Error while loading available pixel formats for desired window, GetLastError()={}", winapi::GetLastError()));
+            }
+
+            if winapi::SetPixelFormat(self.hdc, pixel_format, &pixel_format_descriptor) == 0 {
+                return Err(format!("Error while setting pixel format for desired window, GetLastError()={}", winapi::GetLastError()));
+            }
+
+            let mut attributes = [wgl::WGL_CONTEXT_MAJOR_VERSION_ARB, 3, wgl::WGL_CONTEXT_MINOR_VERSION_ARB, 3, 0];
+            let attributes_ptr = attributes.as_mut_ptr() as *const i32;
+
+            let gl_context = (gl.wglCreateContextAttribsARB)(self.hdc as wgl::HDC, ptr::null_mut(), attributes_ptr);
+            if winapi::wglMakeCurrent(self.hdc, gl_context as winapi::HGLRC) == 0 {
+                return Err(format!("Error while creating OpenGL context for desired window, GetLastError()={}", winapi::GetLastError()));
+            }
+
+            self.gl_context = gl_context as winapi::HGLRC;
+        }
+
+        let mut renderer = RendererContext::new(textures, fonts)?;
         renderer.init()?;
         Ok(renderer)
     }
@@ -294,6 +394,7 @@ impl WindowContext {
 
     pub fn close(&self) {
         unsafe {
+            winapi::wglDeleteContext(self.gl_context);
             winapi::DestroyWindow(self.hwnd);
         }
     }
