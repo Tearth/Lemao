@@ -1,6 +1,4 @@
 use crate::bindings::opengl;
-use crate::bindings::wgl;
-use lemao_winapi::bindings::winapi;
 use std::ffi::CString;
 use std::mem;
 
@@ -50,80 +48,86 @@ pub struct OpenGLPointers {
     pub glVertexAttribPointer: opengl::PFNGLVERTEXATTRIBPOINTERPROC,
     pub glViewport: opengl::PFNGLVIEWPORTPROC,
 
+    #[cfg(windows)]
     pub wglChoosePixelFormatARB: wgl::PFNWGLCHOOSEPIXELFORMATARBPROC,
+
+    #[cfg(windows)]
     pub wglCreateContextAttribsARB: wgl::PFNWGLCREATECONTEXTATTRIBSARBPROC,
 }
 
 impl Default for OpenGLPointers {
     fn default() -> Self {
-        unsafe {
-            let opengl32_dll_cstr = CString::new("opengl32.dll").unwrap();
-            let opengl32_dll_handle = winapi::LoadLibraryA(opengl32_dll_cstr.as_ptr());
+        Self {
+            glAttachShader: get_proc_address::<opengl::PFNGLATTACHSHADERPROC>("glAttachShader"),
+            glBindBuffer: get_proc_address::<opengl::PFNGLBINDBUFFERPROC>("glBindBuffer"),
+            glBindTexture: get_proc_address::<opengl::PFNGLBINDTEXTUREPROC>("glBindTexture"),
+            glBindVertexArray: get_proc_address::<opengl::PFNGLBINDVERTEXARRAYPROC>("glBindVertexArray"),
+            glBlendFunc: get_proc_address::<opengl::PFNGLBLENDFUNCPROC>("glBlendFunc"),
+            glBufferData: get_proc_address::<opengl::PFNGLBUFFERDATAPROC>("glBufferData"),
+            glBufferSubData: get_proc_address::<opengl::PFNGLBUFFERSUBDATAPROC>("glBufferSubData"),
+            glClear: get_proc_address::<opengl::PFNGLCLEARPROC>("glClear"),
+            glClearColor: get_proc_address::<opengl::PFNGLCLEARCOLORPROC>("glClearColor"),
+            glCreateProgram: get_proc_address::<opengl::PFNGLCREATEPROGRAMPROC>("glCreateProgram"),
+            glCompileShader: get_proc_address::<opengl::PFNGLCOMPILESHADERPROC>("glCompileShader"),
+            glCreateShader: get_proc_address::<opengl::PFNGLCREATESHADERPROC>("glCreateShader"),
+            glDebugMessageCallback: get_proc_address::<opengl::PFNGLDEBUGMESSAGECALLBACKPROC>("glDebugMessageCallback"),
+            glDeleteBuffers: get_proc_address::<opengl::PFNGLDELETEBUFFERSPROC>("glDeleteBuffers"),
+            glDeleteProgram: get_proc_address::<opengl::PFNGLDELETEPROGRAMPROC>("glDeleteProgram"),
+            glDeleteTextures: get_proc_address::<opengl::PFNGLDELETETEXTURESPROC>("glDeleteTextures"),
+            glDeleteShader: get_proc_address::<opengl::PFNGLDELETESHADERPROC>("glDeleteShader"),
+            glDeleteVertexArrays: get_proc_address::<opengl::PFNGLDELETEVERTEXARRAYSPROC>("glDeleteVertexArrays"),
+            glDrawArrays: get_proc_address::<opengl::PFNGLDRAWARRAYSPROC>("glDrawArrays"),
+            glDrawElements: get_proc_address::<opengl::PFNGLDRAWELEMENTSPROC>("glDrawElements"),
+            glEnable: get_proc_address::<opengl::PFNGLENABLEPROC>("glEnable"),
+            glEnableVertexAttribArray: get_proc_address::<opengl::PFNGLENABLEVERTEXATTRIBARRAYPROC>("glEnableVertexAttribArray"),
+            glGenBuffers: get_proc_address::<opengl::PFNGLGENBUFFERSPROC>("glGenBuffers"),
+            glGenerateMipmap: get_proc_address::<opengl::PFNGLGENERATEMIPMAPPROC>("glGenerateMipmap"),
+            glGenTextures: get_proc_address::<opengl::PFNGLGENTEXTURESPROC>("glGenTextures"),
+            glGenVertexArrays: get_proc_address::<opengl::PFNGLGENBUFFERSPROC>("glGenVertexArrays"),
+            glGetActiveUniform: get_proc_address::<opengl::PFNGLGETACTIVEUNIFORMPROC>("glGetActiveUniform"),
+            glGetError: get_proc_address::<opengl::PFNGLGETERRORPROC>("glGetError"),
+            glGetProgramiv: get_proc_address::<opengl::PFNGLGETPROGRAMIVPROC>("glGetProgramiv"),
+            glGetProgramInfoLog: get_proc_address::<opengl::PFNGLGETPROGRAMINFOLOGPROC>("glGetProgramInfoLog"),
+            glGetShaderInfoLog: get_proc_address::<opengl::PFNGLGETSHADERINFOLOGPROC>("glGetShaderInfoLog"),
+            glGetShaderiv: get_proc_address::<opengl::PFNGLGETSHADERIVPROC>("glGetShaderiv"),
+            glGetString: get_proc_address::<opengl::PFNGLGETSTRINGPROC>("glGetString"),
+            glGetUniformLocation: get_proc_address::<opengl::PFNGLGETUNIFORMLOCATIONPROC>("glGetUniformLocation"),
+            glLinkProgram: get_proc_address::<opengl::PFNGLLINKPROGRAMPROC>("glLinkProgram"),
+            glShaderSource: get_proc_address::<opengl::PFNGLSHADERSOURCEPROC>("glShaderSource"),
+            glTexImage2D: get_proc_address::<opengl::PFNGLTEXIMAGE2DPROC>("glTexImage2D"),
+            glTexParameteri: get_proc_address::<opengl::PFNGLTEXPARAMETERIPROC>("glTexParameteri"),
+            glUniformMatrix4fv: get_proc_address::<opengl::PFNGLUNIFORMMATRIX4FVPROC>("glUniformMatrix4fv"),
+            glUniform4fv: get_proc_address::<opengl::PFNGLUNIFORM4FVPROC>("glUniform4fv"),
+            glUseProgram: get_proc_address::<opengl::PFNGLUSEPROGRAMPROC>("glUseProgram"),
+            glVertexAttribPointer: get_proc_address::<opengl::PFNGLVERTEXATTRIBPOINTERPROC>("glVertexAttribPointer"),
+            glViewport: get_proc_address::<opengl::PFNGLVIEWPORTPROC>("glViewport"),
 
-            Self {
-                glAttachShader: get_wgl_proc_address::<opengl::PFNGLATTACHSHADERPROC>("glAttachShader"),
-                glBindBuffer: get_wgl_proc_address::<opengl::PFNGLBINDBUFFERPROC>("glBindBuffer"),
-                glBindTexture: get_proc_address::<opengl::PFNGLBINDTEXTUREPROC>("glBindTexture", opengl32_dll_handle),
-                glBindVertexArray: get_wgl_proc_address::<opengl::PFNGLBINDVERTEXARRAYPROC>("glBindVertexArray"),
-                glBlendFunc: get_proc_address::<opengl::PFNGLBLENDFUNCPROC>("glBlendFunc", opengl32_dll_handle),
-                glBufferData: get_wgl_proc_address::<opengl::PFNGLBUFFERDATAPROC>("glBufferData"),
-                glBufferSubData: get_wgl_proc_address::<opengl::PFNGLBUFFERSUBDATAPROC>("glBufferSubData"),
-                glClear: get_proc_address::<opengl::PFNGLCLEARPROC>("glClear", opengl32_dll_handle),
-                glClearColor: get_proc_address::<opengl::PFNGLCLEARCOLORPROC>("glClearColor", opengl32_dll_handle),
-                glCreateProgram: get_wgl_proc_address::<opengl::PFNGLCREATEPROGRAMPROC>("glCreateProgram"),
-                glCompileShader: get_wgl_proc_address::<opengl::PFNGLCOMPILESHADERPROC>("glCompileShader"),
-                glCreateShader: get_wgl_proc_address::<opengl::PFNGLCREATESHADERPROC>("glCreateShader"),
-                glDebugMessageCallback: get_wgl_proc_address::<opengl::PFNGLDEBUGMESSAGECALLBACKPROC>("glDebugMessageCallback"),
-                glDeleteBuffers: get_wgl_proc_address::<opengl::PFNGLDELETEBUFFERSPROC>("glDeleteBuffers"),
-                glDeleteProgram: get_wgl_proc_address::<opengl::PFNGLDELETEPROGRAMPROC>("glDeleteProgram"),
-                glDeleteTextures: get_proc_address::<opengl::PFNGLDELETETEXTURESPROC>("glDeleteTextures", opengl32_dll_handle),
-                glDeleteShader: get_wgl_proc_address::<opengl::PFNGLDELETESHADERPROC>("glDeleteShader"),
-                glDeleteVertexArrays: get_wgl_proc_address::<opengl::PFNGLDELETEVERTEXARRAYSPROC>("glDeleteVertexArrays"),
-                glDrawArrays: get_proc_address::<opengl::PFNGLDRAWARRAYSPROC>("glDrawArrays", opengl32_dll_handle),
-                glDrawElements: get_proc_address::<opengl::PFNGLDRAWELEMENTSPROC>("glDrawElements", opengl32_dll_handle),
-                glEnable: get_proc_address::<opengl::PFNGLENABLEPROC>("glEnable", opengl32_dll_handle),
-                glEnableVertexAttribArray: get_wgl_proc_address::<opengl::PFNGLENABLEVERTEXATTRIBARRAYPROC>("glEnableVertexAttribArray"),
-                glGenBuffers: get_wgl_proc_address::<opengl::PFNGLGENBUFFERSPROC>("glGenBuffers"),
-                glGenerateMipmap: get_wgl_proc_address::<opengl::PFNGLGENERATEMIPMAPPROC>("glGenerateMipmap"),
-                glGenTextures: get_proc_address::<opengl::PFNGLGENTEXTURESPROC>("glGenTextures", opengl32_dll_handle),
-                glGenVertexArrays: get_wgl_proc_address::<opengl::PFNGLGENBUFFERSPROC>("glGenVertexArrays"),
-                glGetActiveUniform: get_wgl_proc_address::<opengl::PFNGLGETACTIVEUNIFORMPROC>("glGetActiveUniform"),
-                glGetError: get_proc_address::<opengl::PFNGLGETERRORPROC>("glGetError", opengl32_dll_handle),
-                glGetProgramiv: get_wgl_proc_address::<opengl::PFNGLGETPROGRAMIVPROC>("glGetProgramiv"),
-                glGetProgramInfoLog: get_wgl_proc_address::<opengl::PFNGLGETPROGRAMINFOLOGPROC>("glGetProgramInfoLog"),
-                glGetShaderInfoLog: get_wgl_proc_address::<opengl::PFNGLGETSHADERINFOLOGPROC>("glGetShaderInfoLog"),
-                glGetShaderiv: get_wgl_proc_address::<opengl::PFNGLGETSHADERIVPROC>("glGetShaderiv"),
-                glGetString: get_proc_address::<opengl::PFNGLGETSTRINGPROC>("glGetString", opengl32_dll_handle),
-                glGetUniformLocation: get_wgl_proc_address::<opengl::PFNGLGETUNIFORMLOCATIONPROC>("glGetUniformLocation"),
-                glLinkProgram: get_wgl_proc_address::<opengl::PFNGLLINKPROGRAMPROC>("glLinkProgram"),
-                glShaderSource: get_wgl_proc_address::<opengl::PFNGLSHADERSOURCEPROC>("glShaderSource"),
-                glTexImage2D: get_proc_address::<opengl::PFNGLTEXIMAGE2DPROC>("glTexImage2D", opengl32_dll_handle),
-                glTexParameteri: get_proc_address::<opengl::PFNGLTEXPARAMETERIPROC>("glTexParameteri", opengl32_dll_handle),
-                glUniformMatrix4fv: get_wgl_proc_address::<opengl::PFNGLUNIFORMMATRIX4FVPROC>("glUniformMatrix4fv"),
-                glUniform4fv: get_wgl_proc_address::<opengl::PFNGLUNIFORM4FVPROC>("glUniform4fv"),
-                glUseProgram: get_wgl_proc_address::<opengl::PFNGLUSEPROGRAMPROC>("glUseProgram"),
-                glVertexAttribPointer: get_wgl_proc_address::<opengl::PFNGLVERTEXATTRIBPOINTERPROC>("glVertexAttribPointer"),
-                glViewport: get_proc_address::<opengl::PFNGLVIEWPORTPROC>("glViewport", opengl32_dll_handle),
+            #[cfg(windows)]
+            wglChoosePixelFormatARB: get_proc_address::<wgl::PFNWGLCHOOSEPIXELFORMATARBPROC>("wglChoosePixelFormatARB"),
 
-                wglChoosePixelFormatARB: get_wgl_proc_address::<wgl::PFNWGLCHOOSEPIXELFORMATARBPROC>("wglChoosePixelFormatARB"),
-                wglCreateContextAttribsARB: get_wgl_proc_address::<wgl::PFNWGLCREATECONTEXTATTRIBSARBPROC>("wglCreateContextAttribsARB"),
-            }
+            #[cfg(windows)]
+            wglCreateContextAttribsARB: get_proc_address::<wgl::PFNWGLCREATECONTEXTATTRIBSARBPROC>("wglCreateContextAttribsARB"),
         }
     }
 }
 
-fn get_proc_address<T>(name: &str, dll_handle: *mut winapi::HINSTANCE__) -> T {
+#[cfg(windows)]
+fn get_proc_address<T>(name: &str) -> T {
     unsafe {
+        let opengl32_dll_cstr = CString::new("opengl32.dll").unwrap();
+        let opengl32_dll_handle = winapi::LoadLibraryA(opengl32_dll_cstr.as_ptr());
+
         let function_cstr = CString::new(name).unwrap();
         let function_handle = winapi::GetProcAddress(dll_handle, function_cstr.as_ptr());
         mem::transmute_copy::<winapi::FARPROC, T>(&function_handle)
     }
 }
 
-fn get_wgl_proc_address<T>(name: &str) -> T {
+#[cfg(unix)]
+fn get_proc_address<T>(name: &str) -> T {
     unsafe {
         let function_cstr = CString::new(name).unwrap();
-        let function_handle = winapi::wglGetProcAddress(function_cstr.as_ptr());
-        mem::transmute_copy::<winapi::PROC, T>(&function_handle)
+        let function_handle = crate::bindings::glx::glXGetProcAddressARB(function_cstr.as_ptr() as *const u8);
+        mem::transmute_copy::<crate::bindings::glx::__GLXextFuncPtr, T>(&function_handle)
     }
 }
