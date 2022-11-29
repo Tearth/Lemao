@@ -6,5 +6,5 @@ edition = "2021"
 [dependencies]
 lemao-math = { path = "../lemao-math" }
 lemao-openal = { path = "../lemao-openal" }
-lemao-opengl = { path = "../lemao-opengl" }
+lemao-opengl = { path = "../lemao-opengl", features = [ "windows" ] }
 lemao-winapi = { path = "../lemao-winapi" }

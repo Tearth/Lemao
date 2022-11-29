@@ -49,10 +49,10 @@ pub struct OpenGLPointers {
     pub glViewport: opengl::PFNGLVIEWPORTPROC,
 
     #[cfg(windows)]
-    pub wglChoosePixelFormatARB: wgl::PFNWGLCHOOSEPIXELFORMATARBPROC,
+    pub wglChoosePixelFormatARB: crate::bindings::wgl::PFNWGLCHOOSEPIXELFORMATARBPROC,
 
     #[cfg(windows)]
-    pub wglCreateContextAttribsARB: wgl::PFNWGLCREATECONTEXTATTRIBSARBPROC,
+    pub wglCreateContextAttribsARB: crate::bindings::wgl::PFNWGLCREATECONTEXTATTRIBSARBPROC,
 }
 
 impl Default for OpenGLPointers {
@@ -103,10 +103,10 @@ impl Default for OpenGLPointers {
             glViewport: get_proc_address::<opengl::PFNGLVIEWPORTPROC>("glViewport"),
 
             #[cfg(windows)]
-            wglChoosePixelFormatARB: get_proc_address::<wgl::PFNWGLCHOOSEPIXELFORMATARBPROC>("wglChoosePixelFormatARB"),
+            wglChoosePixelFormatARB: get_proc_address::<crate::bindings::wgl::PFNWGLCHOOSEPIXELFORMATARBPROC>("wglChoosePixelFormatARB"),
 
             #[cfg(windows)]
-            wglCreateContextAttribsARB: get_proc_address::<wgl::PFNWGLCREATECONTEXTATTRIBSARBPROC>("wglCreateContextAttribsARB"),
+            wglCreateContextAttribsARB: get_proc_address::<crate::bindings::wgl::PFNWGLCREATECONTEXTATTRIBSARBPROC>("wglCreateContextAttribsARB"),
         }
     }
 }
@@ -114,12 +114,36 @@ impl Default for OpenGLPointers {
 #[cfg(windows)]
 fn get_proc_address<T>(name: &str) -> T {
     unsafe {
-        let opengl32_dll_cstr = CString::new("opengl32.dll").unwrap();
-        let opengl32_dll_handle = winapi::LoadLibraryA(opengl32_dll_cstr.as_ptr());
+        let opengl32_dll_functions = [
+            "glBindTexture",
+            "glBlendFunc",
+            "glClear",
+            "glClearColor",
+            "glDeleteTextures",
+            "glDrawArrays",
+            "glDrawElements",
+            "glEnable",
+            "glGenTextures",
+            "glGetError",
+            "glTexImage2D",
+            "glTexParameteri",
+            "glViewport",
+        ];
 
-        let function_cstr = CString::new(name).unwrap();
-        let function_handle = winapi::GetProcAddress(dll_handle, function_cstr.as_ptr());
-        mem::transmute_copy::<winapi::FARPROC, T>(&function_handle)
+        if opengl32_dll_functions.contains(&name) {
+            let opengl32_dll_cstr = CString::new("opengl32.dll").unwrap();
+            let opengl32_dll_handle = lemao_winapi::bindings::winapi::LoadLibraryA(opengl32_dll_cstr.as_ptr());
+
+            let function_cstr = CString::new(name).unwrap();
+            let function_handle = lemao_winapi::bindings::winapi::GetProcAddress(opengl32_dll_handle, function_cstr.as_ptr());
+
+            mem::transmute_copy::<lemao_winapi::bindings::winapi::FARPROC, T>(&function_handle)
+        } else {
+            let function_cstr = CString::new(name).unwrap();
+            let function_handle = lemao_winapi::bindings::winapi::wglGetProcAddress(function_cstr.as_ptr());
+
+            mem::transmute_copy::<lemao_winapi::bindings::winapi::PROC, T>(&function_handle)
+        }
     }
 }
 
