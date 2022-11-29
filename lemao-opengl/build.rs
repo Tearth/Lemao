@@ -33,11 +33,11 @@ fn build_windows_binding() {
     if !Path::new(wgl_binging_path).exists() {
         lemao_bindgen::Builder::default()
             .header("./src/headers/glcorearb.h")
-            .header("./src/headers/wglext.h")
+            .header("./src/headers/wgl.h")
             .clang_args(&["-I./src/headers/"])
             .parse_callbacks(Box::new(lemao_bindgen::CargoCallbacks))
             .layout_tests(false)
-            .allowlist_file("./src/headers/wglext.h")
+            .allowlist_file("./src/headers/wgl.h")
             .generate()
             .unwrap()
             .write_to_file(wgl_binging_path)
