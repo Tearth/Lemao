@@ -8,4 +8,4 @@ lemao-math = { path = "../lemao-math" }
 lemao-openal = { path = "../lemao-openal" }
 lemao-opengl = { path = "../lemao-opengl" }
 lemao-common-platform = { path = "../lemao-platforms/lemao-common-platform" }
-lemao-winapi = { path = "../lemao-winapi" }
+lemao-windows-winapi = { path = "../lemao-platforms/lemao-windows-winapi" }

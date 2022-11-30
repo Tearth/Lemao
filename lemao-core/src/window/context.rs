@@ -7,7 +7,7 @@ use lemao_common_platform::input::MouseButton;
 use lemao_common_platform::window::WindowPlatformSpecific;
 use lemao_common_platform::window::WindowStyle;
 use lemao_math::vec2::Vec2;
-use lemao_winapi::window::WindowsWinAPIWindow;
+use lemao_windows_winapi::window::WindowsWinAPIWindow;
 use std::sync::Arc;
 use std::sync::Mutex;
 
