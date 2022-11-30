@@ -6,6 +6,7 @@ members = [
     "lemao-openal",
     "lemao-opengl",
     "lemao-platforms/lemao-common-platform",
+    "lemao-platforms/lemao-linux-x11",
     "lemao-platforms/lemao-windows-winapi",
 
     "examples/animation",
