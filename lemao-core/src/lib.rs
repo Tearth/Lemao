@@ -4,3 +4,6 @@ pub mod audio;
 pub mod renderer;
 pub mod utils;
 pub mod window;
+
+pub use lemao_common_platform;
+pub use lemao_math;

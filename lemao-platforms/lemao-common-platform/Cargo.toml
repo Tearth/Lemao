@@ -1,0 +1,7 @@
+[package]
+name = "lemao-common-platform"
+version = "1.0.0"
+edition = "2021"
+
+[dependencies]
+lemao-math = { path = "../../lemao-math" }

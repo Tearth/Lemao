@@ -1,5 +1,10 @@
 #![allow(clippy::collapsible_match)]
 
+use lemao_core::lemao_common_platform::input::InputEvent;
+use lemao_core::lemao_common_platform::input::Key;
+use lemao_core::lemao_common_platform::window::WindowStyle;
+use lemao_core::lemao_math::color::Color;
+use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::drawable::sprite::Sprite;
 use lemao_core::renderer::drawable::text::Text;
 use lemao_core::renderer::drawable::Drawable;
@@ -8,12 +13,6 @@ use lemao_core::renderer::fonts::storage::FontStorage;
 use lemao_core::renderer::textures::bmp;
 use lemao_core::renderer::textures::storage::TextureStorage;
 use lemao_core::window::context::WindowContext;
-use lemao_core::window::context::WindowStyle;
-use lemao_core::window::input;
-use lemao_core::window::input::InputEvent;
-use lemao_core::window::input::Key;
-use lemao_math::color::Color;
-use lemao_math::vec2::Vec2;
 use std::sync::Arc;
 use std::sync::Mutex;
 use std::time::Instant;
@@ -81,39 +80,39 @@ pub fn main() -> Result<(), String> {
         }
 
         let camera = renderer.get_active_camera_mut()?;
-        if input::is_key_pressed(Key::ArrowUp) {
+        if window.is_key_pressed(Key::ArrowUp) {
             camera.move_toward(Vec2::new(0.0, 200.0 * delta));
         }
-        if input::is_key_pressed(Key::ArrowDown) {
+        if window.is_key_pressed(Key::ArrowDown) {
             camera.move_toward(Vec2::new(0.0, -200.0 * delta));
         }
-        if input::is_key_pressed(Key::ArrowLeft) {
+        if window.is_key_pressed(Key::ArrowLeft) {
             camera.move_toward(Vec2::new(-200.0 * delta, 0.0));
         }
-        if input::is_key_pressed(Key::ArrowRight) {
+        if window.is_key_pressed(Key::ArrowRight) {
             camera.move_toward(Vec2::new(200.0 * delta, 0.0));
         }
 
         let sprite = renderer.get_drawable_mut(sprite_id)?;
-        if input::is_key_pressed(Key::KeyW) {
+        if window.is_key_pressed(Key::KeyW) {
             sprite.move_delta(Vec2::new(0.0, 200.0 * delta));
         }
-        if input::is_key_pressed(Key::KeyS) {
+        if window.is_key_pressed(Key::KeyS) {
             sprite.move_delta(Vec2::new(0.0, -200.0 * delta));
         }
-        if input::is_key_pressed(Key::KeyA) {
+        if window.is_key_pressed(Key::KeyA) {
             sprite.move_delta(Vec2::new(-200.0 * delta, 0.0));
         }
-        if input::is_key_pressed(Key::KeyD) {
+        if window.is_key_pressed(Key::KeyD) {
             sprite.move_delta(Vec2::new(200.0 * delta, 0.0));
         }
-        if input::is_key_pressed(Key::KeyE) {
+        if window.is_key_pressed(Key::KeyE) {
             sprite.rotate(-2.0 * delta);
         }
-        if input::is_key_pressed(Key::KeyQ) {
+        if window.is_key_pressed(Key::KeyQ) {
             sprite.rotate(2.0 * delta);
         }
-        if input::is_key_pressed(Key::Space) {
+        if window.is_key_pressed(Key::Space) {
             sprite.move_delta(Vec2::new_from_angle(sprite.get_rotation()) * 200.0 * Vec2::new(delta, delta));
         }
 

@@ -5,6 +5,5 @@ edition = "2021"
 
 [dependencies]
 lemao-core = { path = "../../lemao-core" }
-lemao-math = { path = "../../lemao-math" }
 chrono = { version = "0.4.22" }
 fastrand = { version = "1.8.0" }

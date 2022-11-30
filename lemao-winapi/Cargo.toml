@@ -3,5 +3,10 @@ name = "lemao-winapi"
 version = "1.0.0"
 edition = "2021"
 
+[dependencies]
+lemao-common-platform = { path = "../lemao-platforms/lemao-common-platform" }
+lemao-math = { path = "../lemao-math" }
+lemao-opengl = { path = "../lemao-opengl" }
+
 [build-dependencies]
 lemao-bindgen = { path = "../lemao-bindgen" }

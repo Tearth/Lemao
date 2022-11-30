@@ -16,6 +16,7 @@ use super::shapes::storage::ShapeStorage;
 use super::shapes::Shape;
 use super::textures::storage::TextureStorage;
 use super::textures::Texture;
+use lemao_common_platform::renderer::RendererPlatformSpecific;
 use lemao_math::color::Color;
 use lemao_math::vec2::Vec2;
 use lemao_math::vec3::Vec3;
@@ -40,6 +41,7 @@ pub struct RendererContext {
     default_sprite_shape_id: usize,
     default_texture_id: usize,
 
+    renderer_platform_specific: Box<dyn RendererPlatformSpecific>,
     textures: Arc<Mutex<TextureStorage>>,
     fonts: Arc<Mutex<FontStorage>>,
     cameras: Option<CameraStorage>,
@@ -50,7 +52,11 @@ pub struct RendererContext {
 }
 
 impl RendererContext {
-    pub fn new(textures: Arc<Mutex<TextureStorage>>, fonts: Arc<Mutex<FontStorage>>) -> Result<Self, String> {
+    pub fn new(
+        renderer_platform_specific: Box<dyn RendererPlatformSpecific>,
+        textures: Arc<Mutex<TextureStorage>>,
+        fonts: Arc<Mutex<FontStorage>>,
+    ) -> Result<Self, String> {
         Ok(RendererContext {
             gl: Default::default(),
 
@@ -63,6 +69,7 @@ impl RendererContext {
             default_sprite_shape_id: 0,
             default_texture_id: 0,
 
+            renderer_platform_specific,
             textures,
             fonts,
             shaders: None,
@@ -339,6 +346,16 @@ impl RendererContext {
 
         self.get_drawable(drawable_id)?.draw(shader)?;
         Ok(())
+    }
+
+    pub fn close(&self) {
+        self.renderer_platform_specific.close();
+    }
+}
+
+impl Drop for RendererContext {
+    fn drop(&mut self) {
+        self.close();
     }
 }
 

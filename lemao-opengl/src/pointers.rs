@@ -113,6 +113,8 @@ impl Default for OpenGLPointers {
 
 #[cfg(windows)]
 fn get_proc_address<T>(name: &str) -> T {
+    use crate::bindings::winapi;
+
     unsafe {
         let opengl32_dll_functions = [
             "glBindTexture",
@@ -132,17 +134,17 @@ fn get_proc_address<T>(name: &str) -> T {
 
         if opengl32_dll_functions.contains(&name) {
             let opengl32_dll_cstr = CString::new("opengl32.dll").unwrap();
-            let opengl32_dll_handle = lemao_winapi::bindings::winapi::LoadLibraryA(opengl32_dll_cstr.as_ptr());
+            let opengl32_dll_handle = winapi::LoadLibraryA(opengl32_dll_cstr.as_ptr());
 
             let function_cstr = CString::new(name).unwrap();
-            let function_handle = lemao_winapi::bindings::winapi::GetProcAddress(opengl32_dll_handle, function_cstr.as_ptr());
+            let function_handle = winapi::GetProcAddress(opengl32_dll_handle, function_cstr.as_ptr());
 
-            mem::transmute_copy::<lemao_winapi::bindings::winapi::FARPROC, T>(&function_handle)
+            mem::transmute_copy::<winapi::FARPROC, T>(&function_handle)
         } else {
             let function_cstr = CString::new(name).unwrap();
-            let function_handle = lemao_winapi::bindings::winapi::wglGetProcAddress(function_cstr.as_ptr());
+            let function_handle = winapi::wglGetProcAddress(function_cstr.as_ptr());
 
-            mem::transmute_copy::<lemao_winapi::bindings::winapi::PROC, T>(&function_handle)
+            mem::transmute_copy::<winapi::PROC, T>(&function_handle)
         }
     }
 }

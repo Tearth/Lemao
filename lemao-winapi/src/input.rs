@@ -1,90 +1,7 @@
-use super::context::WindowContext;
-use lemao_winapi::bindings::winapi;
-use std::mem;
-
-pub enum InputEvent {
-    Unknown,
-    WindowMoved(i32, i32),
-    WindowSizeChanged(u32, u32),
-    WindowClosed,
-    KeyPressed(Key),
-    KeyReleased(Key),
-    CharPressed(char),
-    MouseButtonPressed(MouseButton),
-    MouseButtonReleased(MouseButton),
-    MouseMoved(i32, i32),
-    MouseWheelRotated(i32),
-}
-
-#[derive(Debug)]
-pub enum Key {
-    Unknown = 0x00,
-    Enter = 0x0d,
-    Escape = 0x1b,
-    Space = 0x20,
-
-    ArrowLeft = 0x25,
-    ArrowUp = 0x26,
-    ArrowRight = 0x27,
-    ArrowDown = 0x28,
-
-    Key0 = 0x30,
-    Key1 = 0x31,
-    Key2 = 0x32,
-    Key3 = 0x33,
-    Key4 = 0x34,
-    Key5 = 0x35,
-    Key6 = 0x36,
-    Key7 = 0x37,
-    Key8 = 0x38,
-    Key9 = 0x39,
-
-    KeyA = 0x41,
-    KeyB = 0x42,
-    KeyC = 0x43,
-    KeyD = 0x44,
-    KeyE = 0x45,
-    KeyF = 0x46,
-    KeyG = 0x47,
-    KeyH = 0x48,
-    KeyI = 0x49,
-    KeyJ = 0x4a,
-    KeyK = 0x4b,
-    KeyL = 0x4c,
-    KeyM = 0x4d,
-    KeyN = 0x4e,
-    KeyO = 0x4f,
-    KeyP = 0x50,
-    KeyQ = 0x51,
-    KeyR = 0x52,
-    KeyS = 0x53,
-    KeyT = 0x54,
-    KeyU = 0x55,
-    KeyV = 0x56,
-    KeyW = 0x57,
-    KeyX = 0x58,
-    KeyY = 0x59,
-    KeyZ = 0x5a,
-
-    Num0 = 0x60,
-    Num1 = 0x61,
-    Num2 = 0x62,
-    Num3 = 0x63,
-    Num4 = 0x64,
-    Num5 = 0x65,
-    Num6 = 0x66,
-    Num7 = 0x67,
-    Num8 = 0x68,
-    Num9 = 0x69,
-}
-
-#[derive(Debug)]
-pub enum MouseButton {
-    Unknown = 0x00,
-    Left = 0x01,
-    Right = 0x02,
-    Middle = 0x04,
-}
+use crate::bindings::winapi;
+use lemao_common_platform::input::InputEvent;
+use lemao_common_platform::input::Key;
+use lemao_common_platform::input::MouseButton;
 
 impl From<winapi::MSG> for InputEvent {
     fn from(message: winapi::MSG) -> InputEvent {
@@ -104,44 +21,6 @@ impl From<winapi::MSG> for InputEvent {
         }
     }
 }
-
-pub fn is_key_pressed(key: Key) -> bool {
-    unsafe { ((winapi::GetKeyState(key as i32) as u16) & 0x8000) != 0 }
-}
-
-pub fn is_mouse_button_pressed(button: MouseButton) -> bool {
-    unsafe { ((winapi::GetKeyState(button as i32) as u16) & 0x8000) != 0 }
-}
-
-pub fn get_cursor_position(window: &WindowContext) -> (i32, i32) {
-    unsafe {
-        let mut point = mem::zeroed();
-        winapi::GetCursorPos(&mut point);
-        winapi::ScreenToClient(window.hwnd, &mut point);
-
-        (point.x, point.y)
-    }
-}
-
-pub fn set_cursor_visibility(visible: bool) {
-    unsafe {
-        match visible {
-            true => while winapi::ShowCursor(1) < 0 {},
-            false => while winapi::ShowCursor(0) >= 0 {},
-        };
-    }
-}
-
-pub fn is_cursor_visible() -> bool {
-    unsafe {
-        let mut cursor_info: winapi::tagCURSORINFO = mem::zeroed();
-        cursor_info.cbSize = mem::size_of::<winapi::tagCURSORINFO>() as u32;
-        winapi::GetCursorInfo(&mut cursor_info);
-
-        cursor_info.flags != 0
-    }
-}
-
 fn virtual_key_to_key(virtual_key: u64) -> Key {
     match virtual_key {
         0x0d => Key::Enter,

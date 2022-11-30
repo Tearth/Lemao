@@ -1,5 +1,11 @@
 #![allow(clippy::collapsible_match)]
 
+use lemao_core::lemao_common_platform::input::InputEvent;
+use lemao_core::lemao_common_platform::input::Key;
+use lemao_core::lemao_common_platform::input::MouseButton;
+use lemao_core::lemao_common_platform::window::WindowStyle;
+use lemao_core::lemao_math::color::Color;
+use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::drawable::line::Line;
 use lemao_core::renderer::drawable::text::Text;
 use lemao_core::renderer::drawable::Drawable;
@@ -7,13 +13,6 @@ use lemao_core::renderer::fonts::bff;
 use lemao_core::renderer::fonts::storage::FontStorage;
 use lemao_core::renderer::textures::storage::TextureStorage;
 use lemao_core::window::context::WindowContext;
-use lemao_core::window::context::WindowStyle;
-use lemao_core::window::input;
-use lemao_core::window::input::InputEvent;
-use lemao_core::window::input::Key;
-use lemao_core::window::input::MouseButton;
-use lemao_math::color::Color;
-use lemao_math::vec2::Vec2;
 use std::sync::Arc;
 use std::sync::Mutex;
 
@@ -73,15 +72,15 @@ pub fn main() -> Result<(), String> {
             }
         }
 
-        if input::is_mouse_button_pressed(MouseButton::Left) {
+        if window.is_mouse_button_pressed(MouseButton::Left) {
             let window_size = window.get_size();
-            let position = input::get_cursor_position(&window);
+            let position = window.get_cursor_position();
             renderer.get_drawable_with_type_mut::<Line>(line_id)?.set_from(Vec2::new(position.0 as f32, window_size.y - position.1 as f32));
         }
 
-        if input::is_mouse_button_pressed(MouseButton::Right) {
+        if window.is_mouse_button_pressed(MouseButton::Right) {
             let window_size = window.get_size();
-            let position = input::get_cursor_position(&window);
+            let position = window.get_cursor_position();
             renderer.get_drawable_with_type_mut::<Line>(line_id)?.set_to(Vec2::new(position.0 as f32, window_size.y - position.1 as f32));
         }
 
