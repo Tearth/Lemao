@@ -18,7 +18,7 @@ use std::rc::Rc;
 use std::time::SystemTime;
 use std::time::UNIX_EPOCH;
 
-pub struct WindowsWinAPIWindow {
+pub struct WindowWinAPI {
     pub(crate) hwnd: winapi::HWND,
     pub(crate) hdc: winapi::HDC,
     pub(crate) fake: bool,
@@ -35,7 +35,7 @@ pub struct WndProcEvent {
     l_param: winapi::LPARAM,
 }
 
-impl WindowsWinAPIWindow {
+impl WindowWinAPI {
     pub fn new(title: &str, style: WindowStyle) -> Result<Box<Self>, String> {
         unsafe {
             let timestamp = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis();
@@ -160,7 +160,7 @@ impl WindowsWinAPIWindow {
     }
 }
 
-impl WindowPlatformSpecific for WindowsWinAPIWindow {
+impl WindowPlatformSpecific for WindowWinAPI {
     fn poll_event(&mut self) -> Option<lemao_common_platform::input::InputEvent> {
         unsafe {
             let mut event: winapi::MSG = mem::zeroed();
@@ -215,7 +215,7 @@ impl WindowPlatformSpecific for WindowsWinAPIWindow {
 
     fn create_renderer(&mut self) -> Result<Box<dyn RendererPlatformSpecific>, String> {
         unsafe {
-            let fake_window = WindowsWinAPIWindow::new_fake()?;
+            let fake_window = WindowWinAPI::new_fake()?;
             let fake_window_hdc = fake_window.hdc;
 
             let pixel_format_descriptor = winapi::PIXELFORMATDESCRIPTOR {
@@ -426,7 +426,7 @@ extern "C" fn wnd_proc(hwnd: winapi::HWND, message: winapi::UINT, w_param: winap
         match message {
             winapi::WM_CREATE => {
                 let create_struct = &mut *(l_param as *mut winapi::CREATESTRUCT);
-                let window = &mut *(create_struct.lpCreateParams as *mut WindowsWinAPIWindow);
+                let window = &mut *(create_struct.lpCreateParams as *mut WindowWinAPI);
                 let hdc: winapi::HDC = winapi::GetDC(hwnd);
 
                 // Save pointer to the window context, so it can be used in all future events
@@ -438,7 +438,7 @@ extern "C" fn wnd_proc(hwnd: winapi::HWND, message: winapi::UINT, w_param: winap
             }
             winapi::WM_MOVE | winapi::WM_SIZE => {
                 let window_ptr = winapi::GetWindowLongPtrA(hwnd, winapi::GWLP_USERDATA);
-                let window = &mut *(window_ptr as *mut WindowsWinAPIWindow);
+                let window = &mut *(window_ptr as *mut WindowWinAPI);
 
                 window.wnd_proc_events.push_front(WndProcEvent { message, l_param });
             }
@@ -451,7 +451,7 @@ extern "C" fn wnd_proc(hwnd: winapi::HWND, message: winapi::UINT, w_param: winap
             }
             winapi::WM_DESTROY => {
                 let window_ptr = winapi::GetWindowLongPtrA(hwnd, winapi::GWLP_USERDATA);
-                let window = &mut *(window_ptr as *mut WindowsWinAPIWindow);
+                let window = &mut *(window_ptr as *mut WindowWinAPI);
 
                 window.hwnd = ptr::null_mut();
                 window.hdc = ptr::null_mut();

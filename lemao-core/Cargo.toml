@@ -9,3 +9,4 @@ lemao-openal = { path = "../lemao-openal" }
 lemao-opengl = { path = "../lemao-opengl" }
 lemao-common-platform = { path = "../lemao-platforms/lemao-common-platform" }
 lemao-windows-winapi = { path = "../lemao-platforms/lemao-windows-winapi" }
+lemao-linux-x11 = { path = "../lemao-platforms/lemao-linux-x11" }

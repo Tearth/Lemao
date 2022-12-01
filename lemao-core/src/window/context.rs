@@ -7,7 +7,6 @@ use lemao_common_platform::input::MouseButton;
 use lemao_common_platform::window::WindowPlatformSpecific;
 use lemao_common_platform::window::WindowStyle;
 use lemao_math::vec2::Vec2;
-use lemao_windows_winapi::window::WindowsWinAPIWindow;
 use std::sync::Arc;
 use std::sync::Mutex;
 
@@ -17,7 +16,11 @@ pub struct WindowContext {
 
 impl WindowContext {
     pub fn new(title: &str, style: WindowStyle) -> Result<Self, String> {
-        Ok(Self { window: WindowsWinAPIWindow::new(title, style)? })
+        #[cfg(windows)]
+        return Ok(Self { window: lemao_windows_winapi::window::WindowWinAPI::new(title, style)? });
+
+        #[cfg(unix)]
+        return Ok(Self { window: lemao_linux_x11::window::WindowX11::new(title, style)? });
     }
 
     pub fn poll_event(&mut self) -> Option<InputEvent> {
