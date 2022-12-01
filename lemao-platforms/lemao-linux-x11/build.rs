@@ -13,4 +13,6 @@ fn main() {
             .write_to_file(x11_binging_path)
             .unwrap();
     }
+
+    println!("cargo:rustc-link-lib=dylib=X11");
 }

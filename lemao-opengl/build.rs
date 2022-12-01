@@ -67,12 +67,17 @@ fn build_linux_binding() {
     if !Path::new(glx_binging_path).exists() {
         lemao_bindgen::Builder::default()
             .header("/usr/include/GL/glx.h")
+            .header("/usr/include/GL/glxext.h")
             .parse_callbacks(Box::new(lemao_bindgen::CargoCallbacks))
             .layout_tests(false)
             .allowlist_file("/usr/include/GL/glx.h")
+            .allowlist_file("/usr/include/GL/glxext.h")
             .generate()
             .unwrap()
             .write_to_file(glx_binging_path)
             .unwrap();
     }
+
+    //println!("cargo:rustc-link-lib=dylib=GL");
+    println!("cargo:rustc-link-lib=dylib=GLX");
 }
