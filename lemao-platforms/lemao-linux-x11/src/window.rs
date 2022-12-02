@@ -1,10 +1,10 @@
 use crate::bindings::x11;
-use crate::bindings::x11::KeyRelease;
 use crate::input;
 use crate::renderer::LinuxX11Renderer;
 use lemao_common_platform::input::InputEvent;
 use lemao_common_platform::input::Key;
 use lemao_common_platform::input::MouseButton;
+use lemao_common_platform::renderer::RendererPlatformSpecific;
 use lemao_common_platform::window::WindowPlatformSpecific;
 use lemao_common_platform::window::WindowStyle;
 use lemao_math::vec2::Vec2;
@@ -147,8 +147,8 @@ impl WindowX11 {
                 x11::XRootWindow(display, screen_id),
                 0,
                 0,
-                800,
-                600,
+                1,
+                1,
                 0,
                 (*visual_info).depth,
                 x11::InputOutput,
@@ -167,7 +167,7 @@ impl WindowX11 {
             x11::XClearWindow(display, window);
             x11::XMapRaised(display, window);
 
-            Ok(Box::new(Self {
+            let mut context = Box::new(Self {
                 display,
                 frame_buffer_config: best_frame_buffer_config,
                 delete_window_atom,
@@ -178,13 +178,16 @@ impl WindowX11 {
                 style,
                 position: Default::default(),
                 size: Default::default(),
-            }))
+            });
+
+            context.set_style(style)?;
+            Ok(context)
         }
     }
 }
 
 impl WindowPlatformSpecific for WindowX11 {
-    fn poll_event(&mut self) -> Option<lemao_common_platform::input::InputEvent> {
+    fn poll_event(&mut self) -> Option<InputEvent> {
         unsafe {
             if x11::XPending(self.display) > 0 {
                 let mut event = mem::zeroed();
@@ -253,7 +256,7 @@ impl WindowPlatformSpecific for WindowX11 {
         }
     }
 
-    fn create_renderer(&mut self) -> Result<Box<dyn lemao_common_platform::renderer::RendererPlatformSpecific>, String> {
+    fn create_renderer(&mut self) -> Result<Box<dyn RendererPlatformSpecific>, String> {
         unsafe { Ok(Box::new(LinuxX11Renderer::new(self.display, self.frame_buffer_config, self.window))) }
     }
 
@@ -270,6 +273,66 @@ impl WindowPlatformSpecific for WindowX11 {
     }
 
     fn set_style(&mut self, style: WindowStyle) -> Result<(), String> {
+        unsafe {
+            match style {
+                WindowStyle::Window { position, size } => {
+                    let net_wm_state_cstr = CString::new("_NET_WM_STATE").unwrap();
+                    let net_wm_state_fullscreen_cstr = CString::new("_NET_WM_STATE_FULLSCREEN").unwrap();
+
+                    let wm_state = x11::XInternAtom(self.display, net_wm_state_cstr.as_ptr(), 1);
+                    let wm_fullscreen = x11::XInternAtom(self.display, net_wm_state_fullscreen_cstr.as_ptr(), 1);
+
+                    let mut event: x11::XEvent = mem::zeroed();
+                    event.type_ = x11::ClientMessage as i32;
+                    event.xclient.window = self.window;
+                    event.xclient.format = 32;
+                    event.xclient.message_type = wm_state;
+                    event.xclient.data.l[0] = 0;
+                    event.xclient.data.l[1] = wm_fullscreen as i64;
+                    event.xclient.data.l[2] = 0;
+                    event.xclient.data.l[3] = 1;
+
+                    x11::XSendEvent(
+                        self.display,
+                        x11::XDefaultRootWindow(self.display),
+                        0,
+                        x11::SubstructureNotifyMask as i64 | x11::SubstructureRedirectMask as i64,
+                        &mut event,
+                    );
+
+                    x11::XMoveWindow(self.display, self.window, position.x as i32, position.y as i32);
+                    x11::XResizeWindow(self.display, self.window, size.x as u32, size.y as u32);
+                }
+                WindowStyle::Borderless | WindowStyle::Fullscreen => {
+                    let net_wm_state_cstr = CString::new("_NET_WM_STATE").unwrap();
+                    let net_wm_state_fullscreen_cstr = CString::new("_NET_WM_STATE_FULLSCREEN").unwrap();
+
+                    let wm_state = x11::XInternAtom(self.display, net_wm_state_cstr.as_ptr(), 1);
+                    let wm_fullscreen = x11::XInternAtom(self.display, net_wm_state_fullscreen_cstr.as_ptr(), 1);
+
+                    let mut event: x11::XEvent = mem::zeroed();
+                    event.type_ = x11::ClientMessage as i32;
+                    event.xclient.window = self.window;
+                    event.xclient.format = 32;
+                    event.xclient.message_type = wm_state;
+                    event.xclient.data.l[0] = 1;
+                    event.xclient.data.l[1] = wm_fullscreen as i64;
+                    event.xclient.data.l[2] = 0;
+                    event.xclient.data.l[3] = 1;
+
+                    x11::XSendEvent(
+                        self.display,
+                        x11::XDefaultRootWindow(self.display),
+                        0,
+                        x11::SubstructureNotifyMask as i64 | x11::SubstructureRedirectMask as i64,
+                        &mut event,
+                    );
+                }
+            }
+
+            self.style = style;
+        }
+
         Ok(())
     }
 
