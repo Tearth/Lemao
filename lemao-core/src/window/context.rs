@@ -71,7 +71,7 @@ impl WindowContext {
         self.window.get_cursor_position()
     }
 
-    pub fn set_cursor_visibility(&self, visible: bool) {
+    pub fn set_cursor_visibility(&mut self, visible: bool) {
         self.window.set_cursor_visibility(visible)
     }
 

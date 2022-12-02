@@ -390,9 +390,11 @@ impl WindowPlatformSpecific for WindowWinAPI {
     fn is_key_pressed(&self, key: Key) -> bool {
         unsafe { ((winapi::GetKeyState(key as i32) as u16) & 0x8000) != 0 }
     }
+
     fn is_mouse_button_pressed(&self, button: MouseButton) -> bool {
         unsafe { ((winapi::GetKeyState(button as i32) as u16) & 0x8000) != 0 }
     }
+
     fn get_cursor_position(&self) -> (i32, i32) {
         unsafe {
             let mut point = mem::zeroed();
@@ -402,6 +404,7 @@ impl WindowPlatformSpecific for WindowWinAPI {
             (point.x, point.y)
         }
     }
+
     fn set_cursor_visibility(&self, visible: bool) {
         unsafe {
             match visible {
@@ -410,7 +413,8 @@ impl WindowPlatformSpecific for WindowWinAPI {
             };
         }
     }
-    fn is_cursor_visible(&self) -> bool {
+
+    fn is_cursor_visible(&mut self) -> bool {
         unsafe {
             let mut cursor_info: winapi::tagCURSORINFO = mem::zeroed();
             cursor_info.cbSize = mem::size_of::<winapi::tagCURSORINFO>() as u32;

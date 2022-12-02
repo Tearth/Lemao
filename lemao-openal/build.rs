@@ -14,4 +14,7 @@ fn main() {
             .write_to_file(openal_binging_path)
             .unwrap();
     }
+
+    #[cfg(unix)]
+    println!("cargo:rustc-link-lib=dylib=openal");
 }

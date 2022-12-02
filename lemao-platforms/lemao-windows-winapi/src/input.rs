@@ -21,6 +21,7 @@ impl From<winapi::MSG> for InputEvent {
         }
     }
 }
+
 fn virtual_key_to_key(virtual_key: u64) -> Key {
     match virtual_key {
         0x0d => Key::Enter,

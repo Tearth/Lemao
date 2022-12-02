@@ -6,6 +6,8 @@ fn main() {
         #[cfg(unix)]
         lemao_bindgen::Builder::default()
             .header("/usr/include/X11/Xlib.h")
+            .header("/usr/include/X11/keysym.h")
+            .header("/usr/include/X11/extensions/Xfixes.h")
             .parse_callbacks(Box::new(lemao_bindgen::CargoCallbacks))
             .layout_tests(false)
             .generate()
@@ -15,4 +17,5 @@ fn main() {
     }
 
     println!("cargo:rustc-link-lib=dylib=X11");
+    println!("cargo:rustc-link-lib=dylib=Xfixes");
 }

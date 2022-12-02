@@ -12,7 +12,7 @@ pub enum InputEvent {
     MouseWheelRotated(i32),
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Key {
     Unknown = 0x00,
     Enter = 0x0d,
@@ -76,8 +76,8 @@ pub enum Key {
 
 #[derive(Debug)]
 pub enum MouseButton {
-    Unknown = 0x00,
-    Left = 0x01,
-    Right = 0x02,
-    Middle = 0x04,
+    Left,
+    Middle,
+    Right,
+    Unknown,
 }
