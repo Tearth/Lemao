@@ -19,7 +19,7 @@ pub struct WindowContext {
 impl WindowContext {
     pub fn new(title: &str, style: WindowStyle) -> Result<Self, String> {
         #[cfg(windows)]
-        return Ok(Self { window: lemao_windows_winapi::window::WindowWinAPI::new(title, style)? });
+        return Ok(Self { window: lemao_windows_winapi::window::WindowWinAPI::new(title, style)?, events: VecDeque::new() });
 
         #[cfg(unix)]
         return Ok(Self { window: lemao_linux_x11::window::WindowX11::new(title, style)?, events: VecDeque::new() });

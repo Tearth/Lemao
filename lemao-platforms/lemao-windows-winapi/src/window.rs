@@ -158,7 +158,7 @@ impl WindowWinAPI {
 }
 
 impl WindowPlatformSpecific for WindowWinAPI {
-    fn poll_event(&mut self) -> Option<lemao_common_platform::input::InputEvent> {
+    fn poll_event(&mut self) -> Vec<InputEvent> {
         unsafe {
             let mut event: winapi::MSG = mem::zeroed();
 
@@ -167,18 +167,18 @@ impl WindowPlatformSpecific for WindowWinAPI {
                 winapi::DispatchMessageA(&event);
 
                 match event.message {
-                    winapi::WM_KEYDOWN => return Some(InputEvent::KeyPressed(input::virtual_key_to_key(event.wParam))),
-                    winapi::WM_KEYUP => return Some(InputEvent::KeyReleased(input::virtual_key_to_key(event.wParam))),
-                    winapi::WM_CHAR => return Some(InputEvent::CharPressed(char::from_u32(event.wParam as u32).unwrap())),
-                    winapi::WM_LBUTTONDOWN => return Some(InputEvent::MouseButtonPressed(MouseButton::Left)),
-                    winapi::WM_RBUTTONDOWN => return Some(InputEvent::MouseButtonPressed(MouseButton::Right)),
-                    winapi::WM_MBUTTONDOWN => return Some(InputEvent::MouseButtonPressed(MouseButton::Middle)),
-                    winapi::WM_LBUTTONUP => return Some(InputEvent::MouseButtonReleased(MouseButton::Left)),
-                    winapi::WM_RBUTTONUP => return Some(InputEvent::MouseButtonReleased(MouseButton::Right)),
-                    winapi::WM_MBUTTONUP => return Some(InputEvent::MouseButtonReleased(MouseButton::Middle)),
-                    winapi::WM_MOUSEMOVE => return Some(InputEvent::MouseMoved((event.lParam as i32) & 0xffff, (event.lParam as i32) >> 16)),
-                    winapi::WM_MOUSEWHEEL => return Some(InputEvent::MouseWheelRotated((event.wParam as i32) >> 16)),
-                    winapi::WM_QUIT => return Some(InputEvent::WindowClosed),
+                    winapi::WM_KEYDOWN => return vec![InputEvent::KeyPressed(input::virtual_key_to_key(event.wParam))],
+                    winapi::WM_KEYUP => return vec![InputEvent::KeyReleased(input::virtual_key_to_key(event.wParam))],
+                    winapi::WM_CHAR => return vec![InputEvent::CharPressed(char::from_u32(event.wParam as u32).unwrap())],
+                    winapi::WM_LBUTTONDOWN => return vec![InputEvent::MouseButtonPressed(MouseButton::Left)],
+                    winapi::WM_RBUTTONDOWN => return vec![InputEvent::MouseButtonPressed(MouseButton::Right)],
+                    winapi::WM_MBUTTONDOWN => return vec![InputEvent::MouseButtonPressed(MouseButton::Middle)],
+                    winapi::WM_LBUTTONUP => return vec![InputEvent::MouseButtonReleased(MouseButton::Left)],
+                    winapi::WM_RBUTTONUP => return vec![InputEvent::MouseButtonReleased(MouseButton::Right)],
+                    winapi::WM_MBUTTONUP => return vec![InputEvent::MouseButtonReleased(MouseButton::Middle)],
+                    winapi::WM_MOUSEMOVE => return vec![InputEvent::MouseMoved((event.lParam as i32) & 0xffff, (event.lParam as i32) >> 16)],
+                    winapi::WM_MOUSEWHEEL => return vec![InputEvent::MouseWheelRotated((event.wParam as i32) >> 16)],
+                    winapi::WM_QUIT => return vec![InputEvent::WindowClosed],
                     _ => {}
                 }
             }
@@ -193,20 +193,20 @@ impl WindowPlatformSpecific for WindowWinAPI {
                         let y = (event.l_param >> 16) as i32 + rect.top;
                         self.position = Vec2::new(x as f32, y as f32);
 
-                        return Some(InputEvent::WindowMoved(x, y));
+                        return vec![InputEvent::WindowMoved(x, y)];
                     }
                     winapi::WM_SIZE => {
                         let width = (event.l_param & 0xffff) as u32;
                         let height = (event.l_param >> 16) as u32;
                         self.size = Vec2::new(width as f32, height as f32);
 
-                        return Some(InputEvent::WindowSizeChanged(width, height));
+                        return vec![InputEvent::WindowSizeChanged(width, height)];
                     }
-                    _ => return None,
+                    _ => return Vec::new(),
                 }
             }
 
-            None
+            Vec::new()
         }
     }
 
