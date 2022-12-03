@@ -142,13 +142,14 @@ impl WindowX11 {
                 cursor: 0,
             };
 
+            let window_size = if let WindowStyle::Window { position: _, size } = style { size } else { Vec2::new(1.0, 1.0) };
             let window = x11::XCreateWindow(
                 display,
                 x11::XRootWindow(display, screen_id),
                 0,
                 0,
-                1,
-                1,
+                window_size.x as u32,
+                window_size.y as u32,
                 0,
                 (*visual_info).depth,
                 x11::InputOutput,
