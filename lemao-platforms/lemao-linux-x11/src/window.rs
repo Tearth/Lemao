@@ -187,7 +187,7 @@ impl WindowX11 {
 }
 
 impl WindowPlatformSpecific for WindowX11 {
-    fn poll_event(&mut self) -> Option<InputEvent> {
+    fn poll_event(&mut self) -> Vec<InputEvent> {
         unsafe {
             if x11::XPending(self.display) > 0 {
                 let mut event = mem::zeroed();
@@ -195,63 +195,65 @@ impl WindowPlatformSpecific for WindowX11 {
 
                 match event.type_ as u32 {
                     //winapi::WM_CHAR => return Some(event.into()),
-                    //winapi::WM_MOUSEWHEEL => return Some(event.into()),
                     x11::ConfigureNotify => {
                         if event.xconfigure.width != (self.size.x as i32) || event.xconfigure.height != (self.size.y as i32) {
                             self.size = Vec2::new(event.xconfigure.width as f32, event.xconfigure.height as f32);
-                            return Some(InputEvent::WindowSizeChanged(event.xconfigure.width as u32, event.xconfigure.height as u32));
+                            return vec![InputEvent::WindowSizeChanged(event.xconfigure.width as u32, event.xconfigure.height as u32)];
                         }
                     }
                     x11::KeyPress => {
-                        let keysym = x11::XLookupKeysym(mem::transmute(&event.xkey), 0);
+                        let keysym = x11::XLookupKeysym(&event.xkey as *const _ as *mut x11::XKeyEvent, 0);
                         let key = input::virtual_key_to_key(keysym as u32);
-                        let input_event = InputEvent::KeyPressed(key.clone());
                         self.keyboard_state[key as usize] = true;
 
-                        return Some(input_event);
+                        let mut buffer = vec![0; 1];
+                        let buffer_ptr = buffer.as_mut_ptr() as *mut i8;
+                        x11::XLookupString(&mut event.xkey, buffer_ptr, 1, ptr::null_mut(), ptr::null_mut());
+
+                        return vec![InputEvent::KeyPressed(key), InputEvent::CharPressed(char::from_u32(buffer[0] as u32).unwrap())];
                     }
                     x11::KeyRelease => {
-                        let keysym = x11::XLookupKeysym(mem::transmute(&event.xkey), 0);
+                        let keysym = x11::XLookupKeysym(&event.xkey as *const _ as *mut x11::XKeyEvent, 0);
                         let key = input::virtual_key_to_key(keysym as u32);
-                        let input_event = InputEvent::KeyPressed(key.clone());
+                        let input_event = InputEvent::KeyPressed(key);
                         self.keyboard_state[key as usize] = false;
 
-                        return Some(input_event);
+                        return vec![input_event];
                     }
                     x11::ButtonPress => {
                         self.mouse_state[(event.xbutton.button as usize) - 1] = true;
-                        return Some(match event.xbutton.button {
+                        return vec![match event.xbutton.button {
                             x11::Button1 => InputEvent::MouseButtonPressed(MouseButton::Left),
                             x11::Button2 => InputEvent::MouseButtonPressed(MouseButton::Right),
                             x11::Button3 => InputEvent::MouseButtonPressed(MouseButton::Middle),
                             _ => InputEvent::MouseButtonPressed(MouseButton::Unknown),
-                        });
+                        }];
                     }
                     x11::ButtonRelease => {
                         self.mouse_state[(event.xbutton.button as usize) - 1] = false;
-                        return Some(match event.xbutton.button {
+                        return vec![match event.xbutton.button {
                             x11::Button1 => InputEvent::MouseButtonReleased(MouseButton::Left),
                             x11::Button2 => InputEvent::MouseButtonReleased(MouseButton::Right),
                             x11::Button3 => InputEvent::MouseButtonReleased(MouseButton::Middle),
                             x11::Button4 => InputEvent::MouseWheelRotated(1),
                             x11::Button5 => InputEvent::MouseWheelRotated(-1),
                             _ => InputEvent::MouseButtonReleased(MouseButton::Unknown),
-                        });
+                        }];
                     }
                     x11::MotionNotify => {
-                        return Some(InputEvent::MouseMoved(event.xmotion.x, event.xmotion.y));
+                        return vec![InputEvent::MouseMoved(event.xmotion.x, event.xmotion.y)];
                     }
                     x11::ClientMessage => {
                         if event.xclient.data.l[0] == self.delete_window_atom as i64 {
-                            return Some(InputEvent::WindowClosed);
+                            return vec![InputEvent::WindowClosed];
                         }
                     }
                     _ => {}
                 }
 
-                None
+                Vec::new()
             } else {
-                None
+                Vec::new()
             }
         }
     }

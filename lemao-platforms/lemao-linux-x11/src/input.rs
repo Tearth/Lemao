@@ -1,27 +1,5 @@
 use crate::bindings::x11;
-use lemao_common_platform::input::InputEvent;
 use lemao_common_platform::input::Key;
-
-impl From<x11::_XEvent> for InputEvent {
-    fn from(event: x11::_XEvent) -> InputEvent {
-        unsafe {
-            match event.type_ as u32 {
-                x11::KeyPress => InputEvent::KeyPressed(virtual_key_to_key(event.xkey.keycode)),
-                //winapi::WM_KEYUP => InputEvent::KeyReleased(virtual_key_to_key(message.wParam)),
-                //winapi::WM_CHAR => InputEvent::CharPressed(char::from_u32(message.wParam as u32).unwrap()),
-                //winapi::WM_LBUTTONDOWN => InputEvent::MouseButtonPressed(MouseButton::Left),
-                //winapi::WM_RBUTTONDOWN => InputEvent::MouseButtonPressed(MouseButton::Right),
-                //winapi::WM_MBUTTONDOWN => InputEvent::MouseButtonPressed(MouseButton::Middle),
-                //winapi::WM_LBUTTONUP => InputEvent::MouseButtonReleased(MouseButton::Left),
-                //winapi::WM_RBUTTONUP => InputEvent::MouseButtonReleased(MouseButton::Right),
-                //winapi::WM_MBUTTONUP => InputEvent::MouseButtonReleased(MouseButton::Middle),
-                //winapi::WM_MOUSEMOVE => InputEvent::MouseMoved((message.lParam as i32) & 0xffff, (message.lParam as i32) >> 16),
-                //winapi::WM_MOUSEWHEEL => InputEvent::MouseWheelRotated((message.wParam as i32) >> 16),
-                _ => InputEvent::Unknown,
-            }
-        }
-    }
-}
 
 pub fn virtual_key_to_key(virtual_key: u32) -> Key {
     match virtual_key {

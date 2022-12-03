@@ -12,7 +12,7 @@ pub enum InputEvent {
     MouseWheelRotated(i32),
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Copy, Clone)]
 pub enum Key {
     Unknown,
     Enter,

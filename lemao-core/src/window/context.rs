@@ -7,11 +7,13 @@ use lemao_common_platform::input::MouseButton;
 use lemao_common_platform::window::WindowPlatformSpecific;
 use lemao_common_platform::window::WindowStyle;
 use lemao_math::vec2::Vec2;
+use std::collections::VecDeque;
 use std::sync::Arc;
 use std::sync::Mutex;
 
 pub struct WindowContext {
     window: Box<dyn WindowPlatformSpecific>,
+    events: VecDeque<InputEvent>,
 }
 
 impl WindowContext {
@@ -20,11 +22,12 @@ impl WindowContext {
         return Ok(Self { window: lemao_windows_winapi::window::WindowWinAPI::new(title, style)? });
 
         #[cfg(unix)]
-        return Ok(Self { window: lemao_linux_x11::window::WindowX11::new(title, style)? });
+        return Ok(Self { window: lemao_linux_x11::window::WindowX11::new(title, style)?, events: VecDeque::new() });
     }
 
     pub fn poll_event(&mut self) -> Option<InputEvent> {
-        self.window.poll_event()
+        self.events.extend(self.window.poll_event());
+        self.events.pop_front()
     }
 
     pub fn create_renderer(&mut self, textures: Arc<Mutex<TextureStorage>>, fonts: Arc<Mutex<FontStorage>>) -> Result<RendererContext, String> {

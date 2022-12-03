@@ -6,6 +6,7 @@ fn main() {
         #[cfg(unix)]
         lemao_bindgen::Builder::default()
             .header("/usr/include/X11/Xlib.h")
+            .header("/usr/include/X11/Xutil.h")
             .header("/usr/include/X11/keysym.h")
             .header("/usr/include/X11/extensions/Xfixes.h")
             .parse_callbacks(Box::new(lemao_bindgen::CargoCallbacks))

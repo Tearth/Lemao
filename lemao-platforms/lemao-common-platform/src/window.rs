@@ -13,7 +13,7 @@ pub enum WindowStyle {
 }
 
 pub trait WindowPlatformSpecific {
-    fn poll_event(&mut self) -> Option<InputEvent>;
+    fn poll_event(&mut self) -> Vec<InputEvent>;
     fn create_renderer(&mut self) -> Result<Box<dyn RendererPlatformSpecific>, String>;
     fn get_position(&self) -> Vec2;
     fn get_size(&self) -> Vec2;
