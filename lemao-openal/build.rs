@@ -16,5 +16,10 @@ fn main() {
     }
 
     #[cfg(unix)]
+    link_linux_libs();
+}
+
+#[cfg(unix)]
+fn link_linux_libs() {
     println!("cargo:rustc-link-lib=dylib=openal");
 }

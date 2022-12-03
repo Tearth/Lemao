@@ -8,6 +8,9 @@ fn main() {
 
     #[cfg(unix)]
     build_linux_binding();
+
+    #[cfg(unix)]
+    link_linux_libs();
 }
 
 fn build_core_binding() {
@@ -77,7 +80,9 @@ fn build_linux_binding() {
             .write_to_file(glx_binging_path)
             .unwrap();
     }
+}
 
-    //println!("cargo:rustc-link-lib=dylib=GL");
+#[cfg(unix)]
+fn link_linux_libs() {
     println!("cargo:rustc-link-lib=dylib=GLX");
 }

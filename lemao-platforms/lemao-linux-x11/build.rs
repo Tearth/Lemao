@@ -17,6 +17,12 @@ fn main() {
             .unwrap();
     }
 
+    #[cfg(unix)]
+    link_linux_libs();
+}
+
+#[cfg(unix)]
+fn link_linux_libs() {
     println!("cargo:rustc-link-lib=dylib=X11");
     println!("cargo:rustc-link-lib=dylib=Xfixes");
 }
