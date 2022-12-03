@@ -1,4 +1,5 @@
 use crate::bindings::winapi;
+use crate::input;
 use crate::renderer::WindowsWinAPIRenderer;
 use lemao_common_platform::input::InputEvent;
 use lemao_common_platform::input::Key;
@@ -170,17 +171,17 @@ impl WindowPlatformSpecific for WindowWinAPI {
                 winapi::DispatchMessageA(&event);
 
                 match event.message {
-                    winapi::WM_KEYDOWN => return Some(event.into()),
-                    winapi::WM_KEYUP => return Some(event.into()),
-                    winapi::WM_CHAR => return Some(event.into()),
-                    winapi::WM_LBUTTONDOWN => return Some(event.into()),
-                    winapi::WM_MBUTTONDOWN => return Some(event.into()),
-                    winapi::WM_RBUTTONDOWN => return Some(event.into()),
-                    winapi::WM_LBUTTONUP => return Some(event.into()),
-                    winapi::WM_MBUTTONUP => return Some(event.into()),
-                    winapi::WM_RBUTTONUP => return Some(event.into()),
-                    winapi::WM_MOUSEMOVE => return Some(event.into()),
-                    winapi::WM_MOUSEWHEEL => return Some(event.into()),
+                    winapi::WM_KEYDOWN => return Some(InputEvent::KeyPressed(input::virtual_key_to_key(event.wParam))),
+                    winapi::WM_KEYUP => return Some(InputEvent::KeyReleased(input::virtual_key_to_key(event.wParam))),
+                    winapi::WM_CHAR => return Some(InputEvent::CharPressed(char::from_u32(event.wParam as u32).unwrap())),
+                    winapi::WM_LBUTTONDOWN => return Some(InputEvent::MouseButtonPressed(MouseButton::Left)),
+                    winapi::WM_RBUTTONDOWN => return Some(InputEvent::MouseButtonPressed(MouseButton::Right)),
+                    winapi::WM_MBUTTONDOWN => return Some(InputEvent::MouseButtonPressed(MouseButton::Middle)),
+                    winapi::WM_LBUTTONUP => return Some(InputEvent::MouseButtonReleased(MouseButton::Left)),
+                    winapi::WM_RBUTTONUP => return Some(InputEvent::MouseButtonReleased(MouseButton::Right)),
+                    winapi::WM_MBUTTONUP => return Some(InputEvent::MouseButtonReleased(MouseButton::Middle)),
+                    winapi::WM_MOUSEMOVE => return Some(InputEvent::MouseMoved((event.lParam as i32) & 0xffff, (event.lParam as i32) >> 16)),
+                    winapi::WM_MOUSEWHEEL => return Some(InputEvent::MouseWheelRotated((event.wParam as i32) >> 16)),
                     winapi::WM_QUIT => return Some(InputEvent::WindowClosed),
                     _ => {}
                 }
@@ -388,11 +389,11 @@ impl WindowPlatformSpecific for WindowWinAPI {
     }
 
     fn is_key_pressed(&self, key: Key) -> bool {
-        unsafe { ((winapi::GetKeyState(key as i32) as u16) & 0x8000) != 0 }
+        unsafe { ((winapi::GetKeyState(input::key_to_virtual_key(key) as i32) as u16) & 0x8000) != 0 }
     }
 
     fn is_mouse_button_pressed(&self, button: MouseButton) -> bool {
-        unsafe { ((winapi::GetKeyState(button as i32) as u16) & 0x8000) != 0 }
+        unsafe { ((winapi::GetKeyState(input::button_to_virtual_button(button) as i32) as u16) & 0x8000) != 0 }
     }
 
     fn get_cursor_position(&self) -> (i32, i32) {
@@ -405,7 +406,7 @@ impl WindowPlatformSpecific for WindowWinAPI {
         }
     }
 
-    fn set_cursor_visibility(&self, visible: bool) {
+    fn set_cursor_visibility(&mut self, visible: bool) {
         unsafe {
             match visible {
                 true => while winapi::ShowCursor(1) < 0 {},
@@ -414,7 +415,7 @@ impl WindowPlatformSpecific for WindowWinAPI {
         }
     }
 
-    fn is_cursor_visible(&mut self) -> bool {
+    fn is_cursor_visible(&self) -> bool {
         unsafe {
             let mut cursor_info: winapi::tagCURSORINFO = mem::zeroed();
             cursor_info.cbSize = mem::size_of::<winapi::tagCURSORINFO>() as u32;
