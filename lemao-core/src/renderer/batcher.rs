@@ -95,12 +95,12 @@ impl BatchRenderer {
             }
         }
 
-        let mut vertices = batch.vertices.as_ref().unwrap().clone();
+        let vertices = batch.vertices.as_ref().unwrap();
         if self.vertices.len() + vertices.len() > self.max_vertices_count {
             return Err("Too many vertices".to_string());
         }
 
-        let mut indices = batch.indices.as_ref().unwrap().clone();
+        let indices = batch.indices.as_ref().unwrap();
         if self.indices.len() + indices.len() > self.max_indices_count {
             return Err("Too many indices".to_string());
         }
@@ -110,20 +110,25 @@ impl BatchRenderer {
             let position = Vec4::new(vertices[index * 9 + 0], vertices[index * 9 + 1], vertices[index * 9 + 2], 1.0);
             let transformed_position = transformation_matrix * position;
 
-            vertices[index * 9 + 0] = transformed_position.x;
-            vertices[index * 9 + 1] = transformed_position.y;
-            vertices[index * 9 + 2] = transformed_position.z;
+            self.vertices.push(transformed_position.x);
+            self.vertices.push(transformed_position.y);
+            self.vertices.push(transformed_position.z);
+
+            self.vertices.push(vertices[index * 9 + 3]);
+            self.vertices.push(vertices[index * 9 + 4]);
+            self.vertices.push(vertices[index * 9 + 5]);
+            self.vertices.push(vertices[index * 9 + 6]);
+            self.vertices.push(vertices[index * 9 + 7]);
+            self.vertices.push(vertices[index * 9 + 8]);
         }
 
         let base_indice = self.max_indice;
         for index in 0..indices.len() {
-            indices[index] += base_indice;
-            self.max_indice = self.max_indice.max(indices[index] + 1);
+            self.indices.push(indices[index] + base_indice);
+            self.max_indice = self.max_indice.max(indices[index] + base_indice + 1);
         }
 
         self.first_batch_added = true;
-        self.vertices.extend_from_slice(&vertices);
-        self.indices.extend_from_slice(&indices);
         self.texture_gl_id = batch.texture_gl_id.unwrap();
         self.color = batch.color.unwrap();
 
