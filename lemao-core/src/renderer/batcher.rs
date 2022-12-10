@@ -95,12 +95,12 @@ impl BatchRenderer {
             }
         }
 
-        let vertices = batch.vertices.as_ref().unwrap();
+        let vertices = batch.vertices.unwrap();
         if self.vertices.len() + vertices.len() > self.max_vertices_count {
             return Err("Too many vertices".to_string());
         }
 
-        let indices = batch.indices.as_ref().unwrap();
+        let indices = batch.indices.unwrap();
         if self.indices.len() + indices.len() > self.max_indices_count {
             return Err("Too many indices".to_string());
         }

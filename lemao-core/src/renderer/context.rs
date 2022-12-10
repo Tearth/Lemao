@@ -24,7 +24,6 @@ use lemao_opengl::bindings::opengl;
 use lemao_opengl::pointers::OpenGLPointers;
 use std::ffi::c_void;
 use std::fs;
-use std::ptr;
 use std::rc::Rc;
 use std::sync::Arc;
 use std::sync::Mutex;
@@ -81,11 +80,11 @@ impl RendererContext {
     }
 
     pub fn init(&mut self) -> Result<(), String> {
-        #[cfg(debug_assertions)]
-        unsafe {
-            (self.gl.glEnable)(opengl::GL_DEBUG_OUTPUT);
-            (self.gl.glDebugMessageCallback)(gl_error, ptr::null_mut());
-        }
+        // #[cfg(debug_assertions)]
+        // unsafe {
+        //     (self.gl.glEnable)(opengl::GL_DEBUG_OUTPUT);
+        //     (self.gl.glDebugMessageCallback)(gl_error, ptr::null_mut());
+        // }
 
         self.init_storages();
         self.init_default_camera()?;
@@ -359,6 +358,7 @@ impl Drop for RendererContext {
     }
 }
 
+#[allow(dead_code)]
 unsafe extern "C" fn gl_error(
     source: opengl::GLenum,
     r#type: opengl::GLenum,
