@@ -79,12 +79,12 @@ impl Shape {
         self.id
     }
 
-    pub fn get_vertices(&self) -> Vec<f32> {
-        self.vertices.clone()
+    pub fn get_vertices(&self) -> &Vec<f32> {
+        &self.vertices
     }
 
-    pub fn get_indices(&self) -> Vec<u32> {
-        self.indices.clone()
+    pub fn get_indices(&self) -> &Vec<u32> {
+        &self.indices
     }
 }
 

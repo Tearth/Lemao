@@ -27,10 +27,10 @@ pub struct BatchRenderer {
     max_indice: u32,
 }
 
-pub struct Batch {
+pub struct Batch<'a> {
     pub(crate) shape_id: Option<usize>,
-    pub(crate) vertices: Option<Vec<f32>>,
-    pub(crate) indices: Option<Vec<u32>>,
+    pub(crate) vertices: Option<&'a Vec<f32>>,
+    pub(crate) indices: Option<&'a Vec<u32>>,
     pub(crate) texture_gl_id: Option<u32>,
     pub(crate) color: Option<Color>,
 }
@@ -167,8 +167,14 @@ impl BatchRenderer {
     }
 }
 
-impl Batch {
-    pub fn new(shape_id: Option<usize>, vertices: Option<Vec<f32>>, indices: Option<Vec<u32>>, texture_gl_id: Option<u32>, color: Option<Color>) -> Self {
+impl<'a> Batch<'a> {
+    pub fn new(
+        shape_id: Option<usize>,
+        vertices: Option<&'a Vec<f32>>,
+        indices: Option<&'a Vec<u32>>,
+        texture_gl_id: Option<u32>,
+        color: Option<Color>,
+    ) -> Self {
         Self { shape_id, vertices, indices, texture_gl_id, color }
     }
 }
