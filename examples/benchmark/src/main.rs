@@ -13,6 +13,12 @@ use std::sync::Arc;
 use std::sync::Mutex;
 use std::time::Instant;
 
+#[no_mangle]
+pub static NvOptimusEnablement: i32 = 1;
+
+#[no_mangle]
+pub static AmdPowerXpressRequestHighPerformance: i32 = 1;
+
 const CELLS_COUNT: usize = 10000;
 const MAX_SPEED: f32 = 1.0;
 
