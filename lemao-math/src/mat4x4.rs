@@ -1,11 +1,13 @@
 use crate::vec3::Vec3;
 use crate::vec4::Vec4;
-use std::ops::Add;
+use std::arch::x86_64;
+use std::mem;
 use std::ops::Index;
 use std::ops::IndexMut;
 use std::ops::Mul;
-use std::ops::Sub;
 
+#[repr(C)]
+#[repr(align(16))]
 #[derive(Copy, Clone, Default, Debug, PartialEq)]
 pub struct Mat4x4 {
     data: [f32; 16],
@@ -29,18 +31,18 @@ impl Mat4x4 {
         matrix[10] = 2.0 / (near - far);
         matrix[15] = 1.0;
 
-        matrix[3] = -1.0;
-        matrix[7] = -1.0;
-        matrix[11] = (far + near) / (near - far);
+        matrix[12] = -1.0;
+        matrix[13] = -1.0;
+        matrix[14] = (far + near) / (near - far);
 
         matrix
     }
 
     pub fn translate(translation: Vec3) -> Self {
         let mut matrix: Mat4x4 = Mat4x4::identity();
-        matrix[3] = translation.x;
-        matrix[7] = translation.y;
-        matrix[11] = translation.z;
+        matrix[12] = translation.x;
+        matrix[13] = translation.y;
+        matrix[14] = translation.z;
 
         matrix
     }
@@ -48,8 +50,8 @@ impl Mat4x4 {
     pub fn rotate(rotation: f32) -> Self {
         let mut matrix: Mat4x4 = Mat4x4::identity();
         matrix[0] = rotation.cos();
-        matrix[1] = -rotation.sin();
-        matrix[4] = rotation.sin();
+        matrix[4] = -rotation.sin();
+        matrix[1] = rotation.sin();
         matrix[5] = rotation.cos();
 
         matrix
@@ -67,59 +69,9 @@ impl Mat4x4 {
     pub fn as_ptr(&self) -> *const f32 {
         self.data.as_ptr() as *const f32
     }
-}
 
-impl Add for Mat4x4 {
-    type Output = Self;
-
-    fn add(self, rhs: Self) -> Self::Output {
-        Self::Output {
-            data: [
-                self[0] + rhs[0],
-                self[1] + rhs[1],
-                self[2] + rhs[2],
-                self[3] + rhs[3],
-                self[4] + rhs[4],
-                self[5] + rhs[5],
-                self[6] + rhs[6],
-                self[7] + rhs[7],
-                self[8] + rhs[8],
-                self[9] + rhs[9],
-                self[10] + rhs[10],
-                self[11] + rhs[11],
-                self[12] + rhs[12],
-                self[13] + rhs[13],
-                self[14] + rhs[14],
-                self[15] + rhs[15],
-            ],
-        }
-    }
-}
-
-impl Sub for Mat4x4 {
-    type Output = Self;
-
-    fn sub(self, rhs: Self) -> Self::Output {
-        Self::Output {
-            data: [
-                self[0] - rhs[0],
-                self[1] - rhs[1],
-                self[2] - rhs[2],
-                self[3] - rhs[3],
-                self[4] - rhs[4],
-                self[5] - rhs[5],
-                self[6] - rhs[6],
-                self[7] - rhs[7],
-                self[8] - rhs[8],
-                self[9] - rhs[9],
-                self[10] - rhs[10],
-                self[11] - rhs[11],
-                self[12] - rhs[12],
-                self[13] - rhs[13],
-                self[14] - rhs[14],
-                self[15] - rhs[15],
-            ],
-        }
+    pub fn as_mut_ptr(&mut self) -> *mut f32 {
+        self.data.as_mut_ptr() as *mut f32
     }
 }
 
@@ -127,7 +79,50 @@ impl Mul for Mat4x4 {
     type Output = Self;
 
     fn mul(self, rhs: Self) -> Self::Output {
+        /*
+            1x + 2y + 3z   1hx + 2hy + 3hz
+            6x + 5y + 4z   6hx + 5hy + 4hz
+            7x + 8y + 9z   7hx + 8hy + 9hz
+
+            (1)  + (2)  + (3)    (1)   + (2)   + (3)
+            (6)x + (5)y + (4)z   (6)hx + (5)hy + (4)hz
+            (7)  + (8)  + (9)    (7)   + (8)   + (9)
+        */
+        // https://math.stackexchange.com/a/64639
+        unsafe {
+            let mut matrix = Mat4x4::default();
+            let row1 = x86_64::_mm_load_ps(self.as_ptr().add(0));
+            let row2 = x86_64::_mm_load_ps(self.as_ptr().add(4));
+            let row3 = x86_64::_mm_load_ps(self.as_ptr().add(8));
+            let row4 = x86_64::_mm_load_ps(self.as_ptr().add(12));
+
+            let col1 = x86_64::_mm_load_ps(rhs.as_ptr().add(0));
+            let col2 = x86_64::_mm_load_ps(rhs.as_ptr().add(4));
+            let col3 = x86_64::_mm_load_ps(rhs.as_ptr().add(8));
+            let col4 = x86_64::_mm_load_ps(rhs.as_ptr().add(12));
+
+            let cols = [col1, col2, col3, col4];
+            for col in 0..4 {
+                let col_m128 = cols[col];
+                let x_m128 = x86_64::_mm_shuffle_ps::<0x00>(col_m128, col_m128);
+                let y_m128 = x86_64::_mm_shuffle_ps::<0x55>(col_m128, col_m128);
+                let z_m128 = x86_64::_mm_shuffle_ps::<0xaa>(col_m128, col_m128);
+                let w_m128 = x86_64::_mm_shuffle_ps::<0xff>(col_m128, col_m128);
+
+                let r1 = x86_64::_mm_mul_ps(x_m128, row1);
+                let r2 = x86_64::_mm_add_ps(r1, x86_64::_mm_mul_ps(y_m128, row2));
+                let r3 = x86_64::_mm_add_ps(r2, x86_64::_mm_mul_ps(z_m128, row3));
+                let r4 = x86_64::_mm_add_ps(r3, x86_64::_mm_mul_ps(w_m128, row4));
+
+                x86_64::_mm_store_ps(matrix.as_mut_ptr().add(col * 4), r4);
+            }
+
+            matrix
+        }
+
+        /*
         let mut matrix = Mat4x4::default();
+
         for i in 0..16 {
             let row = i / 4;
             let col = i % 4;
@@ -141,6 +136,7 @@ impl Mul for Mat4x4 {
         }
 
         matrix
+        */
     }
 }
 
@@ -148,13 +144,35 @@ impl Mul<Vec4> for Mat4x4 {
     type Output = Vec4;
 
     fn mul(self, rhs: Vec4) -> Self::Output {
-        let mut vector = Vec4::new(0.0, 0.0, 0.0, 0.0);
-        vector.x = self[(0 * 4) + 0] * rhs.x + self[(0 * 4) + 1] * rhs.y + self[(0 * 4) + 2] * rhs.z + self[(0 * 4) + 3] * rhs.w;
-        vector.y = self[(1 * 4) + 0] * rhs.x + self[(1 * 4) + 1] * rhs.y + self[(1 * 4) + 2] * rhs.z + self[(1 * 4) + 3] * rhs.w;
-        vector.z = self[(2 * 4) + 0] * rhs.x + self[(2 * 4) + 1] * rhs.y + self[(2 * 4) + 2] * rhs.z + self[(2 * 4) + 3] * rhs.w;
-        vector.w = self[(3 * 4) + 0] * rhs.x + self[(3 * 4) + 1] * rhs.y + self[(3 * 4) + 2] * rhs.z + self[(3 * 4) + 3] * rhs.w;
+        // https://math.stackexchange.com/a/64639
+        unsafe {
+            let row1 = x86_64::_mm_load_ps(self.as_ptr().add(0));
+            let row2 = x86_64::_mm_load_ps(self.as_ptr().add(4));
+            let row3 = x86_64::_mm_load_ps(self.as_ptr().add(8));
+            let row4 = x86_64::_mm_load_ps(self.as_ptr().add(12));
 
-        vector
+            let rhs_m128 = x86_64::_mm_load_ps(rhs.as_ptr());
+            let x_m128 = x86_64::_mm_shuffle_ps::<0x00>(rhs_m128, rhs_m128);
+            let y_m128 = x86_64::_mm_shuffle_ps::<0x55>(rhs_m128, rhs_m128);
+            let z_m128 = x86_64::_mm_shuffle_ps::<0xaa>(rhs_m128, rhs_m128);
+            let w_m128 = x86_64::_mm_shuffle_ps::<0xff>(rhs_m128, rhs_m128);
+
+            let r1 = x86_64::_mm_mul_ps(x_m128, row1);
+            let r2 = x86_64::_mm_add_ps(r1, x86_64::_mm_mul_ps(y_m128, row2));
+            let r3 = x86_64::_mm_add_ps(r2, x86_64::_mm_mul_ps(z_m128, row3));
+            let r4 = x86_64::_mm_add_ps(r3, x86_64::_mm_mul_ps(w_m128, row4));
+
+            mem::transmute(r4)
+        }
+
+        /*
+        Vec4::new(
+            self[(0 * 4) + 0] * rhs.x + self[(0 * 4) + 1] * rhs.y + self[(0 * 4) + 2] * rhs.z + self[(0 * 4) + 3] * rhs.w,
+            self[(1 * 4) + 0] * rhs.x + self[(1 * 4) + 1] * rhs.y + self[(1 * 4) + 2] * rhs.z + self[(1 * 4) + 3] * rhs.w,
+            self[(2 * 4) + 0] * rhs.x + self[(2 * 4) + 1] * rhs.y + self[(2 * 4) + 2] * rhs.z + self[(2 * 4) + 3] * rhs.w,
+            self[(3 * 4) + 0] * rhs.x + self[(3 * 4) + 1] * rhs.y + self[(3 * 4) + 2] * rhs.z + self[(3 * 4) + 3] * rhs.w,
+        )
+        */
     }
 }
 

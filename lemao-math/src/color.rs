@@ -1,6 +1,7 @@
 use std::ops::Add;
 use std::ops::Sub;
 
+#[repr(C)]
 #[derive(Copy, Clone, Default, PartialEq)]
 pub struct Color {
     pub r: f32,

@@ -1,4 +1,4 @@
-#![allow(clippy::identity_op, clippy::erasing_op)]
+#![allow(clippy::identity_op, clippy::erasing_op, clippy::needless_range_loop)]
 
 pub mod color;
 pub mod mat4x4;

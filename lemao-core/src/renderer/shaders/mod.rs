@@ -126,7 +126,7 @@ impl Shader {
                     (self.gl.glUniform4fv)(parameter.location as i32, 1, data);
                 }
                 opengl::GL_FLOAT_MAT4 => {
-                    (self.gl.glUniformMatrix4fv)(parameter.location as i32, 1, opengl::GL_TRUE as u8, data);
+                    (self.gl.glUniformMatrix4fv)(parameter.location as i32, 1, opengl::GL_FALSE as u8, data);
                 }
                 _ => return Err("Invalid shader parameter type".to_string()),
             };

@@ -1,4 +1,5 @@
 #[repr(C)]
+#[repr(align(16))]
 #[derive(Copy, Clone, Default, Debug, PartialEq)]
 pub struct Vec4 {
     pub x: f32,
@@ -14,5 +15,9 @@ impl Vec4 {
 
     pub fn as_ptr(&self) -> *const f32 {
         self as *const _ as *const f32
+    }
+
+    pub fn as_mut_ptr(&mut self) -> *mut f32 {
+        self as *mut _ as *mut f32
     }
 }
