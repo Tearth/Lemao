@@ -13,6 +13,7 @@ members = [
     "examples/audio",
     "examples/benchmark",
     "examples/line",
+    "examples/paint",
     "examples/rectangle",
     "examples/transformation",
     "examples/window",

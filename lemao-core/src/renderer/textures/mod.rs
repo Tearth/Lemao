@@ -29,15 +29,10 @@ impl Texture {
             (gl.glTexParameteri)(opengl::GL_TEXTURE_2D, opengl::GL_TEXTURE_MIN_FILTER, opengl::GL_LINEAR_MIPMAP_LINEAR as i32);
             (gl.glTexParameteri)(opengl::GL_TEXTURE_2D, opengl::GL_TEXTURE_MAG_FILTER, opengl::GL_LINEAR as i32);
 
-            let format = opengl::GL_RGBA;
-            let texture_width = size.x as i32;
-            let texture_height = size.y as i32;
-            let texture_ptr = data.as_ptr() as *const c_void;
+            let texture = Self { id: 0, texture_gl_id, gl, size };
+            texture.set_data(size, data);
 
-            (gl.glTexImage2D)(opengl::GL_TEXTURE_2D, 0, format as i32, texture_width, texture_height, 0, format, opengl::GL_UNSIGNED_BYTE, texture_ptr);
-            (gl.glGenerateMipmap)(opengl::GL_TEXTURE_2D);
-
-            Self { id: 0, texture_gl_id, gl, size }
+            texture
         }
     }
 
@@ -47,6 +42,20 @@ impl Texture {
 
     pub fn get_size(&self) -> Vec2 {
         self.size
+    }
+
+    pub fn set_data(&self, size: Vec2, data: Vec<u8>) {
+        unsafe {
+            (self.gl.glBindTexture)(opengl::GL_TEXTURE_2D, self.texture_gl_id);
+
+            let format = opengl::GL_RGBA;
+            let texture_width = size.x as i32;
+            let texture_height = size.y as i32;
+            let texture_ptr = data.as_ptr() as *const c_void;
+
+            (self.gl.glTexImage2D)(opengl::GL_TEXTURE_2D, 0, format as i32, texture_width, texture_height, 0, format, opengl::GL_UNSIGNED_BYTE, texture_ptr);
+            (self.gl.glGenerateMipmap)(opengl::GL_TEXTURE_2D);
+        }
     }
 }
 
