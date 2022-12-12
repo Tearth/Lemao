@@ -301,13 +301,13 @@ impl WindowPlatformSpecific for WindowWinAPI {
         unsafe { ((winapi::GetKeyState(input::button_to_virtual_button(button) as i32) as u16) & 0x8000) != 0 }
     }
 
-    fn get_cursor_position(&self) -> (i32, i32) {
+    fn get_cursor_position(&self) -> Vec2 {
         unsafe {
             let mut point = mem::zeroed();
             winapi::GetCursorPos(&mut point);
             winapi::ScreenToClient(self.hwnd, &mut point);
 
-            (point.x, point.y)
+            Vec2::new(point.x as f32, point.y as f32)
         }
     }
 

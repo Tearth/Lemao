@@ -12,6 +12,7 @@ use lemao_core::renderer::drawable::Drawable;
 use lemao_core::renderer::fonts::bff;
 use lemao_core::renderer::fonts::storage::FontStorage;
 use lemao_core::renderer::textures::storage::TextureStorage;
+use lemao_core::window::context::CoordinationSystem;
 use lemao_core::window::context::WindowContext;
 use std::sync::Arc;
 use std::sync::Mutex;
@@ -76,9 +77,8 @@ pub fn main() -> Result<(), String> {
         }
 
         if window.is_mouse_button_pressed(MouseButton::Left) {
-            let window_size = window.get_size();
-            let position = window.get_cursor_position();
-            renderer.get_drawable_with_type_mut::<Rectangle>(rectangle_id)?.set_position(Vec2::new(position.0 as f32, window_size.y - position.1 as f32));
+            let position = window.get_cursor_position(CoordinationSystem::Renderer);
+            renderer.get_drawable_with_type_mut::<Rectangle>(rectangle_id)?.set_position(position);
         }
 
         renderer.clear(Color::new(0.5, 0.5, 0.5, 1.0));

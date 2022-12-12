@@ -12,6 +12,7 @@ use lemao_core::renderer::fonts::bff;
 use lemao_core::renderer::fonts::storage::FontStorage;
 use lemao_core::renderer::textures::storage::TextureStorage;
 use lemao_core::renderer::textures::Texture;
+use lemao_core::window::context::CoordinationSystem;
 use lemao_core::window::context::WindowContext;
 use std::sync::Arc;
 use std::sync::Mutex;
@@ -66,10 +67,10 @@ pub fn main() -> Result<(), String> {
         }
 
         if window.is_mouse_button_pressed(MouseButton::Left) {
-            let mouse_position = window.get_cursor_position();
-            let index = (mouse_position.0 as usize) + ((window_size.y as usize) - (mouse_position.1 as usize)) * (window_size.x as usize);
+            let cursor_position = window.get_cursor_position(CoordinationSystem::Renderer);
+            let index = (cursor_position.x + cursor_position.y * window_size.x) as usize;
 
-            if index < texture_data.len() {
+            if cursor_position.x >= 0.0 && cursor_position.x < window_size.x && cursor_position.y >= 0.0 && cursor_position.y < window_size.y {
                 texture_data[index * 4 + 0] = 255;
                 texture_data[index * 4 + 1] = 255;
                 texture_data[index * 4 + 2] = 255;

@@ -1,3 +1,4 @@
+use crate::renderer::cameras::Camera;
 use crate::renderer::context::RendererContext;
 use crate::renderer::fonts::storage::FontStorage;
 use crate::renderer::textures::storage::TextureStorage;
@@ -14,6 +15,12 @@ use std::sync::Mutex;
 pub struct WindowContext {
     window: Box<dyn WindowPlatformSpecific>,
     events: VecDeque<InputEvent>,
+}
+
+pub enum CoordinationSystem<'a> {
+    Window,
+    Renderer,
+    Camera(&'a Camera),
 }
 
 impl WindowContext {
@@ -70,8 +77,14 @@ impl WindowContext {
         self.window.is_mouse_button_pressed(button)
     }
 
-    pub fn get_cursor_position(&self) -> (i32, i32) {
-        self.window.get_cursor_position()
+    pub fn get_cursor_position(&self, coordination_system: CoordinationSystem) -> Vec2 {
+        let cursor_position = self.window.get_cursor_position();
+
+        match coordination_system {
+            CoordinationSystem::Window => cursor_position,
+            CoordinationSystem::Renderer => Vec2::new(cursor_position.x, self.get_size().y - cursor_position.y),
+            CoordinationSystem::Camera(camera) => Vec2::new(cursor_position.x, self.get_size().y - cursor_position.y) + camera.get_position(),
+        }
     }
 
     pub fn set_cursor_visibility(&mut self, visible: bool) {

@@ -24,7 +24,7 @@ pub trait WindowPlatformSpecific {
 
     fn is_key_pressed(&self, key: Key) -> bool;
     fn is_mouse_button_pressed(&self, button: MouseButton) -> bool;
-    fn get_cursor_position(&self) -> (i32, i32);
+    fn get_cursor_position(&self) -> Vec2;
     fn set_cursor_visibility(&mut self, visible: bool);
     fn is_cursor_visible(&self) -> bool;
 }

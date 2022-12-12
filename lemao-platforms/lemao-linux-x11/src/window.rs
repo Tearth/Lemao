@@ -355,7 +355,7 @@ impl WindowPlatformSpecific for WindowX11 {
         self.mouse_state[button as usize]
     }
 
-    fn get_cursor_position(&self) -> (i32, i32) {
+    fn get_cursor_position(&self) -> Vec2 {
         unsafe {
             let mut window_returned = mem::zeroed();
             let mut root_cursor_position_x = 0;
@@ -375,7 +375,8 @@ impl WindowPlatformSpecific for WindowX11 {
                 &mut window_cursor_position_y,
                 &mut mask,
             );
-            (window_cursor_position_x, window_cursor_position_y)
+
+            Vec2::new(window_cursor_position_x as f32, window_cursor_position_y as f32)
         }
     }
 
