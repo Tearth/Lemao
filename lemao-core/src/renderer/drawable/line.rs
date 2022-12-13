@@ -23,7 +23,6 @@ pub struct Line {
     scale: Vec2,
     rotation: f32,
     size: Vec2,
-    anchor: Vec2,
     color: Color,
     from: Vec2,
     to: Vec2,
@@ -44,7 +43,6 @@ impl Line {
             scale: Vec2::new(1.0, 1.0),
             rotation: 1.0,
             size: Default::default(),
-            anchor: Default::default(),
             color: Color::new(1.0, 1.0, 1.0, 1.0),
             from,
             to,
@@ -91,9 +89,9 @@ impl Line {
     }
 
     fn calculate_position_rotation_scale(&mut self) {
-        self.position = self.from + Vec2::new(0.5, 0.5);
+        self.position = self.from;
         self.rotation = Vec2::new(0.0, 1.0).signed_angle(self.to - self.from);
-        self.size = Vec2::new(self.thickness, self.from.distance(self.to));
+        self.size = Vec2::new(self.thickness, self.from.distance(self.to) + 1.0);
     }
 }
 
@@ -131,11 +129,11 @@ impl Drawable for Line {
     }
 
     fn get_anchor(&self) -> Vec2 {
-        self.anchor
+        panic!("Line doesn't support anchor property");
     }
 
-    fn set_anchor(&mut self, anchor: Vec2) {
-        self.anchor = anchor;
+    fn set_anchor(&mut self, _anchor: Vec2) {
+        panic!("Line doesn't support anchor property");
     }
 
     fn get_color(&self) -> Color {
@@ -147,11 +145,11 @@ impl Drawable for Line {
     }
 
     fn get_transformation_matrix(&self) -> Mat4x4 {
-        let translation = Mat4x4::translate(Vec3::from(self.position));
-        let anchor_offset = Mat4x4::translate(-Vec3::from(self.anchor));
+        let translation = Mat4x4::translate(Vec3::from(self.position + Vec2::new(0.5, 0.5)));
+        let anchor_offset = Mat4x4::translate(Vec3::new(0.0, -0.5, 0.0));
         let scale = Mat4x4::scale(Vec3::from(self.scale * self.size));
         let rotation = Mat4x4::rotate(self.rotation);
-        translation * rotation * scale * anchor_offset
+        translation * rotation * anchor_offset * scale
     }
 
     fn get_batch(&self) -> Batch {
