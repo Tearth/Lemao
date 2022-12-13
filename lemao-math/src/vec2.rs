@@ -37,7 +37,14 @@ impl Vec2 {
     }
 
     pub fn signed_angle(&self, rhs: Vec2) -> f32 {
-        (self.x - rhs.x).atan2(rhs.y - self.y)
+        // https://stackoverflow.com/a/16544330
+        // https://en.wikipedia.org/wiki/Atan2
+        // rhs.y.atan2(rhs.x) - self.y.atan2(self.x)
+
+        let dot = self.x * rhs.x + self.y * rhs.y;
+        let det = self.x * rhs.y - self.y * rhs.x;
+
+        det.atan2(dot)
     }
 
     pub fn distance(&self, rhs: Vec2) -> f32 {
