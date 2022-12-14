@@ -7,6 +7,7 @@ use std::any::Any;
 
 pub mod animation;
 pub mod circle;
+pub mod frame;
 pub mod line;
 pub mod rectangle;
 pub mod sprite;

@@ -12,6 +12,7 @@ members = [
     "examples/animation",
     "examples/audio",
     "examples/benchmark",
+    "examples/frame",
     "examples/line",
     "examples/paint",
     "examples/rectangle",

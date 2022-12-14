@@ -1,5 +1,6 @@
 use super::animation::Animation;
 use super::circle::Circle;
+use super::frame::Frame;
 use super::line::Line;
 use super::rectangle::Rectangle;
 use super::sprite::Sprite;
@@ -24,6 +25,14 @@ impl DrawableStorage {
         let id = self.data.len();
         circle.id = id;
         self.data.push(Some(circle));
+
+        id
+    }
+
+    pub fn store_frame(&mut self, mut frame: Box<Frame>) -> usize {
+        let id = self.data.len();
+        frame.id = id;
+        self.data.push(Some(frame));
 
         id
     }
