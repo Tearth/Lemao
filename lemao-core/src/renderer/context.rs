@@ -2,7 +2,7 @@ use super::batcher::BatchRenderer;
 use super::cameras::storage::CameraStorage;
 use super::cameras::Camera;
 use super::drawable::animation::Animation;
-use super::drawable::circle::Circle;
+use super::drawable::disc::Disc;
 use super::drawable::frame::Frame;
 use super::drawable::line::Line;
 use super::drawable::rectangle::Rectangle;
@@ -241,12 +241,12 @@ impl RendererContext {
         Ok(self.drawables.as_mut().unwrap().store_animation(animation))
     }
 
-    pub fn create_circle(&mut self, radius: f32, sides: u32) -> Result<usize, String> {
+    pub fn create_disc(&mut self, radius: f32, sides: u32) -> Result<usize, String> {
         let texture_storage = self.textures.lock().unwrap();
         let texture = texture_storage.get(self.default_texture_id)?;
-        let circle = Box::new(Circle::new(self, texture, radius, sides));
+        let disc = Box::new(Disc::new(self, texture, radius, sides));
 
-        Ok(self.drawables.as_mut().unwrap().store_circle(circle))
+        Ok(self.drawables.as_mut().unwrap().store_disc(disc))
     }
 
     pub fn create_frame(&mut self, size: Vec2) -> Result<usize, String> {

@@ -36,7 +36,7 @@ pub fn main() -> Result<(), String> {
     let mut window = WindowContext::new("Transformation", WindowStyle::Window { position: window_position, size: window_size })?;
     let mut renderer = window.create_renderer(textures.clone(), fonts.clone())?;
 
-    let kaela_rgb = textures.lock().unwrap().store(bmp::load(&renderer, "./assets/circle.bmp")?);
+    let kaela_rgb = textures.lock().unwrap().store(bmp::load(&renderer, "./assets/disc.bmp")?);
     let font_id = fonts.lock().unwrap().store(bff::load(&renderer, "./assets/inconsolata.bff")?);
 
     let gui_camera_id = renderer.create_camera(Default::default(), window_size)?;

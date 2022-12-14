@@ -1,5 +1,5 @@
 use super::animation::Animation;
-use super::circle::Circle;
+use super::disc::Disc;
 use super::frame::Frame;
 use super::line::Line;
 use super::rectangle::Rectangle;
@@ -21,10 +21,10 @@ impl DrawableStorage {
         id
     }
 
-    pub fn store_circle(&mut self, mut circle: Box<Circle>) -> usize {
+    pub fn store_disc(&mut self, mut disc: Box<Disc>) -> usize {
         let id = self.data.len();
-        circle.id = id;
-        self.data.push(Some(circle));
+        disc.id = id;
+        self.data.push(Some(disc));
 
         id
     }

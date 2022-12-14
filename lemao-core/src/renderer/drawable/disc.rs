@@ -12,7 +12,7 @@ use std::mem;
 use std::ptr;
 use std::rc::Rc;
 
-pub struct Circle {
+pub struct Disc {
     pub(crate) id: usize,
     pub(crate) vao_gl_id: u32,
     pub(crate) vbo_gl_id: u32,
@@ -35,9 +35,9 @@ pub struct Circle {
     indices: Vec<u32>,
 }
 
-impl Circle {
+impl Disc {
     pub fn new(renderer: &RendererContext, texture: &Texture, radius: f32, sides: u32) -> Self {
-        let mut circle = Circle {
+        let mut disc = Disc {
             id: 0,
             vao_gl_id: 0,
             vbo_gl_id: 0,
@@ -61,27 +61,27 @@ impl Circle {
         };
 
         unsafe {
-            (circle.gl.glGenVertexArrays)(1, &mut circle.vao_gl_id);
-            (circle.gl.glBindVertexArray)(circle.vao_gl_id);
+            (disc.gl.glGenVertexArrays)(1, &mut disc.vao_gl_id);
+            (disc.gl.glBindVertexArray)(disc.vao_gl_id);
 
-            (circle.gl.glGenBuffers)(1, &mut circle.vbo_gl_id);
-            (circle.gl.glBindBuffer)(opengl::GL_ARRAY_BUFFER, circle.vbo_gl_id);
+            (disc.gl.glGenBuffers)(1, &mut disc.vbo_gl_id);
+            (disc.gl.glBindBuffer)(opengl::GL_ARRAY_BUFFER, disc.vbo_gl_id);
 
-            (circle.gl.glGenBuffers)(1, &mut circle.ebo_gl_id);
-            (circle.gl.glBindBuffer)(opengl::GL_ELEMENT_ARRAY_BUFFER, circle.ebo_gl_id);
+            (disc.gl.glGenBuffers)(1, &mut disc.ebo_gl_id);
+            (disc.gl.glBindBuffer)(opengl::GL_ELEMENT_ARRAY_BUFFER, disc.ebo_gl_id);
 
             let attrib_size = (9 * mem::size_of::<f32>()) as i32;
-            (circle.gl.glVertexAttribPointer)(0, 3, opengl::GL_FLOAT, opengl::GL_FALSE as u8, attrib_size, ptr::null_mut());
-            (circle.gl.glVertexAttribPointer)(1, 4, opengl::GL_FLOAT, opengl::GL_FALSE as u8, attrib_size, (3 * mem::size_of::<f32>()) as *const c_void);
-            (circle.gl.glVertexAttribPointer)(2, 2, opengl::GL_FLOAT, opengl::GL_FALSE as u8, attrib_size, (7 * mem::size_of::<f32>()) as *const c_void);
+            (disc.gl.glVertexAttribPointer)(0, 3, opengl::GL_FLOAT, opengl::GL_FALSE as u8, attrib_size, ptr::null_mut());
+            (disc.gl.glVertexAttribPointer)(1, 4, opengl::GL_FLOAT, opengl::GL_FALSE as u8, attrib_size, (3 * mem::size_of::<f32>()) as *const c_void);
+            (disc.gl.glVertexAttribPointer)(2, 2, opengl::GL_FLOAT, opengl::GL_FALSE as u8, attrib_size, (7 * mem::size_of::<f32>()) as *const c_void);
 
-            (circle.gl.glEnableVertexAttribArray)(0);
-            (circle.gl.glEnableVertexAttribArray)(1);
-            (circle.gl.glEnableVertexAttribArray)(2);
+            (disc.gl.glEnableVertexAttribArray)(0);
+            (disc.gl.glEnableVertexAttribArray)(1);
+            (disc.gl.glEnableVertexAttribArray)(2);
         }
 
-        circle.update();
-        circle
+        disc.update();
+        disc
     }
 
     pub fn get_id(&self) -> usize {
@@ -182,7 +182,7 @@ impl Circle {
     }
 }
 
-impl Drawable for Circle {
+impl Drawable for Disc {
     fn get_position(&self) -> Vec2 {
         self.position
     }
@@ -267,7 +267,7 @@ impl Drawable for Circle {
     }
 }
 
-impl Drop for Circle {
+impl Drop for Disc {
     fn drop(&mut self) {
         unsafe {
             if self.vbo_gl_id != 0 {
