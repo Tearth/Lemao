@@ -6,7 +6,7 @@ use lemao_core::lemao_common_platform::input::MouseButton;
 use lemao_core::lemao_common_platform::window::WindowStyle;
 use lemao_core::lemao_math::color::Color;
 use lemao_core::lemao_math::vec2::Vec2;
-use lemao_core::renderer::drawable::disc::Disc;
+use lemao_core::renderer::drawable::circle::Circle;
 use lemao_core::renderer::drawable::text::Text;
 use lemao_core::renderer::drawable::Drawable;
 use lemao_core::renderer::fonts::bff;
@@ -19,9 +19,9 @@ use std::sync::Mutex;
 
 #[rustfmt::skip]
 const DESCRIPTION: &str = 
-"Disc:
+"Circle:
  LMB - place
- Scroll - set sides";
+ Scroll - set thickness";
 
 pub fn main() -> Result<(), String> {
     let textures = Arc::new(Mutex::new(TextureStorage::default()));
@@ -30,17 +30,17 @@ pub fn main() -> Result<(), String> {
     let window_position = Default::default();
     let window_size = Vec2::new(1366.0, 768.0);
 
-    let mut window = WindowContext::new("Disc", WindowStyle::Window { position: window_position, size: window_size })?;
+    let mut window = WindowContext::new("Circle", WindowStyle::Window { position: window_position, size: window_size })?;
     let mut renderer = window.create_renderer(textures, fonts.clone())?;
 
     let font_id = fonts.lock().unwrap().store(bff::load(&renderer, "./assets/inconsolata.bff")?);
 
-    let disc_id = renderer.create_disc(100.0, 32).unwrap();
+    let circle_id = renderer.create_circle(100.0, 64).unwrap();
     let description_text_id = renderer.create_text(font_id)?;
 
-    let disc = renderer.get_drawable_with_type_mut::<Disc>(disc_id)?;
-    disc.set_anchor(Vec2::new(0.5, 0.5));
-    disc.set_position(Vec2::new(400.0, 300.0));
+    let circle = renderer.get_drawable_with_type_mut::<Circle>(circle_id)?;
+    circle.set_anchor(Vec2::new(0.5, 0.5));
+    circle.set_position(Vec2::new(400.0, 300.0));
 
     let description_text = renderer.get_drawable_with_type_mut::<Text>(description_text_id)?;
     description_text.set_text(DESCRIPTION);
@@ -57,13 +57,11 @@ pub fn main() -> Result<(), String> {
                     }
                 }
                 InputEvent::MouseWheelRotated(delta) => {
-                    let disc = renderer.get_drawable_with_type_mut::<Disc>(disc_id)?;
+                    let circle = renderer.get_drawable_with_type_mut::<Circle>(circle_id)?;
                     if delta > 0 {
-                        disc.set_sides(disc.get_sides() + 1);
+                        circle.set_thickness(circle.get_thickness() + 1.0);
                     } else {
-                        if disc.get_sides() > 3 {
-                            disc.set_sides(disc.get_sides() - 1);
-                        }
+                        circle.set_thickness(circle.get_thickness() - 1.0);
                     }
                 }
                 InputEvent::WindowSizeChanged(width, height) => {
@@ -80,11 +78,11 @@ pub fn main() -> Result<(), String> {
 
         if window.is_mouse_button_pressed(MouseButton::Left) {
             let position = window.get_cursor_position(CoordinationSystem::Renderer);
-            renderer.get_drawable_with_type_mut::<Disc>(disc_id)?.set_position(position);
+            renderer.get_drawable_with_type_mut::<Circle>(circle_id)?.set_position(position);
         }
 
         renderer.clear(Color::new(0.5, 0.5, 0.5, 1.0));
-        renderer.draw(disc_id)?;
+        renderer.draw(circle_id)?;
         renderer.draw(description_text_id)?;
         window.swap_buffers();
     }

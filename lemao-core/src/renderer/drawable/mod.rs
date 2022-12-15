@@ -6,6 +6,7 @@ use lemao_math::vec2::Vec2;
 use std::any::Any;
 
 pub mod animation;
+pub mod circle;
 pub mod disc;
 pub mod frame;
 pub mod line;
