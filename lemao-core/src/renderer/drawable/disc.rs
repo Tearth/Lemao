@@ -123,15 +123,17 @@ impl Disc {
         unsafe {
             let mut angle = 0.0f32;
             let position = Vec2::new(0.5, 0.5);
+            let scaled_position = position * Vec2::new(self.radius, self.radius);
 
             self.vertices.clear();
             self.indices.clear();
 
-            self.vertices.extend_from_slice(&self.get_vertices(position, position, Color::new(1.0, 1.0, 1.0, 1.0)));
+            self.vertices.extend_from_slice(&self.get_vertices(scaled_position, position, Color::new(1.0, 1.0, 1.0, 1.0)));
 
             for n in 0..self.sides {
-                let position = Vec2::new(angle.sin() + 0.5, angle.cos() + 0.5);
-                self.vertices.extend_from_slice(&self.get_vertices(position, position, Color::new(1.0, 1.0, 1.0, 1.0)));
+                let position = Vec2::new(angle.sin(), angle.cos());
+                let scaled_position = position * Vec2::new(self.radius, self.radius) + Vec2::new(self.radius, self.radius);
+                self.vertices.extend_from_slice(&self.get_vertices(scaled_position, position, Color::new(1.0, 1.0, 1.0, 1.0)));
 
                 if n > 0 {
                     self.indices.extend_from_slice(&[0, n, n + 1]);
@@ -149,7 +151,7 @@ impl Disc {
             }
 
             self.elements_count = self.indices.len() as u32;
-            self.size = Vec2::new(self.radius, self.radius);
+            self.size = Vec2::new(self.radius, self.radius) * 2.0;
 
             let vertices_size = (mem::size_of::<f32>() * self.vertices.len()) as i64;
             let vertices_ptr = self.vertices.as_ptr() as *const c_void;
@@ -233,8 +235,8 @@ impl Drawable for Disc {
 
     fn get_transformation_matrix(&self) -> Mat4x4 {
         let translation = Mat4x4::translate(Vec3::from(self.position));
-        let anchor_offset = Mat4x4::translate(-Vec3::from(self.anchor));
-        let scale = Mat4x4::scale(Vec3::from(self.scale * self.size));
+        let anchor_offset = Mat4x4::translate(-Vec3::from(self.anchor * self.size));
+        let scale = Mat4x4::scale(Vec3::from(self.scale));
         let rotation = Mat4x4::rotate(self.rotation);
         translation * rotation * scale * anchor_offset
     }
