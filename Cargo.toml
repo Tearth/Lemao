@@ -8,6 +8,7 @@ members = [
     "lemao-platforms/lemao-common-platform",
     "lemao-platforms/lemao-linux-x11",
     "lemao-platforms/lemao-windows-winapi",
+    "lemao-ui",
 
     "examples/animation",
     "examples/audio",
@@ -19,5 +20,6 @@ members = [
     "examples/paint",
     "examples/rectangle",
     "examples/transformation",
+    "examples/ui",
     "examples/window",
 ]
