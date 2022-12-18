@@ -1,18 +1,43 @@
+use crate::components::canvas::Canvas;
 use crate::components::panel::Panel;
 use crate::components::Component;
+use crate::components::ComponentSize;
 use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::renderer::context::RendererContext;
 
 pub struct UiContext {
+    main_canvas_id: usize,
     components: Vec<Option<Box<dyn Component>>>,
 }
 
 impl UiContext {
-    pub fn new() -> Result<Self, String> {
-        Ok(Self { components: Default::default() })
+    pub fn new(renderer: &mut RendererContext) -> Result<Self, String> {
+        let mut ui = Self { main_canvas_id: 0, components: Default::default() };
+        ui.main_canvas_id = ui.create_canvas(renderer)?;
+
+        let main_canvas = ui.get_component_mut(ui.main_canvas_id)?;
+        main_canvas.set_size(ComponentSize::Absolute(renderer.get_viewport_size()));
+
+        Ok(ui)
     }
 
-    pub fn process_event(&mut self, event: &InputEvent) {}
+    pub fn process_event(&mut self, event: &InputEvent) {
+        match event {
+            InputEvent::WindowSizeChanged(size) => {
+                let main_canvas = self.get_component_mut(self.main_canvas_id).unwrap();
+                main_canvas.set_size(ComponentSize::Absolute(*size));
+            }
+            _ => {}
+        }
+    }
+
+    pub fn create_canvas(&mut self, renderer: &mut RendererContext) -> Result<usize, String> {
+        let id = self.components.len();
+        let canvas = Box::new(Canvas::new(id)?);
+        self.components.push(Some(canvas));
+
+        Ok(id)
+    }
 
     pub fn create_panel(&mut self, renderer: &mut RendererContext) -> Result<usize, String> {
         let id = self.components.len();

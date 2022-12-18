@@ -38,7 +38,7 @@ impl WindowContext {
 
     pub fn create_renderer(&mut self, textures: Arc<Mutex<TextureStorage>>, fonts: Arc<Mutex<FontStorage>>) -> Result<RendererContext, String> {
         let renderer_platform_specific = self.window.create_renderer()?;
-        let mut renderer = RendererContext::new(renderer_platform_specific, textures, fonts)?;
+        let mut renderer = RendererContext::new(renderer_platform_specific, self.window.get_size(), textures, fonts)?;
         renderer.init()?;
 
         Ok(renderer)

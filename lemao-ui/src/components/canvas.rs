@@ -5,28 +5,26 @@ use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::context::RendererContext;
 use std::any::Any;
 
-pub struct Panel {
+pub struct Canvas {
     pub(crate) id: usize,
 
     position: ComponentPosition,
     size: ComponentSize,
     anchor: Vec2,
-    rectangle_id: usize,
 }
 
-impl Panel {
-    pub fn new(id: usize, renderer: &mut RendererContext) -> Result<Self, String> {
+impl Canvas {
+    pub fn new(id: usize) -> Result<Self, String> {
         Ok(Self {
             id,
             position: ComponentPosition::Absolute(Default::default()),
             size: ComponentSize::Absolute(Default::default()),
             anchor: Default::default(),
-            rectangle_id: renderer.create_rectangle(Vec2::new(100.0, 100.0))?,
         })
     }
 }
 
-impl Component for Panel {
+impl Component for Canvas {
     fn get_position(&self) -> ComponentPosition {
         self.position
     }
@@ -51,8 +49,7 @@ impl Component for Panel {
         self.anchor = anchor;
     }
 
-    fn draw(&mut self, renderer: &mut RendererContext) -> Result<(), String> {
-        renderer.draw(self.rectangle_id)?;
+    fn draw(&mut self, _renderer: &mut RendererContext) -> Result<(), String> {
         Ok(())
     }
 

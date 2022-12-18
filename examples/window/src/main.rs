@@ -81,7 +81,7 @@ pub fn main() -> Result<(), String> {
                     let description_text_margin = left_top_text_size.y - 0.0;
                     let window_status_text_margin = left_top_text_size.y + description_text_size.y + 20.0;
 
-                    renderer.set_viewport(size);
+                    renderer.set_viewport_size(size);
                     renderer.get_active_camera_mut()?.set_size(size);
 
                     renderer.get_drawable_mut(description_text_id)?.set_position(Vec2::new(5.0, size.y - description_text_margin));

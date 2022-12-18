@@ -68,7 +68,7 @@ pub fn main() -> Result<(), String> {
                 InputEvent::WindowSizeChanged(size) => {
                     window_size = size;
 
-                    renderer.set_viewport(size);
+                    renderer.set_viewport_size(size);
                     renderer.get_active_camera_mut()?.set_size(size);
                     renderer.get_drawable_mut(fps_text_id)?.set_position(Vec2::new(5.0, window_size.y - 0.0));
                 }

@@ -26,7 +26,7 @@ pub fn main() -> Result<(), String> {
         Err(message) => panic!("{}", message),
     };
 
-    let mut ui = UiContext::new()?;
+    let mut ui = UiContext::new(&mut renderer)?;
     let panel_id = ui.create_panel(&mut renderer)?;
     let mut is_running = true;
 
@@ -34,7 +34,7 @@ pub fn main() -> Result<(), String> {
         while let Some(event) = window.poll_event() {
             match event {
                 InputEvent::WindowSizeChanged(size) => {
-                    renderer.set_viewport(size);
+                    renderer.set_viewport_size(size);
                     renderer.get_active_camera_mut()?.set_size(size);
                 }
 

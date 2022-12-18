@@ -33,6 +33,7 @@ use std::sync::Mutex;
 pub struct RendererContext {
     pub(crate) gl: Rc<OpenGLPointers>,
 
+    viewport_size: Vec2,
     default_camera_id: usize,
     active_camera_id: usize,
     default_shader_id: usize,
@@ -55,12 +56,14 @@ pub struct RendererContext {
 impl RendererContext {
     pub fn new(
         renderer_platform_specific: Box<dyn RendererPlatformSpecific>,
+        viewport_size: Vec2,
         textures: Arc<Mutex<TextureStorage>>,
         fonts: Arc<Mutex<FontStorage>>,
     ) -> Result<Self, String> {
         Ok(RendererContext {
             gl: Default::default(),
 
+            viewport_size,
             default_camera_id: 0,
             active_camera_id: 0,
             default_shader_id: 0,
@@ -88,6 +91,7 @@ impl RendererContext {
         //     (self.gl.glDebugMessageCallback)(gl_error, ptr::null_mut());
         // }
 
+        self.set_viewport_size(self.viewport_size);
         self.init_storages();
         self.init_default_camera()?;
         self.init_default_shader()?;
@@ -159,7 +163,11 @@ impl RendererContext {
         self.batch_renderer = Some(BatchRenderer::new(self, 1024 * 1024, 1024 * 100));
     }
 
-    pub fn set_viewport(&mut self, size: Vec2) {
+    pub fn get_viewport_size(&self) -> Vec2 {
+        self.viewport_size
+    }
+
+    pub fn set_viewport_size(&mut self, size: Vec2) {
         unsafe {
             (self.gl.glViewport)(0, 0, size.x as i32, size.y as i32);
         }
