@@ -1,8 +1,10 @@
 use crate::components::canvas::Canvas;
 use crate::components::panel::Panel;
 use crate::components::Component;
+use crate::components::ComponentPosition;
 use crate::components::ComponentSize;
 use lemao_core::lemao_common_platform::input::InputEvent;
+use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::context::RendererContext;
 
 pub struct UiContext {
@@ -77,9 +79,42 @@ impl UiContext {
         self.get_component_mut(component_id)?.as_any_mut().downcast_mut::<T>().ok_or(format!("Component with id {} cannot be downcasted", component_id))
     }
 
+    pub fn get_main_canvas(&self) -> Result<&dyn Component, String> {
+        self.get_component(self.main_canvas_id)
+    }
+
+    pub fn get_main_canvas_mut(&mut self) -> Result<&mut dyn Component, String> {
+        self.get_component_mut(self.main_canvas_id)
+    }
+
     pub fn draw(&mut self, renderer: &mut RendererContext, component_id: usize) -> Result<(), String> {
+        let main_canvas = self.get_main_canvas()?;
+        let area_position = match main_canvas.get_position() {
+            ComponentPosition::AbsoluteToParent(position) => position,
+            _ => return Err("Invalid canvas".to_string()),
+        };
+        let area_size = match main_canvas.get_size() {
+            ComponentSize::Absolute(size) => size,
+            _ => return Err("Invalid canvas".to_string()),
+        };
+        self.update(renderer, self.main_canvas_id, area_position, area_size)?;
+
         let component = self.get_component_mut(component_id)?;
         component.draw(renderer)?;
+
+        Ok(())
+    }
+
+    fn update(&mut self, renderer: &mut RendererContext, component_id: usize, area_position: Vec2, area_size: Vec2) -> Result<(), String> {
+        let component = self.get_component_mut(component_id)?;
+        component.update(renderer, area_position, area_size)?;
+
+        let component_area_position = component.get_screen_position() - (component.get_screen_size() * component.get_anchor());
+        let component_area_size = component.get_screen_size();
+
+        for child_id in component.get_children().clone() {
+            self.update(renderer, child_id, component_area_position, component_area_size)?;
+        }
 
         Ok(())
     }

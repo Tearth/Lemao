@@ -9,17 +9,23 @@ pub struct Canvas {
     pub(crate) id: usize,
 
     position: ComponentPosition,
+    screen_position: Vec2,
     size: ComponentSize,
+    screen_size: Vec2,
     anchor: Vec2,
+    children: Vec<usize>,
 }
 
 impl Canvas {
     pub fn new(id: usize) -> Result<Self, String> {
         Ok(Self {
             id,
-            position: ComponentPosition::Absolute(Default::default()),
+            position: ComponentPosition::AbsoluteToParent(Default::default()),
+            screen_position: Default::default(),
             size: ComponentSize::Absolute(Default::default()),
+            screen_size: Default::default(),
             anchor: Default::default(),
+            children: Default::default(),
         })
     }
 }
@@ -29,12 +35,20 @@ impl Component for Canvas {
         self.position
     }
 
+    fn get_screen_position(&self) -> Vec2 {
+        self.screen_position
+    }
+
     fn set_position(&mut self, position: ComponentPosition) {
         self.position = position;
     }
 
     fn get_size(&self) -> ComponentSize {
         self.size
+    }
+
+    fn get_screen_size(&self) -> Vec2 {
+        self.screen_size
     }
 
     fn set_size(&mut self, size: ComponentSize) {
@@ -47,6 +61,32 @@ impl Component for Canvas {
 
     fn set_anchor(&mut self, anchor: Vec2) {
         self.anchor = anchor;
+    }
+
+    fn add_child(&mut self, component_id: usize) {
+        self.children.push(component_id);
+    }
+
+    fn remove_child(&mut self, component_id: usize) {
+        self.children.retain(|&p| p != component_id);
+    }
+
+    fn get_children(&self) -> &Vec<usize> {
+        &self.children
+    }
+
+    fn update(&mut self, renderer: &mut RendererContext, area_position: Vec2, area_size: Vec2) -> Result<(), String> {
+        self.screen_position = match self.position {
+            ComponentPosition::AbsoluteToParent(position) => area_position + position,
+            ComponentPosition::RelativeToParent(position) => area_position + (position * area_size),
+        };
+
+        self.screen_size = match self.size {
+            ComponentSize::Absolute(size) => size,
+            ComponentSize::Relative(size) => area_size * size,
+        };
+
+        Ok(())
     }
 
     fn draw(&mut self, _renderer: &mut RendererContext) -> Result<(), String> {
