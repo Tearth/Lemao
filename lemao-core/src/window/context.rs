@@ -19,7 +19,6 @@ pub struct WindowContext {
 
 pub enum CoordinationSystem<'a> {
     Window,
-    Renderer,
     Camera(&'a Camera),
 }
 
@@ -81,8 +80,7 @@ impl WindowContext {
         let cursor_position = self.window.get_cursor_position();
 
         match coordination_system {
-            CoordinationSystem::Window => cursor_position,
-            CoordinationSystem::Renderer => Vec2::new(cursor_position.x, self.get_size().y - cursor_position.y),
+            CoordinationSystem::Window => Vec2::new(cursor_position.x, self.get_size().y - cursor_position.y),
             CoordinationSystem::Camera(camera) => Vec2::new(cursor_position.x, self.get_size().y - cursor_position.y) + camera.get_position(),
         }
     }

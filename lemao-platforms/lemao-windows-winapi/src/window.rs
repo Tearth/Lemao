@@ -4,6 +4,7 @@ use crate::renderer::WindowsWinAPIRenderer;
 use lemao_common_platform::input::InputEvent;
 use lemao_common_platform::input::Key;
 use lemao_common_platform::input::MouseButton;
+use lemao_common_platform::input::MouseWheelDirection;
 use lemao_common_platform::renderer::RendererPlatformSpecific;
 use lemao_common_platform::window::WindowPlatformSpecific;
 use lemao_common_platform::window::WindowStyle;
@@ -176,8 +177,16 @@ impl WindowPlatformSpecific for WindowWinAPI {
                     winapi::WM_LBUTTONUP => return vec![InputEvent::MouseButtonReleased(MouseButton::Left)],
                     winapi::WM_RBUTTONUP => return vec![InputEvent::MouseButtonReleased(MouseButton::Right)],
                     winapi::WM_MBUTTONUP => return vec![InputEvent::MouseButtonReleased(MouseButton::Middle)],
-                    winapi::WM_MOUSEMOVE => return vec![InputEvent::MouseMoved((event.lParam as i32) & 0xffff, (event.lParam as i32) >> 16)],
-                    winapi::WM_MOUSEWHEEL => return vec![InputEvent::MouseWheelRotated((event.wParam as i32) >> 16)],
+                    winapi::WM_MOUSEMOVE => {
+                        let position = Vec2::new(((event.lParam as i32) & 0xffff) as f32, ((event.lParam as i32) >> 16) as f32);
+                        let screen_position = Vec2::new(position.x, self.size.y - position.y);
+
+                        return vec![InputEvent::MouseMoved(screen_position)];
+                    }
+                    winapi::WM_MOUSEWHEEL => {
+                        let direction = if ((event.wParam as i32) >> 16) > 0 { MouseWheelDirection::Up } else { MouseWheelDirection::Down };
+                        return vec![InputEvent::MouseWheelRotated(direction)];
+                    }
                     winapi::WM_QUIT => return vec![InputEvent::WindowClosed],
                     _ => {}
                 }
@@ -193,14 +202,14 @@ impl WindowPlatformSpecific for WindowWinAPI {
                         let y = (event.l_param >> 16) as i32 + rect.top;
                         self.position = Vec2::new(x as f32, y as f32);
 
-                        return vec![InputEvent::WindowMoved(x, y)];
+                        return vec![InputEvent::WindowMoved(self.position)];
                     }
                     winapi::WM_SIZE => {
                         let width = (event.l_param & 0xffff) as u32;
                         let height = (event.l_param >> 16) as u32;
                         self.size = Vec2::new(width as f32, height as f32);
 
-                        return vec![InputEvent::WindowSizeChanged(width, height)];
+                        return vec![InputEvent::WindowSizeChanged(self.size)];
                     }
                     _ => return Vec::new(),
                 }

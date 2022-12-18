@@ -1,15 +1,17 @@
+use lemao_math::vec2::Vec2;
+
 pub enum InputEvent {
     Unknown,
-    WindowMoved(i32, i32),
-    WindowSizeChanged(u32, u32),
+    WindowMoved(Vec2),
+    WindowSizeChanged(Vec2),
     WindowClosed,
     KeyPressed(Key),
     KeyReleased(Key),
     CharPressed(char),
     MouseButtonPressed(MouseButton),
     MouseButtonReleased(MouseButton),
-    MouseMoved(i32, i32),
-    MouseWheelRotated(i32),
+    MouseMoved(Vec2),
+    MouseWheelRotated(MouseWheelDirection),
 }
 
 #[derive(Debug, Copy, Clone)]
@@ -74,10 +76,17 @@ pub enum Key {
     Num9,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub enum MouseButton {
     Left,
     Middle,
     Right,
     Unknown,
+}
+
+#[derive(Debug, Copy, Clone, PartialEq)]
+pub enum MouseWheelDirection {
+    Up,
+    Down,
+    None,
 }

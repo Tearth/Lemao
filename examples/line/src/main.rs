@@ -3,6 +3,7 @@
 use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_common_platform::input::Key;
 use lemao_core::lemao_common_platform::input::MouseButton;
+use lemao_core::lemao_common_platform::input::MouseWheelDirection;
 use lemao_core::lemao_common_platform::window::WindowStyle;
 use lemao_core::lemao_math::color::Color;
 use lemao_core::lemao_math::vec2::Vec2;
@@ -53,18 +54,18 @@ pub fn main() -> Result<(), String> {
                         window.close();
                     }
                 }
-                InputEvent::MouseWheelRotated(delta) => {
+                InputEvent::MouseWheelRotated(direction) => {
                     let line = renderer.get_drawable_with_type_mut::<Line>(line_id)?;
-                    if delta > 0 {
+                    if direction == MouseWheelDirection::Up {
                         line.set_thickness(line.get_thickness() + 1.0);
                     } else {
                         line.set_thickness((line.get_thickness() - 1.0).max(1.0));
                     }
                 }
-                InputEvent::WindowSizeChanged(width, height) => {
-                    renderer.set_viewport(width, height);
-                    renderer.get_active_camera_mut()?.set_size(Vec2::new(width as f32, height as f32));
-                    renderer.get_drawable_mut(description_text_id)?.set_position(Vec2::new(5.0, height as f32 - 0.0));
+                InputEvent::WindowSizeChanged(size) => {
+                    renderer.set_viewport(size.x as u32, size.y as u32);
+                    renderer.get_active_camera_mut()?.set_size(size);
+                    renderer.get_drawable_mut(description_text_id)?.set_position(Vec2::new(5.0, size.y - 0.0));
                 }
                 InputEvent::WindowClosed => {
                     is_running = false;
@@ -74,12 +75,12 @@ pub fn main() -> Result<(), String> {
         }
 
         if window.is_mouse_button_pressed(MouseButton::Left) {
-            let position = window.get_cursor_position(CoordinationSystem::Renderer);
+            let position = window.get_cursor_position(CoordinationSystem::Window);
             renderer.get_drawable_with_type_mut::<Line>(line_id)?.set_from(position);
         }
 
         if window.is_mouse_button_pressed(MouseButton::Right) {
-            let position = window.get_cursor_position(CoordinationSystem::Renderer);
+            let position = window.get_cursor_position(CoordinationSystem::Window);
             renderer.get_drawable_with_type_mut::<Line>(line_id)?.set_to(position);
         }
 

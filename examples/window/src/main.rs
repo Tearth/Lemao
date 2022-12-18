@@ -8,6 +8,7 @@ use lemao_core::renderer::drawable::Drawable;
 use lemao_core::renderer::fonts::bff;
 use lemao_core::renderer::fonts::storage::FontStorage;
 use lemao_core::renderer::textures::storage::TextureStorage;
+use lemao_core::window::context::CoordinationSystem;
 use lemao_core::window::context::WindowContext;
 use std::sync::Arc;
 use std::sync::Mutex;
@@ -69,26 +70,26 @@ pub fn main() -> Result<(), String> {
         let mut style_changed = false;
         while let Some(event) = window.poll_event() {
             match event {
-                InputEvent::WindowMoved(_, _) => {
+                InputEvent::WindowMoved(_) => {
                     style_changed = true;
                 }
 
-                InputEvent::WindowSizeChanged(width, height) => {
+                InputEvent::WindowSizeChanged(size) => {
                     let left_top_text_size = renderer.get_drawable_with_type_mut::<Text>(left_top_text_id)?.get_size();
                     let description_text_size = renderer.get_drawable_with_type_mut::<Text>(description_text_id)?.get_size();
 
                     let description_text_margin = left_top_text_size.y - 0.0;
                     let window_status_text_margin = left_top_text_size.y + description_text_size.y + 20.0;
 
-                    renderer.set_viewport(width, height);
-                    renderer.get_active_camera_mut()?.set_size(Vec2::new(width as f32, height as f32));
+                    renderer.set_viewport(size.x as u32, size.y as u32);
+                    renderer.get_active_camera_mut()?.set_size(size);
 
-                    renderer.get_drawable_mut(description_text_id)?.set_position(Vec2::new(5.0, height as f32 - description_text_margin));
-                    renderer.get_drawable_mut(window_status_text_id)?.set_position(Vec2::new(5.0, height as f32 - window_status_text_margin));
-                    renderer.get_drawable_mut(left_top_text_id)?.set_position(Vec2::new(5.0, height as f32));
-                    renderer.get_drawable_mut(right_top_text_id)?.set_position(Vec2::new(width as f32 - 5.0, height as f32));
+                    renderer.get_drawable_mut(description_text_id)?.set_position(Vec2::new(5.0, size.y - description_text_margin));
+                    renderer.get_drawable_mut(window_status_text_id)?.set_position(Vec2::new(5.0, size.y - window_status_text_margin));
+                    renderer.get_drawable_mut(left_top_text_id)?.set_position(Vec2::new(5.0, size.y));
+                    renderer.get_drawable_mut(right_top_text_id)?.set_position(Vec2::new(size.x - 5.0, size.y));
                     renderer.get_drawable_mut(left_bottom_text_id)?.set_position(Vec2::new(5.0, 0.0));
-                    renderer.get_drawable_mut(right_bottom_text_id)?.set_position(Vec2::new(width as f32 - 5.0, 0.0));
+                    renderer.get_drawable_mut(right_bottom_text_id)?.set_position(Vec2::new(size.x - 5.0, 0.0));
 
                     style_changed = true;
                 }
@@ -114,6 +115,9 @@ pub fn main() -> Result<(), String> {
 
                     window.set_style(WindowStyle::Fullscreen)?;
                 }
+                InputEvent::MouseMoved(_) => {
+                    style_changed = true;
+                }
                 InputEvent::WindowClosed => {
                     is_running = false;
                 }
@@ -123,10 +127,11 @@ pub fn main() -> Result<(), String> {
 
         if style_changed {
             renderer.get_drawable_with_type_mut::<Text>(window_status_text_id)?.set_text(&format!(
-                "Window position: {:?}\nWindow size: {:?}\nWindow style: {:?}",
+                "Window position: {:?}\nWindow size: {:?}\nWindow style: {:?}\nCursor position: {:?}",
                 window.get_position(),
                 window.get_size(),
-                window.get_style()
+                window.get_style(),
+                window.get_cursor_position(CoordinationSystem::Window)
             ));
         }
 

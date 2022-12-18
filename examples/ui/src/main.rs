@@ -33,9 +33,9 @@ pub fn main() -> Result<(), String> {
     while is_running {
         while let Some(event) = window.poll_event() {
             match event {
-                InputEvent::WindowSizeChanged(width, height) => {
-                    renderer.set_viewport(width, height);
-                    renderer.get_active_camera_mut()?.set_size(Vec2::new(width as f32, height as f32));
+                InputEvent::WindowSizeChanged(size) => {
+                    renderer.set_viewport(size.x as u32, size.y as u32);
+                    renderer.get_active_camera_mut()?.set_size(size);
                 }
 
                 InputEvent::WindowClosed => {

@@ -65,11 +65,11 @@ pub fn main() -> Result<(), String> {
     while is_running {
         while let Some(event) = window.poll_event() {
             match event {
-                InputEvent::WindowSizeChanged(width, height) => {
-                    window_size = Vec2::new(width as f32, height as f32);
+                InputEvent::WindowSizeChanged(size) => {
+                    window_size = size;
 
-                    renderer.set_viewport(width, height);
-                    renderer.get_active_camera_mut()?.set_size(Vec2::new(width as f32, height as f32));
+                    renderer.set_viewport(size.x as u32, size.y as u32);
+                    renderer.get_active_camera_mut()?.set_size(size);
                     renderer.get_drawable_mut(fps_text_id)?.set_position(Vec2::new(5.0, window_size.y - 0.0));
                 }
                 InputEvent::WindowClosed => {

@@ -66,11 +66,11 @@ pub fn main() -> Result<(), String> {
                         window.close()
                     }
                 }
-                InputEvent::WindowSizeChanged(width, height) => {
-                    renderer.set_viewport(width, height);
-                    renderer.get_active_camera_mut()?.set_size(Vec2::new(width as f32, height as f32));
-                    renderer.get_camera_mut(gui_camera_id)?.set_size(Vec2::new(width as f32, height as f32));
-                    renderer.get_drawable_mut(description_text_id)?.set_position(Vec2::new(5.0, height as f32 - 0.0));
+                InputEvent::WindowSizeChanged(size) => {
+                    renderer.set_viewport(size.x as u32, size.y as u32);
+                    renderer.get_active_camera_mut()?.set_size(size);
+                    renderer.get_camera_mut(gui_camera_id)?.set_size(size);
+                    renderer.get_drawable_mut(description_text_id)?.set_position(Vec2::new(5.0, size.y - 0.0));
                 }
                 InputEvent::WindowClosed => {
                     is_running = false;
