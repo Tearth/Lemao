@@ -34,7 +34,7 @@ pub fn main() -> Result<(), String> {
         while let Some(event) = window.poll_event() {
             match event {
                 InputEvent::WindowSizeChanged(size) => {
-                    renderer.set_viewport(size.x as u32, size.y as u32);
+                    renderer.set_viewport(size);
                     renderer.get_active_camera_mut()?.set_size(size);
                 }
 

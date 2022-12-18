@@ -159,9 +159,9 @@ impl RendererContext {
         self.batch_renderer = Some(BatchRenderer::new(self, 1024 * 1024, 1024 * 100));
     }
 
-    pub fn set_viewport(&mut self, width: u32, height: u32) {
+    pub fn set_viewport(&mut self, size: Vec2) {
         unsafe {
-            (self.gl.glViewport)(0, 0, width as i32, height as i32);
+            (self.gl.glViewport)(0, 0, size.x as i32, size.y as i32);
         }
     }
 

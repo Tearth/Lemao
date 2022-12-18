@@ -67,7 +67,7 @@ pub fn main() -> Result<(), String> {
                     }
                 }
                 InputEvent::WindowSizeChanged(size) => {
-                    renderer.set_viewport(size.x as u32, size.y as u32);
+                    renderer.set_viewport(size);
                     renderer.get_active_camera_mut()?.set_size(size);
                     renderer.get_camera_mut(gui_camera_id)?.set_size(size);
                     renderer.get_drawable_mut(description_text_id)?.set_position(Vec2::new(5.0, size.y - 0.0));

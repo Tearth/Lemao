@@ -64,7 +64,7 @@ pub fn main() -> Result<(), String> {
                 InputEvent::WindowSizeChanged(size) => {
                     let description_text_size = renderer.get_drawable_with_type_mut::<Text>(description_text_id)?.get_size();
 
-                    renderer.set_viewport(size.x as u32, size.y as u32);
+                    renderer.set_viewport(size);
                     renderer.get_active_camera_mut()?.set_size(size);
                     renderer.get_drawable_mut(description_text_id)?.set_position(Vec2::new(5.0, size.y - 0.0));
                     renderer.get_drawable_mut(status_text_id)?.set_position(Vec2::new(5.0, size.y - description_text_size.y - 20.0));
