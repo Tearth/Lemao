@@ -1,4 +1,5 @@
 use super::Component;
+use super::ComponentMargin;
 use super::ComponentPosition;
 use super::ComponentSize;
 use lemao_core::lemao_math::color::Color;
@@ -16,6 +17,7 @@ pub struct Panel {
     size: ComponentSize,
     screen_size: Vec2,
     anchor: Vec2,
+    margin: ComponentMargin,
     color: Color,
     rectangle_id: usize,
     children: Vec<usize>,
@@ -30,6 +32,7 @@ impl Panel {
             size: ComponentSize::Absolute(Default::default()),
             screen_size: Default::default(),
             anchor: Default::default(),
+            margin: Default::default(),
             color: Color::new(1.0, 1.0, 1.0, 1.0),
             rectangle_id: renderer.create_rectangle(Vec2::new(100.0, 100.0))?,
             children: Default::default(),
@@ -78,6 +81,14 @@ impl Component for Panel {
         self.anchor = anchor;
     }
 
+    fn get_margin(&self) -> ComponentMargin {
+        self.margin
+    }
+
+    fn set_margin(&mut self, margin: ComponentMargin) {
+        self.margin = margin;
+    }
+
     fn add_child(&mut self, component_id: usize) {
         self.children.push(component_id);
     }
@@ -100,6 +111,9 @@ impl Component for Panel {
             ComponentSize::Absolute(size) => size,
             ComponentSize::Relative(size) => area_size * size,
         };
+
+        self.screen_position += Vec2::new(self.margin.left, self.margin.bottom);
+        self.screen_size -= Vec2::new(self.margin.left + self.margin.right, self.margin.bottom + self.margin.top);
 
         let rectangle = renderer.get_drawable_with_type_mut::<Rectangle>(self.rectangle_id)?;
         rectangle.set_position(self.screen_position);

@@ -17,6 +17,14 @@ pub enum ComponentSize {
     Relative(Vec2),
 }
 
+#[derive(Copy, Clone, Debug, Default)]
+pub struct ComponentMargin {
+    pub top: f32,
+    pub bottom: f32,
+    pub right: f32,
+    pub left: f32,
+}
+
 pub trait Component {
     fn get_position(&self) -> ComponentPosition;
     fn get_screen_position(&self) -> Vec2;
@@ -29,6 +37,9 @@ pub trait Component {
     fn get_anchor(&self) -> Vec2;
     fn set_anchor(&mut self, anchor: Vec2);
 
+    fn get_margin(&self) -> ComponentMargin;
+    fn set_margin(&mut self, margin: ComponentMargin);
+
     fn add_child(&mut self, component_id: usize);
     fn remove_child(&mut self, component_id: usize);
     fn get_children(&self) -> &Vec<usize>;
@@ -38,4 +49,10 @@ pub trait Component {
 
     fn as_any(&self) -> &dyn Any;
     fn as_any_mut(&mut self) -> &mut dyn Any;
+}
+
+impl ComponentMargin {
+    pub fn new(top: f32, bottom: f32, right: f32, left: f32) -> Self {
+        ComponentMargin { top, bottom, right, left }
+    }
 }

@@ -1,4 +1,5 @@
 use super::Component;
+use super::ComponentMargin;
 use super::ComponentPosition;
 use super::ComponentSize;
 use lemao_core::lemao_math::vec2::Vec2;
@@ -13,6 +14,7 @@ pub struct Canvas {
     size: ComponentSize,
     screen_size: Vec2,
     anchor: Vec2,
+    margin: ComponentMargin,
     children: Vec<usize>,
 }
 
@@ -25,6 +27,7 @@ impl Canvas {
             size: ComponentSize::Absolute(Default::default()),
             screen_size: Default::default(),
             anchor: Default::default(),
+            margin: Default::default(),
             children: Default::default(),
         })
     }
@@ -61,6 +64,14 @@ impl Component for Canvas {
 
     fn set_anchor(&mut self, anchor: Vec2) {
         self.anchor = anchor;
+    }
+
+    fn get_margin(&self) -> ComponentMargin {
+        self.margin
+    }
+
+    fn set_margin(&mut self, margin: ComponentMargin) {
+        self.margin = margin;
     }
 
     fn add_child(&mut self, component_id: usize) {
