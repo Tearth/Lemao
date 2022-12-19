@@ -15,6 +15,7 @@ pub struct Canvas {
     screen_size: Vec2,
     anchor: Vec2,
     margin: ComponentMargin,
+    offset: Vec2,
     children: Vec<usize>,
 }
 
@@ -28,6 +29,7 @@ impl Canvas {
             screen_size: Default::default(),
             anchor: Default::default(),
             margin: Default::default(),
+            offset: Default::default(),
             children: Default::default(),
         })
     }
@@ -72,6 +74,14 @@ impl Component for Canvas {
 
     fn set_margin(&mut self, margin: ComponentMargin) {
         self.margin = margin;
+    }
+
+    fn get_offset(&self) -> Vec2 {
+        self.offset
+    }
+
+    fn set_offset(&mut self, offset: Vec2) {
+        self.offset = offset;
     }
 
     fn add_child(&mut self, component_id: usize) {

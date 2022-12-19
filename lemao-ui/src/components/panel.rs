@@ -18,6 +18,7 @@ pub struct Panel {
     screen_size: Vec2,
     anchor: Vec2,
     margin: ComponentMargin,
+    offset: Vec2,
     color: Color,
     rectangle_id: usize,
     children: Vec<usize>,
@@ -33,6 +34,7 @@ impl Panel {
             screen_size: Default::default(),
             anchor: Default::default(),
             margin: Default::default(),
+            offset: Default::default(),
             color: Color::new(1.0, 1.0, 1.0, 1.0),
             rectangle_id: renderer.create_rectangle(Vec2::new(100.0, 100.0))?,
             children: Default::default(),
@@ -89,6 +91,14 @@ impl Component for Panel {
         self.margin = margin;
     }
 
+    fn get_offset(&self) -> Vec2 {
+        self.offset
+    }
+
+    fn set_offset(&mut self, offset: Vec2) {
+        self.offset = offset;
+    }
+
     fn add_child(&mut self, component_id: usize) {
         self.children.push(component_id);
     }
@@ -112,7 +122,7 @@ impl Component for Panel {
             ComponentSize::Relative(size) => area_size * size,
         };
 
-        self.screen_position += Vec2::new(self.margin.left, self.margin.bottom);
+        self.screen_position += Vec2::new(self.margin.left, self.margin.bottom) + self.offset;
         self.screen_size -= Vec2::new(self.margin.left + self.margin.right, self.margin.bottom + self.margin.top);
 
         let rectangle = renderer.get_drawable_with_type_mut::<Rectangle>(self.rectangle_id)?;

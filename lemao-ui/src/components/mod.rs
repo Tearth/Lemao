@@ -40,6 +40,9 @@ pub trait Component {
     fn get_margin(&self) -> ComponentMargin;
     fn set_margin(&mut self, margin: ComponentMargin);
 
+    fn get_offset(&self) -> Vec2;
+    fn set_offset(&mut self, offset: Vec2);
+
     fn add_child(&mut self, component_id: usize);
     fn remove_child(&mut self, component_id: usize);
     fn get_children(&self) -> &Vec<usize>;
