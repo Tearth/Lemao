@@ -1,10 +1,12 @@
 use super::Component;
+use super::ComponentBorderThickness;
 use super::ComponentMargin;
 use super::ComponentPosition;
 use super::ComponentSize;
 use lemao_core::lemao_math::color::Color;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::context::RendererContext;
+use lemao_core::renderer::drawable::frame::Frame;
 use lemao_core::renderer::drawable::rectangle::Rectangle;
 use lemao_core::renderer::drawable::Drawable;
 use std::any::Any;
@@ -20,7 +22,10 @@ pub struct Panel {
     margin: ComponentMargin,
     offset: Vec2,
     color: Color,
-    rectangle_id: usize,
+    border_thickness: ComponentBorderThickness,
+    border_color: Color,
+    filling_rectangle_id: usize,
+    border_frame_id: usize,
     children: Vec<usize>,
 }
 
@@ -36,9 +41,16 @@ impl Panel {
             margin: Default::default(),
             offset: Default::default(),
             color: Color::new(1.0, 1.0, 1.0, 1.0),
-            rectangle_id: renderer.create_rectangle(Vec2::new(100.0, 100.0))?,
+            border_thickness: Default::default(),
+            border_color: Color::new(1.0, 1.0, 1.0, 1.0),
+            filling_rectangle_id: renderer.create_rectangle(Vec2::new(100.0, 100.0))?,
+            border_frame_id: renderer.create_frame(Vec2::new(100.0, 100.0))?,
             children: Default::default(),
         })
+    }
+
+    pub fn get_id(&self) -> usize {
+        self.id
     }
 
     pub fn get_color(&self) -> Color {
@@ -48,6 +60,22 @@ impl Panel {
     pub fn set_color(&mut self, color: Color) {
         self.color = color;
     }
+
+    pub fn get_border_thickness(&self) -> ComponentBorderThickness {
+        self.border_thickness
+    }
+
+    pub fn set_border_thickness(&mut self, border_thickness: ComponentBorderThickness) {
+        self.border_thickness = border_thickness;
+    }
+
+    pub fn get_border_color(&self) -> Color {
+        self.border_color
+    }
+
+    pub fn set_border_color(&mut self, border_color: Color) {
+        self.border_color = border_color;
+    }
 }
 
 impl Component for Panel {
@@ -55,7 +83,7 @@ impl Component for Panel {
         self.position
     }
 
-    fn get_screen_position(&self) -> Vec2 {
+    fn get_work_area_position(&self) -> Vec2 {
         self.screen_position
     }
 
@@ -67,7 +95,7 @@ impl Component for Panel {
         self.size
     }
 
-    fn get_screen_size(&self) -> Vec2 {
+    fn get_work_area_size(&self) -> Vec2 {
         self.screen_size
     }
 
@@ -112,30 +140,45 @@ impl Component for Panel {
     }
 
     fn update(&mut self, renderer: &mut RendererContext, area_position: Vec2, area_size: Vec2) -> Result<(), String> {
-        self.screen_position = match self.position {
-            ComponentPosition::AbsoluteToParent(position) => area_position + position,
-            ComponentPosition::RelativeToParent(position) => area_position + (position * area_size),
-        };
-
         self.screen_size = match self.size {
             ComponentSize::Absolute(size) => size,
             ComponentSize::Relative(size) => area_size * size,
         };
 
+        self.screen_position = match self.position {
+            ComponentPosition::AbsoluteToParent(position) => area_position + position,
+            ComponentPosition::RelativeToParent(position) => area_position + (position * area_size),
+        } - (self.screen_size * self.anchor);
+
         self.screen_position += Vec2::new(self.margin.left, self.margin.bottom) + self.offset;
         self.screen_size -= Vec2::new(self.margin.left + self.margin.right, self.margin.bottom + self.margin.top);
 
-        let rectangle = renderer.get_drawable_with_type_mut::<Rectangle>(self.rectangle_id)?;
-        rectangle.set_position(self.screen_position);
-        rectangle.set_size(self.screen_size);
-        rectangle.set_anchor(self.anchor);
-        rectangle.set_color(self.color);
+        if self.border_thickness != Default::default() {
+            let border_rectangle = renderer.get_drawable_with_type_mut::<Frame>(self.border_frame_id)?;
+            border_rectangle.set_position(self.screen_position);
+            border_rectangle.set_size(self.screen_size);
+            border_rectangle.set_thickness(self.border_thickness.into());
+            border_rectangle.set_color(self.border_color);
+
+            self.screen_position += Vec2::new(self.border_thickness.left, self.border_thickness.bottom);
+            self.screen_size -= Vec2::new(self.border_thickness.left + self.border_thickness.right, self.border_thickness.top + self.border_thickness.bottom);
+        }
+
+        let filling_rectangle = renderer.get_drawable_with_type_mut::<Rectangle>(self.filling_rectangle_id)?;
+        filling_rectangle.set_position(self.screen_position);
+        filling_rectangle.set_size(self.screen_size);
+        filling_rectangle.set_color(self.color);
 
         Ok(())
     }
 
     fn draw(&mut self, renderer: &mut RendererContext) -> Result<(), String> {
-        renderer.draw(self.rectangle_id)?;
+        renderer.draw(self.filling_rectangle_id)?;
+
+        if self.border_thickness != Default::default() {
+            renderer.draw(self.border_frame_id)?;
+        }
+
         Ok(())
     }
 

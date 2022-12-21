@@ -33,6 +33,10 @@ impl Canvas {
             children: Default::default(),
         })
     }
+
+    pub fn get_id(&self) -> usize {
+        self.id
+    }
 }
 
 impl Component for Canvas {
@@ -40,7 +44,7 @@ impl Component for Canvas {
         self.position
     }
 
-    fn get_screen_position(&self) -> Vec2 {
+    fn get_work_area_position(&self) -> Vec2 {
         self.screen_position
     }
 
@@ -52,7 +56,7 @@ impl Component for Canvas {
         self.size
     }
 
-    fn get_screen_size(&self) -> Vec2 {
+    fn get_work_area_size(&self) -> Vec2 {
         self.screen_size
     }
 
@@ -96,16 +100,16 @@ impl Component for Canvas {
         &self.children
     }
 
-    fn update(&mut self, renderer: &mut RendererContext, area_position: Vec2, area_size: Vec2) -> Result<(), String> {
-        self.screen_position = match self.position {
-            ComponentPosition::AbsoluteToParent(position) => area_position + position,
-            ComponentPosition::RelativeToParent(position) => area_position + (position * area_size),
-        };
-
+    fn update(&mut self, _renderer: &mut RendererContext, area_position: Vec2, area_size: Vec2) -> Result<(), String> {
         self.screen_size = match self.size {
             ComponentSize::Absolute(size) => size,
             ComponentSize::Relative(size) => area_size * size,
         };
+
+        self.screen_position = match self.position {
+            ComponentPosition::AbsoluteToParent(position) => area_position + position,
+            ComponentPosition::RelativeToParent(position) => area_position + (position * area_size),
+        } - (self.screen_size * self.anchor);
 
         Ok(())
     }

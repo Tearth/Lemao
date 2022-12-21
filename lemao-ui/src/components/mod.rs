@@ -1,5 +1,6 @@
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::context::RendererContext;
+use lemao_core::renderer::drawable::frame::FrameThickness;
 use std::any::Any;
 
 pub mod canvas;
@@ -25,13 +26,21 @@ pub struct ComponentMargin {
     pub left: f32,
 }
 
+#[derive(Copy, Clone, Debug, Default, PartialEq)]
+pub struct ComponentBorderThickness {
+    pub top: f32,
+    pub bottom: f32,
+    pub right: f32,
+    pub left: f32,
+}
+
 pub trait Component {
     fn get_position(&self) -> ComponentPosition;
-    fn get_screen_position(&self) -> Vec2;
+    fn get_work_area_position(&self) -> Vec2;
     fn set_position(&mut self, position: ComponentPosition);
 
     fn get_size(&self) -> ComponentSize;
-    fn get_screen_size(&self) -> Vec2;
+    fn get_work_area_size(&self) -> Vec2;
     fn set_size(&mut self, size: ComponentSize);
 
     fn get_anchor(&self) -> Vec2;
@@ -56,6 +65,18 @@ pub trait Component {
 
 impl ComponentMargin {
     pub fn new(top: f32, bottom: f32, right: f32, left: f32) -> Self {
-        ComponentMargin { top, bottom, right, left }
+        Self { top, bottom, right, left }
+    }
+}
+
+impl ComponentBorderThickness {
+    pub fn new(top: f32, bottom: f32, right: f32, left: f32) -> Self {
+        Self { top, bottom, right, left }
+    }
+}
+
+impl From<ComponentBorderThickness> for FrameThickness {
+    fn from(thickness: ComponentBorderThickness) -> Self {
+        Self { top: thickness.top, bottom: thickness.bottom, right: thickness.right, left: thickness.left }
     }
 }

@@ -9,6 +9,7 @@ use lemao_opengl::pointers::OpenGLPointers;
 use std::any::Any;
 use std::ffi::c_void;
 use std::mem;
+use std::ops::{Add, Sub};
 use std::ptr;
 use std::rc::Rc;
 
@@ -27,9 +28,17 @@ pub struct Frame {
     size: Vec2,
     anchor: Vec2,
     color: Color,
-    thickness: Vec2,
+    thickness: FrameThickness,
     vertices: Vec<f32>,
     indices: Vec<u32>,
+}
+
+#[derive(Copy, Clone, Debug, Default, PartialEq)]
+pub struct FrameThickness {
+    pub top: f32,
+    pub bottom: f32,
+    pub right: f32,
+    pub left: f32,
 }
 
 impl Frame {
@@ -49,7 +58,7 @@ impl Frame {
             size,
             anchor: Default::default(),
             color: Color::new(1.0, 1.0, 1.0, 1.0),
-            thickness: Vec2::new(1.0, 1.0),
+            thickness: FrameThickness::new(1.0, 1.0, 1.0, 1.0),
             vertices: Vec::new(),
             indices: Vec::new(),
         };
@@ -95,11 +104,11 @@ impl Frame {
         self.update();
     }
 
-    pub fn get_thickness(&self) -> Vec2 {
+    pub fn get_thickness(&self) -> FrameThickness {
         self.thickness
     }
 
-    pub fn set_thickness(&mut self, thickness: Vec2) {
+    pub fn set_thickness(&mut self, thickness: FrameThickness) {
         self.thickness = thickness;
         self.update();
     }
@@ -127,7 +136,7 @@ impl Frame {
     }
 
     #[rustfmt::skip]
-    fn get_vertices(&self, size: Vec2, color: Color, thickness: Vec2) -> [f32; 72] {
+    fn get_vertices(&self, size: Vec2, color: Color, thickness: FrameThickness) -> [f32; 72] {
         [
             /*
                 3--------2
@@ -176,8 +185,8 @@ impl Frame {
             /* t.u */ 0.0,
             /* t.v */ 1.0,
 
-            /* v.x */ thickness.x,
-            /* v.y */ thickness.y,
+            /* v.x */ thickness.left,
+            /* v.y */ thickness.bottom,
             /* v.z */ 0.0,
             /* c.r */ color.r,
             /* c.g */ color.g,
@@ -186,8 +195,8 @@ impl Frame {
             /* t.u */ 0.1,
             /* t.v */ 0.1,
 
-            /* v.x */ size.x - thickness.x,
-            /* v.y */ thickness.y,
+            /* v.x */ size.x - thickness.right,
+            /* v.y */ thickness.bottom,
             /* v.z */ 0.0,
             /* c.r */ color.r,
             /* c.g */ color.g,
@@ -196,8 +205,8 @@ impl Frame {
             /* t.u */ 0.9,
             /* t.v */ 0.0,
 
-            /* v.x */ size.x - thickness.x,
-            /* v.y */ size.y - thickness.y,
+            /* v.x */ size.x - thickness.right,
+            /* v.y */ size.y - thickness.top,
             /* v.z */ 0.0,
             /* c.r */ color.r,
             /* c.g */ color.g,
@@ -206,8 +215,8 @@ impl Frame {
             /* t.u */ 0.1,
             /* t.v */ 0.1,
 
-            /* v.x */ thickness.x,
-            /* v.y */ size.y - thickness.y,
+            /* v.x */ thickness.left,
+            /* v.y */ size.y - thickness.top,
             /* v.z */ 0.0,
             /* c.r */ color.r,
             /* c.g */ color.g,
@@ -319,5 +328,27 @@ impl Drop for Frame {
                 (self.gl.glDeleteVertexArrays)(1, &mut self.vao_gl_id);
             }
         }
+    }
+}
+
+impl FrameThickness {
+    pub fn new(top: f32, bottom: f32, right: f32, left: f32) -> Self {
+        Self { top, bottom, right, left }
+    }
+}
+
+impl Add for FrameThickness {
+    type Output = Self;
+
+    fn add(self, other: Self) -> Self {
+        Self { top: self.top + other.top, bottom: self.bottom + other.bottom, right: self.right + other.right, left: self.left + other.left }
+    }
+}
+
+impl Sub for FrameThickness {
+    type Output = Self;
+
+    fn sub(self, other: Self) -> Self {
+        Self { top: self.top - other.top, bottom: self.bottom - other.bottom, right: self.right - other.right, left: self.left - other.left }
     }
 }

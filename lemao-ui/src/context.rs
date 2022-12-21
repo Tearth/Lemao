@@ -109,8 +109,8 @@ impl UiContext {
         let component = self.get_component_mut(component_id)?;
         component.update(renderer, area_position, area_size)?;
 
-        let component_area_position = component.get_screen_position() - (component.get_screen_size() * component.get_anchor());
-        let component_area_size = component.get_screen_size();
+        let component_area_position = component.get_work_area_position();
+        let component_area_size = component.get_work_area_size();
 
         for child_id in component.get_children().clone() {
             self.update(renderer, child_id, component_area_position, component_area_size)?;
