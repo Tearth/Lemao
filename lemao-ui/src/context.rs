@@ -8,13 +8,17 @@ use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::context::RendererContext;
 
 pub struct UiContext {
+    ui_camera_id: usize,
     main_canvas_id: usize,
     components: Vec<Option<Box<dyn Component>>>,
 }
 
 impl UiContext {
     pub fn new(renderer: &mut RendererContext) -> Result<Self, String> {
-        let mut ui = Self { main_canvas_id: 0, components: Default::default() };
+        let main_camera = renderer.get_active_camera()?;
+        let ui_camera_id = renderer.create_camera(main_camera.get_position(), main_camera.get_size())?;
+
+        let mut ui = Self { main_canvas_id: 0, ui_camera_id, components: Default::default() };
         ui.main_canvas_id = ui.create_canvas(renderer)?;
 
         let main_canvas = ui.get_component_mut(ui.main_canvas_id)?;
@@ -23,14 +27,19 @@ impl UiContext {
         Ok(ui)
     }
 
-    pub fn process_event(&mut self, event: &InputEvent) {
+    pub fn process_event(&mut self, renderer: &mut RendererContext, event: &InputEvent) -> Result<(), String> {
         match event {
             InputEvent::WindowSizeChanged(size) => {
-                let main_canvas = self.get_component_mut(self.main_canvas_id).unwrap();
+                let ui_camera = renderer.get_camera_mut(self.ui_camera_id)?;
+                let main_canvas = self.get_component_mut(self.main_canvas_id)?;
+
+                ui_camera.set_size(*size);
                 main_canvas.set_size(ComponentSize::Absolute(*size));
             }
             _ => {}
         }
+
+        Ok(())
     }
 
     pub fn create_canvas(&mut self, renderer: &mut RendererContext) -> Result<usize, String> {
@@ -88,6 +97,9 @@ impl UiContext {
     }
 
     pub fn draw(&mut self, renderer: &mut RendererContext, component_id: usize) -> Result<(), String> {
+        let active_camera_id = renderer.get_active_camera()?.get_id();
+        renderer.set_camera_as_active(self.ui_camera_id)?;
+
         let main_canvas = self.get_main_canvas()?;
         let area_position = match main_canvas.get_position() {
             ComponentPosition::AbsoluteToParent(position) => position,
@@ -102,6 +114,7 @@ impl UiContext {
         let component = self.get_component_mut(component_id)?;
         component.draw(renderer)?;
 
+        renderer.set_camera_as_active(active_camera_id)?;
         Ok(())
     }
 
