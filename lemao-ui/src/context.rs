@@ -1,8 +1,11 @@
+use std::collections::VecDeque;
+
 use crate::components::canvas::Canvas;
 use crate::components::panel::Panel;
 use crate::components::Component;
 use crate::components::ComponentPosition;
 use crate::components::ComponentSize;
+use crate::events::UiEvent;
 use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::context::RendererContext;
@@ -10,7 +13,9 @@ use lemao_core::renderer::context::RendererContext;
 pub struct UiContext {
     ui_camera_id: usize,
     main_canvas_id: usize,
+    last_cursor_position: Vec2,
     components: Vec<Option<Box<dyn Component>>>,
+    events: VecDeque<UiEvent>,
 }
 
 impl UiContext {
@@ -18,7 +23,8 @@ impl UiContext {
         let main_camera = renderer.get_active_camera()?;
         let ui_camera_id = renderer.create_camera(main_camera.get_position(), main_camera.get_size())?;
 
-        let mut ui = Self { main_canvas_id: 0, ui_camera_id, components: Default::default() };
+        let mut ui =
+            Self { main_canvas_id: 0, last_cursor_position: Default::default(), ui_camera_id, components: Default::default(), events: Default::default() };
         ui.main_canvas_id = ui.create_canvas(renderer)?;
 
         let main_canvas = ui.get_component_mut(ui.main_canvas_id)?;
@@ -27,7 +33,7 @@ impl UiContext {
         Ok(ui)
     }
 
-    pub fn process_event(&mut self, renderer: &mut RendererContext, event: &InputEvent) -> Result<(), String> {
+    pub fn process_window_event(&mut self, renderer: &mut RendererContext, event: &InputEvent) -> Result<(), String> {
         match event {
             InputEvent::WindowSizeChanged(size) => {
                 let ui_camera = renderer.get_camera_mut(self.ui_camera_id)?;
@@ -36,10 +42,75 @@ impl UiContext {
                 ui_camera.set_size(*size);
                 main_canvas.set_size(ComponentSize::Absolute(*size));
             }
+            InputEvent::MouseMoved(cursor_position) => {
+                for (component_id, component) in self.components.iter().enumerate() {
+                    if component_id == self.main_canvas_id {
+                        continue;
+                    }
+
+                    if component.is_none() {
+                        continue;
+                    }
+
+                    let component = component.as_ref().unwrap();
+
+                    if component.is_point_inside(*cursor_position) {
+                        if !component.is_point_inside(self.last_cursor_position) {
+                            self.events.push_back(UiEvent::CursorEnter(component_id, *cursor_position));
+                        }
+
+                        self.events.push_back(UiEvent::CursorOver(component_id, *cursor_position));
+                    } else {
+                        if component.is_point_inside(self.last_cursor_position) {
+                            self.events.push_back(UiEvent::CursorLeave(component_id, *cursor_position));
+                        }
+                    }
+                }
+
+                self.last_cursor_position = *cursor_position;
+            }
+            InputEvent::MouseButtonPressed(button) => {
+                for (component_id, component) in self.components.iter().enumerate() {
+                    if component_id == self.main_canvas_id {
+                        continue;
+                    }
+
+                    if component.is_none() {
+                        continue;
+                    }
+
+                    let component = component.as_ref().unwrap();
+
+                    if component.is_point_inside(self.last_cursor_position) {
+                        self.events.push_back(UiEvent::MouseButtonPressed(component_id, *button));
+                    }
+                }
+            }
+            InputEvent::MouseButtonReleased(button) => {
+                for (component_id, component) in self.components.iter().enumerate() {
+                    if component_id == self.main_canvas_id {
+                        continue;
+                    }
+
+                    if component.is_none() {
+                        continue;
+                    }
+
+                    let component = component.as_ref().unwrap();
+
+                    if component.is_point_inside(self.last_cursor_position) {
+                        self.events.push_back(UiEvent::MouseButtonReleased(component_id, *button));
+                    }
+                }
+            }
             _ => {}
         }
 
         Ok(())
+    }
+
+    pub fn poll_event(&mut self) -> Option<UiEvent> {
+        self.events.pop_front()
     }
 
     pub fn create_canvas(&mut self, renderer: &mut RendererContext) -> Result<usize, String> {
