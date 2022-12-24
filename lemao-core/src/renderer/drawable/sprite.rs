@@ -59,6 +59,14 @@ impl Sprite {
         self.texture_gl_id = texture.texture_gl_id;
         self.size = texture.get_size();
     }
+
+    pub fn get_size(&self) -> Vec2 {
+        self.size
+    }
+
+    pub fn set_size(&mut self, size: Vec2) {
+        self.size = size;
+    }
 }
 
 impl Drawable for Sprite {
