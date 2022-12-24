@@ -1,5 +1,4 @@
-use std::collections::VecDeque;
-
+use crate::components::button::Button;
 use crate::components::canvas::Canvas;
 use crate::components::panel::Panel;
 use crate::components::Component;
@@ -9,6 +8,7 @@ use crate::events::UiEvent;
 use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::context::RendererContext;
+use std::collections::VecDeque;
 
 pub struct UiContext {
     ui_camera_id: usize,
@@ -111,6 +111,14 @@ impl UiContext {
 
     pub fn poll_event(&mut self) -> Option<UiEvent> {
         self.events.pop_front()
+    }
+
+    pub fn create_button(&mut self, renderer: &mut RendererContext, label_font_id: usize) -> Result<usize, String> {
+        let id = self.components.len();
+        let button = Box::new(Button::new(id, renderer, label_font_id)?);
+        self.components.push(Some(button));
+
+        Ok(id)
     }
 
     pub fn create_canvas(&mut self, renderer: &mut RendererContext) -> Result<usize, String> {

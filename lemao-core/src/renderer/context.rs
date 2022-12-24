@@ -242,6 +242,14 @@ impl RendererContext {
         self.set_camera_as_active(self.default_camera_id)
     }
 
+    pub fn get_fonts(&self) -> Arc<Mutex<FontStorage>> {
+        self.fonts.clone()
+    }
+
+    pub fn get_textures(&self) -> Arc<Mutex<TextureStorage>> {
+        self.textures.clone()
+    }
+
     pub fn create_animation(&mut self, texture_id: usize, tile_size: Vec2) -> Result<usize, String> {
         let texture_storage = self.textures.lock().unwrap();
         let texture = texture_storage.get(texture_id)?;

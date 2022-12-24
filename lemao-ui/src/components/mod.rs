@@ -3,6 +3,7 @@ use lemao_core::renderer::context::RendererContext;
 use lemao_core::renderer::drawable::frame::FrameThickness;
 use std::any::Any;
 
+pub mod button;
 pub mod canvas;
 pub mod panel;
 
@@ -32,6 +33,20 @@ pub struct ComponentBorderThickness {
     pub bottom: f32,
     pub right: f32,
     pub left: f32,
+}
+
+#[derive(Copy, Clone, Debug)]
+pub enum HorizontalAlignment {
+    Left,
+    Middle,
+    Right,
+}
+
+#[derive(Copy, Clone, Debug)]
+pub enum VerticalAlignment {
+    Top,
+    Middle,
+    Bottom,
 }
 
 pub trait Component {
