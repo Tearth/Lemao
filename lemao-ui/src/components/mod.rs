@@ -6,6 +6,7 @@ use std::any::Any;
 pub mod button;
 pub mod canvas;
 pub mod image;
+pub mod image_button;
 pub mod panel;
 
 #[derive(Copy, Clone, Debug)]
