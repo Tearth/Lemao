@@ -205,6 +205,9 @@ impl Component for Button {
             ComponentPosition::RelativeToParent(position) => area_position + (position * area_size),
         } - (self.screen_size * self.anchor);
 
+        self.screen_size = self.screen_size.floor();
+        self.screen_position = self.screen_position.floor();
+
         self.screen_position += Vec2::new(self.margin.left, self.margin.bottom) + self.offset;
         self.screen_size -= Vec2::new(self.margin.left + self.margin.right, self.margin.bottom + self.margin.top);
 
@@ -217,6 +220,9 @@ impl Component for Button {
 
             self.screen_position += Vec2::new(self.border_thickness.left, self.border_thickness.bottom);
             self.screen_size -= Vec2::new(self.border_thickness.left + self.border_thickness.right, self.border_thickness.top + self.border_thickness.bottom);
+
+            self.screen_size = self.screen_size.floor();
+            self.screen_position = self.screen_position.floor();
         }
 
         let filling_rectangle = renderer.get_drawable_with_type_mut::<Rectangle>(self.filling_rectangle_id)?;

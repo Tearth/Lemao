@@ -111,6 +111,9 @@ impl Component for Canvas {
             ComponentPosition::RelativeToParent(position) => area_position + (position * area_size),
         } - (self.screen_size * self.anchor);
 
+        self.screen_size = self.screen_size.floor();
+        self.screen_position = self.screen_position.floor();
+
         Ok(())
     }
 

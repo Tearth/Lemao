@@ -218,6 +218,9 @@ impl Component for ImageButton {
         self.screen_position += Vec2::new(self.margin.left, self.margin.bottom) + self.offset;
         self.screen_size -= Vec2::new(self.margin.left + self.margin.right, self.margin.bottom + self.margin.top);
 
+        self.screen_size = self.screen_size.floor();
+        self.screen_position = self.screen_position.floor();
+
         if self.border_thickness != Default::default() {
             let border_rectangle = renderer.get_drawable_with_type_mut::<Frame>(self.border_frame_id)?;
             border_rectangle.set_position(self.screen_position);
@@ -227,6 +230,9 @@ impl Component for ImageButton {
 
             self.screen_position += Vec2::new(self.border_thickness.left, self.border_thickness.bottom);
             self.screen_size -= Vec2::new(self.border_thickness.left + self.border_thickness.right, self.border_thickness.top + self.border_thickness.bottom);
+
+            self.screen_size = self.screen_size.floor();
+            self.screen_position = self.screen_position.floor();
         }
 
         let sprite = renderer.get_drawable_with_type_mut::<Sprite>(self.sprite_id)?;

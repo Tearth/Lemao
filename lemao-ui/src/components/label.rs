@@ -170,6 +170,9 @@ impl Component for Label {
         self.screen_position += Vec2::new(self.margin.left, self.margin.bottom) + self.offset;
         self.screen_size -= Vec2::new(self.margin.left + self.margin.right, self.margin.bottom + self.margin.top);
 
+        self.screen_size = self.screen_size.floor();
+        self.screen_position = self.screen_position.floor();
+
         let font_storage = renderer.get_fonts();
         let font_storage_lock = font_storage.lock().unwrap();
         let font = font_storage_lock.get(self.label_font_id)?;
@@ -181,7 +184,7 @@ impl Component for Label {
 
             for token in self.label_text.split_whitespace() {
                 if label.calculate_text_size(line.clone() + token).x > self.max_multiline_width {
-                    result += &(line.clone() + "\n");
+                    result += &(line.trim().to_string() + "\n");
                     line.clear();
                 }
 

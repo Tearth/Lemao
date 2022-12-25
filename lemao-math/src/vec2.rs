@@ -51,6 +51,10 @@ impl Vec2 {
         ((self.x - rhs.x).powi(2) + (self.y - rhs.y).powi(2)).sqrt()
     }
 
+    pub fn floor(&self) -> Vec2 {
+        Vec2::new(self.x.floor(), self.y.floor())
+    }
+
     pub fn as_ptr(&self) -> *const f32 {
         self as *const _ as *const f32
     }
