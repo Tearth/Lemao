@@ -2,6 +2,7 @@ use crate::components::button::Button;
 use crate::components::canvas::Canvas;
 use crate::components::image::Image;
 use crate::components::image_button::ImageButton;
+use crate::components::label::Label;
 use crate::components::panel::Panel;
 use crate::components::Component;
 use crate::components::ComponentPosition;
@@ -143,6 +144,14 @@ impl UiContext {
         let id = self.components.len();
         let image_button = Box::new(ImageButton::new(id, renderer, label_font_id, texture_id)?);
         self.components.push(Some(image_button));
+
+        Ok(id)
+    }
+
+    pub fn create_label(&mut self, renderer: &mut RendererContext, label_font_id: usize) -> Result<usize, String> {
+        let id = self.components.len();
+        let label = Box::new(Label::new(id, renderer, label_font_id)?);
+        self.components.push(Some(label));
 
         Ok(id)
     }
