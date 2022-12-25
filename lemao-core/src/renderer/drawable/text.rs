@@ -200,6 +200,24 @@ impl Text {
         self.set_text(&self.text.clone());
     }
 
+    pub fn calculate_text_size(&self, text: String) -> Vec2 {
+        let mut text_size = Vec2::new(0.0, self.line_height as f32);
+        let mut line_width = 0.0;
+
+        for char in text.chars() {
+            if char == '\n' {
+                line_width = 0.0;
+                text_size.y += self.line_height as f32;
+                continue;
+            }
+
+            line_width += self.font_character_widths[char as usize] as f32;
+            text_size.x = f32::max(text_size.x, line_width);
+        }
+
+        text_size
+    }
+
     fn get_vertices(&self, width: u32, height: u32, offset: Vec2, uv: Vec2, uv_size: Vec2, color: Color) -> [f32; 36] {
         [
             // Left-bottom

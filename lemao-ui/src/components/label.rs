@@ -20,6 +20,8 @@ pub struct Label {
     margin: ComponentMargin,
     offset: Vec2,
     color: Color,
+    multiline: bool,
+    max_multiline_width: f32,
     label_font_id: usize,
     label_text: String,
     label_offset: Vec2,
@@ -39,6 +41,8 @@ impl Label {
             margin: Default::default(),
             offset: Default::default(),
             color: Color::new(1.0, 1.0, 1.0, 1.0),
+            multiline: false,
+            max_multiline_width: 0.0,
             label_font_id,
             label_text: Default::default(),
             label_offset: Default::default(),
@@ -73,6 +77,13 @@ impl Label {
 
     pub fn set_text(&mut self, text: String) {
         self.label_text = text;
+        self.multiline = false;
+    }
+
+    pub fn set_multiline_text(&mut self, text: String, width: f32) {
+        self.label_text = text;
+        self.max_multiline_width = width;
+        self.multiline = true;
     }
 
     pub fn get_label_offset(&self) -> Vec2 {
@@ -163,6 +174,24 @@ impl Component for Label {
         let font_storage_lock = font_storage.lock().unwrap();
         let font = font_storage_lock.get(self.label_font_id)?;
         let label = renderer.get_drawable_with_type_mut::<Text>(self.label_id)?;
+
+        if self.multiline {
+            let mut line = String::new();
+            let mut result = String::new();
+
+            for token in self.label_text.split_whitespace() {
+                if label.calculate_text_size(line.clone() + token).x > self.max_multiline_width {
+                    result += &(line.clone() + "\n");
+                    line.clear();
+                }
+
+                line += token;
+                line += " ";
+            }
+
+            self.label_text = result + &line;
+        }
+
         label.set_font(font);
         label.set_text(&self.label_text);
         label.set_position(self.screen_position);
