@@ -243,8 +243,8 @@ impl Drawable for Circle {
         self.anchor = anchor;
     }
 
-    fn get_color(&self) -> Color {
-        self.color
+    fn get_color(&self) -> &Color {
+        &self.color
     }
 
     fn set_color(&mut self, color: Color) {
@@ -260,7 +260,7 @@ impl Drawable for Circle {
     }
 
     fn get_batch(&self) -> Batch {
-        Batch::new(None, Some(&self.vertices), Some(&self.indices), Some(self.texture_gl_id), Some(self.color))
+        Batch::new(None, Some(&self.vertices), Some(&self.indices), Some(self.texture_gl_id), Some(&self.color))
     }
 
     fn draw(&self, shader: &Shader) -> Result<(), String> {

@@ -71,8 +71,8 @@ impl ImageButton {
         self.id
     }
 
-    pub fn get_color(&self) -> Color {
-        self.color
+    pub fn get_color(&self) -> &Color {
+        &self.color
     }
 
     pub fn set_color(&mut self, color: Color) {
@@ -87,8 +87,8 @@ impl ImageButton {
         self.border_thickness = border_thickness;
     }
 
-    pub fn get_border_color(&self) -> Color {
-        self.border_color
+    pub fn get_border_color(&self) -> &Color {
+        &self.border_color
     }
 
     pub fn set_border_color(&mut self, border_color: Color) {
@@ -227,7 +227,7 @@ impl Component for ImageButton {
             border_rectangle.set_position(self.screen_position);
             border_rectangle.set_size(self.screen_size);
             border_rectangle.set_thickness(self.border_thickness.into());
-            border_rectangle.set_color(self.border_color);
+            border_rectangle.set_color(self.border_color.clone());
 
             self.screen_position += Vec2::new(self.border_thickness.left, self.border_thickness.bottom);
             self.screen_size -= Vec2::new(self.border_thickness.left + self.border_thickness.right, self.border_thickness.top + self.border_thickness.bottom);
@@ -239,7 +239,7 @@ impl Component for ImageButton {
         let sprite = renderer.get_drawable_with_type_mut::<Sprite>(self.sprite_id)?;
         sprite.set_position(self.screen_position);
         sprite.set_size(self.screen_size);
-        sprite.set_color(self.color);
+        sprite.set_color(self.color.clone());
 
         let font_storage = renderer.get_fonts();
         let font_storage_lock = font_storage.lock().unwrap();

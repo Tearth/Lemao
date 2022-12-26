@@ -110,8 +110,8 @@ impl Drawable for Sprite {
         self.anchor = anchor;
     }
 
-    fn get_color(&self) -> Color {
-        self.color
+    fn get_color(&self) -> &Color {
+        &self.color
     }
 
     fn set_color(&mut self, color: Color) {
@@ -127,7 +127,7 @@ impl Drawable for Sprite {
     }
 
     fn get_batch(&self) -> Batch {
-        Batch::new(Some(self.shape_id), None, None, Some(self.texture_gl_id), Some(self.color))
+        Batch::new(Some(self.shape_id), None, None, Some(self.texture_gl_id), Some(&self.color))
     }
 
     fn draw(&self, shader: &Shader) -> Result<(), String> {

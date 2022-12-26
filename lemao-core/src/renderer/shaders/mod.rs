@@ -100,10 +100,21 @@ impl Shader {
                 (gl.glGetActiveUniform)(program_id, index as u32, MAX_UNIFORM_NAME_LENGTH as i32, &mut length, &mut size, &mut r#type, name_ptr);
 
                 let name = String::from_utf8(name).unwrap().trim_end_matches(char::from_u32(0).unwrap()).to_string();
-                let name_cstr = CString::new(name.clone()).unwrap();
-                let location = (gl.glGetUniformLocation)(program_id, name_cstr.as_ptr());
 
-                uniforms.insert(name, ShaderParameter { location: location as u32, r#type });
+                if size == 1 {
+                    let name_cstr = CString::new(name.clone()).unwrap();
+                    let location = (gl.glGetUniformLocation)(program_id, name_cstr.as_ptr());
+
+                    uniforms.insert(name, ShaderParameter { location: location as u32, r#type });
+                } else {
+                    for array_index in 0..size {
+                        let name_with_index = name.replace("[0]", &format!("[{}]", array_index));
+                        let name_cstr = CString::new(name_with_index.clone()).unwrap();
+                        let location = (gl.glGetUniformLocation)(program_id, name_cstr.as_ptr());
+
+                        uniforms.insert(name_with_index, ShaderParameter { location: location as u32, r#type });
+                    }
+                }
             }
 
             Ok(Shader { id: 0, program_id, uniforms, gl })
@@ -114,7 +125,10 @@ impl Shader {
         self.id
     }
 
-    pub fn set_parameter(&self, name: &str, data: *const f32) -> Result<(), String> {
+    pub fn set_parameter<T>(&self, name: &str, data: *const T) -> Result<(), String>
+    where
+        T: Copy + Into<f32>,
+    {
         unsafe {
             let parameter = match self.uniforms.get(name) {
                 Some(parameter) => parameter,
@@ -122,14 +136,17 @@ impl Shader {
             };
 
             match parameter.r#type {
+                opengl::GL_INT => {
+                    (self.gl.glUniform1i)(parameter.location as i32, (*data).into() as i32);
+                }
                 opengl::GL_FLOAT => {
-                    (self.gl.glUniform1f)(parameter.location as i32, *data);
+                    (self.gl.glUniform1f)(parameter.location as i32, (*data).into());
                 }
                 opengl::GL_FLOAT_VEC4 => {
-                    (self.gl.glUniform4fv)(parameter.location as i32, 1, data);
+                    (self.gl.glUniform4fv)(parameter.location as i32, 1, data as *const f32);
                 }
                 opengl::GL_FLOAT_MAT4 => {
-                    (self.gl.glUniformMatrix4fv)(parameter.location as i32, 1, opengl::GL_FALSE as u8, data);
+                    (self.gl.glUniformMatrix4fv)(parameter.location as i32, 1, opengl::GL_FALSE as u8, data as *const f32);
                 }
                 _ => return Err("Invalid shader parameter type".to_string()),
             };
@@ -144,14 +161,12 @@ impl Shader {
                 self.set_parameter("color", solid.as_ptr())?;
             }
             Color::Gradient(gradient) => {
-                self.set_parameter(
-                    "gradientSteps",
-                    Vec4::new(gradient.steps[0].step, gradient.steps[1].step, gradient.steps[2].step, gradient.steps[3].step).as_ptr(),
-                )?;
-                self.set_parameter("gradientStep0Color", gradient.steps[0].color.as_ptr())?;
-                self.set_parameter("gradientStep1Color", gradient.steps[1].color.as_ptr())?;
-                self.set_parameter("gradientStep2Color", gradient.steps[2].color.as_ptr())?;
-                self.set_parameter("gradientStep3Color", gradient.steps[3].color.as_ptr())?;
+                for (index, step) in gradient.steps.iter().enumerate() {
+                    self.set_parameter(&format!("gradientSteps[{}]", index), &step.step)?;
+                    self.set_parameter(&format!("gradientColors[{}]", index), step.color.as_ptr())?;
+                }
+
+                self.set_parameter("gradientStepsCount", &(gradient.steps.len() as f32))?;
             }
         }
 

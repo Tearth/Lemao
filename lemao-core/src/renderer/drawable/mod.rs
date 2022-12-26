@@ -16,7 +16,7 @@ pub mod sprite;
 pub mod storage;
 pub mod text;
 
-#[derive(Copy, Clone, PartialEq)]
+#[derive(Clone, PartialEq)]
 pub enum Color {
     SolidColor(SolidColor),
     Gradient(Gradient),
@@ -37,7 +37,7 @@ pub trait Drawable {
     fn get_anchor(&self) -> Vec2;
     fn set_anchor(&mut self, anchor: Vec2);
 
-    fn get_color(&self) -> Color;
+    fn get_color(&self) -> &Color;
     fn set_color(&mut self, color: Color);
 
     fn get_transformation_matrix(&self) -> Mat4x4;

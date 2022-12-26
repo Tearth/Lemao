@@ -3,20 +3,21 @@ in vec4 ourColor;
 in vec2 TexCoord;
 out vec4 FragColor;
 
-uniform vec4 gradientSteps;
-uniform vec4 gradientStep0Color;
-uniform vec4 gradientStep1Color;
-uniform vec4 gradientStep2Color;
-uniform vec4 gradientStep3Color;
+uniform int gradientStepsCount;
+uniform float gradientSteps[16];
+uniform vec4 gradientColors[16];
 
 uniform sampler2D ourTexture;
 
 void main()
 {
     float phase = TexCoord.x;
-    vec4 color = mix(gradientStep0Color, gradientStep1Color, smoothstep(gradientSteps.x, gradientSteps.y, phase));
-    color = mix(color, gradientStep2Color, smoothstep(gradientSteps.y, gradientSteps.z, phase));
-    color = mix(color, gradientStep3Color, smoothstep(gradientSteps.z, gradientSteps.w, phase));
+    vec4 color = gradientColors[0];
+
+    for (int i = 0; i < gradientStepsCount - 1; i++)
+    {
+        color = mix(color, gradientColors[i + 1], smoothstep(gradientSteps[i], gradientSteps[i + 1], phase));
+    }
     
     FragColor = texture(ourTexture, TexCoord) * ourColor * color;
 }

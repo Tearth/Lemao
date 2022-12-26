@@ -33,7 +33,7 @@ pub struct Batch<'a> {
     pub(crate) vertices: Option<&'a Vec<f32>>,
     pub(crate) indices: Option<&'a Vec<u32>>,
     pub(crate) texture_gl_id: Option<u32>,
-    pub(crate) color: Option<Color>,
+    pub(crate) color: Option<&'a Color>,
 }
 
 impl BatchRenderer {
@@ -91,9 +91,12 @@ impl BatchRenderer {
                 return Err("Invalid texture".to_string());
             }
 
-            if self.color != batch.color.unwrap() {
+            if self.color != *batch.color.unwrap() {
                 return Err("Invalid color".to_string());
             }
+        } else {
+            self.texture_gl_id = batch.texture_gl_id.unwrap();
+            self.color = batch.color.unwrap().clone();
         }
 
         let vertices = batch.vertices.unwrap();
@@ -130,14 +133,12 @@ impl BatchRenderer {
         }
 
         self.first_batch_added = true;
-        self.texture_gl_id = batch.texture_gl_id.unwrap();
-        self.color = batch.color.unwrap();
 
         Ok(())
     }
 
-    pub fn get_color(&self) -> Color {
-        self.color
+    pub fn get_color(&self) -> &Color {
+        &self.color
     }
 
     pub fn draw(&mut self, shader: &Shader) -> Result<(), String> {
@@ -178,7 +179,7 @@ impl<'a> Batch<'a> {
         vertices: Option<&'a Vec<f32>>,
         indices: Option<&'a Vec<u32>>,
         texture_gl_id: Option<u32>,
-        color: Option<Color>,
+        color: Option<&'a Color>,
     ) -> Self {
         Self { shape_id, vertices, indices, texture_gl_id, color }
     }
