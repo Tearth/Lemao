@@ -5,7 +5,6 @@ use crate::renderer::textures::Texture;
 use lemao_math::mat4x4::Mat4x4;
 use lemao_math::vec2::Vec2;
 use lemao_math::vec3::Vec3;
-use lemao_math::vec4::Vec4;
 use lemao_opengl::bindings::opengl;
 use lemao_opengl::pointers::OpenGLPointers;
 use std::any::Any;

@@ -15,6 +15,7 @@ pub const ERROR_LENGTH: usize = 1024;
 pub const DEFAULT_VERTEX_SHADER: &str = include_str!("./vertex/default.vert");
 pub const SOLID_COLOR_FRAGMENT_SHADER: &str = include_str!("./fragment/solid_color.frag");
 pub const GRADIENT_RADIAL_FRAGMENT_SHADER: &str = include_str!("./fragment/gradient_radial.frag");
+pub const GRADIENT_HORIZONTAL_FRAGMENT_SHADER: &str = include_str!("./fragment/gradient_horizontal.frag");
 
 pub struct Shader {
     pub(crate) id: usize,

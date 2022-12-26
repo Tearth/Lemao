@@ -136,6 +136,10 @@ impl BatchRenderer {
         Ok(())
     }
 
+    pub fn get_color(&self) -> Color {
+        self.color
+    }
+
     pub fn draw(&mut self, shader: &Shader) -> Result<(), String> {
         unsafe {
             let data_size = (mem::size_of::<f32>() * self.vertices.len()) as i64;

@@ -16,6 +16,7 @@ use super::fonts::storage::FontStorage;
 use super::shaders::storage::ShaderStorage;
 use super::shaders::Shader;
 use super::shaders::DEFAULT_VERTEX_SHADER;
+use super::shaders::GRADIENT_HORIZONTAL_FRAGMENT_SHADER;
 use super::shaders::GRADIENT_RADIAL_FRAGMENT_SHADER;
 use super::shaders::SOLID_COLOR_FRAGMENT_SHADER;
 use super::shapes::storage::ShapeStorage;
@@ -24,6 +25,7 @@ use super::textures::storage::TextureStorage;
 use super::textures::Texture;
 use lemao_common_platform::renderer::RendererPlatformSpecific;
 use lemao_math::color::SolidColor;
+use lemao_math::gradient::GradientType;
 use lemao_math::vec2::Vec2;
 use lemao_math::vec3::Vec3;
 use lemao_opengl::bindings::opengl;
@@ -42,6 +44,7 @@ pub struct RendererContext {
     active_camera_id: usize,
     default_solid_color_shader_id: usize,
     default_gradient_radial_shader_id: usize,
+    default_gradient_horizontal_shader_id: usize,
     active_shader_id: usize,
     default_line_shape_id: usize,
     default_rectangle_shape_id: usize,
@@ -73,6 +76,7 @@ impl RendererContext {
             active_camera_id: 0,
             default_solid_color_shader_id: 0,
             default_gradient_radial_shader_id: 0,
+            default_gradient_horizontal_shader_id: 0,
             active_shader_id: 0,
             default_line_shape_id: 0,
             default_rectangle_shape_id: 0,
@@ -130,7 +134,8 @@ impl RendererContext {
         let gradient_radial_shader = Shader::new(self, DEFAULT_VERTEX_SHADER, GRADIENT_RADIAL_FRAGMENT_SHADER)?;
         self.default_gradient_radial_shader_id = self.shaders.as_mut().unwrap().store(gradient_radial_shader);
 
-        // self.set_solid_color_shader()?;
+        let gradient_horizontal_shader = Shader::new(self, DEFAULT_VERTEX_SHADER, GRADIENT_HORIZONTAL_FRAGMENT_SHADER)?;
+        self.default_gradient_horizontal_shader_id = self.shaders.as_mut().unwrap().store(gradient_horizontal_shader);
 
         Ok(())
     }
@@ -369,16 +374,49 @@ impl RendererContext {
     }
 
     pub fn batcher_draw(&mut self) -> Result<(), String> {
-        let camera = self.cameras.as_mut().unwrap().get_mut(self.active_camera_id)?;
-        let shader = self.shaders.as_ref().unwrap().get(self.active_shader_id)?;
+        let shader_id = match self.batch_renderer.as_ref().unwrap().get_color() {
+            Color::SolidColor(_) => self.default_solid_color_shader_id,
+            Color::Gradient(gradient) => match gradient.r#type {
+                GradientType::Radial => self.default_gradient_radial_shader_id,
+                GradientType::Horizontal => self.default_gradient_horizontal_shader_id,
+            },
+        };
 
-        if camera.get_dirty_flag() {
+        if shader_id != self.active_shader_id || self.cameras.as_mut().unwrap().get_mut(self.active_camera_id)?.get_dirty_flag() {
+            self.set_shader_as_active(shader_id)?;
+
+            let camera = self.cameras.as_mut().unwrap().get_mut(self.active_camera_id)?;
+            let shader = self.shaders.as_ref().unwrap().get(shader_id)?;
             shader.set_parameter("proj", camera.get_projection_matrix().as_ptr())?;
             shader.set_parameter("view", camera.get_view_matrix().as_ptr())?;
             camera.set_dirty_flag(false);
         }
 
-        self.batch_renderer.as_mut().unwrap().draw(shader)
+        self.batch_renderer.as_mut().unwrap().draw(self.shaders.as_ref().unwrap().get(shader_id)?)
+    }
+
+    pub fn draw(&mut self, drawable_id: usize) -> Result<(), String> {
+        let drawable = self.drawables.as_ref().unwrap().get(drawable_id)?;
+        let shader_id = match drawable.get_color() {
+            Color::SolidColor(_) => self.default_solid_color_shader_id,
+            Color::Gradient(gradient) => match gradient.r#type {
+                GradientType::Radial => self.default_gradient_radial_shader_id,
+                GradientType::Horizontal => self.default_gradient_horizontal_shader_id,
+            },
+        };
+
+        if shader_id != self.active_shader_id || self.cameras.as_mut().unwrap().get_mut(self.active_camera_id)?.get_dirty_flag() {
+            self.set_shader_as_active(shader_id)?;
+
+            let camera = self.cameras.as_mut().unwrap().get_mut(self.active_camera_id)?;
+            let shader = self.shaders.as_ref().unwrap().get(shader_id)?;
+            shader.set_parameter("proj", camera.get_projection_matrix().as_ptr())?;
+            shader.set_parameter("view", camera.get_view_matrix().as_ptr())?;
+            camera.set_dirty_flag(false);
+        }
+
+        self.get_drawable(drawable_id)?.draw(self.shaders.as_ref().unwrap().get(shader_id)?)?;
+        Ok(())
     }
 
     pub fn clear(&self, color: SolidColor) {
@@ -386,29 +424,6 @@ impl RendererContext {
             (self.gl.glClearColor)(color.r, color.g, color.b, color.a);
             (self.gl.glClear)(opengl::GL_COLOR_BUFFER_BIT);
         }
-    }
-
-    pub fn draw(&mut self, drawable_id: usize) -> Result<(), String> {
-        let drawable = self.drawables.as_ref().unwrap().get(drawable_id)?;
-        let shader_id = match drawable.get_color() {
-            Color::SolidColor(_) => self.default_solid_color_shader_id,
-            Color::Gradient(_) => self.default_gradient_radial_shader_id,
-        };
-        self.set_shader_as_active(shader_id)?;
-
-        let shader = self.shaders.as_ref().unwrap().get(shader_id)?;
-        let camera = self.cameras.as_mut().unwrap().get_mut(self.active_camera_id)?;
-        shader.set_parameter("proj", camera.get_projection_matrix().as_ptr())?;
-        shader.set_parameter("view", camera.get_view_matrix().as_ptr())?;
-
-        // if camera.get_dirty_flag() {
-        //    shader.set_parameter("proj", camera.get_projection_matrix().as_ptr())?;
-        //    shader.set_parameter("view", camera.get_view_matrix().as_ptr())?;
-        //    camera.set_dirty_flag(false);
-        //}
-
-        self.get_drawable(drawable_id)?.draw(shader)?;
-        Ok(())
     }
 
     pub fn close(&self) {

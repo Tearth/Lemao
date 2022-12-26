@@ -13,7 +13,7 @@ uniform sampler2D ourTexture;
 
 void main()
 {
-    float phase = length(TexCoord * 2 - 1);
+    float phase = TexCoord.x;
     vec4 color = mix(gradientStep0Color, gradientStep1Color, smoothstep(gradientSteps.x, gradientSteps.y, phase));
     color = mix(color, gradientStep2Color, smoothstep(gradientSteps.y, gradientSteps.z, phase));
     color = mix(color, gradientStep3Color, smoothstep(gradientSteps.z, gradientSteps.w, phase));

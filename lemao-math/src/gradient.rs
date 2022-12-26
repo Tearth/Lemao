@@ -9,6 +9,7 @@ pub struct Gradient {
 #[derive(Copy, Clone, PartialEq)]
 pub enum GradientType {
     Radial,
+    Horizontal,
 }
 
 #[derive(Copy, Clone, Default, PartialEq)]
