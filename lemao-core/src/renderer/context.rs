@@ -16,9 +16,8 @@ use super::fonts::storage::FontStorage;
 use super::shaders::storage::ShaderStorage;
 use super::shaders::Shader;
 use super::shaders::DEFAULT_VERTEX_SHADER;
-use super::shaders::GRADIENT_HORIZONTAL_FRAGMENT_SHADER;
-use super::shaders::GRADIENT_RADIAL_FRAGMENT_SHADER;
-use super::shaders::SOLID_COLOR_FRAGMENT_SHADER;
+use super::shaders::GRADIENT_FRAGMENT_SHADER;
+use super::shaders::SOLID_FRAGMENT_SHADER;
 use super::shapes::storage::ShapeStorage;
 use super::shapes::Shape;
 use super::textures::storage::TextureStorage;
@@ -42,9 +41,8 @@ pub struct RendererContext {
     viewport_size: Vec2,
     default_camera_id: usize,
     active_camera_id: usize,
-    default_solid_color_shader_id: usize,
-    default_gradient_radial_shader_id: usize,
-    default_gradient_horizontal_shader_id: usize,
+    default_solid_shader_id: usize,
+    default_gradient_shader_id: usize,
     active_shader_id: usize,
     default_line_shape_id: usize,
     default_rectangle_shape_id: usize,
@@ -74,9 +72,8 @@ impl RendererContext {
             viewport_size,
             default_camera_id: 0,
             active_camera_id: 0,
-            default_solid_color_shader_id: 0,
-            default_gradient_radial_shader_id: 0,
-            default_gradient_horizontal_shader_id: 0,
+            default_solid_shader_id: 0,
+            default_gradient_shader_id: 0,
             active_shader_id: 0,
             default_line_shape_id: 0,
             default_rectangle_shape_id: 0,
@@ -128,14 +125,11 @@ impl RendererContext {
     }
 
     pub fn init_default_shaders(&mut self) -> Result<(), String> {
-        let solid_color_shader = Shader::new(self, DEFAULT_VERTEX_SHADER, SOLID_COLOR_FRAGMENT_SHADER)?;
-        self.default_solid_color_shader_id = self.shaders.as_mut().unwrap().store(solid_color_shader);
+        let solid_shader = Shader::new(self, DEFAULT_VERTEX_SHADER, SOLID_FRAGMENT_SHADER)?;
+        self.default_solid_shader_id = self.shaders.as_mut().unwrap().store(solid_shader);
 
-        let gradient_radial_shader = Shader::new(self, DEFAULT_VERTEX_SHADER, GRADIENT_RADIAL_FRAGMENT_SHADER)?;
-        self.default_gradient_radial_shader_id = self.shaders.as_mut().unwrap().store(gradient_radial_shader);
-
-        let gradient_horizontal_shader = Shader::new(self, DEFAULT_VERTEX_SHADER, GRADIENT_HORIZONTAL_FRAGMENT_SHADER)?;
-        self.default_gradient_horizontal_shader_id = self.shaders.as_mut().unwrap().store(gradient_horizontal_shader);
+        let gradient_shader = Shader::new(self, DEFAULT_VERTEX_SHADER, GRADIENT_FRAGMENT_SHADER)?;
+        self.default_gradient_shader_id = self.shaders.as_mut().unwrap().store(gradient_shader);
 
         Ok(())
     }
@@ -375,11 +369,8 @@ impl RendererContext {
 
     pub fn batcher_draw(&mut self) -> Result<(), String> {
         let shader_id = match self.batch_renderer.as_ref().unwrap().get_color() {
-            Color::SolidColor(_) => self.default_solid_color_shader_id,
-            Color::Gradient(gradient) => match gradient.r#type {
-                GradientType::Radial => self.default_gradient_radial_shader_id,
-                GradientType::Horizontal => self.default_gradient_horizontal_shader_id,
-            },
+            Color::SolidColor(_) => self.default_solid_shader_id,
+            Color::Gradient(_) => self.default_gradient_shader_id,
         };
 
         if shader_id != self.active_shader_id || self.cameras.as_mut().unwrap().get_mut(self.active_camera_id)?.get_dirty_flag() {
@@ -398,11 +389,8 @@ impl RendererContext {
     pub fn draw(&mut self, drawable_id: usize) -> Result<(), String> {
         let drawable = self.drawables.as_ref().unwrap().get(drawable_id)?;
         let shader_id = match drawable.get_color() {
-            Color::SolidColor(_) => self.default_solid_color_shader_id,
-            Color::Gradient(gradient) => match gradient.r#type {
-                GradientType::Radial => self.default_gradient_radial_shader_id,
-                GradientType::Horizontal => self.default_gradient_horizontal_shader_id,
-            },
+            Color::SolidColor(_) => self.default_solid_shader_id,
+            Color::Gradient(_) => self.default_gradient_shader_id,
         };
 
         if shader_id != self.active_shader_id || self.cameras.as_mut().unwrap().get_mut(self.active_camera_id)?.get_dirty_flag() {

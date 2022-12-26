@@ -1,6 +1,5 @@
 use super::context::RendererContext;
 use super::drawable::Color;
-use lemao_math::vec4::Vec4;
 use lemao_opengl::bindings::opengl;
 use lemao_opengl::pointers::OpenGLPointers;
 use std::collections::HashMap;
@@ -13,9 +12,8 @@ pub mod storage;
 pub const MAX_UNIFORM_NAME_LENGTH: usize = 32;
 pub const ERROR_LENGTH: usize = 1024;
 pub const DEFAULT_VERTEX_SHADER: &str = include_str!("./vertex/default.vert");
-pub const SOLID_COLOR_FRAGMENT_SHADER: &str = include_str!("./fragment/solid_color.frag");
-pub const GRADIENT_RADIAL_FRAGMENT_SHADER: &str = include_str!("./fragment/gradient_radial.frag");
-pub const GRADIENT_HORIZONTAL_FRAGMENT_SHADER: &str = include_str!("./fragment/gradient_horizontal.frag");
+pub const SOLID_FRAGMENT_SHADER: &str = include_str!("./fragment/solid.frag");
+pub const GRADIENT_FRAGMENT_SHADER: &str = include_str!("./fragment/gradient.frag");
 
 pub struct Shader {
     pub(crate) id: usize,
@@ -161,12 +159,13 @@ impl Shader {
                 self.set_parameter("color", solid.as_ptr())?;
             }
             Color::Gradient(gradient) => {
+                self.set_parameter("gradientPatternType", &(gradient.r#type as u32 as f32))?;
+                self.set_parameter("gradientStepsCount", &(gradient.steps.len() as f32))?;
+
                 for (index, step) in gradient.steps.iter().enumerate() {
                     self.set_parameter(&format!("gradientSteps[{}]", index), &step.step)?;
                     self.set_parameter(&format!("gradientColors[{}]", index), step.color.as_ptr())?;
                 }
-
-                self.set_parameter("gradientStepsCount", &(gradient.steps.len() as f32))?;
             }
         }
 
