@@ -1,6 +1,7 @@
 use super::batcher::Batch;
 use super::shaders::Shader;
-use lemao_math::color::Color;
+use lemao_math::color::SolidColor;
+use lemao_math::gradient::Gradient;
 use lemao_math::mat4x4::Mat4x4;
 use lemao_math::vec2::Vec2;
 use std::any::Any;
@@ -14,6 +15,12 @@ pub mod rectangle;
 pub mod sprite;
 pub mod storage;
 pub mod text;
+
+#[derive(Copy, Clone, PartialEq)]
+pub enum Color {
+    SolidColor(SolidColor),
+    Gradient(Gradient),
+}
 
 pub trait Drawable {
     fn get_position(&self) -> Vec2;

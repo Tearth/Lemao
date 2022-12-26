@@ -1,7 +1,8 @@
 use super::context::RendererContext;
+use super::drawable::Color;
 use super::drawable::Drawable;
 use super::shaders::Shader;
-use lemao_math::color::Color;
+use lemao_math::color::SolidColor;
 use lemao_math::mat4x4::Mat4x4;
 use lemao_math::vec4::Vec4;
 use lemao_opengl::bindings::opengl;
@@ -78,7 +79,7 @@ impl BatchRenderer {
                 vertices: Vec::new(),
                 indices: Vec::new(),
                 texture_gl_id: 0,
-                color: Color::new(0.0, 0.0, 0.0, 1.0),
+                color: Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 1.0)),
                 max_indice: 0,
             }
         }
@@ -151,7 +152,7 @@ impl BatchRenderer {
             (self.gl.glBufferData)(opengl::GL_ELEMENT_ARRAY_BUFFER, indices_size, indices_ptr, opengl::GL_STATIC_DRAW);
 
             shader.set_parameter("model", Mat4x4::identity().as_ptr())?;
-            shader.set_parameter("color", Color::new(1.0, 1.0, 1.0, 1.0).as_ptr())?;
+            shader.set_color(&self.color)?;
 
             (self.gl.glBindTexture)(opengl::GL_TEXTURE_2D, self.texture_gl_id);
             (self.gl.glDrawElements)(opengl::GL_TRIANGLES, self.indices.len() as i32, opengl::GL_UNSIGNED_INT, ptr::null());

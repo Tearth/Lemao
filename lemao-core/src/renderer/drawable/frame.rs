@@ -57,7 +57,7 @@ impl Frame {
             rotation: 0.0,
             size,
             anchor: Default::default(),
-            color: Color::new(1.0, 1.0, 1.0, 1.0),
+            color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             thickness: FrameThickness::new(1.0, 1.0, 1.0, 1.0),
             vertices: Vec::new(),
             indices: Vec::new(),
@@ -118,7 +118,7 @@ impl Frame {
             self.vertices.clear();
             self.indices.clear();
 
-            self.vertices.extend_from_slice(&self.get_vertices(self.size, Color::new(1.0, 1.0, 1.0, 1.0), self.thickness));
+            self.vertices.extend_from_slice(&self.get_vertices(self.size, SolidColor::new(1.0, 1.0, 1.0, 1.0), self.thickness));
             let vertices_size = (mem::size_of::<f32>() * self.vertices.len()) as i64;
             let vertices_ptr = self.vertices.as_ptr() as *const c_void;
 
@@ -136,7 +136,7 @@ impl Frame {
     }
 
     #[rustfmt::skip]
-    fn get_vertices(&self, size: Vec2, color: Color, thickness: FrameThickness) -> [f32; 72] {
+    fn get_vertices(&self, size: Vec2, color: SolidColor, thickness: FrameThickness) -> [f32; 72] {
         [
             /*
                 3--------2
@@ -294,7 +294,7 @@ impl Drawable for Frame {
             let model = self.get_transformation_matrix();
 
             shader.set_parameter("model", model.as_ptr())?;
-            shader.set_parameter("color", self.color.as_ptr())?;
+            shader.set_color(&self.color)?;
 
             (self.gl.glBindVertexArray)(self.vao_gl_id);
             (self.gl.glBindTexture)(opengl::GL_TEXTURE_2D, self.texture_gl_id);

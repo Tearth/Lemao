@@ -3,16 +3,16 @@ use std::ops::Sub;
 
 #[repr(C)]
 #[derive(Copy, Clone, Default, PartialEq)]
-pub struct Color {
+pub struct SolidColor {
     pub r: f32,
     pub g: f32,
     pub b: f32,
     pub a: f32,
 }
 
-impl Color {
+impl SolidColor {
     pub fn new(r: f32, g: f32, b: f32, a: f32) -> Self {
-        Color { r, g, b, a }
+        SolidColor { r, g, b, a }
     }
 
     pub fn as_ptr(&self) -> *const f32 {
@@ -20,7 +20,7 @@ impl Color {
     }
 }
 
-impl Add for Color {
+impl Add for SolidColor {
     type Output = Self;
 
     fn add(self, rhs: Self) -> Self {
@@ -33,7 +33,7 @@ impl Add for Color {
     }
 }
 
-impl Sub for Color {
+impl Sub for SolidColor {
     type Output = Self;
 
     fn sub(self, rhs: Self) -> Self {

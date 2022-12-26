@@ -52,7 +52,7 @@ impl Circle {
             rotation: 0.0,
             size: Vec2::new(radius * 2.0, radius * 2.0),
             anchor: Default::default(),
-            color: Color::new(1.0, 1.0, 1.0, 1.0),
+            color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             radius,
             sides,
             angle: 2.0 * std::f32::consts::PI,
@@ -141,7 +141,7 @@ impl Circle {
                 let position = Vec2::new(angle.sin(), angle.cos());
                 let outer_position = position * self.radius + Vec2::new(self.radius, self.radius);
                 let inner_position = position * (self.radius - self.thickness) + Vec2::new(self.radius, self.radius);
-                self.vertices.extend_from_slice(&self.get_vertices(outer_position, inner_position, position, Color::new(1.0, 1.0, 1.0, 1.0)));
+                self.vertices.extend_from_slice(&self.get_vertices(outer_position, inner_position, position, SolidColor::new(1.0, 1.0, 1.0, 1.0)));
 
                 if n > 0 {
                     self.indices.extend_from_slice(&[n * 2 - 2, n * 2 - 1, n * 2, n * 2 - 1, n * 2, n * 2 + 1]);
@@ -177,7 +177,7 @@ impl Circle {
     }
 
     #[rustfmt::skip]
-    fn get_vertices(&self, outer_position: Vec2, inner_position: Vec2, uv: Vec2, color: Color) -> [f32; 18] {
+    fn get_vertices(&self, outer_position: Vec2, inner_position: Vec2, uv: Vec2, color: SolidColor) -> [f32; 18] {
         [
             /* v.x */ outer_position.x,
             /* v.y */ outer_position.y,
@@ -268,7 +268,7 @@ impl Drawable for Circle {
             let model = self.get_transformation_matrix();
 
             shader.set_parameter("model", model.as_ptr())?;
-            shader.set_parameter("color", self.color.as_ptr())?;
+            shader.set_color(&self.color)?;
 
             (self.gl.glBindVertexArray)(self.vao_gl_id);
             (self.gl.glBindTexture)(opengl::GL_TEXTURE_2D, self.texture_gl_id);

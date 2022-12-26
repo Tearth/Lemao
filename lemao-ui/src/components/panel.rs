@@ -3,11 +3,12 @@ use super::ComponentBorderThickness;
 use super::ComponentMargin;
 use super::ComponentPosition;
 use super::ComponentSize;
-use lemao_core::lemao_math::color::Color;
+use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::context::RendererContext;
 use lemao_core::renderer::drawable::frame::Frame;
 use lemao_core::renderer::drawable::rectangle::Rectangle;
+use lemao_core::renderer::drawable::Color;
 use lemao_core::renderer::drawable::Drawable;
 use std::any::Any;
 
@@ -40,9 +41,9 @@ impl Panel {
             anchor: Default::default(),
             margin: Default::default(),
             offset: Default::default(),
-            color: Color::new(1.0, 1.0, 1.0, 1.0),
+            color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             border_thickness: Default::default(),
-            border_color: Color::new(1.0, 1.0, 1.0, 1.0),
+            border_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             filling_rectangle_id: renderer.create_rectangle(Vec2::new(100.0, 100.0))?,
             border_frame_id: renderer.create_frame(Vec2::new(100.0, 100.0))?,
             children: Default::default(),

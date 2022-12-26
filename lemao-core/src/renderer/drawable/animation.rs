@@ -52,7 +52,7 @@ impl Animation {
             rotation: 0.0,
             size: tile_size,
             anchor: Default::default(),
-            color: Color::new(1.0, 1.0, 1.0, 1.0),
+            color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             texture_size,
             frames_count: Vec2::new(texture_size.x / tile_size.x, texture_size.y / tile_size.y),
             total_frames_count: ((texture_size.x / tile_size.x) * (texture_size.y / tile_size.y)) as u32,
@@ -123,7 +123,7 @@ impl Animation {
             let col = frame / (self.frames_count.y as u32);
             let uv = Vec2::new(row as f32 * uv_width, 1.0 - col as f32 * uv_height - uv_size.y);
 
-            self.vertices.extend_from_slice(&self.get_vertices(uv, uv_size, Color::new(1.0, 1.0, 1.0, 1.0)));
+            self.vertices.extend_from_slice(&self.get_vertices(uv, uv_size, SolidColor::new(1.0, 1.0, 1.0, 1.0)));
             self.indices.extend_from_slice(&[0, 1, 2, 0, 2, 3]);
 
             let vertices_size = (mem::size_of::<f32>() * self.vertices.len()) as i64;
@@ -152,7 +152,7 @@ impl Animation {
     }
 
     #[rustfmt::skip]
-    fn get_vertices(&self, uv: Vec2, uv_size: Vec2, color: Color) -> [f32; 36] {
+    fn get_vertices(&self, uv: Vec2, uv_size: Vec2, color: SolidColor) -> [f32; 36] {
         [
             // Left-bottom
             /* v.x */ 0.0,
@@ -264,7 +264,7 @@ impl Drawable for Animation {
             let model = self.get_transformation_matrix();
 
             shader.set_parameter("model", model.as_ptr())?;
-            shader.set_parameter("color", self.color.as_ptr())?;
+            shader.set_color(&self.color)?;
 
             (self.gl.glBindVertexArray)(self.vao_gl_id);
             (self.gl.glBindTexture)(opengl::GL_TEXTURE_2D, self.texture_gl_id);

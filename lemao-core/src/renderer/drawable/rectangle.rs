@@ -5,6 +5,7 @@ use crate::renderer::textures::Texture;
 use lemao_math::mat4x4::Mat4x4;
 use lemao_math::vec2::Vec2;
 use lemao_math::vec3::Vec3;
+use lemao_math::vec4::Vec4;
 use lemao_opengl::bindings::opengl;
 use lemao_opengl::pointers::OpenGLPointers;
 use std::any::Any;
@@ -42,7 +43,7 @@ impl Rectangle {
             rotation: 0.0,
             size,
             anchor: Default::default(),
-            color: Color::new(1.0, 1.0, 1.0, 1.0),
+            color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
         }
     }
 
@@ -129,7 +130,7 @@ impl Drawable for Rectangle {
             let model = self.get_transformation_matrix();
 
             shader.set_parameter("model", model.as_ptr())?;
-            shader.set_parameter("color", self.color.as_ptr())?;
+            shader.set_color(&self.color)?;
 
             (self.gl.glBindVertexArray)(self.shape_vao_gl_id);
             (self.gl.glBindTexture)(opengl::GL_TEXTURE_2D, self.texture_gl_id);

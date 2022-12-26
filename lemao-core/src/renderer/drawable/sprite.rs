@@ -42,7 +42,7 @@ impl Sprite {
             rotation: 0.0,
             size: texture.get_size(),
             anchor: Default::default(),
-            color: Color::new(1.0, 1.0, 1.0, 1.0),
+            color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
         }
     }
 
@@ -135,7 +135,7 @@ impl Drawable for Sprite {
             let model = self.get_transformation_matrix();
 
             shader.set_parameter("model", model.as_ptr())?;
-            shader.set_parameter("color", self.color.as_ptr())?;
+            shader.set_color(&self.color)?;
 
             (self.gl.glBindVertexArray)(self.shape_vao_gl_id);
             (self.gl.glBindTexture)(opengl::GL_TEXTURE_2D, self.texture_gl_id);

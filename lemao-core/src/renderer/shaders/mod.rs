@@ -1,4 +1,6 @@
 use super::context::RendererContext;
+use super::drawable::Color;
+use lemao_math::vec4::Vec4;
 use lemao_opengl::bindings::opengl;
 use lemao_opengl::pointers::OpenGLPointers;
 use std::collections::HashMap;
@@ -10,8 +12,9 @@ pub mod storage;
 
 pub const MAX_UNIFORM_NAME_LENGTH: usize = 32;
 pub const ERROR_LENGTH: usize = 1024;
-pub const DEFAULT_VERTEX_SHADER: &str = include_str!("./default.vert");
-pub const DEFAULT_FRAGMENT_SHADER: &str = include_str!("./default.frag");
+pub const DEFAULT_VERTEX_SHADER: &str = include_str!("./vertex/default.vert");
+pub const SOLID_COLOR_FRAGMENT_SHADER: &str = include_str!("./fragment/solid_color.frag");
+pub const GRADIENT_RADIAL_FRAGMENT_SHADER: &str = include_str!("./fragment/gradient_radial.frag");
 
 pub struct Shader {
     pub(crate) id: usize,
@@ -27,11 +30,7 @@ pub struct ShaderParameter {
 }
 
 impl Shader {
-    pub fn new_default(renderer: &RendererContext) -> Result<Self, String> {
-        Shader::new_from_string(renderer, DEFAULT_VERTEX_SHADER, DEFAULT_FRAGMENT_SHADER)
-    }
-
-    pub fn new_from_string(renderer: &RendererContext, vertex_shader: &str, fragment_shader: &str) -> Result<Self, String> {
+    pub fn new(renderer: &RendererContext, vertex_shader: &str, fragment_shader: &str) -> Result<Self, String> {
         unsafe {
             let gl = renderer.gl.clone();
 
@@ -101,7 +100,7 @@ impl Shader {
 
                 let name = String::from_utf8(name).unwrap().trim_end_matches(char::from_u32(0).unwrap()).to_string();
                 let name_cstr = CString::new(name.clone()).unwrap();
-                let location = (gl.glGetUniformLocation)(3, name_cstr.as_ptr());
+                let location = (gl.glGetUniformLocation)(program_id, name_cstr.as_ptr());
 
                 uniforms.insert(name, ShaderParameter { location: location as u32, r#type });
             }
@@ -122,6 +121,9 @@ impl Shader {
             };
 
             match parameter.r#type {
+                opengl::GL_FLOAT => {
+                    (self.gl.glUniform1f)(parameter.location as i32, *data);
+                }
                 opengl::GL_FLOAT_VEC4 => {
                     (self.gl.glUniform4fv)(parameter.location as i32, 1, data);
                 }
@@ -133,6 +135,26 @@ impl Shader {
 
             Ok(())
         }
+    }
+
+    pub fn set_color(&self, color: &Color) -> Result<(), String> {
+        match color {
+            Color::SolidColor(solid) => {
+                self.set_parameter("color", solid.as_ptr())?;
+            }
+            Color::Gradient(gradient) => {
+                self.set_parameter(
+                    "gradientSteps",
+                    Vec4::new(gradient.steps[0].step, gradient.steps[1].step, gradient.steps[2].step, gradient.steps[3].step).as_ptr(),
+                )?;
+                self.set_parameter("gradientStep0Color", gradient.steps[0].color.as_ptr())?;
+                self.set_parameter("gradientStep1Color", gradient.steps[1].color.as_ptr())?;
+                self.set_parameter("gradientStep2Color", gradient.steps[2].color.as_ptr())?;
+                self.set_parameter("gradientStep3Color", gradient.steps[3].color.as_ptr())?;
+            }
+        }
+
+        Ok(())
     }
 
     pub fn set_as_active(&self) {

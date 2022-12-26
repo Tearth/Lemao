@@ -55,7 +55,7 @@ impl Text {
             rotation: 0.0,
             size: Default::default(),
             anchor: Default::default(),
-            color: Color::new(1.0, 1.0, 1.0, 1.0),
+            color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             text: Default::default(),
             line_height: font.get_cell_size().y as u32,
             elements_count: 0,
@@ -149,7 +149,7 @@ impl Text {
                     offset,
                     uv,
                     uv_size,
-                    self.color,
+                    SolidColor::new(1.0, 1.0, 1.0, 1.0),
                 ));
 
                 let indices_offset = (index * 4) as u32;
@@ -218,7 +218,7 @@ impl Text {
         text_size
     }
 
-    fn get_vertices(&self, width: u32, height: u32, offset: Vec2, uv: Vec2, uv_size: Vec2, color: Color) -> [f32; 36] {
+    fn get_vertices(&self, width: u32, height: u32, offset: Vec2, uv: Vec2, uv_size: Vec2, color: SolidColor) -> [f32; 36] {
         [
             // Left-bottom
             /* v.x */ 0.0 + offset.x,
@@ -330,7 +330,7 @@ impl Drawable for Text {
             let model = self.get_transformation_matrix();
 
             shader.set_parameter("model", model.as_ptr())?;
-            shader.set_parameter("color", self.color.as_ptr())?;
+            shader.set_color(&self.color)?;
 
             (self.gl.glBindVertexArray)(self.vao_gl_id);
             (self.gl.glBindTexture)(opengl::GL_TEXTURE_2D, self.texture_gl_id);

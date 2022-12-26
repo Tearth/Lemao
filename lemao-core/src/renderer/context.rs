@@ -10,16 +10,20 @@ use super::drawable::rectangle::Rectangle;
 use super::drawable::sprite::Sprite;
 use super::drawable::storage::DrawableStorage;
 use super::drawable::text::Text;
+use super::drawable::Color;
 use super::drawable::Drawable;
 use super::fonts::storage::FontStorage;
 use super::shaders::storage::ShaderStorage;
 use super::shaders::Shader;
+use super::shaders::DEFAULT_VERTEX_SHADER;
+use super::shaders::GRADIENT_RADIAL_FRAGMENT_SHADER;
+use super::shaders::SOLID_COLOR_FRAGMENT_SHADER;
 use super::shapes::storage::ShapeStorage;
 use super::shapes::Shape;
 use super::textures::storage::TextureStorage;
 use super::textures::Texture;
 use lemao_common_platform::renderer::RendererPlatformSpecific;
-use lemao_math::color::Color;
+use lemao_math::color::SolidColor;
 use lemao_math::vec2::Vec2;
 use lemao_math::vec3::Vec3;
 use lemao_opengl::bindings::opengl;
@@ -36,7 +40,8 @@ pub struct RendererContext {
     viewport_size: Vec2,
     default_camera_id: usize,
     active_camera_id: usize,
-    default_shader_id: usize,
+    default_solid_color_shader_id: usize,
+    default_gradient_radial_shader_id: usize,
     active_shader_id: usize,
     default_line_shape_id: usize,
     default_rectangle_shape_id: usize,
@@ -66,7 +71,8 @@ impl RendererContext {
             viewport_size,
             default_camera_id: 0,
             active_camera_id: 0,
-            default_shader_id: 0,
+            default_solid_color_shader_id: 0,
+            default_gradient_radial_shader_id: 0,
             active_shader_id: 0,
             default_line_shape_id: 0,
             default_rectangle_shape_id: 0,
@@ -94,7 +100,7 @@ impl RendererContext {
         self.set_viewport_size(self.viewport_size);
         self.init_storages();
         self.init_default_camera()?;
-        self.init_default_shader()?;
+        self.init_default_shaders()?;
         self.init_default_shapes();
         self.init_default_texture();
         self.init_batch_renderer();
@@ -117,10 +123,14 @@ impl RendererContext {
         Ok(())
     }
 
-    pub fn init_default_shader(&mut self) -> Result<(), String> {
-        let shader = Shader::new_default(self)?;
-        self.default_shader_id = self.shaders.as_mut().unwrap().store(shader);
-        self.set_default_shader()?;
+    pub fn init_default_shaders(&mut self) -> Result<(), String> {
+        let solid_color_shader = Shader::new(self, DEFAULT_VERTEX_SHADER, SOLID_COLOR_FRAGMENT_SHADER)?;
+        self.default_solid_color_shader_id = self.shaders.as_mut().unwrap().store(solid_color_shader);
+
+        let gradient_radial_shader = Shader::new(self, DEFAULT_VERTEX_SHADER, GRADIENT_RADIAL_FRAGMENT_SHADER)?;
+        self.default_gradient_radial_shader_id = self.shaders.as_mut().unwrap().store(gradient_radial_shader);
+
+        // self.set_solid_color_shader()?;
 
         Ok(())
     }
@@ -131,7 +141,12 @@ impl RendererContext {
             vec![Vec3::new(0.0, 0.0, 0.0), Vec3::new(1.0, 0.0, 0.0), Vec3::new(1.0, 1.0, 0.0), Vec3::new(0.0, 1.0, 0.0)],
             vec![0, 1, 2, 0, 2, 3],
             vec![Vec2::new(0.0, 0.0), Vec2::new(1.0, 0.0), Vec2::new(1.0, 1.0), Vec2::new(0.0, 1.0)],
-            vec![Color::new(1.0, 1.0, 1.0, 1.0), Color::new(1.0, 1.0, 1.0, 1.0), Color::new(1.0, 1.0, 1.0, 1.0), Color::new(1.0, 1.0, 1.0, 1.0)],
+            vec![
+                SolidColor::new(1.0, 1.0, 1.0, 1.0),
+                SolidColor::new(1.0, 1.0, 1.0, 1.0),
+                SolidColor::new(1.0, 1.0, 1.0, 1.0),
+                SolidColor::new(1.0, 1.0, 1.0, 1.0),
+            ],
         );
         self.default_sprite_shape_id = self.shapes.as_mut().unwrap().store(sprite_shape);
 
@@ -140,7 +155,12 @@ impl RendererContext {
             vec![Vec3::new(-0.5, 0.0, 0.0), Vec3::new(0.5, 0.0, 0.0), Vec3::new(0.5, 1.0, 0.0), Vec3::new(-0.5, 1.0, 0.0)],
             vec![0, 1, 2, 0, 2, 3],
             vec![Vec2::new(0.0, 0.0), Vec2::new(1.0, 0.0), Vec2::new(1.0, 1.0), Vec2::new(0.0, 1.0)],
-            vec![Color::new(1.0, 1.0, 1.0, 1.0), Color::new(1.0, 1.0, 1.0, 1.0), Color::new(1.0, 1.0, 1.0, 1.0), Color::new(1.0, 1.0, 1.0, 1.0)],
+            vec![
+                SolidColor::new(1.0, 1.0, 1.0, 1.0),
+                SolidColor::new(1.0, 1.0, 1.0, 1.0),
+                SolidColor::new(1.0, 1.0, 1.0, 1.0),
+                SolidColor::new(1.0, 1.0, 1.0, 1.0),
+            ],
         );
         self.default_line_shape_id = self.shapes.as_mut().unwrap().store(line_shape);
 
@@ -149,7 +169,12 @@ impl RendererContext {
             vec![Vec3::new(0.0, 0.0, 0.0), Vec3::new(1.0, 0.0, 0.0), Vec3::new(1.0, 1.0, 0.0), Vec3::new(0.0, 1.0, 0.0)],
             vec![0, 1, 2, 0, 2, 3],
             vec![Vec2::new(0.0, 0.0), Vec2::new(1.0, 0.0), Vec2::new(1.0, 1.0), Vec2::new(0.0, 1.0)],
-            vec![Color::new(1.0, 1.0, 1.0, 1.0), Color::new(1.0, 1.0, 1.0, 1.0), Color::new(1.0, 1.0, 1.0, 1.0), Color::new(1.0, 1.0, 1.0, 1.0)],
+            vec![
+                SolidColor::new(1.0, 1.0, 1.0, 1.0),
+                SolidColor::new(1.0, 1.0, 1.0, 1.0),
+                SolidColor::new(1.0, 1.0, 1.0, 1.0),
+                SolidColor::new(1.0, 1.0, 1.0, 1.0),
+            ],
         );
         self.default_rectangle_shape_id = self.shapes.as_mut().unwrap().store(rectangle_shape);
     }
@@ -184,7 +209,7 @@ impl RendererContext {
             Err(message) => return Err(format!("Error while loading fragment shader: {}", message)),
         };
 
-        let shader = Shader::new_from_string(self, &vertex_shader, &fragment_shader)?;
+        let shader = Shader::new(self, &vertex_shader, &fragment_shader)?;
         Ok(self.shaders.as_mut().unwrap().store(shader))
     }
 
@@ -202,10 +227,6 @@ impl RendererContext {
         self.active_shader_id = shader_id;
         shader.set_as_active();
         Ok(())
-    }
-
-    pub fn set_default_shader(&mut self) -> Result<(), String> {
-        self.set_shader_as_active(self.default_shader_id)
     }
 
     pub fn create_camera(&mut self, position: Vec2, size: Vec2) -> Result<usize, String> {
@@ -360,7 +381,7 @@ impl RendererContext {
         self.batch_renderer.as_mut().unwrap().draw(shader)
     }
 
-    pub fn clear(&self, color: Color) {
+    pub fn clear(&self, color: SolidColor) {
         unsafe {
             (self.gl.glClearColor)(color.r, color.g, color.b, color.a);
             (self.gl.glClear)(opengl::GL_COLOR_BUFFER_BIT);
@@ -368,14 +389,23 @@ impl RendererContext {
     }
 
     pub fn draw(&mut self, drawable_id: usize) -> Result<(), String> {
-        let camera = self.cameras.as_mut().unwrap().get_mut(self.active_camera_id)?;
-        let shader = self.shaders.as_ref().unwrap().get(self.active_shader_id)?;
+        let drawable = self.drawables.as_ref().unwrap().get(drawable_id)?;
+        let shader_id = match drawable.get_color() {
+            Color::SolidColor(_) => self.default_solid_color_shader_id,
+            Color::Gradient(_) => self.default_gradient_radial_shader_id,
+        };
+        self.set_shader_as_active(shader_id)?;
 
-        if camera.get_dirty_flag() {
-            shader.set_parameter("proj", camera.get_projection_matrix().as_ptr())?;
-            shader.set_parameter("view", camera.get_view_matrix().as_ptr())?;
-            camera.set_dirty_flag(false);
-        }
+        let shader = self.shaders.as_ref().unwrap().get(shader_id)?;
+        let camera = self.cameras.as_mut().unwrap().get_mut(self.active_camera_id)?;
+        shader.set_parameter("proj", camera.get_projection_matrix().as_ptr())?;
+        shader.set_parameter("view", camera.get_view_matrix().as_ptr())?;
+
+        // if camera.get_dirty_flag() {
+        //    shader.set_parameter("proj", camera.get_projection_matrix().as_ptr())?;
+        //    shader.set_parameter("view", camera.get_view_matrix().as_ptr())?;
+        //    camera.set_dirty_flag(false);
+        //}
 
         self.get_drawable(drawable_id)?.draw(shader)?;
         Ok(())

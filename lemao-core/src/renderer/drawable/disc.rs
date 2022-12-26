@@ -51,7 +51,7 @@ impl Disc {
             rotation: 0.0,
             size: Vec2::new(radius * 2.0, radius * 2.0),
             anchor: Default::default(),
-            color: Color::new(1.0, 1.0, 1.0, 1.0),
+            color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             radius,
             sides,
             angle: 2.0 * std::f32::consts::PI,
@@ -128,12 +128,12 @@ impl Disc {
             self.vertices.clear();
             self.indices.clear();
 
-            self.vertices.extend_from_slice(&self.get_vertices(scaled_position, position, Color::new(1.0, 1.0, 1.0, 1.0)));
+            self.vertices.extend_from_slice(&self.get_vertices(scaled_position, position, SolidColor::new(1.0, 1.0, 1.0, 1.0)));
 
             for n in 0..self.sides {
                 let position = Vec2::new(angle.sin(), angle.cos());
                 let scaled_position = position * Vec2::new(self.radius, self.radius) + Vec2::new(self.radius, self.radius);
-                self.vertices.extend_from_slice(&self.get_vertices(scaled_position, position, Color::new(1.0, 1.0, 1.0, 1.0)));
+                self.vertices.extend_from_slice(&self.get_vertices(scaled_position, position, SolidColor::new(1.0, 1.0, 1.0, 1.0)));
 
                 if n > 0 {
                     self.indices.extend_from_slice(&[0, n, n + 1]);
@@ -169,7 +169,7 @@ impl Disc {
     }
 
     #[rustfmt::skip]
-    fn get_vertices(&self, position: Vec2, uv: Vec2, color: Color) -> [f32; 9] {
+    fn get_vertices(&self, position: Vec2, uv: Vec2, color: SolidColor) -> [f32; 9] {
         [
             /* v.x */ position.x,
             /* v.y */ position.y,
@@ -250,7 +250,7 @@ impl Drawable for Disc {
             let model = self.get_transformation_matrix();
 
             shader.set_parameter("model", model.as_ptr())?;
-            shader.set_parameter("color", self.color.as_ptr())?;
+            shader.set_color(&self.color)?;
 
             (self.gl.glBindVertexArray)(self.vao_gl_id);
             (self.gl.glBindTexture)(opengl::GL_TEXTURE_2D, self.texture_gl_id);

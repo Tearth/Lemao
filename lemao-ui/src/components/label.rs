@@ -2,7 +2,7 @@ use super::Component;
 use super::ComponentMargin;
 use super::ComponentPosition;
 use super::ComponentSize;
-use lemao_core::lemao_math::color::Color;
+use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::context::RendererContext;
 use lemao_core::renderer::drawable::text::Text;
@@ -19,7 +19,7 @@ pub struct Label {
     anchor: Vec2,
     margin: ComponentMargin,
     offset: Vec2,
-    color: Color,
+    color: SolidColor,
     multiline: bool,
     max_multiline_width: f32,
     label_font_id: usize,
@@ -40,7 +40,7 @@ impl Label {
             anchor: Default::default(),
             margin: Default::default(),
             offset: Default::default(),
-            color: Color::new(1.0, 1.0, 1.0, 1.0),
+            color: SolidColor::new(1.0, 1.0, 1.0, 1.0),
             multiline: false,
             max_multiline_width: 0.0,
             label_font_id,
@@ -55,11 +55,11 @@ impl Label {
         self.id
     }
 
-    pub fn get_color(&self) -> Color {
+    pub fn get_color(&self) -> SolidColor {
         self.color
     }
 
-    pub fn set_color(&mut self, color: Color) {
+    pub fn set_color(&mut self, color: SolidColor) {
         self.color = color;
     }
 

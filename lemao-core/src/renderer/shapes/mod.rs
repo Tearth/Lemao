@@ -1,5 +1,5 @@
 use super::context::RendererContext;
-use lemao_math::color::Color;
+use lemao_math::color::SolidColor;
 use lemao_math::vec2::Vec2;
 use lemao_math::vec3::Vec3;
 use lemao_opengl::bindings::opengl;
@@ -23,7 +23,7 @@ pub struct Shape {
 }
 
 impl Shape {
-    pub fn new(renderer: &RendererContext, vertices: Vec<Vec3>, indices: Vec<u32>, uv: Vec<Vec2>, colors: Vec<Color>) -> Self {
+    pub fn new(renderer: &RendererContext, vertices: Vec<Vec3>, indices: Vec<u32>, uv: Vec<Vec2>, colors: Vec<SolidColor>) -> Self {
         unsafe {
             let gl = renderer.gl.clone();
 
