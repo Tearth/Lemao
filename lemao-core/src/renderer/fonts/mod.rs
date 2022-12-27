@@ -1,4 +1,5 @@
 use super::context::RendererContext;
+use super::textures::{RawTexture, Texture};
 use lemao_math::vec2::Vec2;
 use lemao_opengl::bindings::opengl;
 use lemao_opengl::pointers::OpenGLPointers;
@@ -7,6 +8,14 @@ use std::rc::Rc;
 
 pub mod bff;
 pub mod storage;
+
+pub struct RawFont {
+    size: Vec2,
+    cell_size: Vec2,
+    base_character_offset: u8,
+    character_widths: Vec<u8>,
+    data: Vec<u8>,
+}
 
 pub struct Font {
     pub(crate) id: usize,
@@ -19,8 +28,67 @@ pub struct Font {
     character_widths: Vec<u8>,
 }
 
+impl RawFont {
+    pub fn new(size: Vec2, cell_size: Vec2, base_character_offset: u8, character_widths: Vec<u8>, data: Vec<u8>) -> Self {
+        Self { size, cell_size, base_character_offset, character_widths, data }
+    }
+
+    pub fn get_size(&self) -> Vec2 {
+        self.size
+    }
+
+    pub fn get_cell_size(&self) -> Vec2 {
+        self.cell_size
+    }
+
+    pub fn get_base_character_offset(&self) -> u8 {
+        self.base_character_offset
+    }
+
+    pub fn get_character_widths(&self) -> &Vec<u8> {
+        &self.character_widths
+    }
+
+    pub fn get_data(&self) -> &Vec<u8> {
+        &self.data
+    }
+
+    pub fn set_character(&mut self, char: u8, offset: Vec2, texture: &RawTexture) {
+        let texture_size = texture.get_size();
+        let texture_data = texture.get_data();
+
+        let characters_per_row = (self.size.x / self.cell_size.x) as u8;
+        let row = (char - self.base_character_offset) % characters_per_row;
+        let col = (char - self.base_character_offset) / characters_per_row;
+        let initial_x = (row as f32 * self.cell_size.x + offset.x) as usize;
+        let initial_y = (self.size.y - (col as f32 * self.cell_size.y) - self.cell_size.y + offset.y) as usize;
+
+        let mut texture_data_index = 0;
+        for y in initial_y..initial_y + self.cell_size.y as usize {
+            for x in initial_x..initial_x + self.cell_size.x as usize {
+                for p in 0..4 {
+                    self.data[x * 4 + y * self.size.x as usize * 4 + p] = 0;
+                    texture_data_index += 1;
+                }
+            }
+        }
+
+        texture_data_index = 0;
+        for y in initial_y..initial_y + texture_size.y as usize {
+            for x in initial_x..initial_x + texture_size.x as usize {
+                for p in 0..4 {
+                    self.data[x * 4 + y * self.size.x as usize * 4 + p] = texture_data[texture_data_index];
+                    texture_data_index += 1;
+                }
+            }
+        }
+
+        self.character_widths[char as usize] = texture_size.x as u8;
+    }
+}
+
 impl Font {
-    pub fn new(renderer: &RendererContext, size: Vec2, cell_size: Vec2, base_character_offset: u8, character_widths: Vec<u8>, data: Vec<u8>) -> Self {
+    pub fn new(renderer: &RendererContext, raw: &RawFont) -> Self {
         unsafe {
             let gl = renderer.gl.clone();
             let mut texture_gl_id = 0;
@@ -33,12 +101,20 @@ impl Font {
             (gl.glTexParameteri)(opengl::GL_TEXTURE_2D, opengl::GL_TEXTURE_MAG_FILTER, opengl::GL_NEAREST as i32);
 
             let format = opengl::GL_RGBA;
-            let texture_ptr = data.as_ptr() as *const c_void;
+            let texture_ptr = raw.data.as_ptr() as *const c_void;
 
-            (gl.glTexImage2D)(opengl::GL_TEXTURE_2D, 0, format as i32, size.x as i32, size.y as i32, 0, format, opengl::GL_UNSIGNED_BYTE, texture_ptr);
+            (gl.glTexImage2D)(opengl::GL_TEXTURE_2D, 0, format as i32, raw.size.x as i32, raw.size.y as i32, 0, format, opengl::GL_UNSIGNED_BYTE, texture_ptr);
             (gl.glGenerateMipmap)(opengl::GL_TEXTURE_2D);
 
-            Self { id: 0, texture_gl_id, gl, size, cell_size, base_character_offset, character_widths }
+            Self {
+                id: 0,
+                texture_gl_id,
+                gl,
+                size: raw.size,
+                cell_size: raw.cell_size,
+                base_character_offset: raw.base_character_offset,
+                character_widths: raw.character_widths.clone(),
+            }
         }
     }
 

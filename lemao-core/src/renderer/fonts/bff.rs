@@ -3,7 +3,7 @@ use crate::utils::binary;
 use std::fs::File;
 use std::io::Read;
 
-pub fn load(renderer: &RendererContext, path: &str) -> Result<Font, String> {
+pub fn load(path: &str) -> Result<RawFont, String> {
     /////////////////////////////////////////////////////////////////////////////////////////////////
     // BFF specification: https://documentation.help/Codehead-Bitmap-Font-Generator/bffformat.html //
     /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -62,12 +62,5 @@ pub fn load(renderer: &RendererContext, path: &str) -> Result<Font, String> {
         }
     }
 
-    Ok(Font::new(
-        renderer,
-        Vec2::new(width as f32, height as f32),
-        Vec2::new(cell_width as f32, cell_height as f32),
-        base_character_offset,
-        character_widths,
-        data,
-    ))
+    Ok(RawFont::new(Vec2::new(width as f32, height as f32), Vec2::new(cell_width as f32, cell_height as f32), base_character_offset, character_widths, data))
 }

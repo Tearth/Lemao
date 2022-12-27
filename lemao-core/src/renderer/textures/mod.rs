@@ -8,6 +8,11 @@ use std::rc::Rc;
 pub mod bmp;
 pub mod storage;
 
+pub struct RawTexture {
+    size: Vec2,
+    data: Vec<u8>,
+}
+
 pub struct Texture {
     pub(crate) id: usize,
     pub(crate) texture_gl_id: u32,
@@ -16,8 +21,22 @@ pub struct Texture {
     size: Vec2,
 }
 
+impl RawTexture {
+    pub fn new(size: Vec2, data: Vec<u8>) -> Self {
+        Self { size, data }
+    }
+
+    pub fn get_size(&self) -> Vec2 {
+        self.size
+    }
+
+    pub fn get_data(&self) -> &Vec<u8> {
+        &self.data
+    }
+}
+
 impl Texture {
-    pub fn new(renderer: &RendererContext, size: Vec2, data: Vec<u8>) -> Self {
+    pub fn new(renderer: &RendererContext, raw: &RawTexture) -> Self {
         unsafe {
             let gl = renderer.gl.clone();
             let mut texture_gl_id = 0;
@@ -29,8 +48,8 @@ impl Texture {
             (gl.glTexParameteri)(opengl::GL_TEXTURE_2D, opengl::GL_TEXTURE_MIN_FILTER, opengl::GL_LINEAR_MIPMAP_LINEAR as i32);
             (gl.glTexParameteri)(opengl::GL_TEXTURE_2D, opengl::GL_TEXTURE_MAG_FILTER, opengl::GL_LINEAR as i32);
 
-            let texture = Self { id: 0, texture_gl_id, gl, size };
-            texture.set_data(size, data);
+            let texture = Self { id: 0, texture_gl_id, gl, size: raw.size };
+            texture.set_data(raw.size, &raw.data);
 
             texture
         }
@@ -44,7 +63,7 @@ impl Texture {
         self.size
     }
 
-    pub fn set_data(&self, size: Vec2, data: Vec<u8>) {
+    pub fn set_data(&self, size: Vec2, data: &Vec<u8>) {
         unsafe {
             (self.gl.glBindTexture)(opengl::GL_TEXTURE_2D, self.texture_gl_id);
 

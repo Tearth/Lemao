@@ -21,6 +21,7 @@ use super::shaders::SOLID_FRAGMENT_SHADER;
 use super::shapes::storage::ShapeStorage;
 use super::shapes::Shape;
 use super::textures::storage::TextureStorage;
+use super::textures::RawTexture;
 use super::textures::Texture;
 use lemao_common_platform::renderer::RendererPlatformSpecific;
 use lemao_math::color::SolidColor;
@@ -179,7 +180,7 @@ impl RendererContext {
     }
 
     pub fn init_default_texture(&mut self) {
-        let texture = Texture::new(self, Vec2::new(1.0, 1.0), vec![255, 255, 255, 255]);
+        let texture = Texture::new(self, &RawTexture::new(Vec2::new(1.0, 1.0), vec![255, 255, 255, 255]));
         self.default_texture_id = self.textures.lock().unwrap().store(texture);
     }
 
