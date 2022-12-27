@@ -60,8 +60,8 @@ impl RawFont {
         let characters_per_row = (self.size.x / self.cell_size.x) as u8;
         let row = (char - self.base_character_offset) % characters_per_row;
         let col = (char - self.base_character_offset) / characters_per_row;
-        let initial_x = (row as f32 * self.cell_size.x + offset.x) as usize;
-        let initial_y = (self.size.y - (col as f32 * self.cell_size.y) - self.cell_size.y + offset.y) as usize;
+        let initial_x = (row as f32 * self.cell_size.x) as usize;
+        let initial_y = (self.size.y - (col as f32 * self.cell_size.y) - self.cell_size.y) as usize;
 
         let mut texture_data_index = 0;
         for y in initial_y..initial_y + self.cell_size.y as usize {
@@ -73,7 +73,10 @@ impl RawFont {
             }
         }
 
+        let initial_x = initial_x + offset.x as usize;
+        let initial_y = initial_y + offset.y as usize;
         texture_data_index = 0;
+
         for y in initial_y..initial_y + texture_size.y as usize {
             for x in initial_x..initial_x + texture_size.x as usize {
                 for p in 0..4 {

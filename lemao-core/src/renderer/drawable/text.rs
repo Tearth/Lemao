@@ -125,6 +125,9 @@ impl Text {
             let uv_height = self.font_cell_size.y / self.font_size.y;
             let uv_size = Vec2::new(uv_width, uv_height);
             let mut index = 0;
+            let mut color = SolidColor::new(1.0, 1.0, 1.0, 1.0);
+            let mut color_section = false;
+            let mut color_definition = String::new();
 
             self.vertices.clear();
             self.indices.clear();
@@ -135,6 +138,27 @@ impl Text {
                     offset.y -= self.line_height as f32;
                     size.y += self.line_height as f32;
                     continue;
+                } else if char == '°' {
+                    if color_section {
+                        let tokens = color_definition.split(',').collect::<Vec<&str>>();
+                        let r = tokens[0].parse::<u8>().unwrap() as f32;
+                        let g = tokens[1].parse::<u8>().unwrap() as f32;
+                        let b = tokens[2].parse::<u8>().unwrap() as f32;
+                        let a = tokens[3].parse::<u8>().unwrap() as f32;
+
+                        color = SolidColor::new(r / 255.0, g / 255.0, b / 255.0, a / 255.0);
+                        color_section = false;
+                    } else {
+                        color_section = true;
+                        color_definition.clear();
+                    }
+
+                    continue;
+                }
+
+                if color_section {
+                    color_definition += &char.to_string();
+                    continue;
                 }
 
                 let row = (char as u8 - self.font_base_character_offset) % characters_per_row;
@@ -143,14 +167,7 @@ impl Text {
                 let character_width = self.font_character_widths[char as usize];
                 let uv = Vec2::new(row as f32 * uv_width, 1.0 - col as f32 * uv_height - uv_height);
 
-                self.vertices.extend_from_slice(&self.get_vertices(
-                    self.font_cell_size.x as u32,
-                    self.font_cell_size.y as u32,
-                    offset,
-                    uv,
-                    uv_size,
-                    SolidColor::new(1.0, 1.0, 1.0, 1.0),
-                ));
+                self.vertices.extend_from_slice(&self.get_vertices(self.font_cell_size.x as u32, self.font_cell_size.y as u32, offset, uv, uv_size, color));
 
                 let indices_offset = (index * 4) as u32;
                 self.indices.extend_from_slice(&[
@@ -203,11 +220,19 @@ impl Text {
     pub fn calculate_text_size(&self, text: String) -> Vec2 {
         let mut text_size = Vec2::new(0.0, self.line_height as f32);
         let mut line_width = 0.0;
+        let mut color_section = false;
 
         for char in text.chars() {
             if char == '\n' {
                 line_width = 0.0;
                 text_size.y += self.line_height as f32;
+                continue;
+            } else if char == '°' {
+                color_section = !color_section;
+                continue;
+            }
+
+            if color_section {
                 continue;
             }
 
