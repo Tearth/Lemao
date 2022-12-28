@@ -94,6 +94,11 @@ impl Disc {
         self.texture_id
     }
 
+    pub fn set_texture(&mut self, texture: &Texture) {
+        self.texture_id = texture.id;
+        self.texture_gl_id = texture.texture_gl_id;
+    }
+
     pub fn get_radius(&self) -> f32 {
         self.radius
     }
@@ -133,13 +138,11 @@ impl Disc {
     fn update(&mut self) {
         unsafe {
             let mut angle = 0.0f32;
-            let position = Vec2::new(0.5, 0.5);
-            let scaled_position = position * Vec2::new(self.radius, self.radius);
 
             self.vertices.clear();
             self.indices.clear();
 
-            self.vertices.extend_from_slice(&self.get_vertices(scaled_position, position, SolidColor::new(1.0, 1.0, 1.0, 1.0)));
+            self.vertices.extend_from_slice(&self.get_vertices(Vec2::new(self.radius, self.radius), Vec2::new(0.5, 0.5), SolidColor::new(1.0, 1.0, 1.0, 1.0)));
 
             for n in 0..self.sides {
                 let (x, y) = if self.squircle_factor == 0.0 || angle.sin().abs() < 0.00001 || angle.cos().abs() < 0.00001 {
@@ -155,7 +158,8 @@ impl Disc {
 
                 let position = Vec2::new(x, y);
                 let scaled_position = position * Vec2::new(self.radius, self.radius) + Vec2::new(self.radius, self.radius);
-                self.vertices.extend_from_slice(&self.get_vertices(scaled_position, position, SolidColor::new(1.0, 1.0, 1.0, 1.0)));
+                let uv = position * Vec2::new(0.5, 0.5) + Vec2::new(0.5, 0.5);
+                self.vertices.extend_from_slice(&self.get_vertices(scaled_position, uv, SolidColor::new(1.0, 1.0, 1.0, 1.0)));
 
                 if n > 0 {
                     self.indices.extend_from_slice(&[0, n, n + 1]);

@@ -95,6 +95,11 @@ impl Frame {
         self.texture_id
     }
 
+    pub fn set_texture(&mut self, texture: &Texture) {
+        self.texture_id = texture.id;
+        self.texture_gl_id = texture.texture_gl_id;
+    }
+
     pub fn get_size(&self) -> Vec2 {
         self.size
     }
@@ -172,8 +177,8 @@ impl Frame {
             /* c.g */ color.g,
             /* c.b */ color.b,
             /* c.a */ color.a,
-            /* t.u */ 0.0,
-            /* t.v */ 0.0,
+            /* t.u */ 1.0,
+            /* t.v */ 1.0,
 
             /* v.x */ 0.0,
             /* v.y */ size.y,
@@ -192,8 +197,8 @@ impl Frame {
             /* c.g */ color.g,
             /* c.b */ color.b,
             /* c.a */ color.a,
-            /* t.u */ 0.1,
-            /* t.v */ 0.1,
+            /* t.u */ thickness.left / self.size.x,
+            /* t.v */ thickness.bottom / self.size.y,
 
             /* v.x */ size.x - thickness.right,
             /* v.y */ thickness.bottom,
@@ -202,8 +207,8 @@ impl Frame {
             /* c.g */ color.g,
             /* c.b */ color.b,
             /* c.a */ color.a,
-            /* t.u */ 0.9,
-            /* t.v */ 0.0,
+            /* t.u */ 1.0 - thickness.right / self.size.x,
+            /* t.v */ thickness.bottom / self.size.y,
 
             /* v.x */ size.x - thickness.right,
             /* v.y */ size.y - thickness.top,
@@ -212,8 +217,8 @@ impl Frame {
             /* c.g */ color.g,
             /* c.b */ color.b,
             /* c.a */ color.a,
-            /* t.u */ 0.1,
-            /* t.v */ 0.1,
+            /* t.u */ 1.0 - thickness.right / self.size.x,
+            /* t.v */ 1.0 - thickness.top / self.size.y,
 
             /* v.x */ thickness.left,
             /* v.y */ size.y - thickness.top,
@@ -222,8 +227,8 @@ impl Frame {
             /* c.g */ color.g,
             /* c.b */ color.b,
             /* c.a */ color.a,
-            /* t.u */ 0.0,
-            /* t.v */ 0.9,
+            /* t.u */ thickness.left / self.size.x,
+            /* t.v */ 1.0 - thickness.top / self.size.y,
         ]
     }
 }

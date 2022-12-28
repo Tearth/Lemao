@@ -96,6 +96,11 @@ impl Circle {
         self.texture_id
     }
 
+    pub fn set_texture(&mut self, texture: &Texture) {
+        self.texture_id = texture.id;
+        self.texture_gl_id = texture.texture_gl_id;
+    }
+
     pub fn get_radius(&self) -> f32 {
         self.radius
     }
@@ -161,9 +166,13 @@ impl Circle {
                 };
 
                 let position = Vec2::new(x, y);
-                let outer_position = position * self.radius + Vec2::new(self.radius, self.radius);
-                let inner_position = position * (self.radius - self.thickness) + Vec2::new(self.radius, self.radius);
-                self.vertices.extend_from_slice(&self.get_vertices(outer_position, inner_position, position, SolidColor::new(1.0, 1.0, 1.0, 1.0)));
+                let outer_position = position * self.radius;
+                let inner_position = position * (self.radius - self.thickness);
+                let outer_uv = outer_position / self.radius * Vec2::new(0.5, 0.5) + Vec2::new(0.5, 0.5);
+                let inner_uv = inner_position / self.radius * Vec2::new(0.5, 0.5) + Vec2::new(0.5, 0.5);
+                let outer_position = outer_position + Vec2::new(self.radius, self.radius);
+                let inner_position = inner_position + Vec2::new(self.radius, self.radius);
+                self.vertices.extend_from_slice(&self.get_vertices(outer_position, inner_position, outer_uv, inner_uv, SolidColor::new(1.0, 1.0, 1.0, 1.0)));
 
                 if n > 0 {
                     self.indices.extend_from_slice(&[n * 2 - 2, n * 2 - 1, n * 2, n * 2 - 1, n * 2, n * 2 + 1]);
@@ -199,7 +208,7 @@ impl Circle {
     }
 
     #[rustfmt::skip]
-    fn get_vertices(&self, outer_position: Vec2, inner_position: Vec2, uv: Vec2, color: SolidColor) -> [f32; 18] {
+    fn get_vertices(&self, outer_position: Vec2, inner_position: Vec2, outer_uv: Vec2, inner_uv: Vec2, color: SolidColor) -> [f32; 18] {
         [
             /* v.x */ outer_position.x,
             /* v.y */ outer_position.y,
@@ -208,8 +217,8 @@ impl Circle {
             /* c.g */ color.g,
             /* c.b */ color.b,
             /* c.a */ color.a,
-            /* t.u */ uv.x,
-            /* t.v */ uv.y,
+            /* t.u */ outer_uv.x,
+            /* t.v */ outer_uv.y,
 
             /* v.x */ inner_position.x,
             /* v.y */ inner_position.y,
@@ -218,8 +227,8 @@ impl Circle {
             /* c.g */ color.g,
             /* c.b */ color.b,
             /* c.a */ color.a,
-            /* t.u */ uv.x,
-            /* t.v */ uv.y,
+            /* t.u */ inner_uv.x,
+            /* t.v */ inner_uv.y,
         ]
     }
 }

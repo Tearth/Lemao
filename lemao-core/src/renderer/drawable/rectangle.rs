@@ -54,6 +54,11 @@ impl Rectangle {
         self.texture_id
     }
 
+    pub fn set_texture(&mut self, texture: &Texture) {
+        self.texture_id = texture.id;
+        self.texture_gl_id = texture.texture_gl_id;
+    }
+
     pub fn get_size(&self) -> Vec2 {
         self.size
     }
