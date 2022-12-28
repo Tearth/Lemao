@@ -30,6 +30,7 @@ pub struct Disc {
     radius: f32,
     sides: u32,
     angle: f32,
+    squircle_factor: f32,
     elements_count: u32,
     vertices: Vec<f32>,
     indices: Vec<u32>,
@@ -55,6 +56,7 @@ impl Disc {
             radius,
             sides,
             angle: 2.0 * std::f32::consts::PI,
+            squircle_factor: 0.0,
             elements_count: 0,
             vertices: Vec::new(),
             indices: Vec::new(),
@@ -119,6 +121,15 @@ impl Disc {
         self.update();
     }
 
+    pub fn get_squircle_factor(&self) -> f32 {
+        self.squircle_factor
+    }
+
+    pub fn set_squircle_factor(&mut self, squircle_factor: f32) {
+        self.squircle_factor = squircle_factor;
+        self.update();
+    }
+
     fn update(&mut self) {
         unsafe {
             let mut angle = 0.0f32;
@@ -131,7 +142,18 @@ impl Disc {
             self.vertices.extend_from_slice(&self.get_vertices(scaled_position, position, SolidColor::new(1.0, 1.0, 1.0, 1.0)));
 
             for n in 0..self.sides {
-                let position = Vec2::new(angle.sin(), angle.cos());
+                let (x, y) = if self.squircle_factor == 0.0 || angle.sin().abs() < 0.00001 || angle.cos().abs() < 0.00001 {
+                    (angle.cos(), angle.sin())
+                } else {
+                    (
+                        (angle.cos().signum() * (1.0 - (1.0 - self.squircle_factor.powi(2) * (2.0 * angle).sin().powi(2)).sqrt()).sqrt())
+                            / (self.squircle_factor * 2.0f32.sqrt() * angle.sin().abs()),
+                        (angle.sin().signum() * (1.0 - (1.0 - self.squircle_factor.powi(2) * (2.0 * angle).sin().powi(2)).sqrt()).sqrt())
+                            / (self.squircle_factor * 2.0f32.sqrt() * angle.cos().abs()),
+                    )
+                };
+
+                let position = Vec2::new(x, y);
                 let scaled_position = position * Vec2::new(self.radius, self.radius) + Vec2::new(self.radius, self.radius);
                 self.vertices.extend_from_slice(&self.get_vertices(scaled_position, position, SolidColor::new(1.0, 1.0, 1.0, 1.0)));
 
