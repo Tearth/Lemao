@@ -4,12 +4,13 @@ use lemao_core::audio::samples::wav;
 use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_common_platform::input::Key;
 use lemao_core::lemao_common_platform::window::WindowStyle;
-use lemao_core::lemao_math::color::Color;
+use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::drawable::text::Text;
 use lemao_core::renderer::drawable::Drawable;
 use lemao_core::renderer::fonts::bff;
 use lemao_core::renderer::fonts::storage::FontStorage;
+use lemao_core::renderer::fonts::Font;
 use lemao_core::renderer::textures::storage::TextureStorage;
 use lemao_core::window::context::WindowContext;
 use std::sync::Arc;
@@ -39,7 +40,7 @@ pub fn main() -> Result<(), String> {
     let mut renderer = window.create_renderer(textures, fonts.clone())?;
     let mut audio = AudioContext::new(samples.clone())?;
 
-    let font_id = fonts.lock().unwrap().store(bff::load(&renderer, "./assets/inconsolata.bff")?);
+    let font_id = fonts.lock().unwrap().store(Font::new(&renderer, &bff::load("./assets/inconsolata.bff")?));
     let chopin_sample_id = samples.lock().unwrap().store(wav::load(&audio, "./assets/chopin.wav")?);
 
     let description_text_id = renderer.create_text(font_id)?;
@@ -89,7 +90,7 @@ pub fn main() -> Result<(), String> {
             status_text.set_text("Status: stopped");
         }
 
-        renderer.clear(Color::new(0.5, 0.5, 0.5, 1.0));
+        renderer.clear(SolidColor::new(0.5, 0.5, 0.5, 1.0));
         renderer.draw(description_text_id)?;
         renderer.draw(status_text_id)?;
         window.swap_buffers();

@@ -3,15 +3,17 @@
 use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_common_platform::input::Key;
 use lemao_core::lemao_common_platform::window::WindowStyle;
-use lemao_core::lemao_math::color::Color;
+use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::drawable::sprite::Sprite;
 use lemao_core::renderer::drawable::text::Text;
 use lemao_core::renderer::drawable::Drawable;
 use lemao_core::renderer::fonts::bff;
 use lemao_core::renderer::fonts::storage::FontStorage;
+use lemao_core::renderer::fonts::Font;
 use lemao_core::renderer::textures::bmp;
 use lemao_core::renderer::textures::storage::TextureStorage;
+use lemao_core::renderer::textures::Texture;
 use lemao_core::window::context::WindowContext;
 use std::sync::Arc;
 use std::sync::Mutex;
@@ -36,8 +38,8 @@ pub fn main() -> Result<(), String> {
     let mut window = WindowContext::new("Transformation", WindowStyle::Window { position: window_position, size: window_size })?;
     let mut renderer = window.create_renderer(textures.clone(), fonts.clone())?;
 
-    let kaela_rgb = textures.lock().unwrap().store(bmp::load(&renderer, "./assets/disc.bmp")?);
-    let font_id = fonts.lock().unwrap().store(bff::load(&renderer, "./assets/inconsolata.bff")?);
+    let kaela_rgb = textures.lock().unwrap().store(Texture::new(&renderer, &bmp::load("./assets/disc.bmp")?));
+    let font_id = fonts.lock().unwrap().store(Font::new(&renderer, &bff::load("./assets/inconsolata.bff")?));
 
     let gui_camera_id = renderer.create_camera(Default::default(), window_size)?;
     let sprite_id = renderer.create_sprite(kaela_rgb)?;
@@ -116,7 +118,7 @@ pub fn main() -> Result<(), String> {
             sprite.move_delta(Vec2::new_from_angle(sprite.get_rotation()) * 200.0 * Vec2::new(delta, delta));
         }
 
-        renderer.clear(Color::new(0.5, 0.5, 0.5, 1.0));
+        renderer.clear(SolidColor::new(0.5, 0.5, 0.5, 1.0));
         renderer.draw(sprite_id)?;
         renderer.set_camera_as_active(gui_camera_id)?;
         renderer.draw(description_text_id)?;

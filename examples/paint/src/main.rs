@@ -4,13 +4,16 @@ use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_common_platform::input::Key;
 use lemao_core::lemao_common_platform::input::MouseButton;
 use lemao_core::lemao_common_platform::window::WindowStyle;
-use lemao_core::lemao_math::color::Color;
+use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::drawable::text::Text;
+use lemao_core::renderer::drawable::Color;
 use lemao_core::renderer::drawable::Drawable;
 use lemao_core::renderer::fonts::bff;
 use lemao_core::renderer::fonts::storage::FontStorage;
+use lemao_core::renderer::fonts::Font;
 use lemao_core::renderer::textures::storage::TextureStorage;
+use lemao_core::renderer::textures::RawTexture;
 use lemao_core::renderer::textures::Texture;
 use lemao_core::window::context::CoordinationSystem;
 use lemao_core::window::context::WindowContext;
@@ -33,8 +36,8 @@ pub fn main() -> Result<(), String> {
     let mut renderer = window.create_renderer(textures.clone(), fonts.clone())?;
 
     let mut texture_data = vec![0; (window_size.x * window_size.y * 4.0) as usize];
-    let texture_id = textures.lock().unwrap().store(Texture::new(&renderer, window_size, texture_data.clone()));
-    let font_id = fonts.lock().unwrap().store(bff::load(&renderer, "./assets/inconsolata.bff")?);
+    let texture_id = textures.lock().unwrap().store(Texture::new(&renderer, &RawTexture::new(window_size, texture_data.clone())));
+    let font_id = fonts.lock().unwrap().store(Font::new(&renderer, &bff::load("./assets/inconsolata.bff")?));
 
     let sprite_id = renderer.create_sprite(texture_id)?;
     let description_text_id = renderer.create_text(font_id)?;
@@ -78,11 +81,11 @@ pub fn main() -> Result<(), String> {
 
                 let texture_storage = textures.lock().unwrap();
                 let texture = texture_storage.get(texture_id).unwrap();
-                texture.set_data(window_size, texture_data.clone());
+                texture.set_data(window_size, &texture_data);
             }
         }
 
-        renderer.clear(Color::new(0.0, 0.0, 0.0, 1.0));
+        renderer.clear(SolidColor::new(0.0, 0.0, 0.0, 1.0));
         renderer.draw(sprite_id)?;
         renderer.draw(description_text_id)?;
         window.swap_buffers();

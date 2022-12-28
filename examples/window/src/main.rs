@@ -1,12 +1,13 @@
 use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_common_platform::input::Key;
 use lemao_core::lemao_common_platform::window::WindowStyle;
-use lemao_core::lemao_math::color::Color;
+use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::drawable::text::Text;
 use lemao_core::renderer::drawable::Drawable;
 use lemao_core::renderer::fonts::bff;
 use lemao_core::renderer::fonts::storage::FontStorage;
+use lemao_core::renderer::fonts::Font;
 use lemao_core::renderer::textures::storage::TextureStorage;
 use lemao_core::window::context::CoordinationSystem;
 use lemao_core::window::context::WindowContext;
@@ -37,7 +38,7 @@ pub fn main() -> Result<(), String> {
         Err(message) => panic!("{}", message),
     };
 
-    let font_id = fonts.lock().unwrap().store(bff::load(&renderer, "./assets/inconsolata.bff")?);
+    let font_id = fonts.lock().unwrap().store(Font::new(&renderer, &bff::load("./assets/inconsolata.bff")?));
     let description_text_id = renderer.create_text(font_id)?;
     let window_status_text_id = renderer.create_text(font_id)?;
     let left_top_text_id = renderer.create_text(font_id)?;
@@ -135,7 +136,7 @@ pub fn main() -> Result<(), String> {
             ));
         }
 
-        renderer.clear(Color::new(0.5, 0.5, 0.5, 1.0));
+        renderer.clear(SolidColor::new(0.5, 0.5, 0.5, 1.0));
         renderer.draw(description_text_id)?;
         renderer.draw(window_status_text_id)?;
         renderer.draw(left_top_text_id)?;

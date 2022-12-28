@@ -4,15 +4,17 @@ use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_common_platform::input::Key;
 use lemao_core::lemao_common_platform::input::MouseWheelDirection;
 use lemao_core::lemao_common_platform::window::WindowStyle;
-use lemao_core::lemao_math::color::Color;
+use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::drawable::animation::Animation;
 use lemao_core::renderer::drawable::text::Text;
 use lemao_core::renderer::drawable::Drawable;
 use lemao_core::renderer::fonts::bff;
 use lemao_core::renderer::fonts::storage::FontStorage;
+use lemao_core::renderer::fonts::Font;
 use lemao_core::renderer::textures::bmp;
 use lemao_core::renderer::textures::storage::TextureStorage;
+use lemao_core::renderer::textures::Texture;
 use lemao_core::window::context::WindowContext;
 use std::sync::Arc;
 use std::sync::Mutex;
@@ -32,8 +34,8 @@ pub fn main() -> Result<(), String> {
     let mut window = WindowContext::new("Animation", WindowStyle::Window { position: window_position, size: window_size })?;
     let mut renderer = window.create_renderer(textures.clone(), fonts.clone())?;
 
-    let explosion_id = textures.lock().unwrap().store(bmp::load(&renderer, "./assets/explosion.bmp")?);
-    let font_id = fonts.lock().unwrap().store(bff::load(&renderer, "./assets/inconsolata.bff")?);
+    let explosion_id = textures.lock().unwrap().store(Texture::new(&renderer, &bmp::load("./assets/explosion.bmp")?));
+    let font_id = fonts.lock().unwrap().store(Font::new(&renderer, &bff::load("./assets/inconsolata.bff")?));
 
     let animation_id = renderer.create_animation(explosion_id, Vec2::new(128.0, 128.0)).unwrap();
     let description_text_id = renderer.create_text(font_id)?;
@@ -83,7 +85,7 @@ pub fn main() -> Result<(), String> {
         std::thread::sleep(std::time::Duration::from_millis(sleep_duration));
         renderer.get_drawable_with_type_mut::<Animation>(animation_id)?.set_next_frame();
 
-        renderer.clear(Color::new(0.5, 0.5, 0.5, 1.0));
+        renderer.clear(SolidColor::new(0.5, 0.5, 0.5, 1.0));
         renderer.draw(animation_id)?;
         renderer.draw(description_text_id)?;
         window.swap_buffers();
