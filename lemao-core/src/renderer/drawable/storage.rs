@@ -4,7 +4,6 @@ use super::disc::Disc;
 use super::frame::Frame;
 use super::line::Line;
 use super::rectangle::Rectangle;
-use super::sprite::Sprite;
 use super::text::Text;
 use super::*;
 
@@ -58,14 +57,6 @@ impl DrawableStorage {
         let id = self.data.len();
         rectangle.id = id;
         self.data.push(Some(rectangle));
-
-        id
-    }
-
-    pub fn store_sprite(&mut self, mut sprite: Box<Sprite>) -> usize {
-        let id = self.data.len();
-        sprite.id = id;
-        self.data.push(Some(sprite));
 
         id
     }

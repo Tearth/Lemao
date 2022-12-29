@@ -157,6 +157,7 @@ impl Circle {
                 let (x, y) = if self.squircle_factor == 0.0 || angle.sin().abs() < 0.00001 || angle.cos().abs() < 0.00001 {
                     (angle.cos(), angle.sin())
                 } else {
+                    // https://arxiv.org/vc/arxiv/papers/1604/1604.02174v1.pdf
                     (
                         (angle.cos().signum() * (1.0 - (1.0 - self.squircle_factor.powi(2) * (2.0 * angle).sin().powi(2)).sqrt()).sqrt())
                             / (self.squircle_factor * 2.0f32.sqrt() * angle.sin().abs()),

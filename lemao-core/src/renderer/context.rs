@@ -7,7 +7,6 @@ use super::drawable::disc::Disc;
 use super::drawable::frame::Frame;
 use super::drawable::line::Line;
 use super::drawable::rectangle::Rectangle;
-use super::drawable::sprite::Sprite;
 use super::drawable::storage::DrawableStorage;
 use super::drawable::text::Text;
 use super::drawable::Color;
@@ -312,22 +311,13 @@ impl RendererContext {
         Ok(self.drawables.as_mut().unwrap().store_line(line))
     }
 
-    pub fn create_rectangle(&mut self, size: Vec2) -> Result<usize, String> {
+    pub fn create_rectangle(&mut self) -> Result<usize, String> {
         let shape = self.shapes.as_ref().unwrap().get(self.default_rectangle_shape_id)?;
         let texture_storage = self.textures.lock().unwrap();
         let texture = texture_storage.get(self.default_texture_id)?;
-        let rectangle = Box::new(Rectangle::new(self, shape, texture, size));
+        let rectangle = Box::new(Rectangle::new(self, shape, texture));
 
         Ok(self.drawables.as_mut().unwrap().store_rectangle(rectangle))
-    }
-
-    pub fn create_sprite(&mut self, texture_id: usize) -> Result<usize, String> {
-        let shape = self.shapes.as_ref().unwrap().get(self.default_sprite_shape_id)?;
-        let texture_storage = self.textures.lock().unwrap();
-        let texture = texture_storage.get(texture_id)?;
-        let sprite = Box::new(Sprite::new(self, shape, texture));
-
-        Ok(self.drawables.as_mut().unwrap().store_sprite(sprite))
     }
 
     pub fn create_text(&mut self, font_id: usize) -> Result<usize, String> {

@@ -58,7 +58,7 @@ impl Button {
             label_horizontal_alignment: HorizontalAlignment::Middle,
             label_vertical_alignment: VerticalAlignment::Middle,
             label_offset: Default::default(),
-            filling_rectangle_id: renderer.create_rectangle(Vec2::new(100.0, 100.0))?,
+            filling_rectangle_id: renderer.create_rectangle()?,
             border_frame_id: renderer.create_frame(Vec2::new(100.0, 100.0))?,
             label_id: renderer.create_text(label_font_id)?,
             children: Default::default(),

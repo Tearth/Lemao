@@ -5,7 +5,7 @@ use lemao_core::lemao_common_platform::input::Key;
 use lemao_core::lemao_common_platform::window::WindowStyle;
 use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
-use lemao_core::renderer::drawable::sprite::Sprite;
+use lemao_core::renderer::drawable::rectangle::Rectangle;
 use lemao_core::renderer::drawable::text::Text;
 use lemao_core::renderer::drawable::Drawable;
 use lemao_core::renderer::fonts::bff;
@@ -42,10 +42,11 @@ pub fn main() -> Result<(), String> {
     let font_id = fonts.lock().unwrap().store(Font::new(&renderer, &bff::load("./assets/inconsolata.bff")?));
 
     let gui_camera_id = renderer.create_camera(Default::default(), window_size)?;
-    let sprite_id = renderer.create_sprite(kaela_rgb)?;
+    let sprite_id = renderer.create_rectangle()?;
     let description_text_id = renderer.create_text(font_id)?;
 
-    let sprite = renderer.get_drawable_with_type_mut::<Sprite>(sprite_id)?;
+    let sprite = renderer.get_drawable_with_type_mut::<Rectangle>(sprite_id)?;
+    sprite.set_texture(textures.lock().unwrap().get(kaela_rgb)?);
     sprite.set_anchor(Vec2::new(0.5, 0.5));
     sprite.set_position(Vec2::new(400.0, 300.0));
 

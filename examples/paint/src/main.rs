@@ -6,8 +6,8 @@ use lemao_core::lemao_common_platform::input::MouseButton;
 use lemao_core::lemao_common_platform::window::WindowStyle;
 use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
+use lemao_core::renderer::drawable::rectangle::Rectangle;
 use lemao_core::renderer::drawable::text::Text;
-use lemao_core::renderer::drawable::Color;
 use lemao_core::renderer::drawable::Drawable;
 use lemao_core::renderer::fonts::bff;
 use lemao_core::renderer::fonts::storage::FontStorage;
@@ -39,8 +39,11 @@ pub fn main() -> Result<(), String> {
     let texture_id = textures.lock().unwrap().store(Texture::new(&renderer, &RawTexture::new(window_size, texture_data.clone())));
     let font_id = fonts.lock().unwrap().store(Font::new(&renderer, &bff::load("./assets/inconsolata.bff")?));
 
-    let sprite_id = renderer.create_sprite(texture_id)?;
+    let sprite_id = renderer.create_rectangle()?;
     let description_text_id = renderer.create_text(font_id)?;
+
+    let sprite = renderer.get_drawable_with_type_mut::<Rectangle>(sprite_id)?;
+    sprite.set_texture(textures.lock().unwrap().get(texture_id)?);
 
     let description_text = renderer.get_drawable_with_type_mut::<Text>(description_text_id)?;
     description_text.set_text(DESCRIPTION);

@@ -7,7 +7,7 @@ use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::context::RendererContext;
 use lemao_core::renderer::drawable::frame::Frame;
-use lemao_core::renderer::drawable::sprite::Sprite;
+use lemao_core::renderer::drawable::rectangle::Rectangle;
 use lemao_core::renderer::drawable::Color;
 use lemao_core::renderer::drawable::Drawable;
 use std::any::Any;
@@ -46,7 +46,7 @@ impl Image {
             border_thickness: Default::default(),
             border_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             texture_id,
-            sprite_id: renderer.create_sprite(texture_id)?,
+            sprite_id: renderer.create_rectangle()?,
             border_frame_id: renderer.create_frame(Vec2::new(100.0, 100.0))?,
             children: Default::default(),
         })
@@ -181,10 +181,14 @@ impl Component for Image {
             self.screen_position = self.screen_position.floor();
         }
 
-        let sprite = renderer.get_drawable_with_type_mut::<Sprite>(self.sprite_id)?;
+        let texture_storage = renderer.get_textures();
+        let texture_storage_lock = texture_storage.lock().unwrap();
+
+        let sprite = renderer.get_drawable_with_type_mut::<Rectangle>(self.sprite_id)?;
         sprite.set_position(self.screen_position);
         sprite.set_size(self.screen_size);
         sprite.set_color(self.color.clone());
+        sprite.set_texture(texture_storage_lock.get(self.texture_id)?);
 
         Ok(())
     }

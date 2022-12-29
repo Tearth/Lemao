@@ -9,7 +9,7 @@ use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::context::RendererContext;
 use lemao_core::renderer::drawable::frame::Frame;
-use lemao_core::renderer::drawable::sprite::Sprite;
+use lemao_core::renderer::drawable::rectangle::Rectangle;
 use lemao_core::renderer::drawable::text::Text;
 use lemao_core::renderer::drawable::Color;
 use lemao_core::renderer::drawable::Drawable;
@@ -60,7 +60,7 @@ impl ImageButton {
             label_vertical_alignment: VerticalAlignment::Middle,
             label_offset: Default::default(),
             texture_id,
-            sprite_id: renderer.create_sprite(texture_id)?,
+            sprite_id: renderer.create_rectangle()?,
             border_frame_id: renderer.create_frame(Vec2::new(100.0, 100.0))?,
             label_id: renderer.create_text(label_font_id)?,
             children: Default::default(),
@@ -236,10 +236,14 @@ impl Component for ImageButton {
             self.screen_position = self.screen_position.floor();
         }
 
-        let sprite = renderer.get_drawable_with_type_mut::<Sprite>(self.sprite_id)?;
+        let texture_storage = renderer.get_textures();
+        let texture_storage_lock = texture_storage.lock().unwrap();
+
+        let sprite = renderer.get_drawable_with_type_mut::<Rectangle>(self.sprite_id)?;
         sprite.set_position(self.screen_position);
         sprite.set_size(self.screen_size);
         sprite.set_color(self.color.clone());
+        sprite.set_texture(texture_storage_lock.get(self.texture_id)?);
 
         let font_storage = renderer.get_fonts();
         let font_storage_lock = font_storage.lock().unwrap();

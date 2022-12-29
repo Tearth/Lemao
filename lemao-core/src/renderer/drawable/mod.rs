@@ -12,7 +12,6 @@ pub mod disc;
 pub mod frame;
 pub mod line;
 pub mod rectangle;
-pub mod sprite;
 pub mod storage;
 pub mod text;
 

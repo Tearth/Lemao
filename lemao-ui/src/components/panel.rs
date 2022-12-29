@@ -44,7 +44,7 @@ impl Panel {
             color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             border_thickness: Default::default(),
             border_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
-            filling_rectangle_id: renderer.create_rectangle(Vec2::new(100.0, 100.0))?,
+            filling_rectangle_id: renderer.create_rectangle()?,
             border_frame_id: renderer.create_frame(Vec2::new(100.0, 100.0))?,
             children: Default::default(),
         })

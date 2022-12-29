@@ -38,12 +38,13 @@ pub fn main() -> Result<(), String> {
 
     let font_id = fonts.lock().unwrap().store(Font::new(&renderer, &bff::load("./assets/inconsolata.bff")?));
 
-    let rectangle_id = renderer.create_rectangle(Vec2::new(100.0, 100.0)).unwrap();
+    let rectangle_id = renderer.create_rectangle().unwrap();
     let description_text_id = renderer.create_text(font_id)?;
 
     let rectangle = renderer.get_drawable_with_type_mut::<Rectangle>(rectangle_id)?;
     rectangle.set_anchor(Vec2::new(0.5, 0.5));
     rectangle.set_position(Vec2::new(400.0, 300.0));
+    rectangle.set_size(Vec2::new(100.0, 100.0));
 
     let description_text = renderer.get_drawable_with_type_mut::<Text>(description_text_id)?;
     description_text.set_text(DESCRIPTION);

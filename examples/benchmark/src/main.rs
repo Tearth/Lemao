@@ -2,6 +2,7 @@ use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_common_platform::window::WindowStyle;
 use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
+use lemao_core::renderer::drawable::rectangle::Rectangle;
 use lemao_core::renderer::drawable::text::Text;
 use lemao_core::renderer::drawable::Drawable;
 use lemao_core::renderer::fonts::bff;
@@ -50,8 +51,10 @@ pub fn main() -> Result<(), String> {
 
     let mut cells = Vec::new();
     for _ in 0..CELLS_COUNT {
-        let sprite_id = renderer.create_sprite(cell_texture_id)?;
-        renderer.get_drawable_mut(sprite_id)?.set_anchor(Vec2::new(0.5, 0.5));
+        let sprite_id = renderer.create_rectangle()?;
+        let sprite = renderer.get_drawable_with_type_mut::<Rectangle>(sprite_id)?;
+        sprite.set_texture(textures.lock().unwrap().get(cell_texture_id)?);
+        sprite.set_anchor(Vec2::new(0.5, 0.5));
 
         cells.push(CellData {
             sprite_id,

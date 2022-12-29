@@ -28,7 +28,7 @@ pub struct Rectangle {
 }
 
 impl Rectangle {
-    pub fn new(renderer: &RendererContext, shape: &Shape, texture: &Texture, size: Vec2) -> Self {
+    pub fn new(renderer: &RendererContext, shape: &Shape, texture: &Texture) -> Self {
         Rectangle {
             id: 0,
             shape_id: shape.id,
@@ -40,7 +40,7 @@ impl Rectangle {
             position: Default::default(),
             scale: Vec2::new(1.0, 1.0),
             rotation: 0.0,
-            size,
+            size: Default::default(),
             anchor: Default::default(),
             color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
         }
@@ -57,6 +57,7 @@ impl Rectangle {
     pub fn set_texture(&mut self, texture: &Texture) {
         self.texture_id = texture.id;
         self.texture_gl_id = texture.texture_gl_id;
+        self.size = texture.get_size();
     }
 
     pub fn get_size(&self) -> Vec2 {
