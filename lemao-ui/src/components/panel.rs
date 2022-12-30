@@ -6,10 +6,10 @@ use super::ComponentSize;
 use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::context::RendererContext;
+use lemao_core::renderer::drawable::circle::Circle;
+use lemao_core::renderer::drawable::disc::Disc;
 use lemao_core::renderer::drawable::frame::Frame;
-use lemao_core::renderer::drawable::rectangle::Rectangle;
 use lemao_core::renderer::drawable::Color;
-use lemao_core::renderer::drawable::Drawable;
 use std::any::Any;
 
 pub struct Panel {
@@ -19,33 +19,49 @@ pub struct Panel {
     screen_position: Vec2,
     size: ComponentSize,
     screen_size: Vec2,
+    shape: PanelShape,
     anchor: Vec2,
     margin: ComponentMargin,
     offset: Vec2,
     color: Color,
     border_thickness: ComponentBorderThickness,
     border_color: Color,
+    roundness_factor: f32,
     filling_rectangle_id: usize,
     border_frame_id: usize,
     children: Vec<usize>,
 }
 
+#[derive(Copy, Clone, Debug, PartialEq)]
+pub enum PanelShape {
+    Rectangle,
+    Disc,
+}
+
 impl Panel {
-    pub fn new(id: usize, renderer: &mut RendererContext) -> Result<Self, String> {
+    pub fn new(id: usize, renderer: &mut RendererContext, shape: PanelShape) -> Result<Self, String> {
         Ok(Self {
             id,
             position: ComponentPosition::AbsoluteToParent(Default::default()),
             screen_position: Default::default(),
             size: ComponentSize::Absolute(Default::default()),
             screen_size: Default::default(),
+            shape,
             anchor: Default::default(),
             margin: Default::default(),
             offset: Default::default(),
             color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             border_thickness: Default::default(),
             border_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
-            filling_rectangle_id: renderer.create_rectangle()?,
-            border_frame_id: renderer.create_frame(Vec2::new(100.0, 100.0))?,
+            roundness_factor: 0.0,
+            filling_rectangle_id: match shape {
+                PanelShape::Rectangle => renderer.create_rectangle()?,
+                PanelShape::Disc => renderer.create_disc(0.0, 512)?,
+            },
+            border_frame_id: match shape {
+                PanelShape::Rectangle => renderer.create_frame(Default::default())?,
+                PanelShape::Disc => renderer.create_circle(0.0, 512)?,
+            },
             children: Default::default(),
         })
     }
@@ -54,20 +70,25 @@ impl Panel {
         self.id
     }
 
-    pub fn get_color(&self) -> &Color {
-        &self.color
+    pub fn get_shape(&self) -> PanelShape {
+        self.shape
     }
 
-    pub fn set_color(&mut self, color: Color) {
-        self.color = color;
+    pub fn set_shape(&mut self, shape: PanelShape) {
+        self.shape = shape;
     }
 
     pub fn get_border_thickness(&self) -> ComponentBorderThickness {
         self.border_thickness
     }
 
-    pub fn set_border_thickness(&mut self, border_thickness: ComponentBorderThickness) {
+    pub fn set_border_thickness(&mut self, border_thickness: ComponentBorderThickness) -> Result<(), String> {
+        if self.shape == PanelShape::Rectangle && !self.border_thickness.is_axially_uniform() {
+            return Err("Not supported".to_string());
+        }
+
         self.border_thickness = border_thickness;
+        Ok(())
     }
 
     pub fn get_border_color(&self) -> &Color {
@@ -76,6 +97,19 @@ impl Panel {
 
     pub fn set_border_color(&mut self, border_color: Color) {
         self.border_color = border_color;
+    }
+
+    pub fn get_roundness_factor(&self) -> f32 {
+        self.roundness_factor
+    }
+
+    pub fn set_roundness_factor(&mut self, roundness_factor: f32) -> Result<(), String> {
+        if self.shape == PanelShape::Rectangle {
+            return Err("Not supported".to_string());
+        }
+
+        self.roundness_factor = roundness_factor;
+        Ok(())
     }
 }
 
@@ -128,6 +162,14 @@ impl Component for Panel {
         self.offset = offset;
     }
 
+    fn get_color(&self) -> &Color {
+        &self.color
+    }
+
+    fn set_color(&mut self, color: Color) {
+        self.color = color;
+    }
+
     fn add_child(&mut self, component_id: usize) {
         self.children.push(component_id);
     }
@@ -158,11 +200,17 @@ impl Component for Panel {
         self.screen_position = self.screen_position.floor();
 
         if self.border_thickness != Default::default() {
-            let border_rectangle = renderer.get_drawable_with_type_mut::<Frame>(self.border_frame_id)?;
+            let border_rectangle = renderer.get_drawable_mut(self.border_frame_id)?;
             border_rectangle.set_position(self.screen_position);
             border_rectangle.set_size(self.screen_size);
-            border_rectangle.set_thickness(self.border_thickness.into());
             border_rectangle.set_color(self.border_color.clone());
+
+            match self.shape {
+                PanelShape::Rectangle => renderer.get_drawable_with_type_mut::<Frame>(self.border_frame_id)?.set_thickness(self.border_thickness.into()),
+                PanelShape::Disc => renderer
+                    .get_drawable_with_type_mut::<Circle>(self.border_frame_id)?
+                    .set_thickness(Vec2::new(self.border_thickness.left, self.border_thickness.top)),
+            }
 
             self.screen_position += Vec2::new(self.border_thickness.left, self.border_thickness.bottom);
             self.screen_size -= Vec2::new(self.border_thickness.left + self.border_thickness.right, self.border_thickness.top + self.border_thickness.bottom);
@@ -171,10 +219,15 @@ impl Component for Panel {
             self.screen_position = self.screen_position.floor();
         }
 
-        let filling_rectangle = renderer.get_drawable_with_type_mut::<Rectangle>(self.filling_rectangle_id)?;
+        let filling_rectangle = renderer.get_drawable_mut(self.filling_rectangle_id)?;
         filling_rectangle.set_position(self.screen_position);
         filling_rectangle.set_size(self.screen_size);
         filling_rectangle.set_color(self.color.clone());
+
+        if self.shape == PanelShape::Disc {
+            renderer.get_drawable_with_type_mut::<Disc>(self.filling_rectangle_id)?.set_squircle_factor(self.roundness_factor);
+            renderer.get_drawable_with_type_mut::<Circle>(self.border_frame_id)?.set_squircle_factor(self.roundness_factor);
+        }
 
         Ok(())
     }

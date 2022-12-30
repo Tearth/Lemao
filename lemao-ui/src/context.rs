@@ -3,6 +3,7 @@ use crate::components::canvas::Canvas;
 use crate::components::image::Image;
 use crate::components::label::Label;
 use crate::components::panel::Panel;
+use crate::components::panel::PanelShape;
 use crate::components::Component;
 use crate::components::ComponentPosition;
 use crate::components::ComponentSize;
@@ -147,9 +148,9 @@ impl UiContext {
         Ok(id)
     }
 
-    pub fn create_panel(&mut self, renderer: &mut RendererContext) -> Result<usize, String> {
+    pub fn create_panel(&mut self, renderer: &mut RendererContext, shape: PanelShape) -> Result<usize, String> {
         let id = self.components.len();
-        let panel = Box::new(Panel::new(id, renderer)?);
+        let panel = Box::new(Panel::new(id, renderer, shape)?);
         self.components.push(Some(panel));
 
         Ok(id)
