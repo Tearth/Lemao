@@ -100,15 +100,6 @@ impl Frame {
         self.texture_gl_id = texture.texture_gl_id;
     }
 
-    pub fn get_size(&self) -> Vec2 {
-        self.size
-    }
-
-    pub fn set_size(&mut self, size: Vec2) {
-        self.size = size;
-        self.update();
-    }
-
     pub fn get_thickness(&self) -> FrameThickness {
         self.thickness
     }
@@ -264,6 +255,15 @@ impl Drawable for Frame {
 
     fn rotate(&mut self, delta: f32) {
         self.rotation += delta;
+    }
+
+    fn get_size(&self) -> Vec2 {
+        self.size
+    }
+
+    fn set_size(&mut self, size: Vec2) {
+        self.size = size;
+        self.update();
     }
 
     fn get_anchor(&self) -> Vec2 {

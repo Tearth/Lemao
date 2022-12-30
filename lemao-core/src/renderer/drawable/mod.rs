@@ -33,6 +33,9 @@ pub trait Drawable {
     fn set_rotation(&mut self, rotation: f32);
     fn rotate(&mut self, delta: f32);
 
+    fn get_size(&self) -> Vec2;
+    fn set_size(&mut self, size: Vec2);
+
     fn get_anchor(&self) -> Vec2;
     fn set_anchor(&mut self, anchor: Vec2);
 

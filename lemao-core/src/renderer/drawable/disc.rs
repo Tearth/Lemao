@@ -27,7 +27,6 @@ pub struct Disc {
     size: Vec2,
     anchor: Vec2,
     color: Color,
-    radius: f32,
     sides: u32,
     angle: f32,
     squircle_factor: f32,
@@ -53,7 +52,6 @@ impl Disc {
             size: Vec2::new(radius * 2.0, radius * 2.0),
             anchor: Default::default(),
             color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
-            radius,
             sides,
             angle: 2.0 * std::f32::consts::PI,
             squircle_factor: 0.0,
@@ -99,15 +97,6 @@ impl Disc {
         self.texture_gl_id = texture.texture_gl_id;
     }
 
-    pub fn get_radius(&self) -> f32 {
-        self.radius
-    }
-
-    pub fn set_radius(&mut self, radius: f32) {
-        self.radius = radius;
-        self.update();
-    }
-
     pub fn get_sides(&self) -> u32 {
         self.sides
     }
@@ -138,11 +127,12 @@ impl Disc {
     fn update(&mut self) {
         unsafe {
             let mut angle = 0.0f32;
+            let radius = self.size / 2.0;
 
             self.vertices.clear();
             self.indices.clear();
 
-            self.vertices.extend_from_slice(&self.get_vertices(Vec2::new(self.radius, self.radius), Vec2::new(0.5, 0.5), SolidColor::new(1.0, 1.0, 1.0, 1.0)));
+            self.vertices.extend_from_slice(&self.get_vertices(radius, Vec2::new(0.5, 0.5), SolidColor::new(1.0, 1.0, 1.0, 1.0)));
 
             for n in 0..self.sides {
                 let (x, y) = if self.squircle_factor == 0.0 || angle.sin().abs() < 0.00001 || angle.cos().abs() < 0.00001 {
@@ -158,7 +148,7 @@ impl Disc {
                 };
 
                 let position = Vec2::new(x, y);
-                let scaled_position = position * Vec2::new(self.radius, self.radius) + Vec2::new(self.radius, self.radius);
+                let scaled_position = position * radius + radius;
                 let uv = position * Vec2::new(0.5, 0.5) + Vec2::new(0.5, 0.5);
                 self.vertices.extend_from_slice(&self.get_vertices(scaled_position, uv, SolidColor::new(1.0, 1.0, 1.0, 1.0)));
 
@@ -178,7 +168,6 @@ impl Disc {
             }
 
             self.elements_count = self.indices.len() as u32;
-            self.size = Vec2::new(self.radius, self.radius) * 2.0;
 
             let vertices_size = (mem::size_of::<f32>() * self.vertices.len()) as i64;
             let vertices_ptr = self.vertices.as_ptr() as *const c_void;
@@ -242,6 +231,15 @@ impl Drawable for Disc {
 
     fn rotate(&mut self, delta: f32) {
         self.rotation += delta;
+    }
+
+    fn get_size(&self) -> Vec2 {
+        self.size
+    }
+
+    fn set_size(&mut self, size: Vec2) {
+        self.size = size;
+        self.update();
     }
 
     fn get_anchor(&self) -> Vec2 {

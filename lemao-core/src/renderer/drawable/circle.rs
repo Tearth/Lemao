@@ -27,7 +27,6 @@ pub struct Circle {
     size: Vec2,
     anchor: Vec2,
     color: Color,
-    radius: f32,
     sides: u32,
     angle: f32,
     thickness: f32,
@@ -54,7 +53,6 @@ impl Circle {
             size: Vec2::new(radius * 2.0, radius * 2.0),
             anchor: Default::default(),
             color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
-            radius,
             sides,
             angle: 2.0 * std::f32::consts::PI,
             thickness: 1.0,
@@ -101,15 +99,6 @@ impl Circle {
         self.texture_gl_id = texture.texture_gl_id;
     }
 
-    pub fn get_radius(&self) -> f32 {
-        self.radius
-    }
-
-    pub fn set_radius(&mut self, radius: f32) {
-        self.radius = radius;
-        self.update();
-    }
-
     pub fn get_sides(&self) -> u32 {
         self.sides
     }
@@ -149,6 +138,7 @@ impl Circle {
     fn update(&mut self) {
         unsafe {
             let mut angle = 0.0f32;
+            let radius = self.size / 2.0;
 
             self.vertices.clear();
             self.indices.clear();
@@ -167,12 +157,12 @@ impl Circle {
                 };
 
                 let position = Vec2::new(x, y);
-                let outer_position = position * self.radius;
-                let inner_position = position * (self.radius - self.thickness);
-                let outer_uv = outer_position / self.radius * Vec2::new(0.5, 0.5) + Vec2::new(0.5, 0.5);
-                let inner_uv = inner_position / self.radius * Vec2::new(0.5, 0.5) + Vec2::new(0.5, 0.5);
-                let outer_position = outer_position + Vec2::new(self.radius, self.radius);
-                let inner_position = inner_position + Vec2::new(self.radius, self.radius);
+                let outer_position = position * radius;
+                let inner_position = position * (radius - Vec2::new(self.thickness, self.thickness));
+                let outer_uv = outer_position / radius * Vec2::new(0.5, 0.5) + Vec2::new(0.5, 0.5);
+                let inner_uv = inner_position / radius * Vec2::new(0.5, 0.5) + Vec2::new(0.5, 0.5);
+                let outer_position = outer_position + radius;
+                let inner_position = inner_position + radius;
                 self.vertices.extend_from_slice(&self.get_vertices(outer_position, inner_position, outer_uv, inner_uv, SolidColor::new(1.0, 1.0, 1.0, 1.0)));
 
                 if n > 0 {
@@ -191,7 +181,6 @@ impl Circle {
             }
 
             self.elements_count = self.indices.len() as u32;
-            self.size = Vec2::new(self.radius, self.radius) * 2.0;
 
             let vertices_size = (mem::size_of::<f32>() * self.vertices.len()) as i64;
             let vertices_ptr = self.vertices.as_ptr() as *const c_void;
@@ -265,6 +254,15 @@ impl Drawable for Circle {
 
     fn rotate(&mut self, delta: f32) {
         self.rotation += delta;
+    }
+
+    fn get_size(&self) -> Vec2 {
+        self.size
+    }
+
+    fn set_size(&mut self, size: Vec2) {
+        self.size = size;
+        self.update();
     }
 
     fn get_anchor(&self) -> Vec2 {

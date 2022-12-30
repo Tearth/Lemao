@@ -107,10 +107,6 @@ impl Text {
         self.set_text(&self.text.clone());
     }
 
-    pub fn get_size(&self) -> Vec2 {
-        self.size
-    }
-
     pub fn get_text(&self) -> &str {
         &self.text
     }
@@ -320,6 +316,14 @@ impl Drawable for Text {
 
     fn rotate(&mut self, delta: f32) {
         self.rotation += delta;
+    }
+
+    fn get_size(&self) -> Vec2 {
+        self.size
+    }
+
+    fn set_size(&mut self, size: Vec2) {
+        self.size = size;
     }
 
     fn get_anchor(&self) -> Vec2 {

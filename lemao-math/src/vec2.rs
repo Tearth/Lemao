@@ -114,6 +114,13 @@ impl Div<f32> for Vec2 {
     }
 }
 
+impl Div<Vec2> for Vec2 {
+    type Output = Vec2;
+    fn div(self, rhs: Vec2) -> Self::Output {
+        Self::Output { x: self.x / rhs.x, y: self.y / rhs.y }
+    }
+}
+
 impl Neg for Vec2 {
     type Output = Self;
     fn neg(self) -> Self::Output {

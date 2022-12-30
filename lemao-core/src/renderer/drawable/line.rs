@@ -128,6 +128,14 @@ impl Drawable for Line {
         self.rotation += delta;
     }
 
+    fn get_size(&self) -> Vec2 {
+        self.size
+    }
+
+    fn set_size(&mut self, size: Vec2) {
+        self.size = size;
+    }
+
     fn get_anchor(&self) -> Vec2 {
         panic!("Line doesn't support anchor property");
     }
