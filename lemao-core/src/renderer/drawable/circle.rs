@@ -29,7 +29,7 @@ pub struct Circle {
     color: Color,
     sides: u32,
     angle: f32,
-    thickness: f32,
+    thickness: Vec2,
     squircle_factor: f32,
     elements_count: u32,
     vertices: Vec<f32>,
@@ -55,7 +55,7 @@ impl Circle {
             color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             sides,
             angle: 2.0 * std::f32::consts::PI,
-            thickness: 1.0,
+            thickness: Vec2::new(1.0, 1.0),
             squircle_factor: 0.0,
             elements_count: 0,
             vertices: Vec::new(),
@@ -117,11 +117,11 @@ impl Circle {
         self.update();
     }
 
-    pub fn get_thickness(&self) -> f32 {
+    pub fn get_thickness(&self) -> Vec2 {
         self.thickness
     }
 
-    pub fn set_thickness(&mut self, thickness: f32) {
+    pub fn set_thickness(&mut self, thickness: Vec2) {
         self.thickness = thickness;
         self.update();
     }
@@ -158,7 +158,7 @@ impl Circle {
 
                 let position = Vec2::new(x, y);
                 let outer_position = position * radius;
-                let inner_position = position * (radius - Vec2::new(self.thickness, self.thickness));
+                let inner_position = position * (radius - self.thickness);
                 let outer_uv = outer_position / radius * Vec2::new(0.5, 0.5) + Vec2::new(0.5, 0.5);
                 let inner_uv = inner_position / radius * Vec2::new(0.5, 0.5) + Vec2::new(0.5, 0.5);
                 let outer_position = outer_position + radius;

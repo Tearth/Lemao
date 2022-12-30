@@ -61,9 +61,9 @@ pub fn main() -> Result<(), String> {
                 InputEvent::MouseWheelRotated(direction) => {
                     let circle = renderer.get_drawable_with_type_mut::<Circle>(circle_id)?;
                     if direction == MouseWheelDirection::Up {
-                        circle.set_thickness(circle.get_thickness() + 1.0);
+                        circle.set_thickness(circle.get_thickness() + Vec2::new(1.0, 1.0));
                     } else {
-                        circle.set_thickness(circle.get_thickness() - 1.0);
+                        circle.set_thickness(circle.get_thickness() - Vec2::new(1.0, 1.0));
                     }
                 }
                 InputEvent::WindowSizeChanged(size) => {
