@@ -6,7 +6,6 @@ use std::any::Any;
 pub mod button;
 pub mod canvas;
 pub mod image;
-pub mod image_button;
 pub mod label;
 pub mod panel;
 

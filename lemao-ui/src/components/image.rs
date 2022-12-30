@@ -185,10 +185,10 @@ impl Component for Image {
         let texture_storage_lock = texture_storage.lock().unwrap();
 
         let sprite = renderer.get_drawable_with_type_mut::<Rectangle>(self.sprite_id)?;
+        sprite.set_texture(texture_storage_lock.get(self.texture_id)?);
         sprite.set_position(self.screen_position);
         sprite.set_size(self.screen_size);
         sprite.set_color(self.color.clone());
-        sprite.set_texture(texture_storage_lock.get(self.texture_id)?);
 
         Ok(())
     }

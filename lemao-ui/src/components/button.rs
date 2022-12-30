@@ -33,6 +33,7 @@ pub struct Button {
     label_horizontal_alignment: HorizontalAlignment,
     label_vertical_alignment: VerticalAlignment,
     label_offset: Vec2,
+    texture_id: Option<usize>,
     filling_rectangle_id: usize,
     border_frame_id: usize,
     label_id: usize,
@@ -58,6 +59,7 @@ impl Button {
             label_horizontal_alignment: HorizontalAlignment::Middle,
             label_vertical_alignment: VerticalAlignment::Middle,
             label_offset: Default::default(),
+            texture_id: None,
             filling_rectangle_id: renderer.create_rectangle()?,
             border_frame_id: renderer.create_frame(Vec2::new(100.0, 100.0))?,
             label_id: renderer.create_text(label_font_id)?,
@@ -131,6 +133,14 @@ impl Button {
 
     pub fn set_label_offset(&mut self, label_offset: Vec2) {
         self.label_offset = label_offset;
+    }
+
+    pub fn get_texture_id(&self) -> Option<usize> {
+        self.texture_id
+    }
+
+    pub fn set_texture_id(&mut self, texture_id: usize) {
+        self.texture_id = Some(texture_id);
     }
 }
 
@@ -230,6 +240,16 @@ impl Component for Button {
         filling_rectangle.set_position(self.screen_position);
         filling_rectangle.set_size(self.screen_size);
         filling_rectangle.set_color(self.color.clone());
+
+        if let Some(texture_id) = self.texture_id {
+            let texture_storage = renderer.get_textures();
+            let texture_storage_lock = texture_storage.lock().unwrap();
+            let texture = texture_storage_lock.get(texture_id)?;
+
+            renderer.get_drawable_with_type_mut::<Rectangle>(self.filling_rectangle_id)?.set_texture(texture);
+        }
+
+        renderer.get_drawable_with_type_mut::<Rectangle>(self.filling_rectangle_id)?.set_size(self.screen_size);
 
         let font_storage = renderer.get_fonts();
         let font_storage_lock = font_storage.lock().unwrap();
