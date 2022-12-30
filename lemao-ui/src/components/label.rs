@@ -6,6 +6,7 @@ use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::context::RendererContext;
 use lemao_core::renderer::drawable::text::Text;
+use lemao_core::renderer::drawable::Color;
 use lemao_core::renderer::drawable::Drawable;
 use std::any::Any;
 
@@ -19,7 +20,7 @@ pub struct Label {
     anchor: Vec2,
     margin: ComponentMargin,
     offset: Vec2,
-    color: SolidColor,
+    color: Color,
     multiline: bool,
     max_multiline_width: f32,
     label_font_id: usize,
@@ -40,7 +41,7 @@ impl Label {
             anchor: Default::default(),
             margin: Default::default(),
             offset: Default::default(),
-            color: SolidColor::new(1.0, 1.0, 1.0, 1.0),
+            color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             multiline: false,
             max_multiline_width: 0.0,
             label_font_id,
@@ -53,14 +54,6 @@ impl Label {
 
     pub fn get_id(&self) -> usize {
         self.id
-    }
-
-    pub fn get_color(&self) -> SolidColor {
-        self.color
-    }
-
-    pub fn set_color(&mut self, color: SolidColor) {
-        self.color = color;
     }
 
     pub fn get_font_id(&self) -> usize {
@@ -142,6 +135,14 @@ impl Component for Label {
 
     fn set_offset(&mut self, offset: Vec2) {
         self.offset = offset;
+    }
+
+    fn get_color(&self) -> &Color {
+        &self.color
+    }
+
+    fn set_color(&mut self, color: Color) {
+        self.color = color;
     }
 
     fn add_child(&mut self, component_id: usize) {

@@ -4,6 +4,7 @@ use super::ComponentPosition;
 use super::ComponentSize;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::context::RendererContext;
+use lemao_core::renderer::drawable::Color;
 use std::any::Any;
 
 pub struct Canvas {
@@ -86,6 +87,14 @@ impl Component for Canvas {
 
     fn set_offset(&mut self, offset: Vec2) {
         self.offset = offset;
+    }
+
+    fn get_color(&self) -> &Color {
+        panic!("Not supported")
+    }
+
+    fn set_color(&mut self, color: Color) {
+        panic!("Not supported")
     }
 
     fn add_child(&mut self, component_id: usize) {

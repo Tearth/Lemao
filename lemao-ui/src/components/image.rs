@@ -56,14 +56,6 @@ impl Image {
         self.id
     }
 
-    pub fn get_color(&self) -> &Color {
-        &self.color
-    }
-
-    pub fn set_color(&mut self, color: Color) {
-        self.color = color;
-    }
-
     pub fn get_border_thickness(&self) -> ComponentBorderThickness {
         self.border_thickness
     }
@@ -136,6 +128,14 @@ impl Component for Image {
 
     fn set_offset(&mut self, offset: Vec2) {
         self.offset = offset;
+    }
+
+    fn get_color(&self) -> &Color {
+        &self.color
+    }
+
+    fn set_color(&mut self, color: Color) {
+        self.color = color;
     }
 
     fn add_child(&mut self, component_id: usize) {

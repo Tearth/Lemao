@@ -1,6 +1,7 @@
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::context::RendererContext;
 use lemao_core::renderer::drawable::frame::FrameThickness;
+use lemao_core::renderer::drawable::Color;
 use std::any::Any;
 
 pub mod button;
@@ -69,6 +70,9 @@ pub trait Component {
     fn get_offset(&self) -> Vec2;
     fn set_offset(&mut self, offset: Vec2);
 
+    fn get_color(&self) -> &Color;
+    fn set_color(&mut self, color: Color);
+
     fn add_child(&mut self, component_id: usize);
     fn remove_child(&mut self, component_id: usize);
     fn get_children(&self) -> &Vec<usize>;
@@ -101,6 +105,10 @@ impl ComponentMargin {
 impl ComponentBorderThickness {
     pub fn new(top: f32, bottom: f32, right: f32, left: f32) -> Self {
         Self { top, bottom, right, left }
+    }
+
+    pub fn is_axially_uniform(&self) -> bool {
+        self.top == self.bottom && self.left == self.right
     }
 }
 
