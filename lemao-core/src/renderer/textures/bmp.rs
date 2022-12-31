@@ -33,17 +33,25 @@ pub fn load(path: &str) -> Result<RawTexture, String> {
     let compression_method = binary::read_le_u32(&bmp, 30);
 
     let mut data = Vec::new();
+    let mut data_index = data_address;
+
     match compression_method {
         0 => {
-            for i in 0..(width * height) {
-                let b = binary::read_u8(&bmp, ((data_address + i * 3) + 0) as usize);
-                let g = binary::read_u8(&bmp, ((data_address + i * 3) + 1) as usize);
-                let r = binary::read_u8(&bmp, ((data_address + i * 3) + 2) as usize);
+            for _ in 0..height {
+                for _ in 0..width {
+                    let b = binary::read_u8(&bmp, (data_index + 0) as usize);
+                    let g = binary::read_u8(&bmp, (data_index + 1) as usize);
+                    let r = binary::read_u8(&bmp, (data_index + 2) as usize);
 
-                data.push(r);
-                data.push(g);
-                data.push(b);
-                data.push(0xff);
+                    data.push(r);
+                    data.push(g);
+                    data.push(b);
+                    data.push(0xff);
+
+                    data_index += 3;
+                }
+
+                data_index += (data_index - data_address) % 4;
             }
         }
         3 => {
