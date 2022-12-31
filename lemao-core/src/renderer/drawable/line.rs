@@ -155,7 +155,7 @@ impl Drawable for Line {
     fn get_transformation_matrix(&self) -> Mat4x4 {
         let translation = Mat4x4::translate(Vec3::from(self.position + Vec2::new(0.5, 0.5)));
         let anchor_offset = Mat4x4::translate(Vec3::new(0.0, -0.5, 0.0));
-        let scale = Mat4x4::scale(Vec3::from(self.scale * self.size));
+        let scale = Mat4x4::scale(Vec3::from(self.scale * self.size).floor());
         let rotation = Mat4x4::rotate(self.rotation);
         translation * rotation * anchor_offset * scale
     }

@@ -20,6 +20,10 @@ impl Vec3 {
         Self { x, y, z }
     }
 
+    pub fn floor(&self) -> Vec3 {
+        Vec3::new(self.x.floor(), self.y.floor(), self.z.floor())
+    }
+
     pub fn as_ptr(&self) -> *const f32 {
         self as *const _ as *const f32
     }

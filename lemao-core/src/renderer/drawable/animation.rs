@@ -258,7 +258,7 @@ impl Drawable for Animation {
     fn get_transformation_matrix(&self) -> Mat4x4 {
         let translation = Mat4x4::translate(Vec3::from(self.position));
         let anchor_offset = Mat4x4::translate(-Vec3::from(self.anchor));
-        let scale = Mat4x4::scale(Vec3::from(self.scale * self.size));
+        let scale = Mat4x4::scale(Vec3::from(self.scale * self.size).floor());
         let rotation = Mat4x4::rotate(self.rotation);
         translation * rotation * scale * anchor_offset
     }
