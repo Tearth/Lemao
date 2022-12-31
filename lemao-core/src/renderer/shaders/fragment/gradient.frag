@@ -5,6 +5,7 @@ out vec4 FragColor;
 
 uniform int gradientPatternType;
 uniform int gradientStepsCount;
+uniform vec2 gradientOffset;
 uniform float gradientSteps[16];
 uniform vec4 gradientColors[16];
 
@@ -20,25 +21,25 @@ void main()
         // Horizontal
         case 0:
         {
-            phase = TexCoord.x;
+            phase = TexCoord.x + gradientOffset.x;
             break;
         }
         // Vertical
         case 1:
         {
-            phase = TexCoord.y;
+            phase = TexCoord.y + gradientOffset.y;
             break;
         }
         // Radial
         case 2:
         {
-            phase = length(TexCoord * 2 - 1);
+            phase = length((TexCoord + gradientOffset) * 2 - 1);
             break;
         }
         // Rectangular
         case 3:
         {
-            phase = max(abs(TexCoord.x * 2  - 1), abs(TexCoord.y * 2  - 1));
+            phase = max(abs((TexCoord.x + gradientOffset.x) * 2  - 1), abs((TexCoord.y + gradientOffset.y) * 2  - 1));
             break;
         }
     }

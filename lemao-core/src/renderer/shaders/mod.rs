@@ -140,6 +140,9 @@ impl Shader {
                 opengl::GL_FLOAT => {
                     (self.gl.glUniform1f)(parameter.location as i32, (*data).into());
                 }
+                opengl::GL_FLOAT_VEC2 => {
+                    (self.gl.glUniform2fv)(parameter.location as i32, 1, data as *const f32);
+                }
                 opengl::GL_FLOAT_VEC4 => {
                     (self.gl.glUniform4fv)(parameter.location as i32, 1, data as *const f32);
                 }
@@ -161,6 +164,7 @@ impl Shader {
             Color::Gradient(gradient) => {
                 self.set_parameter("gradientPatternType", &(gradient.r#type as u32 as f32))?;
                 self.set_parameter("gradientStepsCount", &(gradient.steps.len() as f32))?;
+                self.set_parameter("gradientOffset", gradient.offset.as_ptr() as *const f32)?;
 
                 for (index, step) in gradient.steps.iter().enumerate() {
                     self.set_parameter(&format!("gradientSteps[{}]", index), &step.step)?;

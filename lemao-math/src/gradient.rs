@@ -1,8 +1,10 @@
 use crate::color::SolidColor;
+use crate::vec2::Vec2;
 
 #[derive(Clone, PartialEq)]
 pub struct Gradient {
     pub r#type: GradientType,
+    pub offset: Vec2,
     pub steps: Vec<GradientStep>,
 }
 
@@ -21,8 +23,8 @@ pub struct GradientStep {
 }
 
 impl Gradient {
-    pub fn new(r#type: GradientType) -> Self {
-        Self { r#type, steps: Default::default() }
+    pub fn new(r#type: GradientType, offset: Vec2) -> Self {
+        Self { r#type, offset, steps: Default::default() }
     }
 }
 

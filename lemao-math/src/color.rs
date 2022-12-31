@@ -12,7 +12,11 @@ pub struct SolidColor {
 
 impl SolidColor {
     pub fn new(r: f32, g: f32, b: f32, a: f32) -> Self {
-        SolidColor { r, g, b, a }
+        Self { r, g, b, a }
+    }
+
+    pub fn new_rgb(r: u8, g: u8, b: u8, a: u8) -> Self {
+        Self { r: (r as f32) / 255.0, g: (g as f32) / 255.0, b: (b as f32) / 255.0, a: (a as f32) / 255.0 }
     }
 
     pub fn as_ptr(&self) -> *const f32 {
