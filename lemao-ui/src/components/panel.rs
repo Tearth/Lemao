@@ -9,6 +9,7 @@ use lemao_core::renderer::context::RendererContext;
 use lemao_core::renderer::drawable::circle::Circle;
 use lemao_core::renderer::drawable::disc::Disc;
 use lemao_core::renderer::drawable::frame::Frame;
+use lemao_core::renderer::drawable::rectangle::Rectangle;
 use lemao_core::renderer::drawable::Color;
 use std::any::Any;
 
@@ -27,8 +28,9 @@ pub struct Panel {
     border_thickness: ComponentBorderThickness,
     border_color: Color,
     roundness_factor: f32,
-    filling_rectangle_id: usize,
-    border_frame_id: usize,
+    texture_id: Option<usize>,
+    filling_id: usize,
+    border_id: usize,
     children: Vec<usize>,
 }
 
@@ -54,11 +56,12 @@ impl Panel {
             border_thickness: Default::default(),
             border_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             roundness_factor: 1.0,
-            filling_rectangle_id: match shape {
+            texture_id: None,
+            filling_id: match shape {
                 PanelShape::Rectangle => renderer.create_rectangle()?,
                 PanelShape::Disc => renderer.create_disc(0.0, 512)?,
             },
-            border_frame_id: match shape {
+            border_id: match shape {
                 PanelShape::Rectangle => renderer.create_frame(Default::default())?,
                 PanelShape::Disc => renderer.create_circle(0.0, 512)?,
             },
@@ -110,6 +113,14 @@ impl Panel {
 
         self.roundness_factor = roundness_factor;
         Ok(())
+    }
+
+    pub fn get_texture_id(&self) -> Option<usize> {
+        self.texture_id
+    }
+
+    pub fn set_texture_id(&mut self, texture_id: usize) {
+        self.texture_id = Some(texture_id);
     }
 }
 
@@ -200,15 +211,15 @@ impl Component for Panel {
         self.screen_position = self.screen_position.floor();
 
         if self.border_thickness != Default::default() {
-            let border_rectangle = renderer.get_drawable_mut(self.border_frame_id)?;
+            let border_rectangle = renderer.get_drawable_mut(self.border_id)?;
             border_rectangle.set_position(self.screen_position);
             border_rectangle.set_size(self.screen_size);
             border_rectangle.set_color(self.border_color.clone());
 
             match self.shape {
-                PanelShape::Rectangle => renderer.get_drawable_with_type_mut::<Frame>(self.border_frame_id)?.set_thickness(self.border_thickness.into()),
+                PanelShape::Rectangle => renderer.get_drawable_with_type_mut::<Frame>(self.border_id)?.set_thickness(self.border_thickness.into()),
                 PanelShape::Disc => renderer
-                    .get_drawable_with_type_mut::<Circle>(self.border_frame_id)?
+                    .get_drawable_with_type_mut::<Circle>(self.border_id)?
                     .set_thickness(Vec2::new(self.border_thickness.left, self.border_thickness.top)),
             }
 
@@ -219,24 +230,36 @@ impl Component for Panel {
             self.screen_position = self.screen_position.floor();
         }
 
-        let filling_rectangle = renderer.get_drawable_mut(self.filling_rectangle_id)?;
+        let filling_rectangle = renderer.get_drawable_mut(self.filling_id)?;
         filling_rectangle.set_position(self.screen_position);
-        filling_rectangle.set_size(self.screen_size);
         filling_rectangle.set_color(self.color.clone());
 
+        if let Some(texture_id) = self.texture_id {
+            let texture_storage = renderer.get_textures();
+            let texture_storage_lock = texture_storage.lock().unwrap();
+            let texture = texture_storage_lock.get(texture_id)?;
+
+            match self.shape {
+                PanelShape::Rectangle => renderer.get_drawable_with_type_mut::<Rectangle>(self.filling_id)?.set_texture(texture),
+                PanelShape::Disc => renderer.get_drawable_with_type_mut::<Disc>(self.filling_id)?.set_texture(texture),
+            }
+        }
+
+        renderer.get_drawable_mut(self.filling_id)?.set_size(self.screen_size);
+
         if self.shape == PanelShape::Disc {
-            renderer.get_drawable_with_type_mut::<Disc>(self.filling_rectangle_id)?.set_squircle_factor(1.0 - self.roundness_factor);
-            renderer.get_drawable_with_type_mut::<Circle>(self.border_frame_id)?.set_squircle_factor(1.0 - self.roundness_factor);
+            renderer.get_drawable_with_type_mut::<Disc>(self.filling_id)?.set_squircle_factor(1.0 - self.roundness_factor);
+            renderer.get_drawable_with_type_mut::<Circle>(self.border_id)?.set_squircle_factor(1.0 - self.roundness_factor);
         }
 
         Ok(())
     }
 
     fn draw(&mut self, renderer: &mut RendererContext) -> Result<(), String> {
-        renderer.draw(self.filling_rectangle_id)?;
+        renderer.draw(self.filling_id)?;
 
         if self.border_thickness != Default::default() {
-            renderer.draw(self.border_frame_id)?;
+            renderer.draw(self.border_id)?;
         }
 
         Ok(())

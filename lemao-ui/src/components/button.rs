@@ -238,7 +238,6 @@ impl Component for Button {
 
         let filling_rectangle = renderer.get_drawable_with_type_mut::<Rectangle>(self.filling_rectangle_id)?;
         filling_rectangle.set_position(self.screen_position);
-        filling_rectangle.set_size(self.screen_size);
         filling_rectangle.set_color(self.color.clone());
 
         if let Some(texture_id) = self.texture_id {
