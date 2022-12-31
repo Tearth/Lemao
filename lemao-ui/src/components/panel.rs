@@ -12,6 +12,7 @@ use lemao_core::renderer::drawable::disc::Disc;
 use lemao_core::renderer::drawable::frame::Frame;
 use lemao_core::renderer::drawable::rectangle::Rectangle;
 use lemao_core::renderer::drawable::Color;
+use lemao_core::renderer::textures::Texture;
 use std::any::Any;
 
 pub struct Panel {
@@ -30,6 +31,7 @@ pub struct Panel {
     border_color: Color,
     roundness_factor: f32,
     texture_id: Option<usize>,
+    texture_original_size: Vec2,
     filling_id: usize,
     border_id: usize,
     children: Vec<usize>,
@@ -52,6 +54,7 @@ impl Panel {
             border_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             roundness_factor: 1.0,
             texture_id: None,
+            texture_original_size: Default::default(),
             filling_id: match shape {
                 ComponentShape::Rectangle => renderer.create_rectangle()?,
                 ComponentShape::Disc => renderer.create_disc(0.0, 512)?,
@@ -110,8 +113,10 @@ impl Panel {
         self.texture_id
     }
 
-    pub fn set_texture_id(&mut self, texture_id: usize) {
-        self.texture_id = Some(texture_id);
+    pub fn set_texture_id(&mut self, texture: &Texture) {
+        self.texture_id = Some(texture.get_id());
+        self.texture_original_size = texture.get_size();
+        self.size = ComponentSize::Absolute(texture.get_size());
     }
 }
 
@@ -189,6 +194,12 @@ impl Component for Panel {
             ComponentSize::Absolute(size) => size,
             ComponentSize::Relative(size) => area_size * size,
         };
+
+        if self.screen_size.x.is_nan() {
+            self.screen_size.x = (self.texture_original_size.x / self.texture_original_size.y) * self.screen_size.y;
+        } else if self.screen_size.y.is_nan() {
+            self.screen_size.y = (self.texture_original_size.y / self.texture_original_size.x) * self.screen_size.x;
+        }
 
         self.screen_position = match self.position {
             ComponentPosition::AbsoluteToParent(position) => area_position + position,

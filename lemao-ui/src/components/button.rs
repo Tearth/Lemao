@@ -16,6 +16,8 @@ use lemao_core::renderer::drawable::rectangle::Rectangle;
 use lemao_core::renderer::drawable::text::Text;
 use lemao_core::renderer::drawable::Color;
 use lemao_core::renderer::drawable::Drawable;
+use lemao_core::renderer::textures;
+use lemao_core::renderer::textures::Texture;
 use std::any::Any;
 
 pub struct Button {
@@ -39,6 +41,7 @@ pub struct Button {
     label_vertical_alignment: VerticalAlignment,
     label_offset: Vec2,
     texture_id: Option<usize>,
+    texture_original_size: Vec2,
     filling_id: usize,
     border_id: usize,
     label_id: usize,
@@ -67,6 +70,7 @@ impl Button {
             label_vertical_alignment: VerticalAlignment::Middle,
             label_offset: Default::default(),
             texture_id: None,
+            texture_original_size: Default::default(),
             filling_id: match shape {
                 ComponentShape::Rectangle => renderer.create_rectangle()?,
                 ComponentShape::Disc => renderer.create_disc(0.0, 512)?,
@@ -166,8 +170,10 @@ impl Button {
         self.texture_id
     }
 
-    pub fn set_texture_id(&mut self, texture_id: usize) {
-        self.texture_id = Some(texture_id);
+    pub fn set_texture_id(&mut self, texture: &Texture) {
+        self.texture_id = Some(texture.get_id());
+        self.texture_original_size = texture.get_size();
+        self.size = ComponentSize::Absolute(texture.get_size());
     }
 }
 
@@ -245,6 +251,12 @@ impl Component for Button {
             ComponentSize::Absolute(size) => size,
             ComponentSize::Relative(size) => area_size * size,
         };
+
+        if self.screen_size.x.is_nan() {
+            self.screen_size.x = (self.texture_original_size.x / self.texture_original_size.y) * self.screen_size.y;
+        } else if self.screen_size.y.is_nan() {
+            self.screen_size.y = (self.texture_original_size.y / self.texture_original_size.x) * self.screen_size.x;
+        }
 
         self.screen_position = match self.position {
             ComponentPosition::AbsoluteToParent(position) => area_position + position,

@@ -200,6 +200,7 @@ impl Component for Label {
         label.set_text(&self.label_text);
         label.set_position(self.screen_position);
         label.set_anchor(self.anchor);
+        label.set_color(self.color.clone());
 
         Ok(())
     }
