@@ -2,12 +2,15 @@ use super::Component;
 use super::ComponentBorderThickness;
 use super::ComponentMargin;
 use super::ComponentPosition;
+use super::ComponentShape;
 use super::ComponentSize;
 use super::HorizontalAlignment;
 use super::VerticalAlignment;
 use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::context::RendererContext;
+use lemao_core::renderer::drawable::circle::Circle;
+use lemao_core::renderer::drawable::disc::Disc;
 use lemao_core::renderer::drawable::frame::Frame;
 use lemao_core::renderer::drawable::rectangle::Rectangle;
 use lemao_core::renderer::drawable::text::Text;
@@ -22,46 +25,56 @@ pub struct Button {
     screen_position: Vec2,
     size: ComponentSize,
     screen_size: Vec2,
+    shape: ComponentShape,
     anchor: Vec2,
     margin: ComponentMargin,
     offset: Vec2,
     color: Color,
     border_thickness: ComponentBorderThickness,
     border_color: Color,
+    roundness_factor: f32,
     label_font_id: usize,
     label_text: String,
     label_horizontal_alignment: HorizontalAlignment,
     label_vertical_alignment: VerticalAlignment,
     label_offset: Vec2,
     texture_id: Option<usize>,
-    filling_rectangle_id: usize,
-    border_frame_id: usize,
+    filling_id: usize,
+    border_id: usize,
     label_id: usize,
     children: Vec<usize>,
 }
 
 impl Button {
-    pub fn new(id: usize, renderer: &mut RendererContext, label_font_id: usize) -> Result<Self, String> {
+    pub fn new(id: usize, renderer: &mut RendererContext, shape: ComponentShape, label_font_id: usize) -> Result<Self, String> {
         Ok(Self {
             id,
             position: ComponentPosition::AbsoluteToParent(Default::default()),
             screen_position: Default::default(),
             size: ComponentSize::Absolute(Default::default()),
             screen_size: Default::default(),
+            shape,
             anchor: Default::default(),
             margin: Default::default(),
             offset: Default::default(),
             color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             border_thickness: Default::default(),
             border_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
+            roundness_factor: 1.0,
             label_font_id,
             label_text: Default::default(),
             label_horizontal_alignment: HorizontalAlignment::Middle,
             label_vertical_alignment: VerticalAlignment::Middle,
             label_offset: Default::default(),
             texture_id: None,
-            filling_rectangle_id: renderer.create_rectangle()?,
-            border_frame_id: renderer.create_frame(Vec2::new(100.0, 100.0))?,
+            filling_id: match shape {
+                ComponentShape::Rectangle => renderer.create_rectangle()?,
+                ComponentShape::Disc => renderer.create_disc(0.0, 512)?,
+            },
+            border_id: match shape {
+                ComponentShape::Rectangle => renderer.create_frame(Default::default())?,
+                ComponentShape::Disc => renderer.create_circle(0.0, 512)?,
+            },
             label_id: renderer.create_text(label_font_id)?,
             children: Default::default(),
         })
@@ -71,12 +84,21 @@ impl Button {
         self.id
     }
 
+    pub fn get_shape(&self) -> ComponentShape {
+        self.shape
+    }
+
     pub fn get_border_thickness(&self) -> ComponentBorderThickness {
         self.border_thickness
     }
 
-    pub fn set_border_thickness(&mut self, border_thickness: ComponentBorderThickness) {
+    pub fn set_border_thickness(&mut self, border_thickness: ComponentBorderThickness) -> Result<(), String> {
+        if self.shape == ComponentShape::Rectangle && !self.border_thickness.is_axially_uniform() {
+            return Err("Not supported".to_string());
+        }
+
         self.border_thickness = border_thickness;
+        Ok(())
     }
 
     pub fn get_border_color(&self) -> &Color {
@@ -85,6 +107,19 @@ impl Button {
 
     pub fn set_border_color(&mut self, border_color: Color) {
         self.border_color = border_color;
+    }
+
+    pub fn get_roundness_factor(&self) -> f32 {
+        self.roundness_factor
+    }
+
+    pub fn set_roundness_factor(&mut self, roundness_factor: f32) -> Result<(), String> {
+        if self.shape == ComponentShape::Rectangle {
+            return Err("Not supported".to_string());
+        }
+
+        self.roundness_factor = roundness_factor;
+        Ok(())
     }
 
     pub fn get_font_id(&self) -> usize {
@@ -223,11 +258,17 @@ impl Component for Button {
         self.screen_size -= Vec2::new(self.margin.left + self.margin.right, self.margin.bottom + self.margin.top);
 
         if self.border_thickness != Default::default() {
-            let border_rectangle = renderer.get_drawable_with_type_mut::<Frame>(self.border_frame_id)?;
+            let border_rectangle = renderer.get_drawable_mut(self.border_id)?;
             border_rectangle.set_position(self.screen_position);
             border_rectangle.set_size(self.screen_size);
-            border_rectangle.set_thickness(self.border_thickness.into());
             border_rectangle.set_color(self.border_color.clone());
+
+            match self.shape {
+                ComponentShape::Rectangle => renderer.get_drawable_with_type_mut::<Frame>(self.border_id)?.set_thickness(self.border_thickness.into()),
+                ComponentShape::Disc => renderer
+                    .get_drawable_with_type_mut::<Circle>(self.border_id)?
+                    .set_thickness(Vec2::new(self.border_thickness.left, self.border_thickness.top)),
+            }
 
             self.screen_position += Vec2::new(self.border_thickness.left, self.border_thickness.bottom);
             self.screen_size -= Vec2::new(self.border_thickness.left + self.border_thickness.right, self.border_thickness.top + self.border_thickness.bottom);
@@ -236,7 +277,7 @@ impl Component for Button {
             self.screen_position = self.screen_position.floor();
         }
 
-        let filling_rectangle = renderer.get_drawable_with_type_mut::<Rectangle>(self.filling_rectangle_id)?;
+        let filling_rectangle = renderer.get_drawable_mut(self.filling_id)?;
         filling_rectangle.set_position(self.screen_position);
         filling_rectangle.set_color(self.color.clone());
 
@@ -245,10 +286,18 @@ impl Component for Button {
             let texture_storage_lock = texture_storage.lock().unwrap();
             let texture = texture_storage_lock.get(texture_id)?;
 
-            renderer.get_drawable_with_type_mut::<Rectangle>(self.filling_rectangle_id)?.set_texture(texture);
+            match self.shape {
+                ComponentShape::Rectangle => renderer.get_drawable_with_type_mut::<Rectangle>(self.filling_id)?.set_texture(texture),
+                ComponentShape::Disc => renderer.get_drawable_with_type_mut::<Disc>(self.filling_id)?.set_texture(texture),
+            }
         }
 
-        renderer.get_drawable_with_type_mut::<Rectangle>(self.filling_rectangle_id)?.set_size(self.screen_size);
+        renderer.get_drawable_mut(self.filling_id)?.set_size(self.screen_size);
+
+        if self.shape == ComponentShape::Disc {
+            renderer.get_drawable_with_type_mut::<Disc>(self.filling_id)?.set_squircle_factor(1.0 - self.roundness_factor);
+            renderer.get_drawable_with_type_mut::<Circle>(self.border_id)?.set_squircle_factor(1.0 - self.roundness_factor);
+        }
 
         let font_storage = renderer.get_fonts();
         let font_storage_lock = font_storage.lock().unwrap();
@@ -276,14 +325,32 @@ impl Component for Button {
     }
 
     fn draw(&mut self, renderer: &mut RendererContext) -> Result<(), String> {
-        renderer.draw(self.filling_rectangle_id)?;
+        renderer.draw(self.filling_id)?;
         renderer.draw(self.label_id)?;
 
         if self.border_thickness != Default::default() {
-            renderer.draw(self.border_frame_id)?;
+            renderer.draw(self.border_id)?;
         }
 
         Ok(())
+    }
+
+    fn is_point_inside(&self, point: Vec2) -> bool {
+        if self.shape == ComponentShape::Rectangle || (self.shape == ComponentShape::Disc && self.roundness_factor < 0.8) {
+            let x1 = self.screen_position.x;
+            let y1 = self.screen_position.y;
+            let x2 = self.screen_position.x + self.screen_size.x;
+            let y2 = self.screen_position.y + self.screen_size.y;
+
+            point.x >= x1 && point.y >= y1 && point.x <= x2 && point.y <= y2
+        } else {
+            let scale = self.screen_size.x / self.screen_size.y;
+            let component_center = self.screen_position + self.screen_size / 2.0;
+            let normalized_point = point - component_center;
+            let scaled_point = normalized_point * Vec2::new(1.0, scale);
+
+            scaled_point.distance(Vec2::new(0.0, 0.0)) <= self.screen_size.x / 2.0
+        }
     }
 
     fn as_any(&self) -> &dyn Any {

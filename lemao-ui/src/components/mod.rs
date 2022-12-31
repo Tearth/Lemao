@@ -21,6 +21,12 @@ pub enum ComponentSize {
     Relative(Vec2),
 }
 
+#[derive(Copy, Clone, Debug, PartialEq)]
+pub enum ComponentShape {
+    Rectangle,
+    Disc,
+}
+
 #[derive(Copy, Clone, Debug, Default)]
 pub struct ComponentMargin {
     pub top: f32,
@@ -79,17 +85,7 @@ pub trait Component {
     fn update(&mut self, renderer: &mut RendererContext, area_position: Vec2, area_size: Vec2) -> Result<(), String>;
     fn draw(&mut self, renderer: &mut RendererContext) -> Result<(), String>;
 
-    fn is_point_inside(&self, point: Vec2) -> bool {
-        let component_position = self.get_work_area_position();
-        let component_size = self.get_work_area_size();
-
-        let x1 = component_position.x;
-        let y1 = component_position.y;
-        let x2 = component_position.x + component_size.x;
-        let y2 = component_position.y + component_size.y;
-
-        point.x >= x1 && point.y >= y1 && point.x <= x2 && point.y <= y2
-    }
+    fn is_point_inside(&self, point: Vec2) -> bool;
 
     fn as_any(&self) -> &dyn Any;
     fn as_any_mut(&mut self) -> &mut dyn Any;

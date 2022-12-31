@@ -2,6 +2,7 @@ use super::Component;
 use super::ComponentBorderThickness;
 use super::ComponentMargin;
 use super::ComponentPosition;
+use super::ComponentShape;
 use super::ComponentSize;
 use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
@@ -20,7 +21,7 @@ pub struct Panel {
     screen_position: Vec2,
     size: ComponentSize,
     screen_size: Vec2,
-    shape: PanelShape,
+    shape: ComponentShape,
     anchor: Vec2,
     margin: ComponentMargin,
     offset: Vec2,
@@ -34,14 +35,8 @@ pub struct Panel {
     children: Vec<usize>,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq)]
-pub enum PanelShape {
-    Rectangle,
-    Disc,
-}
-
 impl Panel {
-    pub fn new(id: usize, renderer: &mut RendererContext, shape: PanelShape) -> Result<Self, String> {
+    pub fn new(id: usize, renderer: &mut RendererContext, shape: ComponentShape) -> Result<Self, String> {
         Ok(Self {
             id,
             position: ComponentPosition::AbsoluteToParent(Default::default()),
@@ -58,12 +53,12 @@ impl Panel {
             roundness_factor: 1.0,
             texture_id: None,
             filling_id: match shape {
-                PanelShape::Rectangle => renderer.create_rectangle()?,
-                PanelShape::Disc => renderer.create_disc(0.0, 512)?,
+                ComponentShape::Rectangle => renderer.create_rectangle()?,
+                ComponentShape::Disc => renderer.create_disc(0.0, 512)?,
             },
             border_id: match shape {
-                PanelShape::Rectangle => renderer.create_frame(Default::default())?,
-                PanelShape::Disc => renderer.create_circle(0.0, 512)?,
+                ComponentShape::Rectangle => renderer.create_frame(Default::default())?,
+                ComponentShape::Disc => renderer.create_circle(0.0, 512)?,
             },
             children: Default::default(),
         })
@@ -73,12 +68,8 @@ impl Panel {
         self.id
     }
 
-    pub fn get_shape(&self) -> PanelShape {
+    pub fn get_shape(&self) -> ComponentShape {
         self.shape
-    }
-
-    pub fn set_shape(&mut self, shape: PanelShape) {
-        self.shape = shape;
     }
 
     pub fn get_border_thickness(&self) -> ComponentBorderThickness {
@@ -86,7 +77,7 @@ impl Panel {
     }
 
     pub fn set_border_thickness(&mut self, border_thickness: ComponentBorderThickness) -> Result<(), String> {
-        if self.shape == PanelShape::Rectangle && !self.border_thickness.is_axially_uniform() {
+        if self.shape == ComponentShape::Rectangle && !self.border_thickness.is_axially_uniform() {
             return Err("Not supported".to_string());
         }
 
@@ -107,7 +98,7 @@ impl Panel {
     }
 
     pub fn set_roundness_factor(&mut self, roundness_factor: f32) -> Result<(), String> {
-        if self.shape == PanelShape::Rectangle {
+        if self.shape == ComponentShape::Rectangle {
             return Err("Not supported".to_string());
         }
 
@@ -217,8 +208,8 @@ impl Component for Panel {
             border_rectangle.set_color(self.border_color.clone());
 
             match self.shape {
-                PanelShape::Rectangle => renderer.get_drawable_with_type_mut::<Frame>(self.border_id)?.set_thickness(self.border_thickness.into()),
-                PanelShape::Disc => renderer
+                ComponentShape::Rectangle => renderer.get_drawable_with_type_mut::<Frame>(self.border_id)?.set_thickness(self.border_thickness.into()),
+                ComponentShape::Disc => renderer
                     .get_drawable_with_type_mut::<Circle>(self.border_id)?
                     .set_thickness(Vec2::new(self.border_thickness.left, self.border_thickness.top)),
             }
@@ -240,14 +231,14 @@ impl Component for Panel {
             let texture = texture_storage_lock.get(texture_id)?;
 
             match self.shape {
-                PanelShape::Rectangle => renderer.get_drawable_with_type_mut::<Rectangle>(self.filling_id)?.set_texture(texture),
-                PanelShape::Disc => renderer.get_drawable_with_type_mut::<Disc>(self.filling_id)?.set_texture(texture),
+                ComponentShape::Rectangle => renderer.get_drawable_with_type_mut::<Rectangle>(self.filling_id)?.set_texture(texture),
+                ComponentShape::Disc => renderer.get_drawable_with_type_mut::<Disc>(self.filling_id)?.set_texture(texture),
             }
         }
 
         renderer.get_drawable_mut(self.filling_id)?.set_size(self.screen_size);
 
-        if self.shape == PanelShape::Disc {
+        if self.shape == ComponentShape::Disc {
             renderer.get_drawable_with_type_mut::<Disc>(self.filling_id)?.set_squircle_factor(1.0 - self.roundness_factor);
             renderer.get_drawable_with_type_mut::<Circle>(self.border_id)?.set_squircle_factor(1.0 - self.roundness_factor);
         }
@@ -266,7 +257,7 @@ impl Component for Panel {
     }
 
     fn is_point_inside(&self, point: Vec2) -> bool {
-        if self.shape == PanelShape::Rectangle || (self.shape == PanelShape::Disc && self.roundness_factor < 0.8) {
+        if self.shape == ComponentShape::Rectangle || (self.shape == ComponentShape::Disc && self.roundness_factor < 0.8) {
             let x1 = self.screen_position.x;
             let y1 = self.screen_position.y;
             let x2 = self.screen_position.x + self.screen_size.x;

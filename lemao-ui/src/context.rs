@@ -2,9 +2,9 @@ use crate::components::button::Button;
 use crate::components::canvas::Canvas;
 use crate::components::label::Label;
 use crate::components::panel::Panel;
-use crate::components::panel::PanelShape;
 use crate::components::Component;
 use crate::components::ComponentPosition;
+use crate::components::ComponentShape;
 use crate::components::ComponentSize;
 use crate::events::UiEvent;
 use lemao_core::lemao_common_platform::input::InputEvent;
@@ -115,9 +115,9 @@ impl UiContext {
         self.events.pop_front()
     }
 
-    pub fn create_button(&mut self, renderer: &mut RendererContext, label_font_id: usize) -> Result<usize, String> {
+    pub fn create_button(&mut self, renderer: &mut RendererContext, shape: ComponentShape, label_font_id: usize) -> Result<usize, String> {
         let id = self.components.len();
-        let button = Box::new(Button::new(id, renderer, label_font_id)?);
+        let button = Box::new(Button::new(id, renderer, shape, label_font_id)?);
         self.components.push(Some(button));
 
         Ok(id)
@@ -139,7 +139,7 @@ impl UiContext {
         Ok(id)
     }
 
-    pub fn create_panel(&mut self, renderer: &mut RendererContext, shape: PanelShape) -> Result<usize, String> {
+    pub fn create_panel(&mut self, renderer: &mut RendererContext, shape: ComponentShape) -> Result<usize, String> {
         let id = self.components.len();
         let panel = Box::new(Panel::new(id, renderer, shape)?);
         self.components.push(Some(panel));

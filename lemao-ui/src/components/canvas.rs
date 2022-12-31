@@ -130,6 +130,15 @@ impl Component for Canvas {
         Ok(())
     }
 
+    fn is_point_inside(&self, point: Vec2) -> bool {
+        let x1 = self.screen_position.x;
+        let y1 = self.screen_position.y;
+        let x2 = self.screen_position.x + self.screen_size.x;
+        let y2 = self.screen_position.y + self.screen_size.y;
+
+        point.x >= x1 && point.y >= y1 && point.x <= x2 && point.y <= y2
+    }
+
     fn as_any(&self) -> &dyn Any {
         self
     }
