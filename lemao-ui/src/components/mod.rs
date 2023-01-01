@@ -66,6 +66,11 @@ pub trait Component {
     fn get_work_area_size(&self) -> Vec2;
     fn set_size(&mut self, size: ComponentSize);
 
+    fn get_min_size(&self) -> Vec2;
+    fn set_min_size(&mut self, min_size: Vec2);
+    fn get_max_size(&self) -> Vec2;
+    fn set_max_size(&mut self, max_size: Vec2);
+
     fn get_anchor(&self) -> Vec2;
     fn set_anchor(&mut self, anchor: Vec2);
 

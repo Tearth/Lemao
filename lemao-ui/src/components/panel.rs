@@ -22,6 +22,8 @@ pub struct Panel {
     screen_position: Vec2,
     size: ComponentSize,
     screen_size: Vec2,
+    min_size: Vec2,
+    max_size: Vec2,
     shape: ComponentShape,
     anchor: Vec2,
     margin: ComponentMargin,
@@ -45,6 +47,8 @@ impl Panel {
             screen_position: Default::default(),
             size: ComponentSize::Absolute(Default::default()),
             screen_size: Default::default(),
+            min_size: Vec2::new(f32::MIN, f32::MIN),
+            max_size: Vec2::new(f32::MAX, f32::MAX),
             shape,
             anchor: Default::default(),
             margin: Default::default(),
@@ -145,6 +149,22 @@ impl Component for Panel {
         self.size = size;
     }
 
+    fn get_min_size(&self) -> Vec2 {
+        self.min_size
+    }
+
+    fn set_min_size(&mut self, min_size: Vec2) {
+        self.min_size = min_size;
+    }
+
+    fn get_max_size(&self) -> Vec2 {
+        self.max_size
+    }
+
+    fn set_max_size(&mut self, max_size: Vec2) {
+        self.max_size = max_size;
+    }
+
     fn get_anchor(&self) -> Vec2 {
         self.anchor
     }
@@ -200,6 +220,8 @@ impl Component for Panel {
         } else if self.screen_size.y.is_nan() {
             self.screen_size.y = (self.texture_original_size.y / self.texture_original_size.x) * self.screen_size.x;
         }
+
+        self.screen_size = self.screen_size.clamp(self.min_size, self.max_size);
 
         self.screen_position = match self.position {
             ComponentPosition::AbsoluteToParent(position) => area_position + position,

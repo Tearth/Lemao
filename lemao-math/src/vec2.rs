@@ -55,6 +55,10 @@ impl Vec2 {
         Vec2::new(self.x.floor(), self.y.floor())
     }
 
+    pub fn clamp(&self, floor: Vec2, ceil: Vec2) -> Vec2 {
+        Vec2::new(self.x.clamp(floor.x, ceil.x), self.y.clamp(floor.y, ceil.y))
+    }
+
     pub fn as_ptr(&self) -> *const f32 {
         self as *const _ as *const f32
     }
