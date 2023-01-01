@@ -40,6 +40,7 @@ pub struct Button {
     label_horizontal_alignment: HorizontalAlignment,
     label_vertical_alignment: VerticalAlignment,
     label_offset: Vec2,
+    label_color: Color,
     texture_id: Option<usize>,
     texture_original_size: Vec2,
     filling_id: usize,
@@ -69,6 +70,7 @@ impl Button {
             label_horizontal_alignment: HorizontalAlignment::Middle,
             label_vertical_alignment: VerticalAlignment::Middle,
             label_offset: Default::default(),
+            label_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             texture_id: None,
             texture_original_size: Default::default(),
             filling_id: match shape {
@@ -164,6 +166,14 @@ impl Button {
 
     pub fn set_label_offset(&mut self, label_offset: Vec2) {
         self.label_offset = label_offset;
+    }
+
+    pub fn get_label_color(&self) -> &Color {
+        &self.label_color
+    }
+
+    pub fn set_label_color(&mut self, label_color: Color) {
+        self.label_color = label_color;
     }
 
     pub fn get_texture_id(&self) -> Option<usize> {
@@ -317,6 +327,7 @@ impl Component for Button {
         let label = renderer.get_drawable_with_type_mut::<Text>(self.label_id)?;
         label.set_font(font);
         label.set_text(&self.label_text);
+        label.set_color(self.label_color.clone());
 
         let (horizontal_position, horizontal_anchor) = match self.label_horizontal_alignment {
             HorizontalAlignment::Left => (Vec2::new(self.screen_position.x, 0.0), Vec2::new(0.0, 0.0)),
