@@ -298,7 +298,10 @@ impl Component for Button {
         self.screen_size = self.screen_size.floor();
         self.screen_position = self.screen_position.floor();
 
-        self.screen_position += Vec2::new(self.margin.left, self.margin.bottom) + self.offset;
+        self.screen_position += Vec2::new(
+            self.margin.left * self.anchor.x - self.margin.right * (self.anchor.x - 1.0),
+            self.margin.bottom * (self.anchor.y - 1.0) - self.margin.top * self.anchor.y,
+        ) + self.offset;
         self.screen_size -= Vec2::new(self.margin.left + self.margin.right, self.margin.bottom + self.margin.top);
 
         if self.border_thickness != Default::default() {

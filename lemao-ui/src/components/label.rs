@@ -190,7 +190,10 @@ impl Component for Label {
             ComponentPosition::RelativeToParent(position) => area_position + (position * area_size),
         } - (self.screen_size * self.anchor);
 
-        self.screen_position += Vec2::new(self.margin.left, self.margin.bottom) + self.offset;
+        self.screen_position += Vec2::new(
+            self.margin.left * self.anchor.x - self.margin.right * (self.anchor.x - 1.0),
+            self.margin.bottom * (self.anchor.y - 1.0) - self.margin.top * self.anchor.y,
+        ) + self.offset;
         self.screen_size -= Vec2::new(self.margin.left + self.margin.right, self.margin.bottom + self.margin.top);
 
         self.screen_size = self.screen_size.floor();
