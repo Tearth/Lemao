@@ -1,7 +1,10 @@
+use crate::events::UiEvent;
+
 use super::Component;
 use super::ComponentMargin;
 use super::ComponentPosition;
 use super::ComponentSize;
+use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::context::RendererContext;
 use lemao_core::renderer::drawable::Color;
@@ -127,6 +130,39 @@ impl Component for Canvas {
 
     fn get_children(&self) -> &Vec<usize> {
         &self.children
+    }
+
+    fn process_window_event(&mut self, renderer: &mut RendererContext, event: &InputEvent) -> Vec<UiEvent> {
+        let mut events: Vec<UiEvent> = Default::default();
+
+        match event {
+            InputEvent::MouseMoved(cursor_position, previous_cursor_position) => {
+                if self.is_point_inside(*cursor_position) {
+                    if !self.is_point_inside(*previous_cursor_position) {
+                        events.push(UiEvent::CursorEnter(self.id, *cursor_position));
+                    }
+
+                    events.push(UiEvent::CursorOver(self.id, *cursor_position));
+                } else {
+                    if self.is_point_inside(*previous_cursor_position) {
+                        events.push(UiEvent::CursorLeave(self.id, *cursor_position));
+                    }
+                }
+            }
+            InputEvent::MouseButtonPressed(button, cursor_position) => {
+                if self.is_point_inside(*cursor_position) {
+                    events.push(UiEvent::MouseButtonPressed(self.id, *button));
+                }
+            }
+            InputEvent::MouseButtonReleased(button, cursor_position) => {
+                if self.is_point_inside(*cursor_position) {
+                    events.push(UiEvent::MouseButtonReleased(self.id, *button));
+                }
+            }
+            _ => {}
+        }
+
+        events
     }
 
     fn update(&mut self, _renderer: &mut RendererContext, area_position: Vec2, area_size: Vec2) -> Result<(), String> {

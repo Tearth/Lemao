@@ -36,76 +36,24 @@ impl UiContext {
     }
 
     pub fn process_window_event(&mut self, renderer: &mut RendererContext, event: &InputEvent) -> Result<(), String> {
-        match event {
-            InputEvent::WindowSizeChanged(size) => {
-                let ui_camera = renderer.get_camera_mut(self.ui_camera_id)?;
-                let main_canvas = self.get_component_mut(self.main_canvas_id)?;
+        if let InputEvent::WindowSizeChanged(size) = event {
+            let ui_camera = renderer.get_camera_mut(self.ui_camera_id)?;
+            let main_canvas = self.get_component_mut(self.main_canvas_id)?;
 
-                ui_camera.set_size(*size);
-                main_canvas.set_size(ComponentSize::Absolute(*size));
-            }
-            InputEvent::MouseMoved(cursor_position) => {
-                for (component_id, component) in self.components.iter().enumerate() {
-                    if component_id == self.main_canvas_id {
-                        continue;
-                    }
-
-                    if component.is_none() {
-                        continue;
-                    }
-
-                    let component = component.as_ref().unwrap();
-
-                    if component.is_point_inside(*cursor_position) {
-                        if !component.is_point_inside(self.last_cursor_position) {
-                            self.events.push_back(UiEvent::CursorEnter(component_id, *cursor_position));
-                        }
-
-                        self.events.push_back(UiEvent::CursorOver(component_id, *cursor_position));
-                    } else {
-                        if component.is_point_inside(self.last_cursor_position) {
-                            self.events.push_back(UiEvent::CursorLeave(component_id, *cursor_position));
-                        }
-                    }
+            ui_camera.set_size(*size);
+            main_canvas.set_size(ComponentSize::Absolute(*size));
+        } else {
+            for (component_id, component) in self.components.iter_mut().enumerate() {
+                if component_id == self.main_canvas_id {
+                    continue;
                 }
 
-                self.last_cursor_position = *cursor_position;
-            }
-            InputEvent::MouseButtonPressed(button) => {
-                for (component_id, component) in self.components.iter().enumerate() {
-                    if component_id == self.main_canvas_id {
-                        continue;
-                    }
-
-                    if component.is_none() {
-                        continue;
-                    }
-
-                    let component = component.as_ref().unwrap();
-
-                    if component.is_point_inside(self.last_cursor_position) {
-                        self.events.push_back(UiEvent::MouseButtonPressed(component_id, *button));
-                    }
+                if component.is_none() {
+                    continue;
                 }
+
+                self.events.extend(component.as_mut().unwrap().process_window_event(renderer, event));
             }
-            InputEvent::MouseButtonReleased(button) => {
-                for (component_id, component) in self.components.iter().enumerate() {
-                    if component_id == self.main_canvas_id {
-                        continue;
-                    }
-
-                    if component.is_none() {
-                        continue;
-                    }
-
-                    let component = component.as_ref().unwrap();
-
-                    if component.is_point_inside(self.last_cursor_position) {
-                        self.events.push_back(UiEvent::MouseButtonReleased(component_id, *button));
-                    }
-                }
-            }
-            _ => {}
         }
 
         Ok(())

@@ -26,6 +26,7 @@ pub struct WindowWinAPI {
     style: WindowStyle,
     position: Vec2,
     size: Vec2,
+    last_cursor_position: Vec2,
 }
 
 pub struct WndProcEvent {
@@ -66,6 +67,7 @@ impl WindowWinAPI {
                 style,
                 position: Default::default(),
                 size: Default::default(),
+                last_cursor_position: Default::default(),
             });
             let title_cstr = CString::new(title).unwrap();
 
@@ -128,6 +130,7 @@ impl WindowWinAPI {
                 style: WindowStyle::Window { position: Vec2::new(0.0, 0.0), size: Vec2::new(0.0, 0.0) },
                 position: Default::default(),
                 size: Default::default(),
+                last_cursor_position: Default::default(),
             });
             let title_cstr = CString::new("LemaoWindowInit").unwrap();
 
@@ -171,17 +174,19 @@ impl WindowPlatformSpecific for WindowWinAPI {
                     winapi::WM_KEYDOWN => return vec![InputEvent::KeyPressed(input::virtual_key_to_key(event.wParam))],
                     winapi::WM_KEYUP => return vec![InputEvent::KeyReleased(input::virtual_key_to_key(event.wParam))],
                     winapi::WM_CHAR => return vec![InputEvent::CharPressed(char::from_u32(event.wParam as u32).unwrap())],
-                    winapi::WM_LBUTTONDOWN => return vec![InputEvent::MouseButtonPressed(MouseButton::Left)],
-                    winapi::WM_RBUTTONDOWN => return vec![InputEvent::MouseButtonPressed(MouseButton::Right)],
-                    winapi::WM_MBUTTONDOWN => return vec![InputEvent::MouseButtonPressed(MouseButton::Middle)],
-                    winapi::WM_LBUTTONUP => return vec![InputEvent::MouseButtonReleased(MouseButton::Left)],
-                    winapi::WM_RBUTTONUP => return vec![InputEvent::MouseButtonReleased(MouseButton::Right)],
-                    winapi::WM_MBUTTONUP => return vec![InputEvent::MouseButtonReleased(MouseButton::Middle)],
+                    winapi::WM_LBUTTONDOWN => return vec![InputEvent::MouseButtonPressed(MouseButton::Left, self.get_cursor_position())],
+                    winapi::WM_RBUTTONDOWN => return vec![InputEvent::MouseButtonPressed(MouseButton::Right, self.get_cursor_position())],
+                    winapi::WM_MBUTTONDOWN => return vec![InputEvent::MouseButtonPressed(MouseButton::Middle, self.get_cursor_position())],
+                    winapi::WM_LBUTTONUP => return vec![InputEvent::MouseButtonReleased(MouseButton::Left, self.get_cursor_position())],
+                    winapi::WM_RBUTTONUP => return vec![InputEvent::MouseButtonReleased(MouseButton::Right, self.get_cursor_position())],
+                    winapi::WM_MBUTTONUP => return vec![InputEvent::MouseButtonReleased(MouseButton::Middle, self.get_cursor_position())],
                     winapi::WM_MOUSEMOVE => {
                         let position = Vec2::new(((event.lParam as i32) & 0xffff) as f32, ((event.lParam as i32) >> 16) as f32);
                         let screen_position = Vec2::new(position.x, self.size.y - position.y);
+                        let last_cursor_position = self.last_cursor_position;
+                        self.last_cursor_position = screen_position;
 
-                        return vec![InputEvent::MouseMoved(screen_position)];
+                        return vec![InputEvent::MouseMoved(screen_position, last_cursor_position)];
                     }
                     winapi::WM_MOUSEWHEEL => {
                         let direction = if ((event.wParam as i32) >> 16) > 0 { MouseWheelDirection::Up } else { MouseWheelDirection::Down };

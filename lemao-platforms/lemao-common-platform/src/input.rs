@@ -8,9 +8,9 @@ pub enum InputEvent {
     KeyPressed(Key),
     KeyReleased(Key),
     CharPressed(char),
-    MouseButtonPressed(MouseButton),
-    MouseButtonReleased(MouseButton),
-    MouseMoved(Vec2),
+    MouseButtonPressed(MouseButton, Vec2),
+    MouseButtonReleased(MouseButton, Vec2),
+    MouseMoved(Vec2, Vec2),
     MouseWheelRotated(MouseWheelDirection),
 }
 
