@@ -133,10 +133,7 @@ impl UiContext {
         self.get_component_mut(self.main_canvas_id)
     }
 
-    pub fn draw(&mut self, renderer: &mut RendererContext, component_id: usize) -> Result<(), String> {
-        let active_camera_id = renderer.get_active_camera()?.get_id();
-        renderer.set_camera_as_active(self.ui_camera_id)?;
-
+    pub fn update(&mut self, renderer: &mut RendererContext) -> Result<(), String> {
         let main_canvas = self.get_main_canvas()?;
         let area_position = match main_canvas.get_position() {
             ComponentPosition::AbsoluteToParent(position) => position,
@@ -146,16 +143,12 @@ impl UiContext {
             ComponentSize::Absolute(size) => size,
             _ => return Err("Invalid canvas".to_string()),
         };
-        self.update(renderer, self.main_canvas_id, area_position, area_size)?;
+        self.update_internal(renderer, self.main_canvas_id, area_position, area_size)?;
 
-        let component = self.get_component_mut(component_id)?;
-        component.draw(renderer)?;
-
-        renderer.set_camera_as_active(active_camera_id)?;
         Ok(())
     }
 
-    fn update(&mut self, renderer: &mut RendererContext, component_id: usize, area_position: Vec2, area_size: Vec2) -> Result<(), String> {
+    fn update_internal(&mut self, renderer: &mut RendererContext, component_id: usize, area_position: Vec2, area_size: Vec2) -> Result<(), String> {
         let component = self.get_component_mut(component_id)?;
         component.update(renderer, area_position, area_size)?;
 
@@ -163,9 +156,20 @@ impl UiContext {
         let component_area_size = component.get_work_area_size();
 
         for child_id in component.get_children().clone() {
-            self.update(renderer, child_id, component_area_position, component_area_size)?;
+            self.update_internal(renderer, child_id, component_area_position, component_area_size)?;
         }
 
+        Ok(())
+    }
+
+    pub fn draw(&mut self, renderer: &mut RendererContext, component_id: usize) -> Result<(), String> {
+        let active_camera_id = renderer.get_active_camera()?.get_id();
+        renderer.set_camera_as_active(self.ui_camera_id)?;
+
+        let component = self.get_component_mut(component_id)?;
+        component.draw(renderer)?;
+
+        renderer.set_camera_as_active(active_camera_id)?;
         Ok(())
     }
 }
