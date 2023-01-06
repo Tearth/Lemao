@@ -128,7 +128,8 @@ impl Component for Label {
     }
 
     fn set_size(&mut self, size: ComponentSize) {
-        self.size = size;
+        // Can't be set explicitly
+        // self.size = size;
     }
 
     fn get_min_size(&self) -> Vec2 {
@@ -136,7 +137,8 @@ impl Component for Label {
     }
 
     fn set_min_size(&mut self, min_size: Vec2) {
-        self.min_size = min_size;
+        // Can't be set explicitly
+        // self.min_size = min_size;
     }
 
     fn get_max_size(&self) -> Vec2 {
@@ -144,7 +146,8 @@ impl Component for Label {
     }
 
     fn set_max_size(&mut self, max_size: Vec2) {
-        self.max_size = max_size;
+        // Can't be set explicitly
+        // self.max_size = max_size;
     }
 
     fn get_anchor(&self) -> Vec2 {
@@ -235,12 +238,8 @@ impl Component for Label {
     }
 
     fn update(&mut self, renderer: &mut RendererContext, area_position: Vec2, area_size: Vec2) -> Result<(), String> {
-        self.screen_size = match self.size {
-            ComponentSize::Absolute(size) => size,
-            ComponentSize::Relative(size) => area_size * size,
-        };
-
-        self.screen_size = self.screen_size.clamp(self.min_size, self.max_size);
+        self.screen_size = renderer.get_drawable_with_type_mut::<Text>(self.label_id)?.get_size();
+        self.size = ComponentSize::Absolute(self.screen_size);
 
         self.screen_position = match self.position {
             ComponentPosition::AbsoluteToParent(position) => area_position + position,
@@ -251,7 +250,6 @@ impl Component for Label {
             self.margin.left * self.anchor.x - self.margin.right * (self.anchor.x - 1.0),
             self.margin.bottom * (self.anchor.y - 1.0) - self.margin.top * self.anchor.y,
         ) + self.offset;
-        self.screen_size -= Vec2::new(self.margin.left + self.margin.right, self.margin.bottom + self.margin.top);
 
         self.screen_size = self.screen_size.floor();
         self.screen_position = self.screen_position.floor();
@@ -281,7 +279,6 @@ impl Component for Label {
         label.set_font(font);
         label.set_text(&self.label_text);
         label.set_position(self.screen_position);
-        label.set_anchor(self.anchor);
         label.set_color(self.color.clone());
 
         Ok(())
