@@ -10,6 +10,7 @@ use lemao_common_platform::window::WindowPlatformSpecific;
 use lemao_common_platform::window::WindowStyle;
 use lemao_math::vec2::Vec2;
 use std::collections::VecDeque;
+use std::f32::consts::E;
 use std::ffi::CString;
 use std::mem;
 use std::ptr;
@@ -321,7 +322,7 @@ impl WindowPlatformSpecific for WindowWinAPI {
             winapi::GetCursorPos(&mut point);
             winapi::ScreenToClient(self.hwnd, &mut point);
 
-            Vec2::new(point.x as f32, point.y as f32)
+            Vec2::new(point.x as f32, self.size.y - point.y as f32)
         }
     }
 

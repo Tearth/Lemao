@@ -7,6 +7,7 @@ use super::ComponentPosition;
 use super::ComponentShape;
 use super::ComponentSize;
 use lemao_core::lemao_common_platform::input::InputEvent;
+use lemao_core::lemao_common_platform::input::MouseButton;
 use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::context::RendererContext;
@@ -40,6 +41,11 @@ pub struct Panel {
     filling_id: usize,
     border_id: usize,
     children: Vec<usize>,
+
+    pub on_cursor_enter: Option<fn(component: &mut Self, cursor_position: Vec2)>,
+    pub on_cursor_leave: Option<fn(component: &mut Self, cursor_position: Vec2)>,
+    pub on_mouse_button_pressed: Option<fn(component: &mut Self, mouse_button: MouseButton, cursor_position: Vec2)>,
+    pub on_mouse_button_released: Option<fn(component: &mut Self, mouse_button: MouseButton, cursor_position: Vec2)>,
 }
 
 impl Panel {
@@ -71,6 +77,11 @@ impl Panel {
                 ComponentShape::Disc => renderer.create_circle(0.0, 512)?,
             },
             children: Default::default(),
+
+            on_cursor_enter: None,
+            on_cursor_leave: None,
+            on_mouse_button_pressed: None,
+            on_mouse_button_released: None,
         })
     }
 
@@ -219,23 +230,33 @@ impl Component for Panel {
             InputEvent::MouseMoved(cursor_position, previous_cursor_position) => {
                 if self.is_point_inside(*cursor_position) {
                     if !self.is_point_inside(*previous_cursor_position) {
+                        if let Some(f) = self.on_cursor_enter {
+                            (f)(self, *cursor_position)
+                        };
                         events.push(UiEvent::CursorEnter(self.id, *cursor_position));
                     }
-
-                    events.push(UiEvent::CursorOver(self.id, *cursor_position));
                 } else {
                     if self.is_point_inside(*previous_cursor_position) {
+                        if let Some(f) = self.on_cursor_leave {
+                            (f)(self, *cursor_position)
+                        };
                         events.push(UiEvent::CursorLeave(self.id, *cursor_position));
                     }
                 }
             }
             InputEvent::MouseButtonPressed(button, cursor_position) => {
                 if self.is_point_inside(*cursor_position) {
+                    if let Some(f) = self.on_mouse_button_pressed {
+                        (f)(self, *button, *cursor_position)
+                    };
                     events.push(UiEvent::MouseButtonPressed(self.id, *button));
                 }
             }
             InputEvent::MouseButtonReleased(button, cursor_position) => {
                 if self.is_point_inside(*cursor_position) {
+                    if let Some(f) = self.on_mouse_button_released {
+                        (f)(self, *button, *cursor_position)
+                    };
                     events.push(UiEvent::MouseButtonReleased(self.id, *button));
                 }
             }

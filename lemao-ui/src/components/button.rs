@@ -9,6 +9,7 @@ use super::ComponentSize;
 use super::HorizontalAlignment;
 use super::VerticalAlignment;
 use lemao_core::lemao_common_platform::input::InputEvent;
+use lemao_core::lemao_common_platform::input::MouseButton;
 use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::context::RendererContext;
@@ -46,12 +47,19 @@ pub struct Button {
     label_vertical_alignment: VerticalAlignment,
     label_offset: Vec2,
     label_color: Color,
+    pressed: bool,
     texture_id: Option<usize>,
     texture_original_size: Vec2,
     filling_id: usize,
     border_id: usize,
     label_id: usize,
     children: Vec<usize>,
+
+    pub on_cursor_enter: Option<fn(component: &mut Self, cursor_position: Vec2)>,
+    pub on_cursor_leave: Option<fn(component: &mut Self, cursor_position: Vec2)>,
+    pub on_mouse_button_pressed: Option<fn(component: &mut Self, mouse_button: MouseButton, cursor_position: Vec2)>,
+    pub on_mouse_button_released: Option<fn(component: &mut Self, mouse_button: MouseButton, cursor_position: Vec2)>,
+    pub on_button_clicked: Option<fn(component: &mut Self, mouse_button: MouseButton)>,
 }
 
 impl Button {
@@ -78,6 +86,7 @@ impl Button {
             label_vertical_alignment: VerticalAlignment::Middle,
             label_offset: Default::default(),
             label_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
+            pressed: false,
             texture_id: None,
             texture_original_size: Default::default(),
             filling_id: match shape {
@@ -90,6 +99,12 @@ impl Button {
             },
             label_id: renderer.create_text(label_font_id)?,
             children: Default::default(),
+
+            on_cursor_enter: None,
+            on_cursor_leave: None,
+            on_mouse_button_pressed: None,
+            on_mouse_button_released: None,
+            on_button_clicked: None,
         })
     }
 
@@ -286,25 +301,45 @@ impl Component for Button {
             InputEvent::MouseMoved(cursor_position, previous_cursor_position) => {
                 if self.is_point_inside(*cursor_position) {
                     if !self.is_point_inside(*previous_cursor_position) {
+                        if let Some(f) = self.on_cursor_enter {
+                            (f)(self, *cursor_position)
+                        };
                         events.push(UiEvent::CursorEnter(self.id, *cursor_position));
                     }
-
-                    events.push(UiEvent::CursorOver(self.id, *cursor_position));
                 } else {
                     if self.is_point_inside(*previous_cursor_position) {
+                        if let Some(f) = self.on_cursor_leave {
+                            (f)(self, *cursor_position)
+                        };
                         events.push(UiEvent::CursorLeave(self.id, *cursor_position));
                     }
                 }
             }
             InputEvent::MouseButtonPressed(button, cursor_position) => {
                 if self.is_point_inside(*cursor_position) {
+                    if let Some(f) = self.on_mouse_button_pressed {
+                        (f)(self, *button, *cursor_position)
+                    };
                     events.push(UiEvent::MouseButtonPressed(self.id, *button));
+                    self.pressed = true;
                 }
             }
             InputEvent::MouseButtonReleased(button, cursor_position) => {
                 if self.is_point_inside(*cursor_position) {
+                    if let Some(f) = self.on_mouse_button_released {
+                        (f)(self, *button, *cursor_position)
+                    };
                     events.push(UiEvent::MouseButtonReleased(self.id, *button));
+
+                    if self.pressed {
+                        if let Some(f) = self.on_button_clicked {
+                            (f)(self, *button)
+                        };
+                        events.push(UiEvent::ButtonClicked(self.id, *button));
+                    }
                 }
+
+                self.pressed = false;
             }
             _ => {}
         }
