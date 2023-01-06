@@ -160,20 +160,33 @@ impl UiContext {
             ComponentSize::Absolute(size) => size,
             _ => return Err("Invalid canvas".to_string()),
         };
-        self.update_internal(renderer, self.main_canvas_id, area_position, area_size)?;
+        self.update_internal(renderer, self.main_canvas_id, area_position, area_size, false)?;
 
         Ok(())
     }
 
-    fn update_internal(&mut self, renderer: &mut RendererContext, component_id: usize, area_position: Vec2, area_size: Vec2) -> Result<(), String> {
+    fn update_internal(
+        &mut self,
+        renderer: &mut RendererContext,
+        component_id: usize,
+        area_position: Vec2,
+        area_size: Vec2,
+        force: bool,
+    ) -> Result<(), String> {
         let component = self.get_component_mut(component_id)?;
+        let update_children = component.is_dirty();
+
+        if force {
+            component.set_dirty_flag(true);
+        }
+
         component.update(renderer, area_position, area_size)?;
 
         let component_area_position = component.get_work_area_position();
         let component_area_size = component.get_work_area_size();
 
         for child_id in component.get_children().clone() {
-            self.update_internal(renderer, child_id, component_area_position, component_area_size)?;
+            self.update_internal(renderer, child_id, component_area_position, component_area_size, force || update_children)?;
         }
 
         Ok(())
