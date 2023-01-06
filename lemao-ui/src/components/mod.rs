@@ -95,8 +95,6 @@ pub trait Component {
     fn update(&mut self, renderer: &mut RendererContext, area_position: Vec2, area_size: Vec2) -> Result<(), String>;
     fn draw(&mut self, renderer: &mut RendererContext) -> Result<(), String>;
 
-    fn is_point_inside(&self, point: Vec2) -> bool;
-
     fn as_any(&self) -> &dyn Any;
     fn as_any_mut(&mut self) -> &mut dyn Any;
 }

@@ -44,7 +44,7 @@ impl Camera {
         self.dirty = true;
     }
 
-    pub(crate) fn get_dirty_flag(&self) -> bool {
+    pub(crate) fn is_dirty(&self) -> bool {
         self.dirty
     }
 

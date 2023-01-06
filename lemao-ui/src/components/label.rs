@@ -94,6 +94,15 @@ impl Label {
         self.max_multiline_width = width;
         self.multiline = true;
     }
+
+    fn is_point_inside(&self, point: Vec2) -> bool {
+        let x1 = self.screen_position.x;
+        let y1 = self.screen_position.y;
+        let x2 = self.screen_position.x + self.screen_size.x;
+        let y2 = self.screen_position.y + self.screen_size.y;
+
+        point.x >= x1 && point.y >= y1 && point.x <= x2 && point.y <= y2
+    }
 }
 
 impl Component for Label {
@@ -277,15 +286,6 @@ impl Component for Label {
     fn draw(&mut self, renderer: &mut RendererContext) -> Result<(), String> {
         renderer.draw(self.label_id)?;
         Ok(())
-    }
-
-    fn is_point_inside(&self, point: Vec2) -> bool {
-        let x1 = self.screen_position.x;
-        let y1 = self.screen_position.y;
-        let x2 = self.screen_position.x + self.screen_size.x;
-        let y2 = self.screen_position.y + self.screen_size.y;
-
-        point.x >= x1 && point.y >= y1 && point.x <= x2 && point.y <= y2
     }
 
     fn as_any(&self) -> &dyn Any {

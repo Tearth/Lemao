@@ -95,7 +95,7 @@ impl RendererContext {
         // #[cfg(debug_assertions)]
         // unsafe {
         //     (self.gl.glEnable)(opengl::GL_DEBUG_OUTPUT);
-        //     (self.gl.glDebugMessageCallback)(gl_error, ptr::null_mut());
+        //     (self.gl.glDebugMessageCallback)(gl_error, std::ptr::null_mut());
         // }
 
         self.set_viewport_size(self.viewport_size);
@@ -364,7 +364,7 @@ impl RendererContext {
             Color::Gradient(_) => self.default_gradient_shader_id,
         };
 
-        if shader_id != self.active_shader_id || self.cameras.as_mut().unwrap().get_mut(self.active_camera_id)?.get_dirty_flag() {
+        if shader_id != self.active_shader_id || self.cameras.as_mut().unwrap().get_mut(self.active_camera_id)?.is_dirty() {
             self.set_shader_as_active(shader_id)?;
 
             let camera = self.cameras.as_mut().unwrap().get_mut(self.active_camera_id)?;
@@ -384,7 +384,7 @@ impl RendererContext {
             Color::Gradient(_) => self.default_gradient_shader_id,
         };
 
-        if shader_id != self.active_shader_id || self.cameras.as_mut().unwrap().get_mut(self.active_camera_id)?.get_dirty_flag() {
+        if shader_id != self.active_shader_id || self.cameras.as_mut().unwrap().get_mut(self.active_camera_id)?.is_dirty() {
             self.set_shader_as_active(shader_id)?;
 
             let camera = self.cameras.as_mut().unwrap().get_mut(self.active_camera_id)?;
