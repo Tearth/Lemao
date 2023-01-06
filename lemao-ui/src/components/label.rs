@@ -33,6 +33,7 @@ pub struct Label {
     label_text: String,
     label_id: usize,
     children: Vec<usize>,
+    dirty: bool,
 
     pub on_cursor_enter: Option<fn(component: &mut Self, cursor_position: Vec2)>,
     pub on_cursor_leave: Option<fn(component: &mut Self, cursor_position: Vec2)>,
@@ -60,6 +61,7 @@ impl Label {
             label_text: Default::default(),
             label_id: renderer.create_text(label_font_id)?,
             children: Default::default(),
+            dirty: true,
 
             on_cursor_enter: None,
             on_cursor_leave: None,
@@ -78,6 +80,7 @@ impl Label {
 
     pub fn set_font_id(&mut self, font_id: usize) {
         self.label_font_id = font_id;
+        self.dirty = true;
     }
 
     pub fn get_text(&self) -> &str {
@@ -87,12 +90,14 @@ impl Label {
     pub fn set_text(&mut self, text: String) {
         self.label_text = text;
         self.multiline = false;
+        self.dirty = true;
     }
 
     pub fn set_multiline_text(&mut self, text: String, width: f32) {
         self.label_text = text;
         self.max_multiline_width = width;
         self.multiline = true;
+        self.dirty = true;
     }
 
     fn is_point_inside(&self, point: Vec2) -> bool {
@@ -116,6 +121,7 @@ impl Component for Label {
 
     fn set_position(&mut self, position: ComponentPosition) {
         self.position = position;
+        self.dirty = true;
     }
 
     fn get_size(&self) -> ComponentSize {
@@ -155,6 +161,7 @@ impl Component for Label {
 
     fn set_anchor(&mut self, anchor: Vec2) {
         self.anchor = anchor;
+        self.dirty = true;
     }
 
     fn get_margin(&self) -> ComponentMargin {
@@ -163,6 +170,7 @@ impl Component for Label {
 
     fn set_margin(&mut self, margin: ComponentMargin) {
         self.margin = margin;
+        self.dirty = true;
     }
 
     fn get_offset(&self) -> Vec2 {
@@ -171,6 +179,7 @@ impl Component for Label {
 
     fn set_offset(&mut self, offset: Vec2) {
         self.offset = offset;
+        self.dirty = true;
     }
 
     fn get_color(&self) -> &Color {
@@ -179,6 +188,7 @@ impl Component for Label {
 
     fn set_color(&mut self, color: Color) {
         self.color = color;
+        self.dirty = true;
     }
 
     fn add_child(&mut self, component_id: usize) {
@@ -201,14 +211,16 @@ impl Component for Label {
                 if self.is_point_inside(*cursor_position) {
                     if !self.is_point_inside(*previous_cursor_position) {
                         if let Some(f) = self.on_cursor_enter {
-                            (f)(self, *cursor_position)
+                            (f)(self, *cursor_position);
+                            self.dirty = true;
                         };
                         events.push(UiEvent::CursorEnter(self.id, *cursor_position));
                     }
                 } else {
                     if self.is_point_inside(*previous_cursor_position) {
                         if let Some(f) = self.on_cursor_leave {
-                            (f)(self, *cursor_position)
+                            (f)(self, *cursor_position);
+                            self.dirty = true;
                         };
                         events.push(UiEvent::CursorLeave(self.id, *cursor_position));
                     }
@@ -217,7 +229,8 @@ impl Component for Label {
             InputEvent::MouseButtonPressed(button, cursor_position) => {
                 if self.is_point_inside(*cursor_position) {
                     if let Some(f) = self.on_mouse_button_pressed {
-                        (f)(self, *button, *cursor_position)
+                        (f)(self, *button, *cursor_position);
+                        self.dirty = true;
                     };
                     events.push(UiEvent::MouseButtonPressed(self.id, *button));
                 }
@@ -225,7 +238,8 @@ impl Component for Label {
             InputEvent::MouseButtonReleased(button, cursor_position) => {
                 if self.is_point_inside(*cursor_position) {
                     if let Some(f) = self.on_mouse_button_released {
-                        (f)(self, *button, *cursor_position)
+                        (f)(self, *button, *cursor_position);
+                        self.dirty = true;
                     };
                     events.push(UiEvent::MouseButtonReleased(self.id, *button));
                 }
@@ -237,27 +251,12 @@ impl Component for Label {
     }
 
     fn update(&mut self, renderer: &mut RendererContext, area_position: Vec2, area_size: Vec2) -> Result<(), String> {
-        self.screen_size = renderer.get_drawable_with_type_mut::<Text>(self.label_id)?.get_size();
-        self.size = ComponentSize::Absolute(self.screen_size);
+        if !self.dirty {
+            return Ok(());
+        }
 
-        self.screen_position = match self.position {
-            ComponentPosition::AbsoluteToParent(position) => area_position + position,
-            ComponentPosition::RelativeToParent(position) => area_position + (position * area_size),
-        } - (self.screen_size * self.anchor);
-
-        self.screen_position += Vec2::new(
-            self.margin.left * self.anchor.x - self.margin.right * (self.anchor.x - 1.0),
-            self.margin.bottom * (self.anchor.y - 1.0) - self.margin.top * self.anchor.y,
-        ) + self.offset;
-
-        self.screen_size = self.screen_size.floor();
-        self.screen_position = self.screen_position.floor();
-
-        let font_storage = renderer.get_fonts();
-        let font_storage_lock = font_storage.lock().unwrap();
-        let font = font_storage_lock.get(self.label_font_id)?;
+        // We have to set text first, to get the size used later
         let label = renderer.get_drawable_with_type_mut::<Text>(self.label_id)?;
-
         if self.multiline {
             let mut line = String::new();
             let mut result = String::new();
@@ -275,10 +274,33 @@ impl Component for Label {
             self.label_text = result + &line;
         }
 
-        label.set_font(font);
-        label.set_text(&self.label_text);
+        let font_storage = renderer.get_fonts();
+        let font_storage_lock = font_storage.lock().unwrap();
+        let font = font_storage_lock.get(self.label_font_id)?;
+        renderer.get_drawable_with_type_mut::<Text>(self.label_id)?.set_font(font);
+        renderer.get_drawable_with_type_mut::<Text>(self.label_id)?.set_text(&self.label_text);
+
+        self.screen_size = renderer.get_drawable_with_type_mut::<Text>(self.label_id)?.get_size();
+        self.size = ComponentSize::Absolute(self.screen_size);
+
+        self.screen_position = match self.position {
+            ComponentPosition::AbsoluteToParent(position) => area_position + position,
+            ComponentPosition::RelativeToParent(position) => area_position + (position * area_size),
+        } - (self.screen_size * self.anchor);
+
+        self.screen_position += Vec2::new(
+            self.margin.left * self.anchor.x - self.margin.right * (self.anchor.x - 1.0),
+            self.margin.bottom * (self.anchor.y - 1.0) - self.margin.top * self.anchor.y,
+        ) + self.offset;
+
+        self.screen_size = self.screen_size.floor();
+        self.screen_position = self.screen_position.floor();
+
+        let label = renderer.get_drawable_with_type_mut::<Text>(self.label_id)?;
         label.set_position(self.screen_position);
         label.set_color(self.color.clone());
+
+        self.dirty = false;
 
         Ok(())
     }
@@ -286,6 +308,14 @@ impl Component for Label {
     fn draw(&mut self, renderer: &mut RendererContext) -> Result<(), String> {
         renderer.draw(self.label_id)?;
         Ok(())
+    }
+
+    fn is_dirty(&self) -> bool {
+        self.dirty
+    }
+
+    fn set_dirty_flag(&mut self, dirty: bool) {
+        self.dirty = dirty;
     }
 
     fn as_any(&self) -> &dyn Any {

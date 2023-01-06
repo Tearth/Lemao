@@ -54,6 +54,7 @@ pub struct Button {
     border_id: usize,
     label_id: usize,
     children: Vec<usize>,
+    dirty: bool,
 
     pub on_cursor_enter: Option<fn(component: &mut Self, cursor_position: Vec2)>,
     pub on_cursor_leave: Option<fn(component: &mut Self, cursor_position: Vec2)>,
@@ -99,6 +100,7 @@ impl Button {
             },
             label_id: renderer.create_text(label_font_id)?,
             children: Default::default(),
+            dirty: true,
 
             on_cursor_enter: None,
             on_cursor_leave: None,
@@ -126,6 +128,7 @@ impl Button {
         }
 
         self.border_thickness = border_thickness;
+        self.dirty = true;
         Ok(())
     }
 
@@ -135,6 +138,7 @@ impl Button {
 
     pub fn set_border_color(&mut self, border_color: Color) {
         self.border_color = border_color;
+        self.dirty = true;
     }
 
     pub fn get_roundness_factor(&self) -> f32 {
@@ -147,6 +151,7 @@ impl Button {
         }
 
         self.roundness_factor = roundness_factor;
+        self.dirty = true;
         Ok(())
     }
 
@@ -156,6 +161,7 @@ impl Button {
 
     pub fn set_font_id(&mut self, font_id: usize) {
         self.label_font_id = font_id;
+        self.dirty = true;
     }
 
     pub fn get_text(&self) -> &str {
@@ -164,6 +170,7 @@ impl Button {
 
     pub fn set_text(&mut self, text: String) {
         self.label_text = text;
+        self.dirty = true;
     }
 
     pub fn get_horizontal_alignment(&self) -> HorizontalAlignment {
@@ -172,6 +179,7 @@ impl Button {
 
     pub fn set_horizontal_alignment(&mut self, label_horizontal_alignment: HorizontalAlignment) {
         self.label_horizontal_alignment = label_horizontal_alignment;
+        self.dirty = true;
     }
 
     pub fn get_vertical_alignment(&self) -> VerticalAlignment {
@@ -180,6 +188,7 @@ impl Button {
 
     pub fn set_vertical_alignment(&mut self, label_vertical_alignment: VerticalAlignment) {
         self.label_vertical_alignment = label_vertical_alignment;
+        self.dirty = true;
     }
 
     pub fn get_label_offset(&self) -> Vec2 {
@@ -188,6 +197,7 @@ impl Button {
 
     pub fn set_label_offset(&mut self, label_offset: Vec2) {
         self.label_offset = label_offset;
+        self.dirty = true;
     }
 
     pub fn get_label_color(&self) -> &Color {
@@ -196,6 +206,7 @@ impl Button {
 
     pub fn set_label_color(&mut self, label_color: Color) {
         self.label_color = label_color;
+        self.dirty = true;
     }
 
     pub fn get_texture_id(&self) -> Option<usize> {
@@ -206,6 +217,7 @@ impl Button {
         self.texture_id = Some(texture.get_id());
         self.texture_original_size = texture.get_size();
         self.size = ComponentSize::Absolute(texture.get_size());
+        self.dirty = true;
     }
 
     fn is_point_inside(&self, point: Vec2) -> bool {
@@ -238,6 +250,7 @@ impl Component for Button {
 
     fn set_position(&mut self, position: ComponentPosition) {
         self.position = position;
+        self.dirty = true;
     }
 
     fn get_size(&self) -> ComponentSize {
@@ -250,6 +263,7 @@ impl Component for Button {
 
     fn set_size(&mut self, size: ComponentSize) {
         self.size = size;
+        self.dirty = true;
     }
 
     fn get_min_size(&self) -> Vec2 {
@@ -258,6 +272,7 @@ impl Component for Button {
 
     fn set_min_size(&mut self, min_size: Vec2) {
         self.min_size = min_size;
+        self.dirty = true;
     }
 
     fn get_max_size(&self) -> Vec2 {
@@ -266,6 +281,7 @@ impl Component for Button {
 
     fn set_max_size(&mut self, max_size: Vec2) {
         self.max_size = max_size;
+        self.dirty = true;
     }
 
     fn get_anchor(&self) -> Vec2 {
@@ -274,6 +290,7 @@ impl Component for Button {
 
     fn set_anchor(&mut self, anchor: Vec2) {
         self.anchor = anchor;
+        self.dirty = true;
     }
 
     fn get_margin(&self) -> ComponentMargin {
@@ -282,6 +299,7 @@ impl Component for Button {
 
     fn set_margin(&mut self, margin: ComponentMargin) {
         self.margin = margin;
+        self.dirty = true;
     }
 
     fn get_offset(&self) -> Vec2 {
@@ -290,6 +308,7 @@ impl Component for Button {
 
     fn set_offset(&mut self, offset: Vec2) {
         self.offset = offset;
+        self.dirty = true;
     }
 
     fn get_color(&self) -> &Color {
@@ -298,6 +317,7 @@ impl Component for Button {
 
     fn set_color(&mut self, color: Color) {
         self.color = color;
+        self.dirty = true;
     }
 
     fn add_child(&mut self, component_id: usize) {
@@ -320,14 +340,16 @@ impl Component for Button {
                 if self.is_point_inside(*cursor_position) {
                     if !self.is_point_inside(*previous_cursor_position) {
                         if let Some(f) = self.on_cursor_enter {
-                            (f)(self, *cursor_position)
+                            (f)(self, *cursor_position);
+                            self.dirty = true;
                         };
                         events.push(UiEvent::CursorEnter(self.id, *cursor_position));
                     }
                 } else {
                     if self.is_point_inside(*previous_cursor_position) {
                         if let Some(f) = self.on_cursor_leave {
-                            (f)(self, *cursor_position)
+                            (f)(self, *cursor_position);
+                            self.dirty = true;
                         };
                         events.push(UiEvent::CursorLeave(self.id, *cursor_position));
                     }
@@ -336,7 +358,8 @@ impl Component for Button {
             InputEvent::MouseButtonPressed(button, cursor_position) => {
                 if self.is_point_inside(*cursor_position) {
                     if let Some(f) = self.on_mouse_button_pressed {
-                        (f)(self, *button, *cursor_position)
+                        (f)(self, *button, *cursor_position);
+                        self.dirty = true;
                     };
                     events.push(UiEvent::MouseButtonPressed(self.id, *button));
                     self.pressed = true;
@@ -345,13 +368,15 @@ impl Component for Button {
             InputEvent::MouseButtonReleased(button, cursor_position) => {
                 if self.is_point_inside(*cursor_position) {
                     if let Some(f) = self.on_mouse_button_released {
-                        (f)(self, *button, *cursor_position)
+                        (f)(self, *button, *cursor_position);
+                        self.dirty = true;
                     };
                     events.push(UiEvent::MouseButtonReleased(self.id, *button));
 
                     if self.pressed {
                         if let Some(f) = self.on_button_clicked {
-                            (f)(self, *button)
+                            (f)(self, *button);
+                            self.dirty = true;
                         };
                         events.push(UiEvent::ButtonClicked(self.id, *button));
                     }
@@ -366,6 +391,10 @@ impl Component for Button {
     }
 
     fn update(&mut self, renderer: &mut RendererContext, area_position: Vec2, area_size: Vec2) -> Result<(), String> {
+        if !self.dirty {
+            return Ok(());
+        }
+
         self.screen_size = match self.size {
             ComponentSize::Absolute(size) => size,
             ComponentSize::Relative(size) => area_size * size,
@@ -458,6 +487,8 @@ impl Component for Button {
         label.set_position(horizontal_position + vertical_position + self.label_offset);
         label.set_anchor(horizontal_anchor + vertical_anchor);
 
+        self.dirty = false;
+
         Ok(())
     }
 
@@ -470,6 +501,14 @@ impl Component for Button {
         }
 
         Ok(())
+    }
+
+    fn is_dirty(&self) -> bool {
+        self.dirty
+    }
+
+    fn set_dirty_flag(&mut self, dirty: bool) {
+        self.dirty = dirty;
     }
 
     fn as_any(&self) -> &dyn Any {

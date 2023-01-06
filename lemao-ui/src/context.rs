@@ -16,7 +16,6 @@ use std::collections::VecDeque;
 pub struct UiContext {
     ui_camera_id: usize,
     main_canvas_id: usize,
-    last_cursor_position: Vec2,
     components: Vec<Option<Box<dyn Component>>>,
     events: VecDeque<UiEvent>,
 }
@@ -26,8 +25,7 @@ impl UiContext {
         let main_camera = renderer.get_active_camera()?;
         let ui_camera_id = renderer.create_camera(main_camera.get_position(), main_camera.get_size())?;
 
-        let mut ui =
-            Self { main_canvas_id: 0, last_cursor_position: Default::default(), ui_camera_id, components: Default::default(), events: Default::default() };
+        let mut ui = Self { main_canvas_id: 0, ui_camera_id, components: Default::default(), events: Default::default() };
         ui.main_canvas_id = ui.create_canvas(renderer)?;
 
         let main_canvas = ui.get_component_mut(ui.main_canvas_id)?;
@@ -43,6 +41,10 @@ impl UiContext {
 
             ui_camera.set_size(*size);
             main_canvas.set_size(ComponentSize::Absolute(*size));
+
+            for component in self.components.iter_mut().flatten() {
+                component.set_dirty_flag(true);
+            }
         } else {
             for (component_id, component) in self.components.iter_mut().enumerate() {
                 if component_id == self.main_canvas_id {

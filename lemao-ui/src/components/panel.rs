@@ -41,6 +41,7 @@ pub struct Panel {
     filling_id: usize,
     border_id: usize,
     children: Vec<usize>,
+    dirty: bool,
 
     pub on_cursor_enter: Option<fn(component: &mut Self, cursor_position: Vec2)>,
     pub on_cursor_leave: Option<fn(component: &mut Self, cursor_position: Vec2)>,
@@ -77,6 +78,7 @@ impl Panel {
                 ComponentShape::Disc => renderer.create_circle(0.0, 512)?,
             },
             children: Default::default(),
+            dirty: true,
 
             on_cursor_enter: None,
             on_cursor_leave: None,
@@ -103,6 +105,7 @@ impl Panel {
         }
 
         self.border_thickness = border_thickness;
+        self.dirty = true;
         Ok(())
     }
 
@@ -112,6 +115,7 @@ impl Panel {
 
     pub fn set_border_color(&mut self, border_color: Color) {
         self.border_color = border_color;
+        self.dirty = true;
     }
 
     pub fn get_roundness_factor(&self) -> f32 {
@@ -124,6 +128,7 @@ impl Panel {
         }
 
         self.roundness_factor = roundness_factor;
+        self.dirty = true;
         Ok(())
     }
 
@@ -135,6 +140,7 @@ impl Panel {
         self.texture_id = Some(texture.get_id());
         self.texture_original_size = texture.get_size();
         self.size = ComponentSize::Absolute(texture.get_size());
+        self.dirty = true;
     }
 
     fn is_point_inside(&self, point: Vec2) -> bool {
@@ -167,6 +173,7 @@ impl Component for Panel {
 
     fn set_position(&mut self, position: ComponentPosition) {
         self.position = position;
+        self.dirty = true;
     }
 
     fn get_size(&self) -> ComponentSize {
@@ -179,6 +186,7 @@ impl Component for Panel {
 
     fn set_size(&mut self, size: ComponentSize) {
         self.size = size;
+        self.dirty = true;
     }
 
     fn get_min_size(&self) -> Vec2 {
@@ -187,6 +195,7 @@ impl Component for Panel {
 
     fn set_min_size(&mut self, min_size: Vec2) {
         self.min_size = min_size;
+        self.dirty = true;
     }
 
     fn get_max_size(&self) -> Vec2 {
@@ -195,6 +204,7 @@ impl Component for Panel {
 
     fn set_max_size(&mut self, max_size: Vec2) {
         self.max_size = max_size;
+        self.dirty = true;
     }
 
     fn get_anchor(&self) -> Vec2 {
@@ -203,6 +213,7 @@ impl Component for Panel {
 
     fn set_anchor(&mut self, anchor: Vec2) {
         self.anchor = anchor;
+        self.dirty = true;
     }
 
     fn get_margin(&self) -> ComponentMargin {
@@ -211,6 +222,7 @@ impl Component for Panel {
 
     fn set_margin(&mut self, margin: ComponentMargin) {
         self.margin = margin;
+        self.dirty = true;
     }
 
     fn get_offset(&self) -> Vec2 {
@@ -219,6 +231,7 @@ impl Component for Panel {
 
     fn set_offset(&mut self, offset: Vec2) {
         self.offset = offset;
+        self.dirty = true;
     }
 
     fn get_color(&self) -> &Color {
@@ -227,6 +240,7 @@ impl Component for Panel {
 
     fn set_color(&mut self, color: Color) {
         self.color = color;
+        self.dirty = true;
     }
 
     fn add_child(&mut self, component_id: usize) {
@@ -249,14 +263,16 @@ impl Component for Panel {
                 if self.is_point_inside(*cursor_position) {
                     if !self.is_point_inside(*previous_cursor_position) {
                         if let Some(f) = self.on_cursor_enter {
-                            (f)(self, *cursor_position)
+                            (f)(self, *cursor_position);
+                            self.dirty = true;
                         };
                         events.push(UiEvent::CursorEnter(self.id, *cursor_position));
                     }
                 } else {
                     if self.is_point_inside(*previous_cursor_position) {
                         if let Some(f) = self.on_cursor_leave {
-                            (f)(self, *cursor_position)
+                            (f)(self, *cursor_position);
+                            self.dirty = true;
                         };
                         events.push(UiEvent::CursorLeave(self.id, *cursor_position));
                     }
@@ -265,7 +281,8 @@ impl Component for Panel {
             InputEvent::MouseButtonPressed(button, cursor_position) => {
                 if self.is_point_inside(*cursor_position) {
                     if let Some(f) = self.on_mouse_button_pressed {
-                        (f)(self, *button, *cursor_position)
+                        (f)(self, *button, *cursor_position);
+                        self.dirty = true;
                     };
                     events.push(UiEvent::MouseButtonPressed(self.id, *button));
                 }
@@ -273,7 +290,8 @@ impl Component for Panel {
             InputEvent::MouseButtonReleased(button, cursor_position) => {
                 if self.is_point_inside(*cursor_position) {
                     if let Some(f) = self.on_mouse_button_released {
-                        (f)(self, *button, *cursor_position)
+                        (f)(self, *button, *cursor_position);
+                        self.dirty = true;
                     };
                     events.push(UiEvent::MouseButtonReleased(self.id, *button));
                 }
@@ -285,6 +303,10 @@ impl Component for Panel {
     }
 
     fn update(&mut self, renderer: &mut RendererContext, area_position: Vec2, area_size: Vec2) -> Result<(), String> {
+        if !self.dirty {
+            return Ok(());
+        }
+
         self.screen_size = match self.size {
             ComponentSize::Absolute(size) => size,
             ComponentSize::Relative(size) => area_size * size,
@@ -354,6 +376,8 @@ impl Component for Panel {
             renderer.get_drawable_with_type_mut::<Circle>(self.border_id)?.set_squircle_factor(1.0 - self.roundness_factor);
         }
 
+        self.dirty = false;
+
         Ok(())
     }
 
@@ -365,6 +389,14 @@ impl Component for Panel {
         }
 
         Ok(())
+    }
+
+    fn is_dirty(&self) -> bool {
+        self.dirty
+    }
+
+    fn set_dirty_flag(&mut self, dirty: bool) {
+        self.dirty = dirty;
     }
 
     fn as_any(&self) -> &dyn Any {

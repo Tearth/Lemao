@@ -42,6 +42,7 @@ pub struct Checkbox {
     box_unchecked_texture_id: usize,
     box_id: usize,
     children: Vec<usize>,
+    dirty: bool,
 
     pub on_cursor_enter: Option<fn(component: &mut Self, cursor_position: Vec2)>,
     pub on_cursor_leave: Option<fn(component: &mut Self, cursor_position: Vec2)>,
@@ -90,6 +91,7 @@ impl Checkbox {
             box_unchecked_texture_id,
             box_id: renderer.create_rectangle()?,
             children: Default::default(),
+            dirty: true,
 
             on_cursor_enter: None,
             on_cursor_leave: None,
@@ -116,6 +118,7 @@ impl Checkbox {
 
     pub fn set_font_id(&mut self, font_id: usize) {
         self.label_font_id = font_id;
+        self.dirty = true;
     }
 
     pub fn get_text(&self) -> &str {
@@ -124,13 +127,16 @@ impl Checkbox {
 
     pub fn set_text(&mut self, text: String) {
         self.label_text = text;
+        self.dirty = true;
     }
+
     pub fn is_checked(&self) -> bool {
         self.checked
     }
 
     pub fn set_checked(&mut self, checked: bool) {
         self.checked = checked;
+        self.dirty = true;
     }
 
     pub fn get_label_offset(&self) -> Vec2 {
@@ -139,6 +145,7 @@ impl Checkbox {
 
     pub fn set_label_offset(&mut self, label_offset: Vec2) {
         self.label_offset = label_offset;
+        self.dirty = true;
     }
 
     pub fn get_box_checked_texture_id(&self) -> usize {
@@ -148,6 +155,7 @@ impl Checkbox {
     pub fn set_box_checked_texture(&mut self, box_checked_texture: &Texture) {
         self.box_checked_texture_id = box_checked_texture.get_id();
         self.box_size = box_checked_texture.get_size();
+        self.dirty = true;
     }
 
     pub fn get_box_unchecked_texture_id(&self) -> usize {
@@ -157,6 +165,7 @@ impl Checkbox {
     pub fn set_box_unchecked_texture(&mut self, box_unchecked_texture: &Texture) {
         self.box_unchecked_texture_id = box_unchecked_texture.get_id();
         self.box_size = box_unchecked_texture.get_size();
+        self.dirty = true;
     }
 
     pub fn get_box_color(&self) -> &Color {
@@ -165,6 +174,7 @@ impl Checkbox {
 
     pub fn set_box_color(&mut self, box_color: Color) {
         self.color = box_color;
+        self.dirty = true;
     }
 
     pub fn get_box_offset(&self) -> &Vec2 {
@@ -173,6 +183,7 @@ impl Checkbox {
 
     pub fn set_box_offset(&mut self, box_offset: Vec2) {
         self.box_offset = box_offset;
+        self.dirty = true;
     }
 
     fn is_point_inside(&self, point: Vec2) -> bool {
@@ -205,6 +216,7 @@ impl Component for Checkbox {
 
     fn set_position(&mut self, position: ComponentPosition) {
         self.position = position;
+        self.dirty = true;
     }
 
     fn get_size(&self) -> ComponentSize {
@@ -244,6 +256,7 @@ impl Component for Checkbox {
 
     fn set_anchor(&mut self, anchor: Vec2) {
         self.anchor = anchor;
+        self.dirty = true;
     }
 
     fn get_margin(&self) -> ComponentMargin {
@@ -252,6 +265,7 @@ impl Component for Checkbox {
 
     fn set_margin(&mut self, margin: ComponentMargin) {
         self.margin = margin;
+        self.dirty = true;
     }
 
     fn get_offset(&self) -> Vec2 {
@@ -260,6 +274,7 @@ impl Component for Checkbox {
 
     fn set_offset(&mut self, offset: Vec2) {
         self.offset = offset;
+        self.dirty = true;
     }
 
     fn get_color(&self) -> &Color {
@@ -268,6 +283,7 @@ impl Component for Checkbox {
 
     fn set_color(&mut self, color: Color) {
         self.color = color;
+        self.dirty = true;
     }
 
     fn add_child(&mut self, component_id: usize) {
@@ -329,14 +345,16 @@ impl Component for Checkbox {
                 if self.is_point_inside_box(*cursor_position) {
                     if !self.is_point_inside_box(*previous_cursor_position) {
                         if let Some(f) = self.on_cursor_box_enter {
-                            (f)(self, *cursor_position)
+                            (f)(self, *cursor_position);
+                            self.dirty = true;
                         };
                         events.push(UiEvent::CursorCheckboxEnter(self.id, *cursor_position));
                     }
                 } else {
                     if self.is_point_inside_box(*previous_cursor_position) {
                         if let Some(f) = self.on_cursor_box_leave {
-                            (f)(self, *cursor_position)
+                            (f)(self, *cursor_position);
+                            self.dirty = true;
                         };
                         events.push(UiEvent::CursorCheckboxLeave(self.id, *cursor_position));
                     }
@@ -345,7 +363,8 @@ impl Component for Checkbox {
             InputEvent::MouseButtonPressed(button, cursor_position) => {
                 if self.is_point_inside_box(*cursor_position) {
                     if let Some(f) = self.on_mouse_button_box_pressed {
-                        (f)(self, *button, *cursor_position)
+                        (f)(self, *button, *cursor_position);
+                        self.dirty = true;
                     };
                     events.push(UiEvent::MouseButtonCheckboxPressed(self.id, *button));
                     self.pressed = true;
@@ -354,33 +373,41 @@ impl Component for Checkbox {
             InputEvent::MouseButtonReleased(button, cursor_position) => {
                 if self.is_point_inside_box(*cursor_position) {
                     if let Some(f) = self.on_mouse_button_box_released {
-                        (f)(self, *button, *cursor_position)
+                        (f)(self, *button, *cursor_position);
+                        self.dirty = true;
                     };
                     events.push(UiEvent::MouseButtonCheckboxReleased(self.id, *button));
 
                     if self.pressed {
                         if self.checked {
                             if let Some(f) = self.on_box_unchecked {
-                                (f)(self, *button)
+                                (f)(self, *button);
+                                self.dirty = true;
                             };
                             events.push(UiEvent::CheckboxUnchecked(self.id, *button));
                         } else {
                             if let Some(f) = self.on_box_checked {
-                                (f)(self, *button)
+                                (f)(self, *button);
+                                self.dirty = true;
                             };
                             events.push(UiEvent::CheckboxChecked(self.id, *button));
                         }
 
                         self.checked = !self.checked;
+                        self.dirty = true;
 
                         if let Some(f) = self.on_box_changed {
-                            (f)(self, *button, self.checked)
+                            (f)(self, *button, self.checked);
+                            self.dirty = true;
                         };
                         events.push(UiEvent::CheckboxChanged(self.id, *button, self.checked));
                     }
                 }
 
-                self.pressed = false;
+                if self.pressed {
+                    self.pressed = false;
+                    self.dirty = true;
+                }
             }
             _ => {}
         }
@@ -389,6 +416,17 @@ impl Component for Checkbox {
     }
 
     fn update(&mut self, renderer: &mut RendererContext, area_position: Vec2, area_size: Vec2) -> Result<(), String> {
+        if !self.dirty {
+            return Ok(());
+        }
+
+        // We have to set text first, to get the size used later
+        let font_storage = renderer.get_fonts();
+        let font_storage_lock = font_storage.lock().unwrap();
+        let font = font_storage_lock.get(self.label_font_id)?;
+        renderer.get_drawable_with_type_mut::<Text>(self.label_id)?.set_font(font);
+        renderer.get_drawable_with_type_mut::<Text>(self.label_id)?.set_text(&self.label_text);
+
         self.screen_size = renderer.get_drawable_with_type_mut::<Text>(self.label_id)?.get_size();
         self.size = ComponentSize::Absolute(self.screen_size);
 
@@ -422,15 +460,11 @@ impl Component for Checkbox {
             renderer.get_drawable_with_type_mut::<Rectangle>(self.box_id)?.set_texture(texture);
         }
 
-        let font_storage = renderer.get_fonts();
-        let font_storage_lock = font_storage.lock().unwrap();
-        let font = font_storage_lock.get(self.label_font_id)?;
         let label = renderer.get_drawable_with_type_mut::<Text>(self.label_id)?;
-
-        label.set_font(font);
-        label.set_text(&self.label_text);
         label.set_position(self.screen_position + self.label_offset);
         label.set_color(self.color.clone());
+
+        self.dirty = false;
 
         Ok(())
     }
@@ -439,6 +473,14 @@ impl Component for Checkbox {
         renderer.draw(self.box_id)?;
         renderer.draw(self.label_id)?;
         Ok(())
+    }
+
+    fn is_dirty(&self) -> bool {
+        self.dirty
+    }
+
+    fn set_dirty_flag(&mut self, dirty: bool) {
+        self.dirty = dirty;
     }
 
     fn as_any(&self) -> &dyn Any {

@@ -24,6 +24,7 @@ pub struct Canvas {
     margin: ComponentMargin,
     offset: Vec2,
     children: Vec<usize>,
+    dirty: bool,
 
     pub on_cursor_enter: Option<fn(component: &mut Self, cursor_position: Vec2)>,
     pub on_cursor_leave: Option<fn(component: &mut Self, cursor_position: Vec2)>,
@@ -45,6 +46,7 @@ impl Canvas {
             margin: Default::default(),
             offset: Default::default(),
             children: Default::default(),
+            dirty: true,
 
             on_cursor_enter: None,
             on_cursor_leave: None,
@@ -78,6 +80,7 @@ impl Component for Canvas {
 
     fn set_position(&mut self, position: ComponentPosition) {
         self.position = position;
+        self.dirty = true;
     }
 
     fn get_size(&self) -> ComponentSize {
@@ -90,6 +93,7 @@ impl Component for Canvas {
 
     fn set_size(&mut self, size: ComponentSize) {
         self.size = size;
+        self.dirty = true;
     }
 
     fn get_min_size(&self) -> Vec2 {
@@ -98,6 +102,7 @@ impl Component for Canvas {
 
     fn set_min_size(&mut self, min_size: Vec2) {
         self.min_size = min_size;
+        self.dirty = true;
     }
 
     fn get_max_size(&self) -> Vec2 {
@@ -106,6 +111,7 @@ impl Component for Canvas {
 
     fn set_max_size(&mut self, max_size: Vec2) {
         self.max_size = max_size;
+        self.dirty = true;
     }
 
     fn get_anchor(&self) -> Vec2 {
@@ -114,6 +120,7 @@ impl Component for Canvas {
 
     fn set_anchor(&mut self, anchor: Vec2) {
         self.anchor = anchor;
+        self.dirty = true;
     }
 
     fn get_margin(&self) -> ComponentMargin {
@@ -122,6 +129,7 @@ impl Component for Canvas {
 
     fn set_margin(&mut self, margin: ComponentMargin) {
         self.margin = margin;
+        self.dirty = true;
     }
 
     fn get_offset(&self) -> Vec2 {
@@ -130,6 +138,7 @@ impl Component for Canvas {
 
     fn set_offset(&mut self, offset: Vec2) {
         self.offset = offset;
+        self.dirty = true;
     }
 
     fn get_color(&self) -> &Color {
@@ -160,14 +169,16 @@ impl Component for Canvas {
                 if self.is_point_inside(*cursor_position) {
                     if !self.is_point_inside(*previous_cursor_position) {
                         if let Some(f) = self.on_cursor_enter {
-                            (f)(self, *cursor_position)
+                            (f)(self, *cursor_position);
+                            self.dirty = true;
                         };
                         events.push(UiEvent::CursorEnter(self.id, *cursor_position));
                     }
                 } else {
                     if self.is_point_inside(*previous_cursor_position) {
                         if let Some(f) = self.on_cursor_leave {
-                            (f)(self, *cursor_position)
+                            (f)(self, *cursor_position);
+                            self.dirty = true;
                         };
                         events.push(UiEvent::CursorLeave(self.id, *cursor_position));
                     }
@@ -176,7 +187,8 @@ impl Component for Canvas {
             InputEvent::MouseButtonPressed(button, cursor_position) => {
                 if self.is_point_inside(*cursor_position) {
                     if let Some(f) = self.on_mouse_button_pressed {
-                        (f)(self, *button, *cursor_position)
+                        (f)(self, *button, *cursor_position);
+                        self.dirty = true;
                     };
                     events.push(UiEvent::MouseButtonPressed(self.id, *button));
                 }
@@ -184,7 +196,8 @@ impl Component for Canvas {
             InputEvent::MouseButtonReleased(button, cursor_position) => {
                 if self.is_point_inside(*cursor_position) {
                     if let Some(f) = self.on_mouse_button_released {
-                        (f)(self, *button, *cursor_position)
+                        (f)(self, *button, *cursor_position);
+                        self.dirty = true;
                     };
                     events.push(UiEvent::MouseButtonReleased(self.id, *button));
                 }
@@ -196,6 +209,10 @@ impl Component for Canvas {
     }
 
     fn update(&mut self, _renderer: &mut RendererContext, area_position: Vec2, area_size: Vec2) -> Result<(), String> {
+        if !self.dirty {
+            return Ok(());
+        }
+
         self.screen_size = match self.size {
             ComponentSize::Absolute(size) => size,
             ComponentSize::Relative(size) => area_size * size,
@@ -217,11 +234,21 @@ impl Component for Canvas {
         ) + self.offset;
         self.screen_size -= Vec2::new(self.margin.left + self.margin.right, self.margin.bottom + self.margin.top);
 
+        self.dirty = false;
+
         Ok(())
     }
 
     fn draw(&mut self, _renderer: &mut RendererContext) -> Result<(), String> {
         Ok(())
+    }
+
+    fn is_dirty(&self) -> bool {
+        self.dirty
+    }
+
+    fn set_dirty_flag(&mut self, dirty: bool) {
+        self.dirty = dirty;
     }
 
     fn as_any(&self) -> &dyn Any {
