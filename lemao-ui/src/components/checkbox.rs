@@ -48,14 +48,9 @@ pub struct Checkbox {
     pub on_cursor_leave: Option<fn(component: &mut Self, cursor_position: Vec2)>,
     pub on_mouse_button_pressed: Option<fn(component: &mut Self, mouse_button: MouseButton, cursor_position: Vec2)>,
     pub on_mouse_button_released: Option<fn(component: &mut Self, mouse_button: MouseButton, cursor_position: Vec2)>,
-
-    pub on_cursor_box_enter: Option<fn(component: &mut Self, cursor_position: Vec2)>,
-    pub on_cursor_box_leave: Option<fn(component: &mut Self, cursor_position: Vec2)>,
-    pub on_mouse_button_box_pressed: Option<fn(component: &mut Self, mouse_button: MouseButton, cursor_position: Vec2)>,
-    pub on_mouse_button_box_released: Option<fn(component: &mut Self, mouse_button: MouseButton, cursor_position: Vec2)>,
-    pub on_box_checked: Option<fn(component: &mut Self, mouse_button: MouseButton)>,
-    pub on_box_unchecked: Option<fn(component: &mut Self, mouse_button: MouseButton)>,
-    pub on_box_changed: Option<fn(component: &mut Self, mouse_button: MouseButton, checked: bool)>,
+    pub on_checkbox_checked: Option<fn(component: &mut Self, mouse_button: MouseButton)>,
+    pub on_checkbox_unchecked: Option<fn(component: &mut Self, mouse_button: MouseButton)>,
+    pub on_checkbox_changed: Option<fn(component: &mut Self, mouse_button: MouseButton, checked: bool)>,
 }
 
 impl Checkbox {
@@ -97,14 +92,9 @@ impl Checkbox {
             on_cursor_leave: None,
             on_mouse_button_pressed: None,
             on_mouse_button_released: None,
-
-            on_cursor_box_enter: None,
-            on_cursor_box_leave: None,
-            on_mouse_button_box_pressed: None,
-            on_mouse_button_box_released: None,
-            on_box_checked: None,
-            on_box_unchecked: None,
-            on_box_changed: None,
+            on_checkbox_checked: None,
+            on_checkbox_unchecked: None,
+            on_checkbox_changed: None,
         })
     }
 
@@ -189,17 +179,8 @@ impl Checkbox {
     fn is_point_inside(&self, point: Vec2) -> bool {
         let x1 = self.screen_position.x;
         let y1 = self.screen_position.y;
-        let x2 = self.screen_position.x + self.screen_size.x;
-        let y2 = self.screen_position.y + self.screen_size.y;
-
-        point.x >= x1 && point.y >= y1 && point.x <= x2 && point.y <= y2
-    }
-
-    fn is_point_inside_box(&self, point: Vec2) -> bool {
-        let x1 = self.screen_position.x + self.box_offset.x;
-        let y1 = self.screen_position.y + self.box_offset.y;
-        let x2 = self.screen_position.x + self.box_offset.x + self.box_size.x;
-        let y2 = self.screen_position.y + self.box_offset.y + self.box_size.y;
+        let x2 = self.screen_position.x + self.label_offset.x + self.screen_size.x;
+        let y2 = self.screen_position.y + self.label_offset.y + self.screen_size.y;
 
         point.x >= x1 && point.y >= y1 && point.x <= x2 && point.y <= y2
     }
@@ -325,7 +306,9 @@ impl Component for Checkbox {
                     if let Some(f) = self.on_mouse_button_pressed {
                         (f)(self, *button, *cursor_position)
                     };
+
                     events.push(UiEvent::MouseButtonPressed(self.id, *button));
+                    self.pressed = true;
                 }
             }
             InputEvent::MouseButtonReleased(button, cursor_position) => {
@@ -334,59 +317,16 @@ impl Component for Checkbox {
                         (f)(self, *button, *cursor_position)
                     };
                     events.push(UiEvent::MouseButtonReleased(self.id, *button));
-                }
-            }
-            _ => {}
-        }
-
-        // Box
-        match event {
-            InputEvent::MouseMoved(cursor_position, previous_cursor_position) => {
-                if self.is_point_inside_box(*cursor_position) {
-                    if !self.is_point_inside_box(*previous_cursor_position) {
-                        if let Some(f) = self.on_cursor_box_enter {
-                            (f)(self, *cursor_position);
-                            self.dirty = true;
-                        };
-                        events.push(UiEvent::CursorCheckboxEnter(self.id, *cursor_position));
-                    }
-                } else {
-                    if self.is_point_inside_box(*previous_cursor_position) {
-                        if let Some(f) = self.on_cursor_box_leave {
-                            (f)(self, *cursor_position);
-                            self.dirty = true;
-                        };
-                        events.push(UiEvent::CursorCheckboxLeave(self.id, *cursor_position));
-                    }
-                }
-            }
-            InputEvent::MouseButtonPressed(button, cursor_position) => {
-                if self.is_point_inside_box(*cursor_position) {
-                    if let Some(f) = self.on_mouse_button_box_pressed {
-                        (f)(self, *button, *cursor_position);
-                        self.dirty = true;
-                    };
-                    events.push(UiEvent::MouseButtonCheckboxPressed(self.id, *button));
-                    self.pressed = true;
-                }
-            }
-            InputEvent::MouseButtonReleased(button, cursor_position) => {
-                if self.is_point_inside_box(*cursor_position) {
-                    if let Some(f) = self.on_mouse_button_box_released {
-                        (f)(self, *button, *cursor_position);
-                        self.dirty = true;
-                    };
-                    events.push(UiEvent::MouseButtonCheckboxReleased(self.id, *button));
 
                     if self.pressed {
                         if self.checked {
-                            if let Some(f) = self.on_box_unchecked {
+                            if let Some(f) = self.on_checkbox_unchecked {
                                 (f)(self, *button);
                                 self.dirty = true;
                             };
                             events.push(UiEvent::CheckboxUnchecked(self.id, *button));
                         } else {
-                            if let Some(f) = self.on_box_checked {
+                            if let Some(f) = self.on_checkbox_checked {
                                 (f)(self, *button);
                                 self.dirty = true;
                             };
@@ -396,17 +336,12 @@ impl Component for Checkbox {
                         self.checked = !self.checked;
                         self.dirty = true;
 
-                        if let Some(f) = self.on_box_changed {
+                        if let Some(f) = self.on_checkbox_changed {
                             (f)(self, *button, self.checked);
                             self.dirty = true;
                         };
                         events.push(UiEvent::CheckboxChanged(self.id, *button, self.checked));
                     }
-                }
-
-                if self.pressed {
-                    self.pressed = false;
-                    self.dirty = true;
                 }
             }
             _ => {}

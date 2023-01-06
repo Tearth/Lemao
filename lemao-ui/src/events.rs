@@ -7,11 +7,6 @@ pub enum UiEvent {
     MouseButtonPressed(usize, MouseButton),
     MouseButtonReleased(usize, MouseButton),
     ButtonClicked(usize, MouseButton),
-
-    CursorCheckboxEnter(usize, Vec2),
-    CursorCheckboxLeave(usize, Vec2),
-    MouseButtonCheckboxPressed(usize, MouseButton),
-    MouseButtonCheckboxReleased(usize, MouseButton),
     CheckboxChecked(usize, MouseButton),
     CheckboxUnchecked(usize, MouseButton),
     CheckboxChanged(usize, MouseButton, bool),
