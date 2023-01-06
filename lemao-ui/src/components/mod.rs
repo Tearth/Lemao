@@ -9,6 +9,7 @@ use crate::events::UiEvent;
 
 pub mod button;
 pub mod canvas;
+pub mod checkbox;
 pub mod label;
 pub mod panel;
 

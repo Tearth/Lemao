@@ -1,5 +1,6 @@
 use crate::components::button::Button;
 use crate::components::canvas::Canvas;
+use crate::components::checkbox::Checkbox;
 use crate::components::label::Label;
 use crate::components::panel::Panel;
 use crate::components::Component;
@@ -75,6 +76,20 @@ impl UiContext {
         let id = self.components.len();
         let canvas = Box::new(Canvas::new(id)?);
         self.components.push(Some(canvas));
+
+        Ok(id)
+    }
+
+    pub fn create_checkbox(
+        &mut self,
+        renderer: &mut RendererContext,
+        label_font_id: usize,
+        tick_on_texture_id: usize,
+        tick_off_texture_id: usize,
+    ) -> Result<usize, String> {
+        let id = self.components.len();
+        let checkbox = Box::new(Checkbox::new(id, renderer, label_font_id, tick_on_texture_id, tick_off_texture_id)?);
+        self.components.push(Some(checkbox));
 
         Ok(id)
     }

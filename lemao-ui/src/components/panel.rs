@@ -131,7 +131,7 @@ impl Panel {
         self.texture_id
     }
 
-    pub fn set_texture_id(&mut self, texture: &Texture) {
+    pub fn set_texture(&mut self, texture: &Texture) {
         self.texture_id = Some(texture.get_id());
         self.texture_original_size = texture.get_size();
         self.size = ComponentSize::Absolute(texture.get_size());
