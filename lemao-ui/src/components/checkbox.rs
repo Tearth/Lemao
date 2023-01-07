@@ -368,12 +368,13 @@ impl Component for Checkbox {
         self.screen_position = match self.position {
             ComponentPosition::AbsoluteToParent(position) => area_position + position,
             ComponentPosition::RelativeToParent(position) => area_position + (position * area_size),
-        } - (self.screen_size * self.anchor);
-
+        };
         self.screen_position += Vec2::new(
-            self.margin.left * self.anchor.x - self.margin.right * (self.anchor.x - 1.0),
-            self.margin.bottom * (self.anchor.y - 1.0) - self.margin.top * self.anchor.y,
+            self.margin.left * (1.0 - self.anchor.x) - self.margin.right * self.anchor.x,
+            self.margin.bottom * (1.0 - self.anchor.y) - self.margin.top * self.anchor.y,
         ) + self.offset;
+        self.screen_size -= Vec2::new(self.margin.left + self.margin.right, self.margin.bottom + self.margin.top);
+        self.screen_position -= self.screen_size * self.anchor;
 
         self.screen_size = self.screen_size.floor();
         self.screen_position = self.screen_position.floor();
