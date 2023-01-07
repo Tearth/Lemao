@@ -29,6 +29,7 @@ pub struct Scrollbox {
     scroll_offset: Vec2,
     scroll_difference: Vec2,
     scroll_delta: Vec2,
+    scroll_speed: Vec2,
     children: Vec<usize>,
     dirty: bool,
     event_mask: Option<EventMask>,
@@ -37,6 +38,7 @@ pub struct Scrollbox {
     pub on_cursor_leave: Option<fn(component: &mut Self, cursor_position: Vec2)>,
     pub on_mouse_button_pressed: Option<fn(component: &mut Self, mouse_button: MouseButton, cursor_position: Vec2)>,
     pub on_mouse_button_released: Option<fn(component: &mut Self, mouse_button: MouseButton, cursor_position: Vec2)>,
+    pub on_scroll: Option<fn(component: &mut Self, direction: MouseWheelDirection)>,
 }
 
 impl Scrollbox {
@@ -56,6 +58,7 @@ impl Scrollbox {
             scroll_offset: Default::default(),
             scroll_difference: Default::default(),
             scroll_delta: Default::default(),
+            scroll_speed: Vec2::new(5.0, 5.0),
             children: Default::default(),
             dirty: true,
             event_mask: None,
@@ -64,6 +67,7 @@ impl Scrollbox {
             on_cursor_leave: None,
             on_mouse_button_pressed: None,
             on_mouse_button_released: None,
+            on_scroll: None,
         })
     }
 
@@ -95,6 +99,15 @@ impl Scrollbox {
 
     pub fn set_scroll_delta(&mut self, scroll_delta: Vec2) {
         self.scroll_delta = scroll_delta;
+        self.dirty = true;
+    }
+
+    pub fn get_scroll_speed(&self) -> Vec2 {
+        self.scroll_speed
+    }
+
+    pub fn set_scroll_speed(&mut self, scroll_speed: Vec2) {
+        self.scroll_speed = scroll_speed;
         self.dirty = true;
     }
 
@@ -262,13 +275,18 @@ impl Component for Scrollbox {
             }
             InputEvent::MouseWheelRotated(direction) => {
                 match direction {
-                    MouseWheelDirection::Up => self.scroll_delta -= Vec2::new(0.0, 5.0),
-                    MouseWheelDirection::Down => self.scroll_delta += Vec2::new(0.0, 5.0),
+                    MouseWheelDirection::Up => self.scroll_delta -= Vec2::new(0.0, self.scroll_speed.y),
+                    MouseWheelDirection::Down => self.scroll_delta += Vec2::new(0.0, self.scroll_speed.y),
                     _ => {}
                 };
 
                 self.scroll_delta = self.scroll_delta.clamp(Vec2::new(0.0, 0.0), self.scroll_difference);
-                self.dirty = true;
+
+                if let Some(f) = self.on_scroll {
+                    (f)(self, *direction);
+                    self.dirty = true;
+                };
+                events.push(UiEvent::ScrollboxScroll(self.id, *direction));
             }
             _ => {}
         }

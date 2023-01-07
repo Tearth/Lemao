@@ -214,6 +214,14 @@ impl Button {
         self.dirty = true;
     }
 
+    pub fn is_pressed(&self) -> bool {
+        self.pressed
+    }
+
+    pub fn set_pressed_flag(&mut self, pressed: bool) {
+        self.pressed = pressed;
+    }
+
     pub fn get_texture_id(&self) -> Option<usize> {
         self.texture_id
     }

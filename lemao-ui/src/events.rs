@@ -1,4 +1,4 @@
-use lemao_core::lemao_common_platform::input::MouseButton;
+use lemao_core::lemao_common_platform::input::{MouseButton, MouseWheelDirection};
 use lemao_math::vec2::Vec2;
 
 pub enum UiEvent {
@@ -10,4 +10,5 @@ pub enum UiEvent {
     CheckboxChecked(usize, MouseButton),
     CheckboxUnchecked(usize, MouseButton),
     CheckboxChanged(usize, MouseButton, bool),
+    ScrollboxScroll(usize, MouseWheelDirection),
 }
