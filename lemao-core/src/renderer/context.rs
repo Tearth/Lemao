@@ -344,6 +344,19 @@ impl RendererContext {
         self.get_drawable_mut(drawable_id)?.as_any_mut().downcast_mut::<T>().ok_or(format!("Drawable object with id {} cannot be downcasted", drawable_id))
     }
 
+    pub fn enable_scissor(&self, position: Vec2, size: Vec2) {
+        unsafe {
+            (self.gl.glEnable)(opengl::GL_SCISSOR_TEST);
+            (self.gl.glScissor)(position.x as i32, position.y as i32, size.x as i32, size.y as i32);
+        }
+    }
+
+    pub fn disable_scissor(&self) {
+        unsafe {
+            (self.gl.glDisable)(opengl::GL_SCISSOR_TEST);
+        }
+    }
+
     pub fn batcher_add_drawable(&mut self, drawable_id: usize) -> Result<(), String> {
         let drawable = self.drawables.as_ref().unwrap().get(drawable_id)?;
         let mut batch = drawable.get_batch();

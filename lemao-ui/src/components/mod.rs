@@ -12,6 +12,7 @@ pub mod canvas;
 pub mod checkbox;
 pub mod label;
 pub mod panel;
+pub mod scrollbox;
 
 #[derive(Copy, Clone, Debug)]
 pub enum ComponentPosition {
@@ -61,6 +62,12 @@ pub enum VerticalAlignment {
     Bottom,
 }
 
+#[derive(Copy, Clone, Debug, Default, PartialEq)]
+pub struct EventMask {
+    pub position: Vec2,
+    pub size: Vec2,
+}
+
 pub trait Component {
     fn get_position(&self) -> ComponentPosition;
     fn get_work_area_position(&self) -> Vec2;
@@ -84,6 +91,9 @@ pub trait Component {
     fn get_offset(&self) -> Vec2;
     fn set_offset(&mut self, offset: Vec2);
 
+    fn get_scroll_offset(&self) -> Vec2;
+    fn set_scroll_offset(&mut self, scroll_offset: Vec2);
+
     fn get_color(&self) -> &Color;
     fn set_color(&mut self, color: Color);
 
@@ -97,6 +107,9 @@ pub trait Component {
 
     fn is_dirty(&self) -> bool;
     fn set_dirty_flag(&mut self, dirty: bool);
+
+    fn get_event_mask(&self) -> Option<EventMask>;
+    fn set_event_mask(&mut self, event_mask: Option<EventMask>);
 
     fn as_any(&self) -> &dyn Any;
     fn as_any_mut(&mut self) -> &mut dyn Any;
@@ -121,5 +134,11 @@ impl ComponentBorderThickness {
 impl From<ComponentBorderThickness> for FrameThickness {
     fn from(thickness: ComponentBorderThickness) -> Self {
         Self { top: thickness.top, bottom: thickness.bottom, right: thickness.right, left: thickness.left }
+    }
+}
+
+impl EventMask {
+    pub fn new(position: Vec2, size: Vec2) -> Self {
+        Self { position, size }
     }
 }

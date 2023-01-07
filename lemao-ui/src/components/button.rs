@@ -6,6 +6,7 @@ use super::ComponentMargin;
 use super::ComponentPosition;
 use super::ComponentShape;
 use super::ComponentSize;
+use super::EventMask;
 use super::HorizontalAlignment;
 use super::VerticalAlignment;
 use lemao_core::lemao_common_platform::input::InputEvent;
@@ -37,6 +38,7 @@ pub struct Button {
     anchor: Vec2,
     margin: ComponentMargin,
     offset: Vec2,
+    scroll_offset: Vec2,
     color: Color,
     border_thickness: ComponentBorderThickness,
     border_color: Color,
@@ -55,6 +57,7 @@ pub struct Button {
     label_id: usize,
     children: Vec<usize>,
     dirty: bool,
+    event_mask: Option<EventMask>,
 
     pub on_cursor_enter: Option<fn(component: &mut Self, cursor_position: Vec2)>,
     pub on_cursor_leave: Option<fn(component: &mut Self, cursor_position: Vec2)>,
@@ -77,6 +80,7 @@ impl Button {
             anchor: Default::default(),
             margin: Default::default(),
             offset: Default::default(),
+            scroll_offset: Default::default(),
             color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             border_thickness: Default::default(),
             border_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
@@ -101,6 +105,7 @@ impl Button {
             label_id: renderer.create_text(label_font_id)?,
             children: Default::default(),
             dirty: true,
+            event_mask: None,
 
             on_cursor_enter: None,
             on_cursor_leave: None,
@@ -221,6 +226,16 @@ impl Button {
     }
 
     fn is_point_inside(&self, point: Vec2) -> bool {
+        if let Some(event_mask) = self.event_mask {
+            let event_mask_left_bottom = event_mask.position;
+            let event_mask_right_top = event_mask.position + event_mask.size;
+
+            if point.x < event_mask_left_bottom.x || point.y < event_mask_left_bottom.y || point.x > event_mask_right_top.x || point.y > event_mask_right_top.y
+            {
+                return false;
+            }
+        }
+
         if self.shape == ComponentShape::Rectangle || (self.shape == ComponentShape::Disc && self.roundness_factor < 0.8) {
             let x1 = self.screen_position.x;
             let y1 = self.screen_position.y;
@@ -308,6 +323,15 @@ impl Component for Button {
 
     fn set_offset(&mut self, offset: Vec2) {
         self.offset = offset;
+        self.dirty = true;
+    }
+
+    fn get_scroll_offset(&self) -> Vec2 {
+        self.scroll_offset
+    }
+
+    fn set_scroll_offset(&mut self, scroll_offset: Vec2) {
+        self.scroll_offset = scroll_offset;
         self.dirty = true;
     }
 
@@ -418,6 +442,7 @@ impl Component for Button {
         ) + self.offset;
         self.screen_size -= Vec2::new(self.margin.left + self.margin.right, self.margin.bottom + self.margin.top);
         self.screen_position -= self.screen_size * self.anchor;
+        self.screen_position += self.scroll_offset;
 
         self.screen_size = self.screen_size.floor();
         self.screen_position = self.screen_position.floor();
@@ -509,6 +534,14 @@ impl Component for Button {
 
     fn set_dirty_flag(&mut self, dirty: bool) {
         self.dirty = dirty;
+    }
+
+    fn get_event_mask(&self) -> Option<EventMask> {
+        self.event_mask
+    }
+
+    fn set_event_mask(&mut self, event_mask: Option<EventMask>) {
+        self.event_mask = event_mask;
     }
 
     fn as_any(&self) -> &dyn Any {

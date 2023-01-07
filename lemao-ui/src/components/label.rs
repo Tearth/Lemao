@@ -4,6 +4,7 @@ use super::Component;
 use super::ComponentMargin;
 use super::ComponentPosition;
 use super::ComponentSize;
+use super::EventMask;
 use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_common_platform::input::MouseButton;
 use lemao_core::lemao_math::color::SolidColor;
@@ -26,6 +27,7 @@ pub struct Label {
     anchor: Vec2,
     margin: ComponentMargin,
     offset: Vec2,
+    scroll_offset: Vec2,
     color: Color,
     multiline: bool,
     max_multiline_width: f32,
@@ -34,6 +36,7 @@ pub struct Label {
     label_id: usize,
     children: Vec<usize>,
     dirty: bool,
+    event_mask: Option<EventMask>,
 
     pub on_cursor_enter: Option<fn(component: &mut Self, cursor_position: Vec2)>,
     pub on_cursor_leave: Option<fn(component: &mut Self, cursor_position: Vec2)>,
@@ -54,6 +57,7 @@ impl Label {
             anchor: Default::default(),
             margin: Default::default(),
             offset: Default::default(),
+            scroll_offset: Default::default(),
             color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             multiline: false,
             max_multiline_width: 0.0,
@@ -62,6 +66,7 @@ impl Label {
             label_id: renderer.create_text(label_font_id)?,
             children: Default::default(),
             dirty: true,
+            event_mask: None,
 
             on_cursor_enter: None,
             on_cursor_leave: None,
@@ -101,6 +106,16 @@ impl Label {
     }
 
     fn is_point_inside(&self, point: Vec2) -> bool {
+        if let Some(event_mask) = self.event_mask {
+            let event_mask_left_bottom = event_mask.position;
+            let event_mask_right_top = event_mask.position + event_mask.size;
+
+            if point.x < event_mask_left_bottom.x || point.y < event_mask_left_bottom.y || point.x > event_mask_right_top.x || point.y > event_mask_right_top.y
+            {
+                return false;
+            }
+        }
+
         let x1 = self.screen_position.x;
         let y1 = self.screen_position.y;
         let x2 = self.screen_position.x + self.screen_size.x;
@@ -179,6 +194,15 @@ impl Component for Label {
 
     fn set_offset(&mut self, offset: Vec2) {
         self.offset = offset;
+        self.dirty = true;
+    }
+
+    fn get_scroll_offset(&self) -> Vec2 {
+        self.scroll_offset
+    }
+
+    fn set_scroll_offset(&mut self, scroll_offset: Vec2) {
+        self.scroll_offset = scroll_offset;
         self.dirty = true;
     }
 
@@ -292,6 +316,7 @@ impl Component for Label {
             self.margin.bottom * (1.0 - self.anchor.y) - self.margin.top * self.anchor.y,
         ) + self.offset;
         self.screen_position -= self.screen_size * self.anchor;
+        self.screen_position += self.scroll_offset;
 
         self.screen_size = self.screen_size.floor();
         self.screen_position = self.screen_position.floor();
@@ -316,6 +341,14 @@ impl Component for Label {
 
     fn set_dirty_flag(&mut self, dirty: bool) {
         self.dirty = dirty;
+    }
+
+    fn get_event_mask(&self) -> Option<EventMask> {
+        self.event_mask
+    }
+
+    fn set_event_mask(&mut self, event_mask: Option<EventMask>) {
+        self.event_mask = event_mask;
     }
 
     fn as_any(&self) -> &dyn Any {

@@ -3,10 +3,12 @@ use crate::components::canvas::Canvas;
 use crate::components::checkbox::Checkbox;
 use crate::components::label::Label;
 use crate::components::panel::Panel;
+use crate::components::scrollbox::Scrollbox;
 use crate::components::Component;
 use crate::components::ComponentPosition;
 use crate::components::ComponentShape;
 use crate::components::ComponentSize;
+use crate::components::EventMask;
 use crate::events::UiEvent;
 use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_math::vec2::Vec2;
@@ -112,6 +114,14 @@ impl UiContext {
         Ok(id)
     }
 
+    pub fn create_scrollbox(&mut self, renderer: &mut RendererContext) -> Result<usize, String> {
+        let id = self.components.len();
+        let scrollbox = Box::new(Scrollbox::new(id)?);
+        self.components.push(Some(scrollbox));
+
+        Ok(id)
+    }
+
     pub fn get_component(&self, component_id: usize) -> Result<&dyn Component, String> {
         if component_id >= self.components.len() {
             return Err(format!("Component with id {} not found", component_id));
@@ -150,6 +160,17 @@ impl UiContext {
         self.get_component_mut(self.main_canvas_id)
     }
 
+    pub fn begin_scrollbox(&self, scrollbox_id: usize, renderer: &RendererContext) -> Result<(), String> {
+        let scrollbox = self.get_component(scrollbox_id)?;
+        renderer.enable_scissor(scrollbox.get_work_area_position(), scrollbox.get_work_area_size());
+
+        Ok(())
+    }
+
+    pub fn end_scrollbox(&self, renderer: &RendererContext) {
+        renderer.disable_scissor();
+    }
+
     pub fn update(&mut self, renderer: &mut RendererContext) -> Result<(), String> {
         let main_canvas = self.get_main_canvas()?;
         let area_position = match main_canvas.get_position() {
@@ -160,7 +181,7 @@ impl UiContext {
             ComponentSize::Absolute(size) => size,
             _ => return Err("Invalid canvas".to_string()),
         };
-        self.update_internal(renderer, self.main_canvas_id, area_position, area_size, false)?;
+        self.update_internal(renderer, self.main_canvas_id, area_position, area_size, None, Default::default(), false)?;
 
         Ok(())
     }
@@ -171,6 +192,8 @@ impl UiContext {
         component_id: usize,
         area_position: Vec2,
         area_size: Vec2,
+        event_mask: Option<EventMask>,
+        scroll_offset: Vec2,
         force: bool,
     ) -> Result<(), String> {
         let component = self.get_component_mut(component_id)?;
@@ -180,13 +203,42 @@ impl UiContext {
             component.set_dirty_flag(true);
         }
 
+        component.set_scroll_offset(scroll_offset);
         component.update(renderer, area_position, area_size)?;
 
         let component_area_position = component.get_work_area_position();
         let component_area_size = component.get_work_area_size();
+        let (event_mask, scroll_offset) = if let Ok(scrollbox) = self.get_component_with_type::<Scrollbox>(component_id) {
+            (Some(EventMask::new(component_area_position, component_area_size)), scrollbox.get_scroll_delta())
+        } else {
+            (event_mask, Default::default())
+        };
 
-        for child_id in component.get_children().clone() {
-            self.update_internal(renderer, child_id, component_area_position, component_area_size, force || update_children)?;
+        let component = self.get_component_mut(component_id)?;
+        component.set_event_mask(event_mask);
+
+        for child_id in self.get_component_mut(component_id)?.get_children().clone() {
+            self.update_internal(renderer, child_id, component_area_position, component_area_size, event_mask, scroll_offset, force || update_children)?;
+        }
+
+        // Scrollbox needs to be updated second time, after all children are refreshed
+        if let Ok(scrollbox) = self.get_component_with_type::<Scrollbox>(component_id) {
+            let mut left_bottom_corner: Vec2 = Vec2::new(f32::MAX, f32::MAX);
+            let mut right_top_corner: Vec2 = Vec2::new(f32::MIN, f32::MIN);
+
+            for child_id in self.get_component(component_id)?.get_children().clone() {
+                let child = self.get_component(child_id)?;
+                let child_area_position = child.get_work_area_position();
+                let child_area_size = child.get_work_area_size();
+
+                left_bottom_corner.x = f32::min(left_bottom_corner.x, child_area_position.x);
+                left_bottom_corner.y = f32::min(left_bottom_corner.y, child_area_position.y);
+                right_top_corner.x = f32::max(right_top_corner.x, child_area_position.x + child_area_size.x);
+                right_top_corner.y = f32::max(right_top_corner.y, child_area_position.y + child_area_size.y);
+            }
+
+            self.get_component_with_type_mut::<Scrollbox>(component_id)?.set_total_size(right_top_corner - left_bottom_corner);
+            self.get_component_with_type_mut::<Scrollbox>(component_id)?.update(renderer, area_position, area_size)?;
         }
 
         Ok(())
