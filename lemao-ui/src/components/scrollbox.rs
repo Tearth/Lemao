@@ -111,6 +111,14 @@ impl Scrollbox {
         self.dirty = true;
     }
 
+    pub fn get_color(&self) -> &Color {
+        panic!("Not supported")
+    }
+
+    pub fn set_color(&mut self, color: Color) {
+        panic!("Not supported")
+    }
+
     fn is_point_inside(&self, point: Vec2) -> bool {
         if let Some(event_mask) = self.event_mask {
             let event_mask_left_bottom = event_mask.position;
@@ -210,14 +218,6 @@ impl Component for Scrollbox {
     fn set_scroll_offset(&mut self, scroll_offset: Vec2) {
         self.scroll_offset = scroll_offset;
         self.dirty = true;
-    }
-
-    fn get_color(&self) -> &Color {
-        panic!("Not supported")
-    }
-
-    fn set_color(&mut self, color: Color) {
-        panic!("Not supported")
     }
 
     fn add_child(&mut self, component_id: usize) {

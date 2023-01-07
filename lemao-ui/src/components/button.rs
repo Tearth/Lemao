@@ -222,6 +222,15 @@ impl Button {
         self.pressed = pressed;
     }
 
+    pub fn get_color(&self) -> &Color {
+        &self.color
+    }
+
+    pub fn set_color(&mut self, color: Color) {
+        self.color = color;
+        self.dirty = true;
+    }
+
     pub fn get_texture_id(&self) -> Option<usize> {
         self.texture_id
     }
@@ -340,15 +349,6 @@ impl Component for Button {
 
     fn set_scroll_offset(&mut self, scroll_offset: Vec2) {
         self.scroll_offset = scroll_offset;
-        self.dirty = true;
-    }
-
-    fn get_color(&self) -> &Color {
-        &self.color
-    }
-
-    fn set_color(&mut self, color: Color) {
-        self.color = color;
         self.dirty = true;
     }
 

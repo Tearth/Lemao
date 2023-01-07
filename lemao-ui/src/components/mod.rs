@@ -94,9 +94,6 @@ pub trait Component {
     fn get_scroll_offset(&self) -> Vec2;
     fn set_scroll_offset(&mut self, scroll_offset: Vec2);
 
-    fn get_color(&self) -> &Color;
-    fn set_color(&mut self, color: Color);
-
     fn add_child(&mut self, component_id: usize);
     fn remove_child(&mut self, component_id: usize);
     fn get_children(&self) -> &Vec<usize>;
