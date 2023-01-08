@@ -59,7 +59,7 @@ pub fn main() -> Result<(), String> {
                         window.close()
                     }
                 }
-                InputEvent::MouseWheelRotated(direction) => {
+                InputEvent::MouseWheelRotated(direction, _) => {
                     if direction == MouseWheelDirection::Up {
                         if sleep_duration < 1000 {
                             sleep_duration += 1;

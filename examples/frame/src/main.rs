@@ -59,7 +59,7 @@ pub fn main() -> Result<(), String> {
                         window.close()
                     }
                 }
-                InputEvent::MouseWheelRotated(direction) => {
+                InputEvent::MouseWheelRotated(direction, _) => {
                     let frame = renderer.get_drawable_with_type_mut::<Frame>(frame_id)?;
                     if direction == MouseWheelDirection::Up {
                         frame.set_thickness(frame.get_thickness() + FrameThickness::new(1.0, 1.0, 1.0, 1.0));

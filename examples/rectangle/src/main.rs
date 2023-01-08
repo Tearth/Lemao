@@ -60,7 +60,7 @@ pub fn main() -> Result<(), String> {
                         window.close()
                     }
                 }
-                InputEvent::MouseWheelRotated(direction) => {
+                InputEvent::MouseWheelRotated(direction, _) => {
                     let rectangle = renderer.get_drawable_with_type_mut::<Rectangle>(rectangle_id)?;
                     if direction == MouseWheelDirection::Up {
                         rectangle.set_size(rectangle.get_size() + Vec2::new(1.0, 1.0));

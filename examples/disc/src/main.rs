@@ -58,7 +58,7 @@ pub fn main() -> Result<(), String> {
                         window.close()
                     }
                 }
-                InputEvent::MouseWheelRotated(direction) => {
+                InputEvent::MouseWheelRotated(direction, _) => {
                     let disc = renderer.get_drawable_with_type_mut::<Disc>(disc_id)?;
                     if direction == MouseWheelDirection::Up {
                         disc.set_sides(disc.get_sides() + 1);

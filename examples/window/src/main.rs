@@ -116,7 +116,7 @@ pub fn main() -> Result<(), String> {
 
                     window.set_style(WindowStyle::Fullscreen)?;
                 }
-                InputEvent::MouseMoved(_) => {
+                InputEvent::MouseMoved(_, _) => {
                     style_changed = true;
                 }
                 InputEvent::WindowClosed => {

@@ -55,7 +55,7 @@ pub fn main() -> Result<(), String> {
                         window.close();
                     }
                 }
-                InputEvent::MouseWheelRotated(direction) => {
+                InputEvent::MouseWheelRotated(direction, _) => {
                     let line = renderer.get_drawable_with_type_mut::<Line>(line_id)?;
                     if direction == MouseWheelDirection::Up {
                         line.set_thickness(line.get_thickness() + 1.0);
