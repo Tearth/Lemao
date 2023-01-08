@@ -63,6 +63,13 @@ pub struct Button {
     label_offset: Vec2,
     label_color: Color,
 
+    // Shadow
+    shadow_enabled: bool,
+    shadow_offset: Vec2,
+    shadow_color: Color,
+    shadow_scale: Vec2,
+    shadow_roundness_factor: f32,
+
     // Component-specific properties
     pressed: bool,
 
@@ -121,6 +128,13 @@ impl Button {
             label_vertical_alignment: VerticalAlignment::Middle,
             label_offset: Default::default(),
             label_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
+
+            // Shadow
+            shadow_enabled: false,
+            shadow_offset: Default::default(),
+            shadow_color: Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 1.0)),
+            shadow_scale: Vec2::new(1.0, 1.0),
+            shadow_roundness_factor: 0.0,
 
             // Component-specific properties
             pressed: false,
@@ -256,6 +270,48 @@ impl Button {
     pub fn set_label_color(&mut self, label_color: Color) {
         self.label_color = label_color;
         self.dirty = true;
+    }
+    /* #endregion */
+
+    /* #region Shadow properties */
+    pub fn is_shadow_enabled(&self) -> bool {
+        self.shadow_enabled
+    }
+
+    pub fn set_shadow_enabled_flag(&mut self, shadow_enabled: bool) {
+        self.shadow_enabled = shadow_enabled;
+    }
+
+    pub fn get_shadow_offset(&self) -> Vec2 {
+        self.shadow_offset
+    }
+
+    pub fn set_shadow_offset(&mut self, shadow_offset: Vec2) {
+        self.shadow_offset = shadow_offset;
+    }
+
+    pub fn get_shadow_color(&self) -> &Color {
+        &self.shadow_color
+    }
+
+    pub fn set_shadow_color(&mut self, get_shadow_color: Color) {
+        self.shadow_color = get_shadow_color;
+    }
+
+    pub fn get_shadow_scale(&self) -> Vec2 {
+        self.shadow_scale
+    }
+
+    pub fn set_shadow_scale(&mut self, shadow_scale: Vec2) {
+        self.shadow_scale = shadow_scale;
+    }
+
+    pub fn get_shadow_roundness_factor(&self) -> f32 {
+        self.shadow_roundness_factor
+    }
+
+    pub fn set_shadow_roundness_factor(&mut self, shadow_roundness_factor: f32) {
+        self.shadow_roundness_factor = shadow_roundness_factor;
     }
     /* #endregion */
 
@@ -571,6 +627,40 @@ impl Component for Button {
     }
 
     fn draw(&mut self, renderer: &mut RendererContext) -> Result<(), String> {
+        if self.shadow_enabled {
+            let panel = renderer.get_drawable_mut(self.filling_id)?;
+            let original_position = panel.get_position();
+            let original_scale = panel.get_scale();
+            let original_anchor = panel.get_anchor();
+            let original_color = panel.get_color().clone();
+
+            let original_squircle_factor = if let Ok(disc) = renderer.get_drawable_with_type_mut::<Disc>(self.filling_id) {
+                let original_squircle_factor = disc.get_squircle_factor();
+                disc.set_squircle_factor(1.0 - self.shadow_roundness_factor);
+
+                original_squircle_factor
+            } else {
+                0.0
+            };
+
+            let panel = renderer.get_drawable_mut(self.filling_id)?;
+            panel.set_position(original_position + (panel.get_size() / 2.0) + self.shadow_offset);
+            panel.set_scale(original_scale * self.shadow_scale);
+            panel.set_anchor(Vec2::new(0.5, 0.5));
+            panel.set_color(self.shadow_color.clone());
+            renderer.draw(self.filling_id)?;
+
+            let panel = renderer.get_drawable_mut(self.filling_id)?;
+            panel.set_position(original_position);
+            panel.set_scale(original_scale);
+            panel.set_anchor(original_anchor);
+            panel.set_color(original_color);
+
+            if let Ok(disc) = renderer.get_drawable_with_type_mut::<Disc>(self.filling_id) {
+                disc.set_squircle_factor(original_squircle_factor);
+            }
+        }
+
         renderer.draw(self.filling_id)?;
         renderer.draw(self.label_id)?;
 

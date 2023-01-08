@@ -40,6 +40,11 @@ pub struct Label {
     multiline: bool,
     max_multiline_width: f32,
 
+    // Shadow
+    shadow_enabled: bool,
+    shadow_offset: Vec2,
+    shadow_color: Color,
+
     // Event handlers
     pub on_cursor_enter: Option<fn(component: &mut Self, cursor_position: Vec2)>,
     pub on_cursor_leave: Option<fn(component: &mut Self, cursor_position: Vec2)>,
@@ -74,6 +79,11 @@ impl Label {
             label_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             multiline: false,
             max_multiline_width: 0.0,
+
+            // Shadow
+            shadow_enabled: false,
+            shadow_offset: Default::default(),
+            shadow_color: Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 1.0)),
 
             // Event handlers
             on_cursor_enter: None,
@@ -121,6 +131,32 @@ impl Label {
     pub fn set_color(&mut self, color: Color) {
         self.label_color = color;
         self.dirty = true;
+    }
+    /* #endregion */
+
+    /* #region Shadow properties */
+    pub fn is_shadow_enabled(&self) -> bool {
+        self.shadow_enabled
+    }
+
+    pub fn set_shadow_enabled_flag(&mut self, shadow_enabled: bool) {
+        self.shadow_enabled = shadow_enabled;
+    }
+
+    pub fn get_shadow_offset(&self) -> Vec2 {
+        self.shadow_offset
+    }
+
+    pub fn set_shadow_offset(&mut self, shadow_offset: Vec2) {
+        self.shadow_offset = shadow_offset;
+    }
+
+    pub fn get_shadow_color(&self) -> &Color {
+        &self.shadow_color
+    }
+
+    pub fn set_shadow_color(&mut self, get_shadow_color: Color) {
+        self.shadow_color = get_shadow_color;
     }
     /* #endregion */
 
@@ -359,6 +395,21 @@ impl Component for Label {
     }
 
     fn draw(&mut self, renderer: &mut RendererContext) -> Result<(), String> {
+        if self.shadow_enabled {
+            let panel = renderer.get_drawable_mut(self.label_id)?;
+            let original_position = panel.get_position();
+            let original_color = panel.get_color().clone();
+
+            let panel = renderer.get_drawable_mut(self.label_id)?;
+            panel.set_position(original_position + self.shadow_offset);
+            panel.set_color(self.shadow_color.clone());
+            renderer.draw(self.label_id)?;
+
+            let panel = renderer.get_drawable_mut(self.label_id)?;
+            panel.set_position(original_position);
+            panel.set_color(original_color);
+        }
+
         renderer.draw(self.label_id)?;
         Ok(())
     }

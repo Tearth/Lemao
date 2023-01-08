@@ -49,6 +49,11 @@ pub struct Checkbox {
     label_offset: Vec2,
     label_color: Color,
 
+    // Shadow
+    shadow_enabled: bool,
+    shadow_offset: Vec2,
+    shadow_color: Color,
+
     // Component-specific properties
     pressed: bool,
     checked: bool,
@@ -104,6 +109,11 @@ impl Checkbox {
             label_offset: Default::default(),
             label_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
 
+            // Shadow
+            shadow_enabled: false,
+            shadow_offset: Default::default(),
+            shadow_color: Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 1.0)),
+
             // Component-specific properties
             pressed: false,
             checked: false,
@@ -123,42 +133,7 @@ impl Checkbox {
         self.id
     }
 
-    pub fn get_font_id(&self) -> usize {
-        self.label_font_id
-    }
-
-    pub fn set_font_id(&mut self, font_id: usize) {
-        self.label_font_id = font_id;
-        self.dirty = true;
-    }
-
-    pub fn get_text(&self) -> &str {
-        &self.label_text
-    }
-
-    pub fn set_text(&mut self, text: String) {
-        self.label_text = text;
-        self.dirty = true;
-    }
-
-    pub fn is_checked(&self) -> bool {
-        self.checked
-    }
-
-    pub fn set_checked(&mut self, checked: bool) {
-        self.checked = checked;
-        self.dirty = true;
-    }
-
-    pub fn get_label_offset(&self) -> Vec2 {
-        self.label_offset
-    }
-
-    pub fn set_label_offset(&mut self, label_offset: Vec2) {
-        self.label_offset = label_offset;
-        self.dirty = true;
-    }
-
+    /* #region Box properties */
     pub fn get_box_checked_texture_id(&self) -> usize {
         self.box_checked_texture_id
     }
@@ -196,15 +171,82 @@ impl Checkbox {
         self.box_offset = box_offset;
         self.dirty = true;
     }
+    /* #endregion */
 
-    pub fn get_color(&self) -> &Color {
+    /* #region Label properties */
+    pub fn get_font_id(&self) -> usize {
+        self.label_font_id
+    }
+
+    pub fn set_font_id(&mut self, font_id: usize) {
+        self.label_font_id = font_id;
+        self.dirty = true;
+    }
+
+    pub fn get_text(&self) -> &str {
+        &self.label_text
+    }
+
+    pub fn set_text(&mut self, text: String) {
+        self.label_text = text;
+        self.dirty = true;
+    }
+
+    pub fn get_label_offset(&self) -> Vec2 {
+        self.label_offset
+    }
+
+    pub fn set_label_offset(&mut self, label_offset: Vec2) {
+        self.label_offset = label_offset;
+        self.dirty = true;
+    }
+
+    pub fn get_label_color(&self) -> &Color {
         &self.label_color
     }
 
-    pub fn set_color(&mut self, color: Color) {
+    pub fn set_label_color(&mut self, color: Color) {
         self.label_color = color;
         self.dirty = true;
     }
+    /* #endregion */
+
+    /* #region Shadow properties */
+    pub fn is_shadow_enabled(&self) -> bool {
+        self.shadow_enabled
+    }
+
+    pub fn set_shadow_enabled_flag(&mut self, shadow_enabled: bool) {
+        self.shadow_enabled = shadow_enabled;
+    }
+
+    pub fn get_shadow_offset(&self) -> Vec2 {
+        self.shadow_offset
+    }
+
+    pub fn set_shadow_offset(&mut self, shadow_offset: Vec2) {
+        self.shadow_offset = shadow_offset;
+    }
+
+    pub fn get_shadow_color(&self) -> &Color {
+        &self.shadow_color
+    }
+
+    pub fn set_shadow_color(&mut self, get_shadow_color: Color) {
+        self.shadow_color = get_shadow_color;
+    }
+    /* #endregion */
+
+    /* #region Component-specific properties */
+    pub fn is_checked(&self) -> bool {
+        self.checked
+    }
+
+    pub fn set_checked(&mut self, checked: bool) {
+        self.checked = checked;
+        self.dirty = true;
+    }
+    /* #endregion */
 
     fn is_point_inside(&self, point: Vec2) -> bool {
         if let Some(event_mask) = self.event_mask {
@@ -464,6 +506,21 @@ impl Component for Checkbox {
     }
 
     fn draw(&mut self, renderer: &mut RendererContext) -> Result<(), String> {
+        if self.shadow_enabled {
+            let panel = renderer.get_drawable_mut(self.label_id)?;
+            let original_position = panel.get_position();
+            let original_color = panel.get_color().clone();
+
+            let panel = renderer.get_drawable_mut(self.label_id)?;
+            panel.set_position(original_position + self.shadow_offset);
+            panel.set_color(self.shadow_color.clone());
+            renderer.draw(self.label_id)?;
+
+            let panel = renderer.get_drawable_mut(self.label_id)?;
+            panel.set_position(original_position);
+            panel.set_color(original_color);
+        }
+
         renderer.draw(self.box_id)?;
         renderer.draw(self.label_id)?;
         Ok(())
