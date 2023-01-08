@@ -14,7 +14,9 @@ use lemao_core::renderer::context::RendererContext;
 use lemao_core::renderer::drawable::circle::Circle;
 use lemao_core::renderer::drawable::disc::Disc;
 use lemao_core::renderer::drawable::frame::Frame;
+use lemao_core::renderer::drawable::rectangle::Rectangle;
 use lemao_core::renderer::drawable::Color;
+use lemao_core::renderer::textures::Texture;
 use lemao_math::color::SolidColor;
 use std::any::Any;
 
@@ -43,6 +45,7 @@ pub struct Scrollbox {
     scroll_background_id: usize,
     scroll_background_color: Color,
     scroll_background_roundness_factor: f32,
+    scroll_background_texture_id: Option<usize>,
 
     // Scroll background border properties
     scroll_background_border_id: usize,
@@ -53,6 +56,7 @@ pub struct Scrollbox {
     scroll_id: usize,
     scroll_color: Color,
     scroll_roundness_factor: f32,
+    scroll_texture_id: Option<usize>,
 
     // Scroll border properties
     scroll_border_id: usize,
@@ -108,6 +112,7 @@ impl Scrollbox {
             },
             scroll_background_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             scroll_background_roundness_factor: 0.0,
+            scroll_background_texture_id: None,
 
             // Scroll background border properties
             scroll_background_border_id: match scroll_shape {
@@ -124,6 +129,7 @@ impl Scrollbox {
             },
             scroll_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             scroll_roundness_factor: 0.0,
+            scroll_texture_id: None,
 
             // Scroll border properties
             scroll_border_id: match scroll_shape {
@@ -188,6 +194,15 @@ impl Scrollbox {
         self.dirty = true;
         Ok(())
     }
+
+    pub fn get_scroll_texture_id(&self) -> Option<usize> {
+        self.scroll_texture_id
+    }
+
+    pub fn set_scroll_texture_id(&mut self, scroll_texture: &Texture) {
+        self.scroll_texture_id = Some(scroll_texture.get_id());
+        self.dirty = true;
+    }
     /* #endregion */
 
     /* #region Scroll border properties */
@@ -232,6 +247,15 @@ impl Scrollbox {
         self.scroll_background_roundness_factor = roundness_scroll_background_factor;
         self.dirty = true;
         Ok(())
+    }
+
+    pub fn get_scroll_background_texture_id(&self) -> Option<usize> {
+        self.scroll_background_texture_id
+    }
+
+    pub fn set_scroll_background_texture_id(&mut self, scroll_background_texture: &Texture) {
+        self.scroll_background_texture_id = Some(scroll_background_texture.get_id());
+        self.dirty = true;
     }
     /* #endregion */
 
@@ -652,6 +676,17 @@ impl Component for Scrollbox {
         scroll_background.set_anchor(Vec2::new(1.0, 1.0));
         scroll_background.set_color(self.scroll_background_color.clone());
 
+        if let Some(scroll_background_texture_id) = self.scroll_background_texture_id {
+            let texture_storage = renderer.get_textures();
+            let texture_storage_lock = texture_storage.lock().unwrap();
+            let texture = texture_storage_lock.get(scroll_background_texture_id)?;
+
+            match self.scroll_shape {
+                ComponentShape::Rectangle => renderer.get_drawable_with_type_mut::<Rectangle>(self.scroll_background_id)?.set_texture(texture),
+                ComponentShape::Disc => renderer.get_drawable_with_type_mut::<Disc>(self.scroll_background_id)?.set_texture(texture),
+            }
+        }
+
         let scroll_height = self.screen_size.y * self.screen_size.y / self.total_size.y;
         let scroll_free_space_left = self.screen_size.y - scroll_height;
         let scroll_offset = (scroll_free_space_left * self.scroll_delta.y / self.scroll_difference.y).ceil();
@@ -688,6 +723,17 @@ impl Component for Scrollbox {
         scroll.set_size(scroll_size);
         scroll.set_anchor(Vec2::new(1.0, 1.0));
         scroll.set_color(self.scroll_color.clone());
+
+        if let Some(scroll_texture_id) = self.scroll_texture_id {
+            let texture_storage = renderer.get_textures();
+            let texture_storage_lock = texture_storage.lock().unwrap();
+            let texture = texture_storage_lock.get(scroll_texture_id)?;
+
+            match self.scroll_shape {
+                ComponentShape::Rectangle => renderer.get_drawable_with_type_mut::<Rectangle>(self.scroll_id)?.set_texture(texture),
+                ComponentShape::Disc => renderer.get_drawable_with_type_mut::<Disc>(self.scroll_id)?.set_texture(texture),
+            }
+        }
 
         if self.scroll_shape == ComponentShape::Disc {
             renderer.get_drawable_with_type_mut::<Disc>(self.scroll_id)?.set_squircle_factor(1.0 - self.scroll_roundness_factor);
