@@ -191,7 +191,7 @@ impl WindowPlatformSpecific for WindowWinAPI {
                     }
                     winapi::WM_MOUSEWHEEL => {
                         let direction = if ((event.wParam as i32) >> 16) > 0 { MouseWheelDirection::Up } else { MouseWheelDirection::Down };
-                        return vec![InputEvent::MouseWheelRotated(direction)];
+                        return vec![InputEvent::MouseWheelRotated(direction, self.get_cursor_position())];
                     }
                     winapi::WM_QUIT => return vec![InputEvent::WindowClosed],
                     _ => {}

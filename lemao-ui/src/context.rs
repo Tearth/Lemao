@@ -114,9 +114,9 @@ impl UiContext {
         Ok(id)
     }
 
-    pub fn create_scrollbox(&mut self, renderer: &mut RendererContext) -> Result<usize, String> {
+    pub fn create_scrollbox(&mut self, renderer: &mut RendererContext, scroll_shape: ComponentShape) -> Result<usize, String> {
         let id = self.components.len();
-        let scrollbox = Box::new(Scrollbox::new(id)?);
+        let scrollbox = Box::new(Scrollbox::new(id, renderer, scroll_shape)?);
         self.components.push(Some(scrollbox));
 
         Ok(id)

@@ -11,7 +11,7 @@ pub enum InputEvent {
     MouseButtonPressed(MouseButton, Vec2),
     MouseButtonReleased(MouseButton, Vec2),
     MouseMoved(Vec2, Vec2),
-    MouseWheelRotated(MouseWheelDirection),
+    MouseWheelRotated(MouseWheelDirection, Vec2),
 }
 
 #[derive(Debug, Copy, Clone)]

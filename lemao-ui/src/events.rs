@@ -10,5 +10,10 @@ pub enum UiEvent {
     CheckboxChecked(usize, MouseButton),
     CheckboxUnchecked(usize, MouseButton),
     CheckboxChanged(usize, MouseButton, bool),
-    ScrollboxScroll(usize, MouseWheelDirection),
+
+    ScrollCursorEnter(usize, Vec2),
+    ScrollCursorLeave(usize, Vec2),
+    ScrollMouseButtonPressed(usize, MouseButton),
+    ScrollMouseButtonReleased(usize, MouseButton),
+    ScrollMoved(usize, MouseWheelDirection),
 }
