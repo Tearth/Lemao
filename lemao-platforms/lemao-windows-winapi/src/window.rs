@@ -10,7 +10,6 @@ use lemao_common_platform::window::WindowPlatformSpecific;
 use lemao_common_platform::window::WindowStyle;
 use lemao_math::vec2::Vec2;
 use std::collections::VecDeque;
-use std::f32::consts::E;
 use std::ffi::CString;
 use std::mem;
 use std::ptr;

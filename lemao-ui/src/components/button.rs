@@ -1,5 +1,3 @@
-use crate::events::UiEvent;
-
 use super::Component;
 use super::ComponentBorderThickness;
 use super::ComponentMargin;
@@ -9,6 +7,7 @@ use super::ComponentSize;
 use super::EventMask;
 use super::HorizontalAlignment;
 use super::VerticalAlignment;
+use crate::events::UiEvent;
 use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_common_platform::input::MouseButton;
 use lemao_core::lemao_math::color::SolidColor;
@@ -21,44 +20,53 @@ use lemao_core::renderer::drawable::rectangle::Rectangle;
 use lemao_core::renderer::drawable::text::Text;
 use lemao_core::renderer::drawable::Color;
 use lemao_core::renderer::drawable::Drawable;
-use lemao_core::renderer::textures;
 use lemao_core::renderer::textures::Texture;
 use std::any::Any;
 
 pub struct Button {
     pub(crate) id: usize,
 
+    // Common properties
     position: ComponentPosition,
     screen_position: Vec2,
     size: ComponentSize,
     screen_size: Vec2,
     min_size: Vec2,
     max_size: Vec2,
-    shape: ComponentShape,
     anchor: Vec2,
     margin: ComponentMargin,
     offset: Vec2,
     scroll_offset: Vec2,
+    dirty: bool,
+    children: Vec<usize>,
+    event_mask: Option<EventMask>,
+
+    // Shape properties
+    filling_id: usize,
+    shape: ComponentShape,
     color: Color,
+    roundness_factor: f32,
+    texture_id: Option<usize>,
+    texture_original_size: Vec2,
+
+    // Border properties
+    border_id: usize,
     border_thickness: ComponentBorderThickness,
     border_color: Color,
-    roundness_factor: f32,
+
+    // Label properties
+    label_id: usize,
     label_font_id: usize,
     label_text: String,
     label_horizontal_alignment: HorizontalAlignment,
     label_vertical_alignment: VerticalAlignment,
     label_offset: Vec2,
     label_color: Color,
-    pressed: bool,
-    texture_id: Option<usize>,
-    texture_original_size: Vec2,
-    filling_id: usize,
-    border_id: usize,
-    label_id: usize,
-    children: Vec<usize>,
-    dirty: bool,
-    event_mask: Option<EventMask>,
 
+    // Component-specific properties
+    pressed: bool,
+
+    // Event handlers
     pub on_cursor_enter: Option<fn(component: &mut Self, cursor_position: Vec2)>,
     pub on_cursor_leave: Option<fn(component: &mut Self, cursor_position: Vec2)>,
     pub on_mouse_button_pressed: Option<fn(component: &mut Self, mouse_button: MouseButton, cursor_position: Vec2)>,
@@ -70,43 +78,54 @@ impl Button {
     pub fn new(id: usize, renderer: &mut RendererContext, shape: ComponentShape, label_font_id: usize) -> Result<Self, String> {
         Ok(Self {
             id,
+
+            // Common properties
             position: ComponentPosition::AbsoluteToParent(Default::default()),
             screen_position: Default::default(),
             size: ComponentSize::Absolute(Default::default()),
             screen_size: Default::default(),
             min_size: Vec2::new(f32::MIN, f32::MIN),
             max_size: Vec2::new(f32::MAX, f32::MAX),
-            shape,
             anchor: Default::default(),
             margin: Default::default(),
             offset: Default::default(),
             scroll_offset: Default::default(),
+            dirty: true,
+            children: Default::default(),
+            event_mask: None,
+
+            // Shape properties
+            filling_id: match shape {
+                ComponentShape::Rectangle => renderer.create_rectangle()?,
+                ComponentShape::Disc => renderer.create_disc(0.0, 512)?,
+            },
+            shape,
             color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
+            roundness_factor: 1.0,
+            texture_id: None,
+            texture_original_size: Default::default(),
+
+            // Border properties
+            border_id: match shape {
+                ComponentShape::Rectangle => renderer.create_frame(Default::default())?,
+                ComponentShape::Disc => renderer.create_circle(0.0, 512)?,
+            },
             border_thickness: Default::default(),
             border_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
-            roundness_factor: 1.0,
+
+            // Label properties
+            label_id: renderer.create_text(label_font_id)?,
             label_font_id,
             label_text: Default::default(),
             label_horizontal_alignment: HorizontalAlignment::Middle,
             label_vertical_alignment: VerticalAlignment::Middle,
             label_offset: Default::default(),
             label_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
-            pressed: false,
-            texture_id: None,
-            texture_original_size: Default::default(),
-            filling_id: match shape {
-                ComponentShape::Rectangle => renderer.create_rectangle()?,
-                ComponentShape::Disc => renderer.create_disc(0.0, 512)?,
-            },
-            border_id: match shape {
-                ComponentShape::Rectangle => renderer.create_frame(Default::default())?,
-                ComponentShape::Disc => renderer.create_circle(0.0, 512)?,
-            },
-            label_id: renderer.create_text(label_font_id)?,
-            children: Default::default(),
-            dirty: true,
-            event_mask: None,
 
+            // Component-specific properties
+            pressed: false,
+
+            // Event handlers
             on_cursor_enter: None,
             on_cursor_leave: None,
             on_mouse_button_pressed: None,
@@ -119,10 +138,47 @@ impl Button {
         self.id
     }
 
+    /* #region Shape properties */
     pub fn get_shape(&self) -> ComponentShape {
         self.shape
     }
 
+    pub fn get_roundness_factor(&self) -> f32 {
+        self.roundness_factor
+    }
+
+    pub fn set_roundness_factor(&mut self, roundness_factor: f32) -> Result<(), String> {
+        if self.shape == ComponentShape::Rectangle {
+            return Err("Not supported".to_string());
+        }
+
+        self.roundness_factor = roundness_factor;
+        self.dirty = true;
+        Ok(())
+    }
+
+    pub fn get_color(&self) -> &Color {
+        &self.color
+    }
+
+    pub fn set_color(&mut self, color: Color) {
+        self.color = color;
+        self.dirty = true;
+    }
+
+    pub fn get_texture_id(&self) -> Option<usize> {
+        self.texture_id
+    }
+
+    pub fn set_texture_id(&mut self, texture: &Texture) {
+        self.texture_id = Some(texture.get_id());
+        self.texture_original_size = texture.get_size();
+        self.size = ComponentSize::Absolute(texture.get_size());
+        self.dirty = true;
+    }
+    /* #endregion */
+
+    /* #region Border properties */
     pub fn get_border_thickness(&self) -> ComponentBorderThickness {
         self.border_thickness
     }
@@ -145,21 +201,9 @@ impl Button {
         self.border_color = border_color;
         self.dirty = true;
     }
+    /* #endregion */
 
-    pub fn get_roundness_factor(&self) -> f32 {
-        self.roundness_factor
-    }
-
-    pub fn set_roundness_factor(&mut self, roundness_factor: f32) -> Result<(), String> {
-        if self.shape == ComponentShape::Rectangle {
-            return Err("Not supported".to_string());
-        }
-
-        self.roundness_factor = roundness_factor;
-        self.dirty = true;
-        Ok(())
-    }
-
+    /* #region Label properties */
     pub fn get_font_id(&self) -> usize {
         self.label_font_id
     }
@@ -213,7 +257,9 @@ impl Button {
         self.label_color = label_color;
         self.dirty = true;
     }
+    /* #endregion */
 
+    /* #region Component-specific properties */
     pub fn is_pressed(&self) -> bool {
         self.pressed
     }
@@ -221,26 +267,7 @@ impl Button {
     pub fn set_pressed_flag(&mut self, pressed: bool) {
         self.pressed = pressed;
     }
-
-    pub fn get_color(&self) -> &Color {
-        &self.color
-    }
-
-    pub fn set_color(&mut self, color: Color) {
-        self.color = color;
-        self.dirty = true;
-    }
-
-    pub fn get_texture_id(&self) -> Option<usize> {
-        self.texture_id
-    }
-
-    pub fn set_texture_id(&mut self, texture: &Texture) {
-        self.texture_id = Some(texture.get_id());
-        self.texture_original_size = texture.get_size();
-        self.size = ComponentSize::Absolute(texture.get_size());
-        self.dirty = true;
-    }
+    /* #endregion */
 
     fn is_point_inside(&self, point: Vec2) -> bool {
         if let Some(event_mask) = self.event_mask {
@@ -272,6 +299,7 @@ impl Button {
 }
 
 impl Component for Button {
+    /* #region Common properties */
     fn get_position(&self) -> ComponentPosition {
         self.position
     }
@@ -352,6 +380,14 @@ impl Component for Button {
         self.dirty = true;
     }
 
+    fn is_dirty(&self) -> bool {
+        self.dirty
+    }
+
+    fn set_dirty_flag(&mut self, dirty: bool) {
+        self.dirty = dirty;
+    }
+
     fn add_child(&mut self, component_id: usize) {
         self.children.push(component_id);
     }
@@ -364,7 +400,16 @@ impl Component for Button {
         &self.children
     }
 
-    fn process_window_event(&mut self, renderer: &mut RendererContext, event: &InputEvent) -> Vec<UiEvent> {
+    fn get_event_mask(&self) -> Option<EventMask> {
+        self.event_mask
+    }
+
+    fn set_event_mask(&mut self, event_mask: Option<EventMask>) {
+        self.event_mask = event_mask;
+    }
+    /* #endregion */
+
+    fn process_window_event(&mut self, event: &InputEvent) -> Vec<UiEvent> {
         let mut events: Vec<UiEvent> = Default::default();
 
         match event {
@@ -534,22 +579,6 @@ impl Component for Button {
         }
 
         Ok(())
-    }
-
-    fn is_dirty(&self) -> bool {
-        self.dirty
-    }
-
-    fn set_dirty_flag(&mut self, dirty: bool) {
-        self.dirty = dirty;
-    }
-
-    fn get_event_mask(&self) -> Option<EventMask> {
-        self.event_mask
-    }
-
-    fn set_event_mask(&mut self, event_mask: Option<EventMask>) {
-        self.event_mask = event_mask;
     }
 
     fn as_any(&self) -> &dyn Any {

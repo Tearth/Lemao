@@ -1,20 +1,19 @@
-use crate::events::UiEvent;
-
 use super::Component;
 use super::ComponentMargin;
 use super::ComponentPosition;
 use super::ComponentSize;
 use super::EventMask;
+use crate::events::UiEvent;
 use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_common_platform::input::MouseButton;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::context::RendererContext;
-use lemao_core::renderer::drawable::Color;
 use std::any::Any;
 
 pub struct Canvas {
     pub(crate) id: usize,
 
+    // Common properties
     position: ComponentPosition,
     screen_position: Vec2,
     size: ComponentSize,
@@ -25,10 +24,11 @@ pub struct Canvas {
     margin: ComponentMargin,
     offset: Vec2,
     scroll_offset: Vec2,
-    children: Vec<usize>,
     dirty: bool,
+    children: Vec<usize>,
     event_mask: Option<EventMask>,
 
+    // Event handlers
     pub on_cursor_enter: Option<fn(component: &mut Self, cursor_position: Vec2)>,
     pub on_cursor_leave: Option<fn(component: &mut Self, cursor_position: Vec2)>,
     pub on_mouse_button_pressed: Option<fn(component: &mut Self, mouse_button: MouseButton, cursor_position: Vec2)>,
@@ -39,6 +39,8 @@ impl Canvas {
     pub fn new(id: usize) -> Result<Self, String> {
         Ok(Self {
             id,
+
+            // Common properties
             position: ComponentPosition::AbsoluteToParent(Default::default()),
             screen_position: Default::default(),
             size: ComponentSize::Absolute(Default::default()),
@@ -49,10 +51,11 @@ impl Canvas {
             margin: Default::default(),
             offset: Default::default(),
             scroll_offset: Default::default(),
-            children: Default::default(),
             dirty: true,
+            children: Default::default(),
             event_mask: None,
 
+            // Event handlers
             on_cursor_enter: None,
             on_cursor_leave: None,
             on_mouse_button_pressed: None,
@@ -62,14 +65,6 @@ impl Canvas {
 
     pub fn get_id(&self) -> usize {
         self.id
-    }
-
-    pub fn get_color(&self) -> &Color {
-        panic!("Not supported")
-    }
-
-    pub fn set_color(&mut self, color: Color) {
-        panic!("Not supported")
     }
 
     fn is_point_inside(&self, point: Vec2) -> bool {
@@ -93,6 +88,7 @@ impl Canvas {
 }
 
 impl Component for Canvas {
+    /* #region Common properties */
     fn get_position(&self) -> ComponentPosition {
         self.position
     }
@@ -173,6 +169,14 @@ impl Component for Canvas {
         self.dirty = true;
     }
 
+    fn is_dirty(&self) -> bool {
+        self.dirty
+    }
+
+    fn set_dirty_flag(&mut self, dirty: bool) {
+        self.dirty = dirty;
+    }
+
     fn add_child(&mut self, component_id: usize) {
         self.children.push(component_id);
     }
@@ -185,7 +189,16 @@ impl Component for Canvas {
         &self.children
     }
 
-    fn process_window_event(&mut self, renderer: &mut RendererContext, event: &InputEvent) -> Vec<UiEvent> {
+    fn get_event_mask(&self) -> Option<EventMask> {
+        self.event_mask
+    }
+
+    fn set_event_mask(&mut self, event_mask: Option<EventMask>) {
+        self.event_mask = event_mask;
+    }
+    /* #endregion */
+
+    fn process_window_event(&mut self, event: &InputEvent) -> Vec<UiEvent> {
         let mut events: Vec<UiEvent> = Default::default();
 
         match event {
@@ -266,22 +279,6 @@ impl Component for Canvas {
 
     fn draw(&mut self, _renderer: &mut RendererContext) -> Result<(), String> {
         Ok(())
-    }
-
-    fn is_dirty(&self) -> bool {
-        self.dirty
-    }
-
-    fn set_dirty_flag(&mut self, dirty: bool) {
-        self.dirty = dirty;
-    }
-
-    fn get_event_mask(&self) -> Option<EventMask> {
-        self.event_mask
-    }
-
-    fn set_event_mask(&mut self, event_mask: Option<EventMask>) {
-        self.event_mask = event_mask;
     }
 
     fn as_any(&self) -> &dyn Any {

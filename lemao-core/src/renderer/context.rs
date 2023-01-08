@@ -24,7 +24,6 @@ use super::textures::RawTexture;
 use super::textures::Texture;
 use lemao_common_platform::renderer::RendererPlatformSpecific;
 use lemao_math::color::SolidColor;
-use lemao_math::gradient::GradientType;
 use lemao_math::vec2::Vec2;
 use lemao_math::vec3::Vec3;
 use lemao_opengl::bindings::opengl;

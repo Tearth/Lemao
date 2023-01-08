@@ -1,10 +1,9 @@
-use crate::events::UiEvent;
-
 use super::Component;
 use super::ComponentMargin;
 use super::ComponentPosition;
 use super::ComponentSize;
 use super::EventMask;
+use crate::events::UiEvent;
 use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_common_platform::input::MouseButton;
 use lemao_core::lemao_math::color::SolidColor;
@@ -20,6 +19,7 @@ use std::any::Any;
 pub struct Checkbox {
     pub(crate) id: usize,
 
+    // Common properties
     position: ComponentPosition,
     screen_position: Vec2,
     size: ComponentSize,
@@ -30,23 +30,30 @@ pub struct Checkbox {
     margin: ComponentMargin,
     offset: Vec2,
     scroll_offset: Vec2,
-    color: Color,
+    dirty: bool,
+    children: Vec<usize>,
+    event_mask: Option<EventMask>,
+
+    // Box properties
+    box_id: usize,
     box_color: Color,
     box_offset: Vec2,
     box_size: Vec2,
-    pressed: bool,
-    checked: bool,
+    box_checked_texture_id: usize,
+    box_unchecked_texture_id: usize,
+
+    // Label properties
+    label_id: usize,
     label_font_id: usize,
     label_text: String,
     label_offset: Vec2,
-    label_id: usize,
-    box_checked_texture_id: usize,
-    box_unchecked_texture_id: usize,
-    box_id: usize,
-    children: Vec<usize>,
-    dirty: bool,
-    event_mask: Option<EventMask>,
+    label_color: Color,
 
+    // Component-specific properties
+    pressed: bool,
+    checked: bool,
+
+    // Event handlers
     pub on_cursor_enter: Option<fn(component: &mut Self, cursor_position: Vec2)>,
     pub on_cursor_leave: Option<fn(component: &mut Self, cursor_position: Vec2)>,
     pub on_mouse_button_pressed: Option<fn(component: &mut Self, mouse_button: MouseButton, cursor_position: Vec2)>,
@@ -66,6 +73,8 @@ impl Checkbox {
     ) -> Result<Self, String> {
         Ok(Self {
             id,
+
+            // Common properties
             position: ComponentPosition::AbsoluteToParent(Default::default()),
             screen_position: Default::default(),
             size: ComponentSize::Absolute(Default::default()),
@@ -76,23 +85,30 @@ impl Checkbox {
             margin: Default::default(),
             offset: Default::default(),
             scroll_offset: Default::default(),
-            color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
+            dirty: true,
+            children: Default::default(),
+            event_mask: None,
+
+            // Box properties
+            box_id: renderer.create_rectangle()?,
             box_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
-            box_size: Default::default(),
-            pressed: false,
-            checked: false,
             box_offset: Default::default(),
+            box_size: Default::default(),
+            box_checked_texture_id,
+            box_unchecked_texture_id,
+
+            // Label properties
+            label_id: renderer.create_text(label_font_id)?,
             label_font_id,
             label_text: Default::default(),
             label_offset: Default::default(),
-            label_id: renderer.create_text(label_font_id)?,
-            box_checked_texture_id,
-            box_unchecked_texture_id,
-            box_id: renderer.create_rectangle()?,
-            children: Default::default(),
-            dirty: true,
-            event_mask: None,
+            label_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
 
+            // Component-specific properties
+            pressed: false,
+            checked: false,
+
+            // Event handlers
             on_cursor_enter: None,
             on_cursor_leave: None,
             on_mouse_button_pressed: None,
@@ -168,7 +184,7 @@ impl Checkbox {
     }
 
     pub fn set_box_color(&mut self, box_color: Color) {
-        self.color = box_color;
+        self.label_color = box_color;
         self.dirty = true;
     }
 
@@ -182,11 +198,11 @@ impl Checkbox {
     }
 
     pub fn get_color(&self) -> &Color {
-        &self.color
+        &self.label_color
     }
 
     pub fn set_color(&mut self, color: Color) {
-        self.color = color;
+        self.label_color = color;
         self.dirty = true;
     }
 
@@ -211,6 +227,7 @@ impl Checkbox {
 }
 
 impl Component for Checkbox {
+    /* #region Common properties */
     fn get_position(&self) -> ComponentPosition {
         self.position
     }
@@ -232,7 +249,7 @@ impl Component for Checkbox {
         self.screen_size
     }
 
-    fn set_size(&mut self, size: ComponentSize) {
+    fn set_size(&mut self, _size: ComponentSize) {
         // Can't be set explicitly
         // self.size = size;
     }
@@ -241,7 +258,7 @@ impl Component for Checkbox {
         self.min_size
     }
 
-    fn set_min_size(&mut self, min_size: Vec2) {
+    fn set_min_size(&mut self, _min_size: Vec2) {
         // Can't be set explicitly
         // self.min_size = min_size;
     }
@@ -250,7 +267,7 @@ impl Component for Checkbox {
         self.max_size
     }
 
-    fn set_max_size(&mut self, max_size: Vec2) {
+    fn set_max_size(&mut self, _max_size: Vec2) {
         // Can't be set explicitly
         // self.max_size = max_size;
     }
@@ -291,6 +308,14 @@ impl Component for Checkbox {
         self.dirty = true;
     }
 
+    fn is_dirty(&self) -> bool {
+        self.dirty
+    }
+
+    fn set_dirty_flag(&mut self, dirty: bool) {
+        self.dirty = dirty;
+    }
+
     fn add_child(&mut self, component_id: usize) {
         self.children.push(component_id);
     }
@@ -303,7 +328,16 @@ impl Component for Checkbox {
         &self.children
     }
 
-    fn process_window_event(&mut self, renderer: &mut RendererContext, event: &InputEvent) -> Vec<UiEvent> {
+    fn get_event_mask(&self) -> Option<EventMask> {
+        self.event_mask
+    }
+
+    fn set_event_mask(&mut self, event_mask: Option<EventMask>) {
+        self.event_mask = event_mask;
+    }
+    /* #endregion */
+
+    fn process_window_event(&mut self, event: &InputEvent) -> Vec<UiEvent> {
         let mut events: Vec<UiEvent> = Default::default();
 
         // All component
@@ -422,7 +456,7 @@ impl Component for Checkbox {
 
         let label = renderer.get_drawable_with_type_mut::<Text>(self.label_id)?;
         label.set_position(self.screen_position + self.label_offset);
-        label.set_color(self.color.clone());
+        label.set_color(self.label_color.clone());
 
         self.dirty = false;
 
@@ -433,22 +467,6 @@ impl Component for Checkbox {
         renderer.draw(self.box_id)?;
         renderer.draw(self.label_id)?;
         Ok(())
-    }
-
-    fn is_dirty(&self) -> bool {
-        self.dirty
-    }
-
-    fn set_dirty_flag(&mut self, dirty: bool) {
-        self.dirty = dirty;
-    }
-
-    fn get_event_mask(&self) -> Option<EventMask> {
-        self.event_mask
-    }
-
-    fn set_event_mask(&mut self, event_mask: Option<EventMask>) {
-        self.event_mask = event_mask;
     }
 
     fn as_any(&self) -> &dyn Any {

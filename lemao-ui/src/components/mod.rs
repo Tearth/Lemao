@@ -1,11 +1,9 @@
+use crate::events::UiEvent;
 use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::context::RendererContext;
 use lemao_core::renderer::drawable::frame::FrameThickness;
-use lemao_core::renderer::drawable::Color;
 use std::any::Any;
-
-use crate::events::UiEvent;
 
 pub mod button;
 pub mod canvas;
@@ -98,7 +96,7 @@ pub trait Component {
     fn remove_child(&mut self, component_id: usize);
     fn get_children(&self) -> &Vec<usize>;
 
-    fn process_window_event(&mut self, renderer: &mut RendererContext, event: &InputEvent) -> Vec<UiEvent>;
+    fn process_window_event(&mut self, event: &InputEvent) -> Vec<UiEvent>;
     fn update(&mut self, renderer: &mut RendererContext, area_position: Vec2, area_size: Vec2) -> Result<(), String>;
     fn draw(&mut self, renderer: &mut RendererContext) -> Result<(), String>;
 

@@ -1,5 +1,5 @@
 use super::context::RendererContext;
-use super::textures::{RawTexture, Texture};
+use super::textures::RawTexture;
 use lemao_math::vec2::Vec2;
 use lemao_opengl::bindings::opengl;
 use lemao_opengl::pointers::OpenGLPointers;

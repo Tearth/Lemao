@@ -1,5 +1,3 @@
-use crate::events::UiEvent;
-
 use super::Component;
 use super::ComponentBorderThickness;
 use super::ComponentMargin;
@@ -7,6 +5,7 @@ use super::ComponentPosition;
 use super::ComponentShape;
 use super::ComponentSize;
 use super::EventMask;
+use crate::events::UiEvent;
 use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_common_platform::input::MouseButton;
 use lemao_core::lemao_common_platform::input::MouseWheelDirection;
@@ -22,50 +21,58 @@ use std::any::Any;
 pub struct Scrollbox {
     pub(crate) id: usize,
 
+    // Common properties
     position: ComponentPosition,
     screen_position: Vec2,
     size: ComponentSize,
     screen_size: Vec2,
-    total_size: Vec2,
     min_size: Vec2,
     max_size: Vec2,
     anchor: Vec2,
     margin: ComponentMargin,
     offset: Vec2,
+    scroll_offset: Vec2,
+    dirty: bool,
+    children: Vec<usize>,
+    event_mask: Option<EventMask>,
+
+    // Shape properties
     scroll_shape: ComponentShape,
 
-    scroll_id: usize,
-    scroll_color: Color,
-    scroll_roundness_factor: f32,
-
-    scroll_border_id: usize,
-    scroll_border_color: Color,
-    scroll_border_thickness: ComponentBorderThickness,
-
+    // Scroll background properties
     scroll_background_id: usize,
     scroll_background_color: Color,
     scroll_background_roundness_factor: f32,
 
+    // Scroll background border properties
     scroll_background_border_id: usize,
     scroll_background_border_color: Color,
     scroll_background_border_thickness: ComponentBorderThickness,
 
-    scroll_offset: Vec2,
+    // Scroll properties
+    scroll_id: usize,
+    scroll_color: Color,
+    scroll_roundness_factor: f32,
+
+    // Scroll border properties
+    scroll_border_id: usize,
+    scroll_border_color: Color,
+    scroll_border_thickness: ComponentBorderThickness,
+
+    // Component-specific properties
+    total_size: Vec2,
     scroll_difference: Vec2,
     scroll_delta: Vec2,
     scroll_speed: Vec2,
     scroll_width: f32,
     scroll_pressed: bool,
-    children: Vec<usize>,
-    dirty: bool,
-    event_mask: Option<EventMask>,
 
+    // Event handlers
     pub on_cursor_enter: Option<fn(component: &mut Self, cursor_position: Vec2)>,
     pub on_cursor_leave: Option<fn(component: &mut Self, cursor_position: Vec2)>,
     pub on_mouse_button_pressed: Option<fn(component: &mut Self, mouse_button: MouseButton, cursor_position: Vec2)>,
     pub on_mouse_button_released: Option<fn(component: &mut Self, mouse_button: MouseButton, cursor_position: Vec2)>,
     pub on_scroll: Option<fn(component: &mut Self, direction: MouseWheelDirection)>,
-
     pub on_cursor_scroll_enter: Option<fn(component: &mut Self, cursor_position: Vec2)>,
     pub on_cursor_scroll_leave: Option<fn(component: &mut Self, cursor_position: Vec2)>,
     pub on_mouse_button_scroll_pressed: Option<fn(component: &mut Self, mouse_button: MouseButton, cursor_position: Vec2)>,
@@ -76,39 +83,33 @@ impl Scrollbox {
     pub fn new(id: usize, renderer: &mut RendererContext, scroll_shape: ComponentShape) -> Result<Self, String> {
         Ok(Self {
             id,
+
+            // Common properties
             position: ComponentPosition::AbsoluteToParent(Default::default()),
             screen_position: Default::default(),
             size: ComponentSize::Absolute(Default::default()),
             screen_size: Default::default(),
-            total_size: Default::default(),
             min_size: Vec2::new(f32::MIN, f32::MIN),
             max_size: Vec2::new(f32::MAX, f32::MAX),
             anchor: Default::default(),
             margin: Default::default(),
             offset: Default::default(),
+            dirty: true,
+            children: Default::default(),
+            event_mask: None,
+
+            // Shape properties
             scroll_shape,
 
-            scroll_id: match scroll_shape {
-                ComponentShape::Rectangle => renderer.create_rectangle()?,
-                ComponentShape::Disc => renderer.create_disc(0.0, 512)?,
-            },
-            scroll_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
-            scroll_roundness_factor: 0.0,
-
-            scroll_border_id: match scroll_shape {
-                ComponentShape::Rectangle => renderer.create_frame(Default::default())?,
-                ComponentShape::Disc => renderer.create_circle(0.0, 512)?,
-            },
-            scroll_border_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
-            scroll_border_thickness: Default::default(),
-
+            // Scroll background properties
             scroll_background_id: match scroll_shape {
                 ComponentShape::Rectangle => renderer.create_rectangle()?,
                 ComponentShape::Disc => renderer.create_disc(0.0, 512)?,
             },
-            scroll_background_roundness_factor: 0.0,
             scroll_background_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
+            scroll_background_roundness_factor: 0.0,
 
+            // Scroll background border properties
             scroll_background_border_id: match scroll_shape {
                 ComponentShape::Rectangle => renderer.create_frame(Default::default())?,
                 ComponentShape::Disc => renderer.create_circle(0.0, 512)?,
@@ -116,22 +117,37 @@ impl Scrollbox {
             scroll_background_border_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             scroll_background_border_thickness: Default::default(),
 
+            // Scroll properties
+            scroll_id: match scroll_shape {
+                ComponentShape::Rectangle => renderer.create_rectangle()?,
+                ComponentShape::Disc => renderer.create_disc(0.0, 512)?,
+            },
+            scroll_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
+            scroll_roundness_factor: 0.0,
+
+            // Scroll border properties
+            scroll_border_id: match scroll_shape {
+                ComponentShape::Rectangle => renderer.create_frame(Default::default())?,
+                ComponentShape::Disc => renderer.create_circle(0.0, 512)?,
+            },
+            scroll_border_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
+            scroll_border_thickness: Default::default(),
+
+            // Component-specific properties
+            total_size: Default::default(),
             scroll_offset: Default::default(),
             scroll_difference: Default::default(),
             scroll_delta: Default::default(),
             scroll_speed: Vec2::new(5.0, 5.0),
             scroll_width: 20.0,
             scroll_pressed: false,
-            children: Default::default(),
-            dirty: true,
-            event_mask: None,
 
+            // Event handlers
             on_cursor_enter: None,
             on_cursor_leave: None,
             on_mouse_button_pressed: None,
             on_mouse_button_released: None,
             on_scroll: None,
-
             on_cursor_scroll_enter: None,
             on_cursor_scroll_leave: None,
             on_mouse_button_scroll_pressed: None,
@@ -143,6 +159,103 @@ impl Scrollbox {
         self.id
     }
 
+    /* #region Shape properties */
+    pub fn get_scroll_shape(&self) -> ComponentShape {
+        self.scroll_shape
+    }
+    /* #endregion */
+
+    /* #region Scroll properties */
+    pub fn get_scroll_color(&self) -> &Color {
+        &self.scroll_color
+    }
+
+    pub fn set_scroll_color(&mut self, scroll_color: Color) {
+        self.scroll_color = scroll_color;
+        self.dirty = true;
+    }
+
+    pub fn get_scroll_roundness_factor(&self) -> f32 {
+        self.scroll_roundness_factor
+    }
+
+    pub fn set_scroll_roundness_factor(&mut self, roundness_scroll_factor: f32) -> Result<(), String> {
+        if self.scroll_shape == ComponentShape::Rectangle {
+            return Err("Not supported".to_string());
+        }
+
+        self.scroll_roundness_factor = roundness_scroll_factor;
+        self.dirty = true;
+        Ok(())
+    }
+    /* #endregion */
+
+    /* #region Scroll border properties */
+    pub fn get_scroll_border_color(&self) -> &Color {
+        &self.scroll_border_color
+    }
+
+    pub fn set_scroll_border_color(&mut self, scroll_border_color: Color) {
+        self.scroll_border_color = scroll_border_color;
+        self.dirty = true;
+    }
+
+    pub fn get_scroll_border_thickness(&self) -> ComponentBorderThickness {
+        self.scroll_border_thickness
+    }
+
+    pub fn set_scroll_border_thickness(&mut self, scroll_border_thickness: ComponentBorderThickness) {
+        self.scroll_border_thickness = scroll_border_thickness;
+        self.dirty = true;
+    }
+    /* #endregion */
+
+    /* #region Scroll background properties */
+    pub fn get_scroll_background_color(&self) -> &Color {
+        &self.scroll_background_color
+    }
+
+    pub fn set_scroll_background_color(&mut self, scroll_background_color: Color) {
+        self.scroll_background_color = scroll_background_color;
+        self.dirty = true;
+    }
+
+    pub fn get_scroll_background_roundness_factor(&self) -> f32 {
+        self.scroll_background_roundness_factor
+    }
+
+    pub fn set_scroll_background_roundness_factor(&mut self, roundness_scroll_background_factor: f32) -> Result<(), String> {
+        if self.scroll_shape == ComponentShape::Rectangle {
+            return Err("Not supported".to_string());
+        }
+
+        self.scroll_background_roundness_factor = roundness_scroll_background_factor;
+        self.dirty = true;
+        Ok(())
+    }
+    /* #endregion */
+
+    /* #region Scroll background border properties */
+    pub fn get_scroll_background_border_color(&self) -> &Color {
+        &self.scroll_background_border_color
+    }
+
+    pub fn set_scroll_background_border_color(&mut self, scroll_background_border_color: Color) {
+        self.scroll_background_border_color = scroll_background_border_color;
+        self.dirty = true;
+    }
+
+    pub fn get_scroll_background_border_thickness(&self) -> ComponentBorderThickness {
+        self.scroll_background_border_thickness
+    }
+
+    pub fn set_scroll_background_border_thickness(&mut self, scroll_background_border_thickness: ComponentBorderThickness) {
+        self.scroll_background_border_thickness = scroll_background_border_thickness;
+        self.dirty = true;
+    }
+    /* #endregion */
+
+    /* #region Component-specific properties */
     pub fn get_total_size(&self) -> Vec2 {
         self.total_size
     }
@@ -150,10 +263,6 @@ impl Scrollbox {
     pub fn set_total_size(&mut self, total_size: Vec2) {
         self.total_size = total_size;
         self.dirty = true;
-    }
-
-    pub fn get_scroll_shape(&self) -> ComponentShape {
-        self.scroll_shape
     }
 
     pub fn get_scroll_difference(&self) -> Vec2 {
@@ -183,88 +292,6 @@ impl Scrollbox {
         self.dirty = true;
     }
 
-    pub fn get_scroll_color(&self) -> &Color {
-        &self.scroll_color
-    }
-
-    pub fn set_scroll_color(&mut self, scroll_color: Color) {
-        self.scroll_color = scroll_color;
-        self.dirty = true;
-    }
-
-    pub fn get_scroll_roundness_factor(&self) -> f32 {
-        self.scroll_roundness_factor
-    }
-
-    pub fn set_scroll_roundness_factor(&mut self, roundness_scroll_factor: f32) -> Result<(), String> {
-        if self.scroll_shape == ComponentShape::Rectangle {
-            return Err("Not supported".to_string());
-        }
-
-        self.scroll_roundness_factor = roundness_scroll_factor;
-        self.dirty = true;
-        Ok(())
-    }
-
-    pub fn get_scroll_border_color(&self) -> &Color {
-        &self.scroll_border_color
-    }
-
-    pub fn set_scroll_border_color(&mut self, scroll_border_color: Color) {
-        self.scroll_border_color = scroll_border_color;
-        self.dirty = true;
-    }
-
-    pub fn get_scroll_border_thickness(&self) -> ComponentBorderThickness {
-        self.scroll_border_thickness
-    }
-
-    pub fn set_scroll_border_thickness(&mut self, scroll_border_thickness: ComponentBorderThickness) {
-        self.scroll_border_thickness = scroll_border_thickness;
-        self.dirty = true;
-    }
-
-    pub fn get_scroll_background_color(&self) -> &Color {
-        &self.scroll_background_color
-    }
-
-    pub fn set_scroll_background_color(&mut self, scroll_background_color: Color) {
-        self.scroll_background_color = scroll_background_color;
-        self.dirty = true;
-    }
-
-    pub fn get_scroll_background_roundness_factor(&self) -> f32 {
-        self.scroll_roundness_factor
-    }
-
-    pub fn set_scroll_background_roundness_factor(&mut self, roundness_scroll_background_factor: f32) -> Result<(), String> {
-        if self.scroll_shape == ComponentShape::Rectangle {
-            return Err("Not supported".to_string());
-        }
-
-        self.scroll_background_roundness_factor = roundness_scroll_background_factor;
-        self.dirty = true;
-        Ok(())
-    }
-
-    pub fn get_scroll_background_border_color(&self) -> &Color {
-        &self.scroll_background_border_color
-    }
-
-    pub fn set_scroll_background_border_color(&mut self, scroll_background_border_color: Color) {
-        self.scroll_background_border_color = scroll_background_border_color;
-        self.dirty = true;
-    }
-
-    pub fn get_scroll_background_border_thickness(&self) -> ComponentBorderThickness {
-        self.scroll_background_border_thickness
-    }
-
-    pub fn set_scroll_background_border_thickness(&mut self, scroll_background_border_thickness: ComponentBorderThickness) {
-        self.scroll_background_border_thickness = scroll_background_border_thickness;
-        self.dirty = true;
-    }
-
     pub fn get_scroll_width(&self) -> f32 {
         self.scroll_width
     }
@@ -282,6 +309,7 @@ impl Scrollbox {
         self.scroll_pressed = scroll_pressed;
         self.dirty = true;
     }
+    /* #endregion */
 
     fn is_point_inside(&self, point: Vec2) -> bool {
         if let Some(event_mask) = self.event_mask {
@@ -323,6 +351,7 @@ impl Scrollbox {
 }
 
 impl Component for Scrollbox {
+    /* #region Common properties */
     fn get_position(&self) -> ComponentPosition {
         self.position
     }
@@ -403,6 +432,14 @@ impl Component for Scrollbox {
         self.dirty = true;
     }
 
+    fn is_dirty(&self) -> bool {
+        self.dirty
+    }
+
+    fn set_dirty_flag(&mut self, dirty: bool) {
+        self.dirty = dirty;
+    }
+
     fn add_child(&mut self, component_id: usize) {
         self.children.push(component_id);
     }
@@ -415,9 +452,19 @@ impl Component for Scrollbox {
         &self.children
     }
 
-    fn process_window_event(&mut self, renderer: &mut RendererContext, event: &InputEvent) -> Vec<UiEvent> {
+    fn get_event_mask(&self) -> Option<EventMask> {
+        self.event_mask
+    }
+
+    fn set_event_mask(&mut self, event_mask: Option<EventMask>) {
+        self.event_mask = event_mask;
+    }
+    /* #endregion */
+
+    fn process_window_event(&mut self, event: &InputEvent) -> Vec<UiEvent> {
         let mut events: Vec<UiEvent> = Default::default();
 
+        // Component
         match event {
             InputEvent::MouseMoved(cursor_position, previous_cursor_position) => {
                 if self.is_point_inside(*cursor_position) {
@@ -480,6 +527,7 @@ impl Component for Scrollbox {
             _ => {}
         }
 
+        // Scrollbar
         match event {
             InputEvent::MouseMoved(cursor_position, previous_cursor_position) => {
                 if self.is_point_inside_scroll(*cursor_position) {
@@ -572,8 +620,6 @@ impl Component for Scrollbox {
         self.screen_size = self.screen_size.floor();
         self.screen_position = self.screen_position.floor();
 
-        self.scroll_difference = (self.total_size - self.screen_size).clamp(Vec2::new(0.0, 0.0), Vec2::new(f32::MAX, f32::MAX));
-
         let mut scroll_background_position = self.screen_position + self.screen_size;
         let mut scroll_background_size = Vec2::new(self.scroll_width, self.screen_size.y);
 
@@ -609,6 +655,7 @@ impl Component for Scrollbox {
         let scroll_height = self.screen_size.y * self.screen_size.y / self.total_size.y;
         let scroll_free_space_left = self.screen_size.y - scroll_height;
         let scroll_offset = (scroll_free_space_left * self.scroll_delta.y / self.scroll_difference.y).ceil();
+        self.scroll_difference = (self.total_size - self.screen_size).clamp(Vec2::new(0.0, 0.0), Vec2::new(f32::MAX, f32::MAX));
 
         let mut scroll_position = self.screen_position + self.screen_size - Vec2::new(0.0, scroll_offset);
         let mut scroll_size = Vec2::new(self.scroll_width, scroll_height);
@@ -668,22 +715,6 @@ impl Component for Scrollbox {
         }
 
         Ok(())
-    }
-
-    fn is_dirty(&self) -> bool {
-        self.dirty
-    }
-
-    fn set_dirty_flag(&mut self, dirty: bool) {
-        self.dirty = dirty;
-    }
-
-    fn get_event_mask(&self) -> Option<EventMask> {
-        self.event_mask
-    }
-
-    fn set_event_mask(&mut self, event_mask: Option<EventMask>) {
-        self.event_mask = event_mask;
     }
 
     fn as_any(&self) -> &dyn Any {

@@ -57,7 +57,7 @@ impl UiContext {
                     continue;
                 }
 
-                self.events.extend(component.as_mut().unwrap().process_window_event(renderer, event));
+                self.events.extend(component.as_mut().unwrap().process_window_event(event));
             }
         }
 
@@ -76,7 +76,7 @@ impl UiContext {
         Ok(id)
     }
 
-    pub fn create_canvas(&mut self, renderer: &mut RendererContext) -> Result<usize, String> {
+    pub fn create_canvas(&mut self, _renderer: &mut RendererContext) -> Result<usize, String> {
         let id = self.components.len();
         let canvas = Box::new(Canvas::new(id)?);
         self.components.push(Some(canvas));
@@ -222,7 +222,7 @@ impl UiContext {
         }
 
         // Scrollbox needs to be updated second time, after all children are refreshed
-        if let Ok(scrollbox) = self.get_component_with_type::<Scrollbox>(component_id) {
+        if self.get_component_with_type::<Scrollbox>(component_id).is_ok() {
             let mut left_bottom_corner: Vec2 = Vec2::new(f32::MAX, f32::MAX);
             let mut right_top_corner: Vec2 = Vec2::new(f32::MIN, f32::MIN);
 
