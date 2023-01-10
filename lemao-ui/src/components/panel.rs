@@ -50,7 +50,7 @@ pub struct Panel {
     border_color: Color,
     border_thickness: ComponentBorderThickness,
 
-    // Shadow
+    // Shadow properties
     shadow_enabled: bool,
     shadow_offset: Vec2,
     shadow_color: Color,
@@ -103,7 +103,7 @@ impl Panel {
             border_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             border_thickness: Default::default(),
 
-            // Shadow
+            // Shadow properties
             shadow_enabled: false,
             shadow_offset: Default::default(),
             shadow_color: Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 1.0)),
@@ -498,11 +498,11 @@ impl Component for Panel {
 
     fn draw(&mut self, renderer: &mut RendererContext) -> Result<(), String> {
         if self.shadow_enabled {
-            let panel = renderer.get_drawable_mut(self.filling_id)?;
-            let original_position = panel.get_position();
-            let original_scale = panel.get_scale();
-            let original_anchor = panel.get_anchor();
-            let original_color = panel.get_color().clone();
+            let drawable = renderer.get_drawable_mut(self.filling_id)?;
+            let original_position = drawable.get_position();
+            let original_scale = drawable.get_scale();
+            let original_anchor = drawable.get_anchor();
+            let original_color = drawable.get_color().clone();
 
             let original_squircle_factor = if let Ok(disc) = renderer.get_drawable_with_type_mut::<Disc>(self.filling_id) {
                 let original_squircle_factor = disc.get_squircle_factor();
@@ -513,18 +513,18 @@ impl Component for Panel {
                 0.0
             };
 
-            let panel = renderer.get_drawable_mut(self.filling_id)?;
-            panel.set_position(original_position + (panel.get_size() / 2.0) + self.shadow_offset);
-            panel.set_scale(original_scale * self.shadow_scale);
-            panel.set_anchor(Vec2::new(0.5, 0.5));
-            panel.set_color(self.shadow_color.clone());
+            let drawable = renderer.get_drawable_mut(self.filling_id)?;
+            drawable.set_position(original_position + (drawable.get_size() / 2.0) + self.shadow_offset);
+            drawable.set_scale(original_scale * self.shadow_scale);
+            drawable.set_anchor(Vec2::new(0.5, 0.5));
+            drawable.set_color(self.shadow_color.clone());
             renderer.draw(self.filling_id)?;
 
-            let panel = renderer.get_drawable_mut(self.filling_id)?;
-            panel.set_position(original_position);
-            panel.set_scale(original_scale);
-            panel.set_anchor(original_anchor);
-            panel.set_color(original_color);
+            let drawable = renderer.get_drawable_mut(self.filling_id)?;
+            drawable.set_position(original_position);
+            drawable.set_scale(original_scale);
+            drawable.set_anchor(original_anchor);
+            drawable.set_color(original_color);
 
             if let Ok(disc) = renderer.get_drawable_with_type_mut::<Disc>(self.filling_id) {
                 disc.set_squircle_factor(original_squircle_factor);

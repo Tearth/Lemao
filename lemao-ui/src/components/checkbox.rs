@@ -49,10 +49,10 @@ pub struct Checkbox {
     label_offset: Vec2,
     label_color: Color,
 
-    // Shadow
-    shadow_enabled: bool,
-    shadow_offset: Vec2,
-    shadow_color: Color,
+    // Label shadow properties
+    label_shadow_enabled: bool,
+    label_shadow_offset: Vec2,
+    label_shadow_color: Color,
 
     // Component-specific properties
     pressed: bool,
@@ -109,10 +109,10 @@ impl Checkbox {
             label_offset: Default::default(),
             label_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
 
-            // Shadow
-            shadow_enabled: false,
-            shadow_offset: Default::default(),
-            shadow_color: Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 1.0)),
+            // Label shadow properties
+            label_shadow_enabled: false,
+            label_shadow_offset: Default::default(),
+            label_shadow_color: Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 1.0)),
 
             // Component-specific properties
             pressed: false,
@@ -211,29 +211,29 @@ impl Checkbox {
     }
     /* #endregion */
 
-    /* #region Shadow properties */
-    pub fn is_shadow_enabled(&self) -> bool {
-        self.shadow_enabled
+    /* #region Label shadow properties */
+    pub fn is_label_shadow_enabled(&self) -> bool {
+        self.label_shadow_enabled
     }
 
-    pub fn set_shadow_enabled_flag(&mut self, shadow_enabled: bool) {
-        self.shadow_enabled = shadow_enabled;
+    pub fn set_label_shadow_enabled_flag(&mut self, label_shadow_enabled: bool) {
+        self.label_shadow_enabled = label_shadow_enabled;
     }
 
-    pub fn get_shadow_offset(&self) -> Vec2 {
-        self.shadow_offset
+    pub fn get_label_shadow_offset(&self) -> Vec2 {
+        self.label_shadow_offset
     }
 
-    pub fn set_shadow_offset(&mut self, shadow_offset: Vec2) {
-        self.shadow_offset = shadow_offset;
+    pub fn set_label_shadow_offset(&mut self, label_shadow_offset: Vec2) {
+        self.label_shadow_offset = label_shadow_offset;
     }
 
-    pub fn get_shadow_color(&self) -> &Color {
-        &self.shadow_color
+    pub fn get_label_shadow_color(&self) -> &Color {
+        &self.label_shadow_color
     }
 
-    pub fn set_shadow_color(&mut self, get_shadow_color: Color) {
-        self.shadow_color = get_shadow_color;
+    pub fn set_label_shadow_color(&mut self, get_label_shadow_color: Color) {
+        self.label_shadow_color = get_label_shadow_color;
     }
     /* #endregion */
 
@@ -382,7 +382,6 @@ impl Component for Checkbox {
     fn process_window_event(&mut self, event: &InputEvent) -> Vec<UiEvent> {
         let mut events: Vec<UiEvent> = Default::default();
 
-        // All component
         match event {
             InputEvent::MouseMoved(cursor_position, previous_cursor_position) => {
                 if self.is_point_inside(*cursor_position) {
@@ -435,6 +434,7 @@ impl Component for Checkbox {
 
                         self.checked = !self.checked;
                         self.dirty = true;
+                        self.pressed = false;
 
                         if let Some(f) = self.on_checkbox_changed {
                             (f)(self, *button, self.checked);
@@ -506,19 +506,19 @@ impl Component for Checkbox {
     }
 
     fn draw(&mut self, renderer: &mut RendererContext) -> Result<(), String> {
-        if self.shadow_enabled {
-            let panel = renderer.get_drawable_mut(self.label_id)?;
-            let original_position = panel.get_position();
-            let original_color = panel.get_color().clone();
+        if self.label_shadow_enabled {
+            let drawable = renderer.get_drawable_mut(self.label_id)?;
+            let original_position = drawable.get_position();
+            let original_color = drawable.get_color().clone();
 
-            let panel = renderer.get_drawable_mut(self.label_id)?;
-            panel.set_position(original_position + self.shadow_offset);
-            panel.set_color(self.shadow_color.clone());
+            let drawable = renderer.get_drawable_mut(self.label_id)?;
+            drawable.set_position(original_position + self.label_shadow_offset);
+            drawable.set_color(self.label_shadow_color.clone());
             renderer.draw(self.label_id)?;
 
-            let panel = renderer.get_drawable_mut(self.label_id)?;
-            panel.set_position(original_position);
-            panel.set_color(original_color);
+            let drawable = renderer.get_drawable_mut(self.label_id)?;
+            drawable.set_position(original_position);
+            drawable.set_color(original_color);
         }
 
         renderer.draw(self.box_id)?;

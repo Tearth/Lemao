@@ -40,7 +40,7 @@ pub struct Label {
     multiline: bool,
     max_multiline_width: f32,
 
-    // Shadow
+    // Shadow properties
     shadow_enabled: bool,
     shadow_offset: Vec2,
     shadow_color: Color,
@@ -80,7 +80,7 @@ impl Label {
             multiline: false,
             max_multiline_width: 0.0,
 
-            // Shadow
+            // Shadow properties
             shadow_enabled: false,
             shadow_offset: Default::default(),
             shadow_color: Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 1.0)),
@@ -396,18 +396,18 @@ impl Component for Label {
 
     fn draw(&mut self, renderer: &mut RendererContext) -> Result<(), String> {
         if self.shadow_enabled {
-            let panel = renderer.get_drawable_mut(self.label_id)?;
-            let original_position = panel.get_position();
-            let original_color = panel.get_color().clone();
+            let drawable = renderer.get_drawable_mut(self.label_id)?;
+            let original_position = drawable.get_position();
+            let original_color = drawable.get_color().clone();
 
-            let panel = renderer.get_drawable_mut(self.label_id)?;
-            panel.set_position(original_position + self.shadow_offset);
-            panel.set_color(self.shadow_color.clone());
+            let drawable = renderer.get_drawable_mut(self.label_id)?;
+            drawable.set_position(original_position + self.shadow_offset);
+            drawable.set_color(self.shadow_color.clone());
             renderer.draw(self.label_id)?;
 
-            let panel = renderer.get_drawable_mut(self.label_id)?;
-            panel.set_position(original_position);
-            panel.set_color(original_color);
+            let drawable = renderer.get_drawable_mut(self.label_id)?;
+            drawable.set_position(original_position);
+            drawable.set_color(original_color);
         }
 
         renderer.draw(self.label_id)?;
