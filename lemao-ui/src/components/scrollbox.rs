@@ -1,5 +1,6 @@
 use super::Component;
 use super::ComponentBorderThickness;
+use super::ComponentCornerRounding;
 use super::ComponentMargin;
 use super::ComponentPosition;
 use super::ComponentShape;
@@ -38,13 +39,10 @@ pub struct Scrollbox {
     children: Vec<usize>,
     event_mask: Option<EventMask>,
 
-    // Shape properties
-    scroll_shape: ComponentShape,
-
     // Scroll background properties
     scroll_background_id: usize,
     scroll_background_color: Color,
-    scroll_background_roundness_factor: f32,
+    scroll_background_corner_rounding: ComponentCornerRounding,
     scroll_background_texture_id: Option<usize>,
 
     // Scroll background border properties
@@ -55,7 +53,7 @@ pub struct Scrollbox {
     // Scroll properties
     scroll_id: usize,
     scroll_color: Color,
-    scroll_roundness_factor: f32,
+    scroll_corner_rounding: ComponentCornerRounding,
     scroll_texture_id: Option<usize>,
 
     // Scroll border properties
@@ -84,7 +82,7 @@ pub struct Scrollbox {
 }
 
 impl Scrollbox {
-    pub fn new(id: usize, renderer: &mut RendererContext, scroll_shape: ComponentShape) -> Result<Self, String> {
+    pub fn new(id: usize, renderer: &mut RendererContext) -> Result<Self, String> {
         Ok(Self {
             id,
 
@@ -102,40 +100,25 @@ impl Scrollbox {
             children: Default::default(),
             event_mask: None,
 
-            // Shape properties
-            scroll_shape,
-
             // Scroll background properties
-            scroll_background_id: match scroll_shape {
-                ComponentShape::Rectangle => renderer.create_rectangle()?,
-                ComponentShape::Disc => renderer.create_disc(0.0, 512)?,
-            },
+            scroll_background_id: renderer.create_rectangle()?,
             scroll_background_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
-            scroll_background_roundness_factor: 0.0,
+            scroll_background_corner_rounding: Default::default(),
             scroll_background_texture_id: None,
 
             // Scroll background border properties
-            scroll_background_border_id: match scroll_shape {
-                ComponentShape::Rectangle => renderer.create_frame(Default::default())?,
-                ComponentShape::Disc => renderer.create_circle(0.0, 512)?,
-            },
+            scroll_background_border_id: renderer.create_frame(Default::default())?,
             scroll_background_border_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             scroll_background_border_thickness: Default::default(),
 
             // Scroll properties
-            scroll_id: match scroll_shape {
-                ComponentShape::Rectangle => renderer.create_rectangle()?,
-                ComponentShape::Disc => renderer.create_disc(0.0, 512)?,
-            },
+            scroll_id: renderer.create_rectangle()?,
             scroll_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
-            scroll_roundness_factor: 0.0,
+            scroll_corner_rounding: Default::default(),
             scroll_texture_id: None,
 
             // Scroll border properties
-            scroll_border_id: match scroll_shape {
-                ComponentShape::Rectangle => renderer.create_frame(Default::default())?,
-                ComponentShape::Disc => renderer.create_circle(0.0, 512)?,
-            },
+            scroll_border_id: renderer.create_frame(Default::default())?,
             scroll_border_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             scroll_border_thickness: Default::default(),
 
@@ -165,12 +148,6 @@ impl Scrollbox {
         self.id
     }
 
-    /* #region Shape properties */
-    pub fn get_scroll_shape(&self) -> ComponentShape {
-        self.scroll_shape
-    }
-    /* #endregion */
-
     /* #region Scroll properties */
     pub fn get_scroll_color(&self) -> &Color {
         &self.scroll_color
@@ -181,16 +158,12 @@ impl Scrollbox {
         self.dirty = true;
     }
 
-    pub fn get_scroll_roundness_factor(&self) -> f32 {
-        self.scroll_roundness_factor
+    pub fn get_scroll_corner_rounding(&self) -> ComponentCornerRounding {
+        self.scroll_corner_rounding
     }
 
-    pub fn set_scroll_roundness_factor(&mut self, roundness_scroll_factor: f32) -> Result<(), String> {
-        if self.scroll_shape == ComponentShape::Rectangle {
-            return Err("Not supported".to_string());
-        }
-
-        self.scroll_roundness_factor = roundness_scroll_factor;
+    pub fn set_scroll_corner_rounding(&mut self, scroll_corner_rounding: ComponentCornerRounding) -> Result<(), String> {
+        self.scroll_corner_rounding = scroll_corner_rounding;
         self.dirty = true;
         Ok(())
     }
@@ -235,18 +208,14 @@ impl Scrollbox {
         self.dirty = true;
     }
 
-    pub fn get_scroll_background_roundness_factor(&self) -> f32 {
-        self.scroll_background_roundness_factor
-    }
-
-    pub fn set_scroll_background_roundness_factor(&mut self, roundness_scroll_background_factor: f32) -> Result<(), String> {
-        if self.scroll_shape == ComponentShape::Rectangle {
-            return Err("Not supported".to_string());
-        }
-
-        self.scroll_background_roundness_factor = roundness_scroll_background_factor;
+    pub fn set_scroll_background_corner_rounding(&mut self, scroll_background_corner_rounding: ComponentCornerRounding) -> Result<(), String> {
+        self.scroll_background_corner_rounding = scroll_background_corner_rounding;
         self.dirty = true;
         Ok(())
+    }
+
+    pub fn get_scroll_background_corner_rounding(&self) -> ComponentCornerRounding {
+        self.scroll_background_corner_rounding
     }
 
     pub fn get_scroll_background_texture_id(&self) -> Option<usize> {
@@ -654,14 +623,7 @@ impl Component for Scrollbox {
             border_rectangle.set_anchor(Vec2::new(1.0, 1.0));
             border_rectangle.set_color(self.scroll_background_border_color.clone());
 
-            match self.scroll_shape {
-                ComponentShape::Rectangle => renderer
-                    .get_drawable_with_type_mut::<Frame>(self.scroll_background_border_id)?
-                    .set_thickness(self.scroll_background_border_thickness.into()),
-                ComponentShape::Disc => renderer
-                    .get_drawable_with_type_mut::<Circle>(self.scroll_background_border_id)?
-                    .set_thickness(Vec2::new(self.scroll_background_border_thickness.left, self.scroll_background_border_thickness.top)),
-            }
+            renderer.get_drawable_with_type_mut::<Frame>(self.scroll_background_border_id)?.set_thickness(self.scroll_background_border_thickness.into());
 
             scroll_background_position -= Vec2::new(self.scroll_background_border_thickness.right, self.scroll_background_border_thickness.top);
             scroll_background_size -= Vec2::new(
@@ -681,15 +643,12 @@ impl Component for Scrollbox {
             let texture_storage_lock = texture_storage.lock().unwrap();
             let texture = texture_storage_lock.get(scroll_background_texture_id)?;
 
-            match self.scroll_shape {
-                ComponentShape::Rectangle => renderer.get_drawable_with_type_mut::<Rectangle>(self.scroll_background_id)?.set_texture(texture),
-                ComponentShape::Disc => renderer.get_drawable_with_type_mut::<Disc>(self.scroll_background_id)?.set_texture(texture),
-            }
+            renderer.get_drawable_with_type_mut::<Rectangle>(self.scroll_background_id)?.set_texture(texture);
         }
 
-        let scroll_height = self.screen_size.y * self.screen_size.y / self.total_size.y;
+        let scroll_height = (self.screen_size.y * self.screen_size.y / self.total_size.y).floor();
         let scroll_free_space_left = self.screen_size.y - scroll_height;
-        let scroll_offset = (scroll_free_space_left * self.scroll_delta.y / self.scroll_difference.y).ceil();
+        let scroll_offset = (scroll_free_space_left * self.scroll_delta.y / self.scroll_difference.y).floor();
         self.scroll_difference = (self.total_size - self.screen_size).clamp(Vec2::new(0.0, 0.0), Vec2::new(f32::MAX, f32::MAX));
 
         let mut scroll_position = self.screen_position + self.screen_size - Vec2::new(0.0, scroll_offset);
@@ -702,14 +661,7 @@ impl Component for Scrollbox {
             border_rectangle.set_anchor(Vec2::new(1.0, 1.0));
             border_rectangle.set_color(self.scroll_border_color.clone());
 
-            match self.scroll_shape {
-                ComponentShape::Rectangle => {
-                    renderer.get_drawable_with_type_mut::<Frame>(self.scroll_border_id)?.set_thickness(self.scroll_border_thickness.into())
-                }
-                ComponentShape::Disc => renderer
-                    .get_drawable_with_type_mut::<Circle>(self.scroll_border_id)?
-                    .set_thickness(Vec2::new(self.scroll_border_thickness.left, self.scroll_border_thickness.top)),
-            }
+            renderer.get_drawable_with_type_mut::<Frame>(self.scroll_border_id)?.set_thickness(self.scroll_border_thickness.into());
 
             scroll_position -= Vec2::new(self.scroll_border_thickness.right, self.scroll_border_thickness.top);
             scroll_size -= Vec2::new(
@@ -729,19 +681,13 @@ impl Component for Scrollbox {
             let texture_storage_lock = texture_storage.lock().unwrap();
             let texture = texture_storage_lock.get(scroll_texture_id)?;
 
-            match self.scroll_shape {
-                ComponentShape::Rectangle => renderer.get_drawable_with_type_mut::<Rectangle>(self.scroll_id)?.set_texture(texture),
-                ComponentShape::Disc => renderer.get_drawable_with_type_mut::<Disc>(self.scroll_id)?.set_texture(texture),
-            }
+            renderer.get_drawable_with_type_mut::<Rectangle>(self.scroll_id)?.set_texture(texture);
         }
 
-        if self.scroll_shape == ComponentShape::Disc {
-            renderer.get_drawable_with_type_mut::<Disc>(self.scroll_id)?.set_squircle_factor(1.0 - self.scroll_roundness_factor);
-            renderer.get_drawable_with_type_mut::<Circle>(self.scroll_border_id)?.set_squircle_factor(1.0 - self.scroll_roundness_factor);
-
-            renderer.get_drawable_with_type_mut::<Disc>(self.scroll_background_id)?.set_squircle_factor(1.0 - self.scroll_background_roundness_factor);
-            renderer.get_drawable_with_type_mut::<Circle>(self.scroll_background_border_id)?.set_squircle_factor(1.0 - self.scroll_background_roundness_factor);
-        }
+        renderer.get_drawable_with_type_mut::<Rectangle>(self.scroll_id)?.set_corner_rounding(self.scroll_corner_rounding.into());
+        renderer.get_drawable_with_type_mut::<Frame>(self.scroll_border_id)?.set_corner_rounding(self.scroll_corner_rounding.into());
+        renderer.get_drawable_with_type_mut::<Rectangle>(self.scroll_background_id)?.set_corner_rounding(self.scroll_background_corner_rounding.into());
+        renderer.get_drawable_with_type_mut::<Frame>(self.scroll_background_border_id)?.set_corner_rounding(self.scroll_background_corner_rounding.into());
 
         self.dirty = false;
 

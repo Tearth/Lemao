@@ -3,6 +3,7 @@ use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::context::RendererContext;
 use lemao_core::renderer::drawable::frame::FrameThickness;
+use lemao_core::renderer::drawable::CornerRounding;
 use std::any::Any;
 
 pub mod button;
@@ -44,6 +45,14 @@ pub struct ComponentBorderThickness {
     pub bottom: f32,
     pub right: f32,
     pub left: f32,
+}
+
+#[derive(Copy, Clone, Debug, Default, PartialEq)]
+pub struct ComponentCornerRounding {
+    pub left_bottom: f32,
+    pub right_bottom: f32,
+    pub right_top: f32,
+    pub left_top: f32,
 }
 
 #[derive(Copy, Clone, Debug)]
@@ -129,6 +138,23 @@ impl ComponentBorderThickness {
 impl From<ComponentBorderThickness> for FrameThickness {
     fn from(thickness: ComponentBorderThickness) -> Self {
         Self { top: thickness.top, bottom: thickness.bottom, right: thickness.right, left: thickness.left }
+    }
+}
+
+impl ComponentCornerRounding {
+    pub fn new(left_bottom: f32, right_bottom: f32, right_top: f32, left_top: f32) -> Self {
+        Self { left_bottom, right_bottom, right_top, left_top }
+    }
+}
+
+impl From<ComponentCornerRounding> for CornerRounding {
+    fn from(corner_rounding: ComponentCornerRounding) -> Self {
+        Self {
+            left_bottom: corner_rounding.left_bottom,
+            right_bottom: corner_rounding.right_bottom,
+            right_top: corner_rounding.right_top,
+            left_top: corner_rounding.left_top,
+        }
     }
 }
 

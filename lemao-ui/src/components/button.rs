@@ -1,5 +1,6 @@
 use super::Component;
 use super::ComponentBorderThickness;
+use super::ComponentCornerRounding;
 use super::ComponentMargin;
 use super::ComponentPosition;
 use super::ComponentShape;
@@ -45,7 +46,7 @@ pub struct Button {
     filling_id: usize,
     shape: ComponentShape,
     color: Color,
-    roundness_factor: f32,
+    corner_rounding: ComponentCornerRounding,
     texture_id: Option<usize>,
     texture_original_size: Vec2,
 
@@ -64,11 +65,12 @@ pub struct Button {
     label_color: Color,
 
     // Shadow properties
+    shadow_id: usize,
     shadow_enabled: bool,
     shadow_offset: Vec2,
     shadow_color: Color,
     shadow_scale: Vec2,
-    shadow_roundness_factor: f32,
+    shadow_corner_rounding: ComponentCornerRounding,
 
     // Label shadow properties
     label_shadow_enabled: bool,
@@ -113,7 +115,7 @@ impl Button {
             },
             shape,
             color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
-            roundness_factor: 1.0,
+            corner_rounding: Default::default(),
             texture_id: None,
             texture_original_size: Default::default(),
 
@@ -135,11 +137,15 @@ impl Button {
             label_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
 
             // Shadow properties
+            shadow_id: match shape {
+                ComponentShape::Rectangle => renderer.create_rectangle()?,
+                ComponentShape::Disc => renderer.create_disc(0.0, 512)?,
+            },
             shadow_enabled: false,
             shadow_offset: Default::default(),
             shadow_color: Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 1.0)),
             shadow_scale: Vec2::new(1.0, 1.0),
-            shadow_roundness_factor: 0.0,
+            shadow_corner_rounding: Default::default(),
 
             // Label shadow properties
             label_shadow_enabled: false,
@@ -167,26 +173,21 @@ impl Button {
         self.shape
     }
 
-    pub fn get_roundness_factor(&self) -> f32 {
-        self.roundness_factor
-    }
-
-    pub fn set_roundness_factor(&mut self, roundness_factor: f32) -> Result<(), String> {
-        if self.shape == ComponentShape::Rectangle {
-            return Err("Not supported".to_string());
-        }
-
-        self.roundness_factor = roundness_factor;
-        self.dirty = true;
-        Ok(())
-    }
-
     pub fn get_color(&self) -> &Color {
         &self.color
     }
 
     pub fn set_color(&mut self, color: Color) {
         self.color = color;
+        self.dirty = true;
+    }
+
+    pub fn get_corner_rounding(&self) -> ComponentCornerRounding {
+        self.corner_rounding
+    }
+
+    pub fn set_corner_rounding(&mut self, corner_rounding: ComponentCornerRounding) {
+        self.corner_rounding = corner_rounding;
         self.dirty = true;
     }
 
@@ -316,12 +317,14 @@ impl Button {
         self.shadow_scale = shadow_scale;
     }
 
-    pub fn get_shadow_roundness_factor(&self) -> f32 {
-        self.shadow_roundness_factor
+    pub fn get_shadow_corner_rounding(&self) -> ComponentCornerRounding {
+        self.shadow_corner_rounding
     }
 
-    pub fn set_shadow_roundness_factor(&mut self, shadow_roundness_factor: f32) {
-        self.shadow_roundness_factor = shadow_roundness_factor;
+    pub fn set_shadow_corner_rounding(&mut self, shadow_corner_rounding: ComponentCornerRounding) -> Result<(), String> {
+        self.shadow_corner_rounding = shadow_corner_rounding;
+        self.dirty = true;
+        Ok(())
     }
     /* #endregion */
 
@@ -372,7 +375,7 @@ impl Button {
             }
         }
 
-        if self.shape == ComponentShape::Rectangle || (self.shape == ComponentShape::Disc && self.roundness_factor < 0.8) {
+        if self.shape == ComponentShape::Rectangle {
             let x1 = self.screen_position.x;
             let y1 = self.screen_position.y;
             let x2 = self.screen_position.x + self.screen_size.x;
@@ -629,9 +632,9 @@ impl Component for Button {
 
         renderer.get_drawable_mut(self.filling_id)?.set_size(self.screen_size);
 
-        if self.shape == ComponentShape::Disc {
-            renderer.get_drawable_with_type_mut::<Disc>(self.filling_id)?.set_squircle_factor(1.0 - self.roundness_factor);
-            renderer.get_drawable_with_type_mut::<Circle>(self.border_id)?.set_squircle_factor(1.0 - self.roundness_factor);
+        if self.shape == ComponentShape::Rectangle {
+            renderer.get_drawable_with_type_mut::<Rectangle>(self.filling_id)?.set_corner_rounding(self.corner_rounding.into());
+            renderer.get_drawable_with_type_mut::<Frame>(self.border_id)?.set_corner_rounding(self.corner_rounding.into());
         }
 
         let font_storage = renderer.get_fonts();
@@ -657,6 +660,19 @@ impl Component for Button {
         label.set_position(horizontal_position + vertical_position + self.label_offset);
         label.set_anchor(horizontal_anchor + vertical_anchor);
 
+        if self.shadow_enabled {
+            let shadow = renderer.get_drawable_mut(self.shadow_id)?;
+            shadow.set_position(self.screen_position + self.screen_size / 2.0 + self.shadow_offset);
+            shadow.set_size(self.screen_size);
+            shadow.set_anchor(Vec2::new(0.5, 0.5));
+            shadow.set_color(self.shadow_color.clone());
+            shadow.set_scale(self.shadow_scale);
+
+            if let Ok(rectangle) = renderer.get_drawable_with_type_mut::<Rectangle>(self.shadow_id) {
+                rectangle.set_corner_rounding(self.shadow_corner_rounding.into());
+            }
+        }
+
         self.dirty = false;
 
         Ok(())
@@ -664,37 +680,7 @@ impl Component for Button {
 
     fn draw(&mut self, renderer: &mut RendererContext) -> Result<(), String> {
         if self.shadow_enabled {
-            let drawable = renderer.get_drawable_mut(self.filling_id)?;
-            let original_position = drawable.get_position();
-            let original_scale = drawable.get_scale();
-            let original_anchor = drawable.get_anchor();
-            let original_color = drawable.get_color().clone();
-
-            let original_squircle_factor = if let Ok(disc) = renderer.get_drawable_with_type_mut::<Disc>(self.filling_id) {
-                let original_squircle_factor = disc.get_squircle_factor();
-                disc.set_squircle_factor(1.0 - self.shadow_roundness_factor);
-
-                original_squircle_factor
-            } else {
-                0.0
-            };
-
-            let drawable = renderer.get_drawable_mut(self.filling_id)?;
-            drawable.set_position(original_position + (drawable.get_size() / 2.0) + self.shadow_offset);
-            drawable.set_scale(original_scale * self.shadow_scale);
-            drawable.set_anchor(Vec2::new(0.5, 0.5));
-            drawable.set_color(self.shadow_color.clone());
-            renderer.draw(self.filling_id)?;
-
-            let drawable = renderer.get_drawable_mut(self.filling_id)?;
-            drawable.set_position(original_position);
-            drawable.set_scale(original_scale);
-            drawable.set_anchor(original_anchor);
-            drawable.set_color(original_color);
-
-            if let Ok(disc) = renderer.get_drawable_with_type_mut::<Disc>(self.filling_id) {
-                disc.set_squircle_factor(original_squircle_factor);
-            }
+            renderer.draw(self.shadow_id)?;
         }
 
         renderer.draw(self.filling_id)?;

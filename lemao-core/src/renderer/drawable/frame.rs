@@ -29,6 +29,8 @@ pub struct Frame {
     anchor: Vec2,
     color: Color,
     thickness: FrameThickness,
+    corner_rounding: CornerRounding,
+    elements_count: u32,
     vertices: Vec<f32>,
     indices: Vec<u32>,
 }
@@ -59,6 +61,8 @@ impl Frame {
             anchor: Default::default(),
             color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             thickness: FrameThickness::new(1.0, 1.0, 1.0, 1.0),
+            corner_rounding: Default::default(),
+            elements_count: 0,
             vertices: Vec::new(),
             indices: Vec::new(),
         };
@@ -109,12 +113,166 @@ impl Frame {
         self.update();
     }
 
+    pub fn get_corner_rounding(&self) -> CornerRounding {
+        self.corner_rounding
+    }
+
+    pub fn set_corner_rounding(&mut self, corner_rounding: CornerRounding) {
+        self.corner_rounding = corner_rounding;
+        self.update();
+    }
+
     fn update(&mut self) {
         unsafe {
             self.vertices.clear();
             self.indices.clear();
 
-            self.vertices.extend_from_slice(&self.get_vertices(self.size, SolidColor::new(1.0, 1.0, 1.0, 1.0), self.thickness));
+            // Left-bottom
+            self.vertices.extend_from_slice(&self.get_vertices(
+                Vec2::new(self.corner_rounding.left_bottom, 0.0),
+                Vec2::new(self.corner_rounding.left_bottom, 0.0) / self.size,
+                SolidColor::new(1.0, 1.0, 1.0, 1.0),
+            ));
+            self.vertices.extend_from_slice(&self.get_vertices(
+                Vec2::new(self.thickness.left + self.corner_rounding.left_bottom, self.thickness.bottom),
+                Vec2::new(self.thickness.left + self.corner_rounding.left_bottom, self.thickness.bottom) / self.size,
+                SolidColor::new(1.0, 1.0, 1.0, 1.0),
+            ));
+
+            // Right-bottom
+            self.vertices.extend_from_slice(&self.get_vertices(
+                Vec2::new(self.size.x - self.corner_rounding.right_bottom, 0.0),
+                Vec2::new(self.size.x - self.corner_rounding.right_bottom, 0.0) / self.size,
+                SolidColor::new(1.0, 1.0, 1.0, 1.0),
+            ));
+            self.vertices.extend_from_slice(&self.get_vertices(
+                Vec2::new(self.size.x - self.thickness.right - self.corner_rounding.right_bottom, self.thickness.bottom),
+                Vec2::new(self.size.x - self.thickness.right - self.corner_rounding.right_bottom, self.thickness.bottom) / self.size,
+                SolidColor::new(1.0, 1.0, 1.0, 1.0),
+            ));
+
+            // Right-bottom
+            self.vertices.extend_from_slice(&self.get_vertices(
+                Vec2::new(self.size.x, self.corner_rounding.right_bottom),
+                Vec2::new(self.size.x, self.corner_rounding.right_bottom) / self.size,
+                SolidColor::new(1.0, 1.0, 1.0, 1.0),
+            ));
+            self.vertices.extend_from_slice(&self.get_vertices(
+                Vec2::new(self.size.x - self.thickness.right, self.thickness.bottom + self.corner_rounding.right_bottom),
+                Vec2::new(self.size.x - self.thickness.right, self.thickness.bottom + self.corner_rounding.right_bottom) / self.size,
+                SolidColor::new(1.0, 1.0, 1.0, 1.0),
+            ));
+
+            // Right-top
+            self.vertices.extend_from_slice(&self.get_vertices(
+                Vec2::new(self.size.x, self.size.y - self.corner_rounding.right_top),
+                Vec2::new(self.size.x, self.size.y - self.corner_rounding.right_top) / self.size,
+                SolidColor::new(1.0, 1.0, 1.0, 1.0),
+            ));
+            self.vertices.extend_from_slice(&self.get_vertices(
+                Vec2::new(self.size.x - self.thickness.right, self.size.y - self.thickness.top - self.corner_rounding.right_bottom),
+                Vec2::new(self.size.x - self.thickness.right, self.size.y - self.thickness.top - self.corner_rounding.right_bottom) / self.size,
+                SolidColor::new(1.0, 1.0, 1.0, 1.0),
+            ));
+
+            // Right-top
+            self.vertices.extend_from_slice(&self.get_vertices(
+                Vec2::new(self.size.x - self.corner_rounding.right_top, self.size.y),
+                Vec2::new(self.size.x - self.corner_rounding.right_top, self.size.y) / self.size,
+                SolidColor::new(1.0, 1.0, 1.0, 1.0),
+            ));
+            self.vertices.extend_from_slice(&self.get_vertices(
+                Vec2::new(self.size.x - self.thickness.right - self.corner_rounding.right_top, self.size.y - self.thickness.top),
+                Vec2::new(self.size.x - self.thickness.right - self.corner_rounding.right_top, self.size.y - self.thickness.top) / self.size,
+                SolidColor::new(1.0, 1.0, 1.0, 1.0),
+            ));
+
+            // Left-top
+            self.vertices.extend_from_slice(&self.get_vertices(
+                Vec2::new(self.corner_rounding.left_top, self.size.y),
+                Vec2::new(self.corner_rounding.left_top, self.size.y) / self.size,
+                SolidColor::new(1.0, 1.0, 1.0, 1.0),
+            ));
+            self.vertices.extend_from_slice(&self.get_vertices(
+                Vec2::new(self.thickness.left + self.corner_rounding.left_top, self.size.y - self.thickness.top),
+                Vec2::new(self.thickness.left + self.corner_rounding.left_top, self.size.y - self.thickness.top) / self.size,
+                SolidColor::new(1.0, 1.0, 1.0, 1.0),
+            ));
+
+            // Left-top
+            self.vertices.extend_from_slice(&self.get_vertices(
+                Vec2::new(0.0, self.size.y - self.corner_rounding.left_top),
+                Vec2::new(0.0, self.size.y - self.corner_rounding.left_top) / self.size,
+                SolidColor::new(1.0, 1.0, 1.0, 1.0),
+            ));
+            self.vertices.extend_from_slice(&self.get_vertices(
+                Vec2::new(self.thickness.left, self.size.y - self.thickness.top - self.corner_rounding.left_top),
+                Vec2::new(self.thickness.left, self.size.y - self.thickness.top - self.corner_rounding.left_top) / self.size,
+                SolidColor::new(1.0, 1.0, 1.0, 1.0),
+            ));
+
+            // Left-bottom
+            self.vertices.extend_from_slice(&self.get_vertices(
+                Vec2::new(0.0, self.corner_rounding.left_bottom),
+                Vec2::new(0.0, self.corner_rounding.left_bottom) / self.size,
+                SolidColor::new(1.0, 1.0, 1.0, 1.0),
+            ));
+            self.vertices.extend_from_slice(&self.get_vertices(
+                Vec2::new(self.thickness.left, self.thickness.bottom + self.corner_rounding.left_bottom),
+                Vec2::new(self.thickness.left, self.thickness.bottom + self.corner_rounding.left_bottom) / self.size,
+                SolidColor::new(1.0, 1.0, 1.0, 1.0),
+            ));
+
+            self.indices.extend_from_slice(&[0, 1, 2, 1, 2, 3, 4, 5, 6, 5, 6, 7, 8, 9, 10, 9, 10, 11, 12, 13, 14, 13, 14, 15]);
+
+            if self.corner_rounding.left_bottom > 0.0 {
+                self.get_corner(
+                    Vec2::new(self.corner_rounding.left_bottom, self.corner_rounding.left_bottom),
+                    Vec2::new(self.thickness.left + self.corner_rounding.left_bottom, self.thickness.bottom + self.corner_rounding.left_bottom),
+                    self.corner_rounding.left_bottom,
+                    std::f32::consts::PI * 1.0,
+                    std::f32::consts::PI * 1.5,
+                );
+            }
+
+            if self.corner_rounding.right_bottom > 0.0 {
+                self.get_corner(
+                    Vec2::new(self.size.x - self.corner_rounding.right_bottom, self.corner_rounding.right_bottom),
+                    Vec2::new(
+                        self.size.x - self.thickness.right - self.corner_rounding.right_bottom,
+                        self.thickness.bottom + self.corner_rounding.right_bottom,
+                    ),
+                    self.corner_rounding.right_bottom,
+                    std::f32::consts::PI * 1.5,
+                    std::f32::consts::PI * 2.0,
+                );
+            }
+
+            if self.corner_rounding.right_top > 0.0 {
+                self.get_corner(
+                    Vec2::new(self.size.x - self.corner_rounding.right_top, self.size.y - self.corner_rounding.right_top),
+                    Vec2::new(
+                        self.size.x - self.thickness.right - self.corner_rounding.right_top,
+                        self.size.y - self.thickness.top - self.corner_rounding.right_top,
+                    ),
+                    self.corner_rounding.right_top,
+                    std::f32::consts::PI * 0.0,
+                    std::f32::consts::PI * 0.5,
+                );
+            }
+
+            if self.corner_rounding.left_top > 0.0 {
+                self.get_corner(
+                    Vec2::new(self.corner_rounding.left_top, self.size.y - self.corner_rounding.left_top),
+                    Vec2::new(self.thickness.left + self.corner_rounding.left_top, self.size.y - self.thickness.top - self.corner_rounding.left_top),
+                    self.corner_rounding.left_top,
+                    std::f32::consts::PI * 0.5,
+                    std::f32::consts::PI * 1.0,
+                );
+            }
+
+            self.elements_count = self.indices.len() as u32;
+
             let vertices_size = (mem::size_of::<f32>() * self.vertices.len()) as i64;
             let vertices_ptr = self.vertices.as_ptr() as *const c_void;
 
@@ -122,7 +280,6 @@ impl Frame {
             (self.gl.glBindBuffer)(opengl::GL_ARRAY_BUFFER, self.vbo_gl_id);
             (self.gl.glBufferData)(opengl::GL_ARRAY_BUFFER, vertices_size, vertices_ptr, opengl::GL_STATIC_DRAW);
 
-            self.indices.extend_from_slice(&[0, 1, 4, 1, 4, 5, 1, 2, 5, 2, 5, 6, 2, 3, 6, 3, 6, 7, 3, 0, 7, 0, 7, 4]);
             let indices_size = (mem::size_of::<u32>() * self.indices.len()) as i64;
             let indices_ptr = self.indices.as_ptr() as *const c_void;
 
@@ -132,95 +289,54 @@ impl Frame {
     }
 
     #[rustfmt::skip]
-    fn get_vertices(&self, size: Vec2, color: SolidColor, thickness: FrameThickness) -> [f32; 72] {
+    fn get_vertices(&self, position: Vec2, uv: Vec2, color: SolidColor) -> [f32; 9] {
         [
-            /*
-                3--------2
-                |7------6|
-                ||      ||
-                |4------5|
-                0--------1
-            */
-            /* v.x */ 0.0,
-            /* v.y */ 0.0,
+            /* v.x */ position.x,
+            /* v.y */ position.y,
             /* v.z */ 0.0,
             /* c.r */ color.r,
             /* c.g */ color.g,
             /* c.b */ color.b,
             /* c.a */ color.a,
-            /* t.u */ 0.0,
-            /* t.v */ 0.0,
-
-            /* v.x */ size.x,
-            /* v.y */ 0.0,
-            /* v.z */ 0.0,
-            /* c.r */ color.r,
-            /* c.g */ color.g,
-            /* c.b */ color.b,
-            /* c.a */ color.a,
-            /* t.u */ 1.0,
-            /* t.v */ 0.0,
-
-            /* v.x */ size.x,
-            /* v.y */ size.y,
-            /* v.z */ 0.0,
-            /* c.r */ color.r,
-            /* c.g */ color.g,
-            /* c.b */ color.b,
-            /* c.a */ color.a,
-            /* t.u */ 1.0,
-            /* t.v */ 1.0,
-
-            /* v.x */ 0.0,
-            /* v.y */ size.y,
-            /* v.z */ 0.0,
-            /* c.r */ color.r,
-            /* c.g */ color.g,
-            /* c.b */ color.b,
-            /* c.a */ color.a,
-            /* t.u */ 0.0,
-            /* t.v */ 1.0,
-
-            /* v.x */ thickness.left,
-            /* v.y */ thickness.bottom,
-            /* v.z */ 0.0,
-            /* c.r */ color.r,
-            /* c.g */ color.g,
-            /* c.b */ color.b,
-            /* c.a */ color.a,
-            /* t.u */ thickness.left / self.size.x,
-            /* t.v */ thickness.bottom / self.size.y,
-
-            /* v.x */ size.x - thickness.right,
-            /* v.y */ thickness.bottom,
-            /* v.z */ 0.0,
-            /* c.r */ color.r,
-            /* c.g */ color.g,
-            /* c.b */ color.b,
-            /* c.a */ color.a,
-            /* t.u */ 1.0 - thickness.right / self.size.x,
-            /* t.v */ thickness.bottom / self.size.y,
-
-            /* v.x */ size.x - thickness.right,
-            /* v.y */ size.y - thickness.top,
-            /* v.z */ 0.0,
-            /* c.r */ color.r,
-            /* c.g */ color.g,
-            /* c.b */ color.b,
-            /* c.a */ color.a,
-            /* t.u */ 1.0 - thickness.right / self.size.x,
-            /* t.v */ 1.0 - thickness.top / self.size.y,
-
-            /* v.x */ thickness.left,
-            /* v.y */ size.y - thickness.top,
-            /* v.z */ 0.0,
-            /* c.r */ color.r,
-            /* c.g */ color.g,
-            /* c.b */ color.b,
-            /* c.a */ color.a,
-            /* t.u */ thickness.left / self.size.x,
-            /* t.v */ 1.0 - thickness.top / self.size.y,
+            /* t.u */ uv.x,
+            /* t.v */ uv.y,
         ]
+    }
+
+    fn get_corner(&mut self, outer_center: Vec2, inner_center: Vec2, corner_rounding: f32, from_angle: f32, to_angle: f32) {
+        let mut angle = from_angle;
+        let step = (to_angle - from_angle) / corner_rounding;
+        let base_indice = self.indices[self.indices.len() - 1] + 1;
+
+        for n in 0..=(corner_rounding as u32) {
+            let (x, y) = (angle.cos(), angle.sin());
+
+            let position = Vec2::new(x, y);
+            let outer_scaled_position = position * corner_rounding + outer_center;
+            let inner_scaled_position = position * corner_rounding + inner_center;
+            let outer_uv = outer_scaled_position / self.size;
+            let inner_uv = inner_scaled_position / self.size;
+
+            self.vertices.extend_from_slice(&self.get_vertices(outer_scaled_position, outer_uv, SolidColor::new(1.0, 1.0, 1.0, 1.0)));
+            self.vertices.extend_from_slice(&self.get_vertices(inner_scaled_position, inner_uv, SolidColor::new(1.0, 1.0, 1.0, 1.0)));
+
+            if n > 0 {
+                self.indices.extend_from_slice(&[
+                    base_indice + n * 2 - 2,
+                    base_indice + n * 2 - 1,
+                    base_indice + n * 2,
+                    base_indice + n * 2 - 1,
+                    base_indice + n * 2,
+                    base_indice + n * 2 + 1,
+                ]);
+            }
+
+            angle += step;
+
+            if angle > to_angle + step / 2.0 {
+                break;
+            }
+        }
     }
 }
 
@@ -303,7 +419,7 @@ impl Drawable for Frame {
 
             (self.gl.glBindVertexArray)(self.vao_gl_id);
             (self.gl.glBindTexture)(opengl::GL_TEXTURE_2D, self.texture_gl_id);
-            (self.gl.glDrawElements)(opengl::GL_TRIANGLES, 24, opengl::GL_UNSIGNED_INT, ptr::null());
+            (self.gl.glDrawElements)(opengl::GL_TRIANGLES, self.elements_count as i32, opengl::GL_UNSIGNED_INT, ptr::null());
 
             Ok(())
         }

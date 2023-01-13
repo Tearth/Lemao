@@ -21,6 +21,14 @@ pub enum Color {
     Gradient(Gradient),
 }
 
+#[derive(Copy, Clone, Default, PartialEq)]
+pub struct CornerRounding {
+    pub left_bottom: f32,
+    pub right_bottom: f32,
+    pub right_top: f32,
+    pub left_top: f32,
+}
+
 pub trait Drawable {
     fn get_position(&self) -> Vec2;
     fn set_position(&mut self, position: Vec2);
@@ -49,4 +57,10 @@ pub trait Drawable {
 
     fn as_any(&self) -> &dyn Any;
     fn as_any_mut(&mut self) -> &mut dyn Any;
+}
+
+impl CornerRounding {
+    pub fn new(left_bottom: f32, right_bottom: f32, right_top: f32, left_top: f32) -> Self {
+        Self { left_bottom, right_bottom, right_top, left_top }
+    }
 }
