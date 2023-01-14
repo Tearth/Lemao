@@ -15,7 +15,6 @@ use std::{mem, ptr};
 pub struct Rectangle {
     pub(crate) id: usize,
     pub(crate) shape_id: usize,
-    pub(crate) shape_vao_gl_id: u32,
     pub(crate) vao_gl_id: u32,
     pub(crate) vbo_gl_id: u32,
     pub(crate) ebo_gl_id: u32,
@@ -40,7 +39,6 @@ impl Rectangle {
         let mut rectangle = Rectangle {
             id: 0,
             shape_id: shape.id,
-            shape_vao_gl_id: shape.vao_gl_id,
             vao_gl_id: 0,
             vbo_gl_id: 0,
             ebo_gl_id: 0,
