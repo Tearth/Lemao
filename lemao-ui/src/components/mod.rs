@@ -11,6 +11,7 @@ pub mod canvas;
 pub mod checkbox;
 pub mod label;
 pub mod panel;
+pub mod progressbar;
 pub mod scrollbox;
 
 #[derive(Copy, Clone, Debug)]

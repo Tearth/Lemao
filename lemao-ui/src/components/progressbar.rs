@@ -3,24 +3,27 @@ use super::ComponentBorderThickness;
 use super::ComponentCornerRounding;
 use super::ComponentMargin;
 use super::ComponentPosition;
-use super::ComponentShape;
 use super::ComponentSize;
 use super::EventMask;
+use super::HorizontalAlignment;
+use super::VerticalAlignment;
 use crate::events::UiEvent;
 use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_common_platform::input::MouseButton;
 use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::context::RendererContext;
-use lemao_core::renderer::drawable::circle::Circle;
-use lemao_core::renderer::drawable::disc::Disc;
 use lemao_core::renderer::drawable::frame::Frame;
 use lemao_core::renderer::drawable::rectangle::Rectangle;
+use lemao_core::renderer::drawable::text::Text;
 use lemao_core::renderer::drawable::Color;
+use lemao_core::renderer::drawable::Drawable;
 use lemao_core::renderer::textures::Texture;
 use std::any::Any;
 
-pub struct Panel {
+const MAX_BARS_COUNT: usize = 8;
+
+pub struct ProgressBar {
     pub(crate) id: usize,
 
     // Common properties
@@ -38,9 +41,11 @@ pub struct Panel {
     children: Vec<usize>,
     event_mask: Option<EventMask>,
 
+    // Bar properties
+    bars: Vec<Bar>,
+
     // Shape properties
     filling_id: usize,
-    shape: ComponentShape,
     color: Color,
     corner_rounding: ComponentCornerRounding,
     texture_id: Option<usize>,
@@ -51,6 +56,15 @@ pub struct Panel {
     border_color: Color,
     border_thickness: ComponentBorderThickness,
 
+    // Label properties
+    label_id: usize,
+    label_font_id: usize,
+    label_text: String,
+    label_horizontal_alignment: HorizontalAlignment,
+    label_vertical_alignment: VerticalAlignment,
+    label_offset: Vec2,
+    label_color: Color,
+
     // Shadow properties
     shadow_id: usize,
     shadow_enabled: bool,
@@ -59,6 +73,11 @@ pub struct Panel {
     shadow_scale: Vec2,
     shadow_corner_rounding: ComponentCornerRounding,
 
+    // Label shadow properties
+    label_shadow_enabled: bool,
+    label_shadow_offset: Vec2,
+    label_shadow_color: Color,
+
     // Event handlers
     pub on_cursor_enter: Option<fn(component: &mut Self, cursor_position: Vec2)>,
     pub on_cursor_leave: Option<fn(component: &mut Self, cursor_position: Vec2)>,
@@ -66,8 +85,26 @@ pub struct Panel {
     pub on_mouse_button_released: Option<fn(component: &mut Self, mouse_button: MouseButton, cursor_position: Vec2)>,
 }
 
-impl Panel {
-    pub fn new(id: usize, renderer: &mut RendererContext, shape: ComponentShape) -> Result<Self, String> {
+pub struct Bar {
+    // Common properties
+    visible: bool,
+
+    // Shape properties
+    bar_id: usize,
+    color: Color,
+    from: f32,
+    to: f32,
+    corner_rounding: ComponentCornerRounding,
+    texture_id: Option<usize>,
+
+    // Border properties
+    border_id: usize,
+    border_color: Color,
+    border_thickness: ComponentBorderThickness,
+}
+
+impl ProgressBar {
+    pub fn new(id: usize, renderer: &mut RendererContext, label_font_id: usize) -> Result<Self, String> {
         Ok(Self {
             id,
 
@@ -86,35 +123,42 @@ impl Panel {
             children: Default::default(),
             event_mask: None,
 
+            // Bar properties
+            bars: std::iter::repeat_with(|| Bar::new(renderer).unwrap()).take(MAX_BARS_COUNT).collect::<Vec<_>>(),
+
             // Shape properties
-            filling_id: match shape {
-                ComponentShape::Rectangle => renderer.create_rectangle()?,
-                ComponentShape::Disc => renderer.create_disc(0.0, 512)?,
-            },
-            shape,
+            filling_id: renderer.create_rectangle()?,
             color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             corner_rounding: Default::default(),
             texture_id: None,
             texture_original_size: Default::default(),
 
             // Border properties
-            border_id: match shape {
-                ComponentShape::Rectangle => renderer.create_frame(Default::default())?,
-                ComponentShape::Disc => renderer.create_circle(0.0, 512)?,
-            },
+            border_id: renderer.create_frame(Default::default())?,
             border_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             border_thickness: Default::default(),
 
+            // Label properties
+            label_id: renderer.create_text(label_font_id)?,
+            label_font_id,
+            label_text: Default::default(),
+            label_horizontal_alignment: HorizontalAlignment::Middle,
+            label_vertical_alignment: VerticalAlignment::Middle,
+            label_offset: Default::default(),
+            label_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
+
             // Shadow properties
-            shadow_id: match shape {
-                ComponentShape::Rectangle => renderer.create_rectangle()?,
-                ComponentShape::Disc => renderer.create_disc(0.0, 512)?,
-            },
+            shadow_id: renderer.create_rectangle()?,
             shadow_enabled: false,
             shadow_offset: Default::default(),
             shadow_color: Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 1.0)),
             shadow_scale: Vec2::new(1.0, 1.0),
             shadow_corner_rounding: Default::default(),
+
+            // Label shadow properties
+            label_shadow_enabled: false,
+            label_shadow_offset: Default::default(),
+            label_shadow_color: Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 1.0)),
 
             // Event handlers
             on_cursor_enter: None,
@@ -124,15 +168,90 @@ impl Panel {
         })
     }
 
-    /* #region Shape properties */
     pub fn get_id(&self) -> usize {
         self.id
     }
 
-    pub fn get_shape(&self) -> ComponentShape {
-        self.shape
+    /* #region Bar common properties */
+    pub fn get_bar_visibility(&self, bar_id: usize) -> bool {
+        self.bars[bar_id].visible
     }
 
+    pub fn set_bar_visibility(&mut self, bar_id: usize, visible: bool) {
+        self.bars[bar_id].visible = visible;
+        self.dirty = true;
+    }
+    /* #endregion */
+
+    /* #region Bar shape properties */
+    pub fn get_bar_color(&self, bar_id: usize) -> &Color {
+        &self.bars[bar_id].color
+    }
+
+    pub fn set_bar_color(&mut self, bar_id: usize, color: Color) {
+        self.bars[bar_id].color = color;
+        self.dirty = true;
+    }
+
+    pub fn get_bar_from(&self, bar_id: usize) -> f32 {
+        self.bars[bar_id].from
+    }
+
+    pub fn set_bar_from(&mut self, bar_id: usize, from: f32) {
+        self.bars[bar_id].from = from;
+        self.dirty = true;
+    }
+
+    pub fn get_bar_to(&self, bar_id: usize) -> f32 {
+        self.bars[bar_id].to
+    }
+
+    pub fn set_bar_to(&mut self, bar_id: usize, to: f32) {
+        self.bars[bar_id].to = to;
+        self.dirty = true;
+    }
+
+    pub fn get_bar_corner_rounding(&self, bar_id: usize) -> ComponentCornerRounding {
+        self.bars[bar_id].corner_rounding
+    }
+
+    pub fn set_bar_corner_rounding(&mut self, bar_id: usize, corner_rounding: ComponentCornerRounding) {
+        self.bars[bar_id].corner_rounding = corner_rounding;
+        self.dirty = true;
+    }
+
+    pub fn get_bar_texture_id(&self, bar_id: usize) -> Option<usize> {
+        self.bars[bar_id].texture_id
+    }
+
+    pub fn set_bar_texture(&mut self, bar_id: usize, texture: &Texture) {
+        self.bars[bar_id].texture_id = Some(texture.get_id());
+        self.dirty = true;
+    }
+    /* #endregion */
+
+    /* #region Bar border properties */
+    pub fn get_bar_border_thickness(&self, bar_id: usize) -> ComponentBorderThickness {
+        self.bars[bar_id].border_thickness
+    }
+
+    pub fn set_bar_border_thickness(&mut self, bar_id: usize, border_thickness: ComponentBorderThickness) -> Result<(), String> {
+        self.bars[bar_id].border_thickness = border_thickness;
+        self.dirty = true;
+        Ok(())
+    }
+
+    pub fn get_bar_border_color(&self, bar_id: usize) -> &Color {
+        &self.bars[bar_id].border_color
+    }
+
+    pub fn set_bar_border_color(&mut self, bar_id: usize, border_color: Color) {
+        self.bars[bar_id].border_color = border_color;
+        self.dirty = true;
+    }
+    /* #endregion */
+
+    /* #region Shape properties */
     pub fn get_color(&self) -> &Color {
         &self.color
     }
@@ -169,10 +288,6 @@ impl Panel {
     }
 
     pub fn set_border_thickness(&mut self, border_thickness: ComponentBorderThickness) -> Result<(), String> {
-        if self.shape == ComponentShape::Rectangle && !self.border_thickness.is_axially_uniform() {
-            return Err("Not supported".to_string());
-        }
-
         self.border_thickness = border_thickness;
         self.dirty = true;
         Ok(())
@@ -184,6 +299,62 @@ impl Panel {
 
     pub fn set_border_color(&mut self, border_color: Color) {
         self.border_color = border_color;
+        self.dirty = true;
+    }
+    /* #endregion */
+
+    /* #region Label properties */
+    pub fn get_font_id(&self) -> usize {
+        self.label_font_id
+    }
+
+    pub fn set_font_id(&mut self, font_id: usize) {
+        self.label_font_id = font_id;
+        self.dirty = true;
+    }
+
+    pub fn get_text(&self) -> &str {
+        &self.label_text
+    }
+
+    pub fn set_text(&mut self, text: String) {
+        self.label_text = text;
+        self.dirty = true;
+    }
+
+    pub fn get_horizontal_alignment(&self) -> HorizontalAlignment {
+        self.label_horizontal_alignment
+    }
+
+    pub fn set_horizontal_alignment(&mut self, label_horizontal_alignment: HorizontalAlignment) {
+        self.label_horizontal_alignment = label_horizontal_alignment;
+        self.dirty = true;
+    }
+
+    pub fn get_vertical_alignment(&self) -> VerticalAlignment {
+        self.label_vertical_alignment
+    }
+
+    pub fn set_vertical_alignment(&mut self, label_vertical_alignment: VerticalAlignment) {
+        self.label_vertical_alignment = label_vertical_alignment;
+        self.dirty = true;
+    }
+
+    pub fn get_label_offset(&self) -> Vec2 {
+        self.label_offset
+    }
+
+    pub fn set_label_offset(&mut self, label_offset: Vec2) {
+        self.label_offset = label_offset;
+        self.dirty = true;
+    }
+
+    pub fn get_label_color(&self) -> &Color {
+        &self.label_color
+    }
+
+    pub fn set_label_color(&mut self, label_color: Color) {
+        self.label_color = label_color;
         self.dirty = true;
     }
     /* #endregion */
@@ -232,6 +403,32 @@ impl Panel {
     }
     /* #endregion */
 
+    /* #region Label shadow properties */
+    pub fn is_label_shadow_enabled(&self) -> bool {
+        self.label_shadow_enabled
+    }
+
+    pub fn set_label_shadow_enabled_flag(&mut self, label_shadow_enabled: bool) {
+        self.label_shadow_enabled = label_shadow_enabled;
+    }
+
+    pub fn get_label_shadow_offset(&self) -> Vec2 {
+        self.label_shadow_offset
+    }
+
+    pub fn set_label_shadow_offset(&mut self, label_shadow_offset: Vec2) {
+        self.label_shadow_offset = label_shadow_offset;
+    }
+
+    pub fn get_label_shadow_color(&self) -> &Color {
+        &self.label_shadow_color
+    }
+
+    pub fn set_label_shadow_color(&mut self, get_label_shadow_color: Color) {
+        self.label_shadow_color = get_label_shadow_color;
+    }
+    /* #endregion */
+
     fn is_point_inside(&self, point: Vec2) -> bool {
         if let Some(event_mask) = self.event_mask {
             let event_mask_left_bottom = event_mask.position;
@@ -243,25 +440,16 @@ impl Panel {
             }
         }
 
-        if self.shape == ComponentShape::Rectangle {
-            let x1 = self.screen_position.x;
-            let y1 = self.screen_position.y;
-            let x2 = self.screen_position.x + self.screen_size.x;
-            let y2 = self.screen_position.y + self.screen_size.y;
+        let scale = self.screen_size.x / self.screen_size.y;
+        let component_center = self.screen_position + self.screen_size / 2.0;
+        let normalized_point = point - component_center;
+        let scaled_point = normalized_point * Vec2::new(1.0, scale);
 
-            point.x >= x1 && point.y >= y1 && point.x <= x2 && point.y <= y2
-        } else {
-            let scale = self.screen_size.x / self.screen_size.y;
-            let component_center = self.screen_position + self.screen_size / 2.0;
-            let normalized_point = point - component_center;
-            let scaled_point = normalized_point * Vec2::new(1.0, scale);
-
-            scaled_point.distance(Vec2::new(0.0, 0.0)) <= self.screen_size.x / 2.0
-        }
+        scaled_point.distance(Vec2::new(0.0, 0.0)) <= self.screen_size.x / 2.0
     }
 }
 
-impl Component for Panel {
+impl Component for ProgressBar {
     /* #region Common properties */
     fn get_position(&self) -> ComponentPosition {
         self.position
@@ -458,12 +646,7 @@ impl Component for Panel {
             border_rectangle.set_size(self.screen_size);
             border_rectangle.set_color(self.border_color.clone());
 
-            match self.shape {
-                ComponentShape::Rectangle => renderer.get_drawable_with_type_mut::<Frame>(self.border_id)?.set_thickness(self.border_thickness.into()),
-                ComponentShape::Disc => renderer
-                    .get_drawable_with_type_mut::<Circle>(self.border_id)?
-                    .set_thickness(Vec2::new(self.border_thickness.left, self.border_thickness.top)),
-            }
+            renderer.get_drawable_with_type_mut::<Frame>(self.border_id)?.set_thickness(self.border_thickness.into());
 
             self.screen_position += Vec2::new(self.border_thickness.left, self.border_thickness.bottom);
             self.screen_size -= Vec2::new(self.border_thickness.left + self.border_thickness.right, self.border_thickness.top + self.border_thickness.bottom);
@@ -481,18 +664,36 @@ impl Component for Panel {
             let texture_storage_lock = texture_storage.lock().unwrap();
             let texture = texture_storage_lock.get(texture_id)?;
 
-            match self.shape {
-                ComponentShape::Rectangle => renderer.get_drawable_with_type_mut::<Rectangle>(self.filling_id)?.set_texture(texture),
-                ComponentShape::Disc => renderer.get_drawable_with_type_mut::<Disc>(self.filling_id)?.set_texture(texture),
-            }
+            renderer.get_drawable_with_type_mut::<Rectangle>(self.filling_id)?.set_texture(texture)
         }
 
         renderer.get_drawable_mut(self.filling_id)?.set_size(self.screen_size);
 
-        if self.shape == ComponentShape::Rectangle {
-            renderer.get_drawable_with_type_mut::<Rectangle>(self.filling_id)?.set_corner_rounding(self.corner_rounding.into());
-            renderer.get_drawable_with_type_mut::<Frame>(self.border_id)?.set_corner_rounding(self.corner_rounding.into());
-        }
+        renderer.get_drawable_with_type_mut::<Rectangle>(self.filling_id)?.set_corner_rounding(self.corner_rounding.into());
+        renderer.get_drawable_with_type_mut::<Frame>(self.border_id)?.set_corner_rounding(self.corner_rounding.into());
+
+        let font_storage = renderer.get_fonts();
+        let font_storage_lock = font_storage.lock().unwrap();
+        let font = font_storage_lock.get(self.label_font_id)?;
+        let label = renderer.get_drawable_with_type_mut::<Text>(self.label_id)?;
+        label.set_font(font);
+        label.set_text(&self.label_text);
+        label.set_color(self.label_color.clone());
+
+        let (horizontal_position, horizontal_anchor) = match self.label_horizontal_alignment {
+            HorizontalAlignment::Left => (Vec2::new(self.screen_position.x, 0.0), Vec2::new(0.0, 0.0)),
+            HorizontalAlignment::Middle => (Vec2::new(self.screen_position.x + (self.screen_size.x) / 2.0, 0.0), Vec2::new(0.5, 0.0)),
+            HorizontalAlignment::Right => (Vec2::new(self.screen_position.x + self.screen_size.x, 0.0), Vec2::new(1.0, 0.0)),
+        };
+
+        let (vertical_position, vertical_anchor) = match self.label_vertical_alignment {
+            VerticalAlignment::Top => (Vec2::new(0.0, self.screen_position.y), Vec2::new(0.0, 0.0)),
+            VerticalAlignment::Middle => (Vec2::new(0.0, self.screen_position.y + (self.screen_size.y) / 2.0), Vec2::new(0.0, 0.5)),
+            VerticalAlignment::Bottom => (Vec2::new(0.0, self.screen_position.y + self.screen_size.y), Vec2::new(0.0, 1.0)),
+        };
+
+        label.set_position((horizontal_position + vertical_position + self.label_offset).floor());
+        label.set_anchor(horizontal_anchor + vertical_anchor);
 
         if self.shadow_enabled {
             let shadow = renderer.get_drawable_mut(self.shadow_id)?;
@@ -507,6 +708,17 @@ impl Component for Panel {
             }
         }
 
+        for bar in &mut self.bars {
+            if bar.visible {
+                let filling_rectangle = renderer.get_drawable_mut(bar.bar_id)?;
+                filling_rectangle.set_position(Vec2::new(self.screen_position.x + self.screen_size.x * bar.from, self.screen_position.y));
+                filling_rectangle.set_size(Vec2::new((bar.to - bar.from) * self.screen_size.x, self.screen_size.y));
+                filling_rectangle.set_color(bar.color.clone());
+
+                renderer.get_drawable_with_type_mut::<Rectangle>(bar.bar_id)?.set_corner_rounding(bar.corner_rounding.into());
+            }
+        }
+
         self.dirty = false;
         Ok(())
     }
@@ -517,6 +729,33 @@ impl Component for Panel {
         }
 
         renderer.draw(self.filling_id)?;
+
+        for bar in self.bars.iter().rev() {
+            if bar.visible {
+                renderer.draw(bar.bar_id)?;
+
+                if bar.border_thickness != Default::default() {
+                    renderer.draw(bar.border_id)?;
+                }
+            }
+        }
+
+        if self.label_shadow_enabled {
+            let drawable = renderer.get_drawable_mut(self.label_id)?;
+            let original_position = drawable.get_position();
+            let original_color = drawable.get_color().clone();
+
+            let drawable = renderer.get_drawable_mut(self.label_id)?;
+            drawable.set_position(original_position + self.label_shadow_offset);
+            drawable.set_color(self.label_shadow_color.clone());
+            renderer.draw(self.label_id)?;
+
+            let drawable = renderer.get_drawable_mut(self.label_id)?;
+            drawable.set_position(original_position);
+            drawable.set_color(original_color);
+        }
+
+        renderer.draw(self.label_id)?;
 
         if self.border_thickness != Default::default() {
             renderer.draw(self.border_id)?;
@@ -531,5 +770,27 @@ impl Component for Panel {
 
     fn as_any_mut(&mut self) -> &mut dyn Any {
         self
+    }
+}
+
+impl Bar {
+    pub fn new(renderer: &mut RendererContext) -> Result<Self, String> {
+        Ok(Self {
+            // Common properties
+            visible: false,
+
+            // Shape properties
+            bar_id: renderer.create_rectangle()?,
+            color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
+            from: 0.0,
+            to: 1.0,
+            corner_rounding: Default::default(),
+            texture_id: None,
+
+            // Border properties
+            border_id: renderer.create_frame(Default::default())?,
+            border_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
+            border_thickness: Default::default(),
+        })
     }
 }

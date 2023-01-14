@@ -3,6 +3,7 @@ use crate::components::canvas::Canvas;
 use crate::components::checkbox::Checkbox;
 use crate::components::label::Label;
 use crate::components::panel::Panel;
+use crate::components::progressbar::ProgressBar;
 use crate::components::scrollbox::Scrollbox;
 use crate::components::Component;
 use crate::components::ComponentPosition;
@@ -110,6 +111,14 @@ impl UiContext {
         let id = self.components.len();
         let panel = Box::new(Panel::new(id, renderer, shape)?);
         self.components.push(Some(panel));
+
+        Ok(id)
+    }
+
+    pub fn create_progressbar(&mut self, renderer: &mut RendererContext, label_font_id: usize) -> Result<usize, String> {
+        let id = self.components.len();
+        let progressbar = Box::new(ProgressBar::new(id, renderer, label_font_id)?);
+        self.components.push(Some(progressbar));
 
         Ok(id)
     }
