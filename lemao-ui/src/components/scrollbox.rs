@@ -508,9 +508,9 @@ impl Component for Scrollbox {
                     if self.scroll_delta != last_delta {
                         if let Some(f) = self.on_scroll {
                             (f)(self, *direction);
-                            self.dirty = true;
                         };
                         events.push(UiEvent::ScrollMoved(self.id, *direction));
+                        self.dirty = true;
                     }
                 }
             }

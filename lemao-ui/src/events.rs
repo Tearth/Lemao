@@ -16,4 +16,8 @@ pub enum UiEvent {
     ScrollMouseButtonPressed(usize, MouseButton),
     ScrollMouseButtonReleased(usize, MouseButton),
     ScrollMoved(usize, MouseWheelDirection),
+
+    TextBoxActivated(usize, MouseButton),
+    TextBoxDeactivated(usize, MouseButton),
+    TextBoxContentChanged(usize, char),
 }

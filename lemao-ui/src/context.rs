@@ -5,6 +5,7 @@ use crate::components::label::Label;
 use crate::components::panel::Panel;
 use crate::components::progressbar::ProgressBar;
 use crate::components::scrollbox::Scrollbox;
+use crate::components::textbox::TextBox;
 use crate::components::Component;
 use crate::components::ComponentPosition;
 use crate::components::ComponentShape;
@@ -131,6 +132,14 @@ impl UiContext {
         Ok(id)
     }
 
+    pub fn create_textbox(&mut self, renderer: &mut RendererContext, label_font_id: usize) -> Result<usize, String> {
+        let id = self.components.len();
+        let textbox = Box::new(TextBox::new(id, renderer, label_font_id)?);
+        self.components.push(Some(textbox));
+
+        Ok(id)
+    }
+
     pub fn get_component(&self, component_id: usize) -> Result<&dyn Component, String> {
         if component_id >= self.components.len() {
             return Err(format!("Component with id {} not found", component_id));
@@ -202,7 +211,7 @@ impl UiContext {
         area_position: Vec2,
         area_size: Vec2,
         event_mask: Option<EventMask>,
-        scroll_offset: Vec2,
+        scroll_offset: Option<Vec2>,
         force: bool,
     ) -> Result<(), String> {
         let component = self.get_component_mut(component_id)?;
@@ -212,13 +221,16 @@ impl UiContext {
             component.set_dirty_flag(true);
         }
 
-        component.set_scroll_offset(scroll_offset);
+        if let Some(scroll_offset) = scroll_offset {
+            component.set_scroll_offset(scroll_offset);
+        }
+
         component.update(renderer, area_position, area_size)?;
 
         let component_area_position = component.get_work_area_position();
         let component_area_size = component.get_work_area_size();
         let (event_mask, scroll_offset) = if let Ok(scrollbox) = self.get_component_with_type::<Scrollbox>(component_id) {
-            (Some(EventMask::new(component_area_position, component_area_size)), scrollbox.get_scroll_delta())
+            (Some(EventMask::new(component_area_position, component_area_size)), if update_children { Some(scrollbox.get_scroll_delta()) } else { None })
         } else {
             (event_mask, Default::default())
         };

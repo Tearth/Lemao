@@ -13,6 +13,7 @@ pub mod label;
 pub mod panel;
 pub mod progressbar;
 pub mod scrollbox;
+pub mod textbox;
 
 #[derive(Copy, Clone, Debug)]
 pub enum ComponentPosition {
