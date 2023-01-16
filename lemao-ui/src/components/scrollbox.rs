@@ -584,10 +584,6 @@ impl Component for Scrollbox {
     }
 
     fn update(&mut self, renderer: &mut RendererContext, area_position: Vec2, area_size: Vec2) -> Result<(), String> {
-        if !self.dirty {
-            return Ok(());
-        }
-
         self.screen_size = match self.size {
             ComponentSize::Absolute(size) => size,
             ComponentSize::Relative(size) => area_size * size,
@@ -643,10 +639,11 @@ impl Component for Scrollbox {
             renderer.get_drawable_with_type_mut::<Rectangle>(self.scroll_background_id)?.set_texture(texture);
         }
 
+        self.scroll_difference = (self.total_size - self.screen_size).clamp(Vec2::new(0.0, 0.0), Vec2::new(f32::MAX, f32::MAX));
+
         let scroll_height = (self.screen_size.y * self.screen_size.y / self.total_size.y).floor();
         let scroll_free_space_left = self.screen_size.y - scroll_height;
         let scroll_offset = (scroll_free_space_left * self.scroll_delta.y / self.scroll_difference.y).floor();
-        self.scroll_difference = (self.total_size - self.screen_size).clamp(Vec2::new(0.0, 0.0), Vec2::new(f32::MAX, f32::MAX));
 
         let mut scroll_position = self.screen_position + self.screen_size - Vec2::new(0.0, scroll_offset);
         let mut scroll_size = Vec2::new(self.scroll_width, scroll_height);

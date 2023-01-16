@@ -213,37 +213,36 @@ impl UiContext {
         event_mask: Option<EventMask>,
         scroll_offset: Option<Vec2>,
         force: bool,
-    ) -> Result<(), String> {
+    ) -> Result<bool, String> {
         let component = self.get_component_mut(component_id)?;
-        let update_children = component.is_dirty();
-
-        if force {
-            component.set_dirty_flag(true);
-        }
+        let update = force || component.is_dirty();
 
         if let Some(scroll_offset) = scroll_offset {
             component.set_scroll_offset(scroll_offset);
         }
 
-        component.update(renderer, area_position, area_size)?;
+        if update {
+            component.update(renderer, area_position, area_size)?;
+        }
 
         let component_area_position = component.get_work_area_position();
         let component_area_size = component.get_work_area_size();
         let (event_mask, scroll_offset) = if let Ok(scrollbox) = self.get_component_with_type::<Scrollbox>(component_id) {
-            (Some(EventMask::new(component_area_position, component_area_size)), if update_children { Some(scrollbox.get_scroll_delta()) } else { None })
+            (Some(EventMask::new(component_area_position, component_area_size)), if update { Some(scrollbox.get_scroll_delta()) } else { None })
         } else {
             (event_mask, Default::default())
         };
 
-        let component = self.get_component_mut(component_id)?;
-        component.set_event_mask(event_mask);
+        self.get_component_mut(component_id)?.set_event_mask(event_mask);
 
+        let mut any_component_updated = update;
         for child_id in self.get_component_mut(component_id)?.get_children().clone() {
-            self.update_internal(renderer, child_id, component_area_position, component_area_size, event_mask, scroll_offset, force || update_children)?;
+            any_component_updated |=
+                self.update_internal(renderer, child_id, component_area_position, component_area_size, event_mask, scroll_offset, force || update)?;
         }
 
         // Scrollbox needs to be updated second time, after all children are refreshed
-        if self.get_component_with_type::<Scrollbox>(component_id).is_ok() {
+        if self.get_component_with_type::<Scrollbox>(component_id).is_ok() && any_component_updated {
             let mut left_bottom_corner: Vec2 = Vec2::new(f32::MAX, f32::MAX);
             let mut right_top_corner: Vec2 = Vec2::new(f32::MIN, f32::MIN);
 
@@ -262,7 +261,7 @@ impl UiContext {
             self.get_component_with_type_mut::<Scrollbox>(component_id)?.update(renderer, area_position, area_size)?;
         }
 
-        Ok(())
+        Ok(any_component_updated)
     }
 
     pub fn draw(&mut self, renderer: &mut RendererContext, component_id: usize) -> Result<(), String> {

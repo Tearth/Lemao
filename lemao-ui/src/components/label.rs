@@ -339,10 +339,6 @@ impl Component for Label {
     }
 
     fn update(&mut self, renderer: &mut RendererContext, area_position: Vec2, area_size: Vec2) -> Result<(), String> {
-        if !self.dirty {
-            return Ok(());
-        }
-
         // We have to set text first, to get the size used later
         let label = renderer.get_drawable_with_type_mut::<Text>(self.label_id)?;
         if self.multiline {

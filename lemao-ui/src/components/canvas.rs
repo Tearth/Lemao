@@ -246,10 +246,6 @@ impl Component for Canvas {
     }
 
     fn update(&mut self, _renderer: &mut RendererContext, area_position: Vec2, area_size: Vec2) -> Result<(), String> {
-        if !self.dirty {
-            return Ok(());
-        }
-
         self.screen_size = match self.size {
             ComponentSize::Absolute(size) => size,
             ComponentSize::Relative(size) => area_size * size,

@@ -451,10 +451,6 @@ impl Component for Checkbox {
     }
 
     fn update(&mut self, renderer: &mut RendererContext, area_position: Vec2, area_size: Vec2) -> Result<(), String> {
-        if !self.dirty {
-            return Ok(());
-        }
-
         // We have to set text first, to get the size used later
         let font_storage = renderer.get_fonts();
         let font_storage_lock = font_storage.lock().unwrap();
