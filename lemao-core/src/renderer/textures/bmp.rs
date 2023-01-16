@@ -30,6 +30,7 @@ pub fn load(path: &str) -> Result<RawTexture, String> {
     let data_address = binary::read_le_u32(&bmp, 10);
     let width = binary::read_le_u32(&bmp, 18);
     let height = binary::read_le_u32(&bmp, 22);
+    let bits_per_pixel = binary::read_le_u16(&bmp, 28);
     let compression_method = binary::read_le_u32(&bmp, 30);
 
     let mut data = Vec::new();
@@ -39,16 +40,17 @@ pub fn load(path: &str) -> Result<RawTexture, String> {
         0 => {
             for _ in 0..height {
                 for _ in 0..width {
-                    let b = binary::read_u8(&bmp, (data_index + 0) as usize);
-                    let g = binary::read_u8(&bmp, (data_index + 1) as usize);
-                    let r = binary::read_u8(&bmp, (data_index + 2) as usize);
+                    let b = if bits_per_pixel >= 8 { binary::read_u8(&bmp, (data_index + 0) as usize) } else { 0xff };
+                    let g = if bits_per_pixel >= 16 { binary::read_u8(&bmp, (data_index + 1) as usize) } else { 0xff };
+                    let r = if bits_per_pixel >= 24 { binary::read_u8(&bmp, (data_index + 2) as usize) } else { 0xff };
+                    let a = if bits_per_pixel >= 32 { binary::read_u8(&bmp, (data_index + 3) as usize) } else { 0xff };
 
                     data.push(r);
                     data.push(g);
                     data.push(b);
-                    data.push(0xff);
+                    data.push(a);
 
-                    data_index += 3;
+                    data_index += (bits_per_pixel / 8) as u32;
                 }
 
                 data_index += (data_index - data_address) % 4;
