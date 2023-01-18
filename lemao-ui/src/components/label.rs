@@ -341,11 +341,12 @@ impl Component for Label {
     fn update(&mut self, renderer: &mut RendererContext, area_position: Vec2, area_size: Vec2) -> Result<(), String> {
         // We have to set text first, to get the size used later
         let label = renderer.get_drawable_with_type_mut::<Text>(self.label_id)?;
+        let mut label_text_processed = self.label_text.clone();
         if self.multiline {
             let mut line = String::new();
             let mut result = String::new();
 
-            for token in self.label_text.split_whitespace() {
+            for token in label_text_processed.split(' ') {
                 if label.calculate_text_size(line.clone() + token).x > self.max_multiline_width {
                     result += &(line.trim().to_string() + "\n");
                     line.clear();
@@ -355,14 +356,14 @@ impl Component for Label {
                 line += " ";
             }
 
-            self.label_text = result + &line;
+            label_text_processed = result + &line;
         }
 
         let font_storage = renderer.get_fonts();
         let font_storage_lock = font_storage.lock().unwrap();
         let font = font_storage_lock.get(self.label_font_id)?;
         renderer.get_drawable_with_type_mut::<Text>(self.label_id)?.set_font(font);
-        renderer.get_drawable_with_type_mut::<Text>(self.label_id)?.set_text(&self.label_text);
+        renderer.get_drawable_with_type_mut::<Text>(self.label_id)?.set_text(&label_text_processed);
 
         self.screen_size = renderer.get_drawable_with_type_mut::<Text>(self.label_id)?.get_size();
         self.size = ComponentSize::Absolute(self.screen_size);
