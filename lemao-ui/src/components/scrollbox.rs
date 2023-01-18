@@ -60,6 +60,9 @@ pub struct Scrollbox {
 
     // Component-specific properties
     total_size: Vec2,
+    padding: Vec2,
+    scroll_position: Vec2,
+    scroll_size: Vec2,
     scroll_difference: Vec2,
     scroll_delta: Vec2,
     scroll_speed: Vec2,
@@ -121,6 +124,9 @@ impl Scrollbox {
 
             // Component-specific properties
             total_size: Default::default(),
+            padding: Default::default(),
+            scroll_position: Default::default(),
+            scroll_size: Default::default(),
             scroll_offset: Default::default(),
             scroll_difference: Default::default(),
             scroll_delta: Default::default(),
@@ -250,18 +256,26 @@ impl Scrollbox {
         self.total_size
     }
 
-    pub fn set_total_size(&mut self, total_size: Vec2) {
-        self.total_size = total_size;
+    pub(crate) fn set_total_size(&mut self, total_size: Vec2) {
+        self.total_size = total_size + self.padding;
         self.dirty = true;
     }
 
-    pub fn get_scroll_difference(&self) -> Vec2 {
-        self.scroll_difference
+    pub fn set_padding(&mut self, padding: Vec2) {
+        self.padding = padding;
+        self.dirty = true;
     }
 
-    pub fn set_scroll_difference(&mut self, scroll_difference: Vec2) {
-        self.scroll_difference = scroll_difference;
-        self.dirty = true;
+    pub fn get_padding(&self) -> Vec2 {
+        self.padding
+    }
+
+    pub fn get_scroll_position(&self) -> Vec2 {
+        self.scroll_position
+    }
+
+    pub fn get_scroll_size(&self) -> Vec2 {
+        self.scroll_size
     }
 
     pub fn get_scroll_delta(&self) -> Vec2 {
@@ -331,10 +345,10 @@ impl Scrollbox {
             }
         }
 
-        let x1 = self.screen_position.x + self.screen_size.x - self.scroll_width;
-        let y1 = self.screen_position.y + self.scroll_difference.y - self.scroll_delta.y;
-        let x2 = self.screen_position.x + self.screen_size.x;
-        let y2 = self.screen_position.y + self.screen_size.y;
+        let x1 = self.scroll_position.x - self.scroll_size.x;
+        let y1 = self.scroll_position.y - self.scroll_size.y;
+        let x2 = self.scroll_position.x;
+        let y2 = self.scroll_position.y;
 
         point.x >= x1 && point.y >= y1 && point.x <= x2 && point.y <= y2
     }
@@ -540,7 +554,8 @@ impl Component for Scrollbox {
                 }
 
                 if self.scroll_pressed {
-                    let difference = previous_cursor_position.y - cursor_position.y;
+                    let scroll_ratio = self.total_size.y / self.screen_size.y;
+                    let difference = (previous_cursor_position.y - cursor_position.y) * scroll_ratio;
                     let last_delta = self.scroll_delta;
 
                     self.scroll_delta += Vec2::new(0.0, difference);
@@ -553,6 +568,7 @@ impl Component for Scrollbox {
                             self.dirty = true;
                         };
                         events.push(UiEvent::ScrollMoved(self.id, direction));
+                        self.dirty = true;
                     }
                 }
             }
@@ -645,28 +661,28 @@ impl Component for Scrollbox {
         let scroll_free_space_left = self.screen_size.y - scroll_height;
         let scroll_offset = (scroll_free_space_left * self.scroll_delta.y / self.scroll_difference.y).floor();
 
-        let mut scroll_position = self.screen_position + self.screen_size - Vec2::new(0.0, scroll_offset);
-        let mut scroll_size = Vec2::new(self.scroll_width, scroll_height);
+        self.scroll_position = self.screen_position + self.screen_size - Vec2::new(0.0, scroll_offset);
+        self.scroll_size = Vec2::new(self.scroll_width, scroll_height);
 
         if self.scroll_border_thickness != Default::default() {
             let border_rectangle = renderer.get_drawable_mut(self.scroll_border_id)?;
-            border_rectangle.set_position(scroll_position);
-            border_rectangle.set_size(scroll_size);
+            border_rectangle.set_position(self.scroll_position);
+            border_rectangle.set_size(self.scroll_size);
             border_rectangle.set_anchor(Vec2::new(1.0, 1.0));
             border_rectangle.set_color(self.scroll_border_color.clone());
 
             renderer.get_drawable_with_type_mut::<Frame>(self.scroll_border_id)?.set_thickness(self.scroll_border_thickness.into());
 
-            scroll_position -= Vec2::new(self.scroll_border_thickness.right, self.scroll_border_thickness.top);
-            scroll_size -= Vec2::new(
+            self.scroll_position -= Vec2::new(self.scroll_border_thickness.right, self.scroll_border_thickness.top);
+            self.scroll_size -= Vec2::new(
                 self.scroll_border_thickness.left + self.scroll_border_thickness.right,
                 self.scroll_border_thickness.top + self.scroll_border_thickness.bottom,
             );
         }
 
         let scroll = renderer.get_drawable_mut(self.scroll_id)?;
-        scroll.set_position(scroll_position);
-        scroll.set_size(scroll_size);
+        scroll.set_position(self.scroll_position);
+        scroll.set_size(self.scroll_size);
         scroll.set_anchor(Vec2::new(1.0, 1.0));
         scroll.set_color(self.scroll_color.clone());
 
