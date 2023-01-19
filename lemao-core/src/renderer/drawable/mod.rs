@@ -59,6 +59,22 @@ pub trait Drawable {
     fn as_any_mut(&mut self) -> &mut dyn Any;
 }
 
+impl Color {
+    pub fn set_alpha(self, alpha: f32) -> Color {
+        match self {
+            Self::SolidColor(solid) => Color::SolidColor(SolidColor::new(solid.r, solid.g, solid.b, alpha)),
+            Self::Gradient(gradient) => {
+                let mut gradient = gradient.clone();
+                for step in &mut gradient.steps {
+                    step.color = SolidColor::new(step.color.r, step.color.g, step.color.b, alpha);
+                }
+
+                Color::Gradient(gradient)
+            }
+        }
+    }
+}
+
 impl CornerRounding {
     pub fn new(left_bottom: f32, right_bottom: f32, right_top: f32, left_top: f32) -> Self {
         Self { left_bottom, right_bottom, right_top, left_top }
