@@ -30,6 +30,7 @@ use lemao_ui::components::ComponentMargin;
 use lemao_ui::components::ComponentPosition;
 use lemao_ui::components::ComponentShape;
 use lemao_ui::components::ComponentSize;
+use lemao_ui::components::HorizontalAlignment;
 use lemao_ui::context::UiContext;
 use lemao_ui::events::UiEvent;
 use std::sync::Arc;
@@ -185,7 +186,7 @@ pub fn main() -> Result<(), String> {
     quote_panel.set_offset(Vec2::new(0.0, -50.0));
     quote_panel.set_corner_rounding(ComponentCornerRounding::new(5.0, 5.0, 5.0, 5.0));
     quote_panel.set_border_thickness(ComponentBorderThickness::new(1.0, 1.0, 1.0, 1.0))?;
-    quote_panel.set_border_color(Color::SolidColor(SolidColor::new_rgb(60, 60, 60, 255)));
+    quote_panel.set_border_color(Color::SolidColor(SolidColor::new_rgb(86, 92, 107, 255)));
     ui.get_component_mut(main_window_id)?.add_child(quote_panel_id);
 
     let quote_id = ui.create_label(&mut renderer, font_id)?;
@@ -212,9 +213,9 @@ pub fn main() -> Result<(), String> {
     description_panel.set_max_size(Vec2::new(f32::MAX, 220.0));
     description_panel.set_margin(ComponentMargin::new(0.0, 0.0, 10.0, 10.0));
     description_panel.set_offset(Vec2::new(0.0, -210.0));
-    description_panel.set_corner_rounding(ComponentCornerRounding::new(5.0, 5.0, 5.0, 5.0));
+    description_panel.set_corner_rounding(ComponentCornerRounding::new(5.0, 8.0, 8.0, 5.0));
     description_panel.set_border_thickness(ComponentBorderThickness::new(1.0, 1.0, 1.0, 1.0))?;
-    description_panel.set_border_color(Color::SolidColor(SolidColor::new_rgb(60, 60, 60, 255)));
+    description_panel.set_border_color(Color::SolidColor(SolidColor::new_rgb(86, 92, 107, 255)));
     ui.get_component_mut(main_window_id)?.add_child(description_panel_id);
 
     let mut scroll_gradient = Gradient::new(GradientType::Horizontal, Vec2::new(0.0, 0.0));
@@ -228,10 +229,10 @@ pub fn main() -> Result<(), String> {
     description_scrollbox.set_scroll_color(Color::Gradient(scroll_gradient));
     description_scrollbox.set_scroll_corner_rounding(ComponentCornerRounding::new(8.0, 8.0, 8.0, 8.0))?;
     description_scrollbox.set_scroll_background_corner_rounding(ComponentCornerRounding::new(8.0, 8.0, 8.0, 8.0))?;
-    description_scrollbox.set_scroll_border_thickness(ComponentBorderThickness::new(2.0, 2.0, 2.0, 2.0));
-    description_scrollbox.set_scroll_border_color(Color::SolidColor(SolidColor::new_rgb(140, 125, 110, 255)));
-    description_scrollbox.set_scroll_background_border_color(Color::SolidColor(SolidColor::new_rgb(122, 108, 113, 255)));
-    description_scrollbox.set_scroll_background_border_thickness(ComponentBorderThickness::new(2.0, 2.0, 2.0, 2.0));
+    description_scrollbox.set_scroll_border_thickness(ComponentBorderThickness::new(1.0, 1.0, 1.0, 1.0));
+    description_scrollbox.set_scroll_border_color(Color::SolidColor(SolidColor::new_rgb(199, 178, 153, 255)));
+    description_scrollbox.set_scroll_background_border_color(Color::SolidColor(SolidColor::new_rgb(199, 178, 153, 255)));
+    description_scrollbox.set_scroll_background_border_thickness(ComponentBorderThickness::new(1.0, 1.0, 1.0, 1.0));
     description_scrollbox.set_padding(Vec2::new(0.0, 20.0));
     ui.get_component_mut(description_panel_id)?.add_child(description_scrollbox_id);
 
@@ -386,6 +387,42 @@ pub fn main() -> Result<(), String> {
         checkbox_ids.push(checkbox_id);
     }
 
+    let mut textbox_ids = Vec::new();
+    let mut textbox_label_ids = Vec::new();
+    let textbox_labels = ["Player name:", "Empire name:", "World name:"];
+
+    for textbox_label in textbox_labels {
+        let label_id = ui.create_label(&mut renderer, font_id)?;
+        let label = ui.get_component_with_type_mut::<Label>(label_id)?;
+        label.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0)));
+        label.set_offset(Vec2::new(0.0, -350.0 - 30.0 * textbox_label_ids.len() as f32));
+        label.set_margin(ComponentMargin::new(3.0, 3.0, 3.0, 10.0));
+        label.set_text(textbox_label.to_string());
+        label.set_shadow_enabled_flag(true);
+        label.set_shadow_offset(Vec2::new(1.0, -1.0));
+        label.set_shadow_color(Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 1.0)));
+        ui.get_component_mut(side_window_id)?.add_child(label_id);
+
+        textbox_label_ids.push(label_id);
+
+        let textbox_id = ui.create_textbox(&mut renderer, font_id)?;
+        let textbox = ui.get_component_with_type_mut::<TextBox>(textbox_id)?;
+        textbox.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0)));
+        textbox.set_size(ComponentSize::Absolute(Vec2::new(180.0, 30.0)));
+        textbox.set_offset(Vec2::new(110.0, -350.0 - 30.0 * textbox_ids.len() as f32));
+        textbox.set_margin(ComponentMargin::new(3.0, 3.0, 3.0, 10.0));
+        textbox.set_horizontal_alignment(HorizontalAlignment::Left);
+        textbox.set_label_offset(Vec2::new(3.0, -1.0));
+        textbox.set_color(Color::SolidColor(SolidColor::new_rgb(38, 41, 52, 255)));
+        textbox.set_border_color(Color::SolidColor(SolidColor::new_rgb(199, 178, 153, 255)));
+        textbox.set_border_thickness(ComponentBorderThickness::new(1.0, 1.0, 1.0, 1.0))?;
+        textbox.set_corner_rounding(ComponentCornerRounding::new(3.0, 3.0, 3.0, 3.0));
+        textbox.set_label_max_length(15);
+        ui.get_component_mut(side_window_id)?.add_child(textbox_id);
+
+        textbox_ids.push(textbox_id);
+    }
+
     let mut is_running = true;
 
     while is_running {
@@ -467,6 +504,14 @@ pub fn main() -> Result<(), String> {
 
         for checkbox_id in &checkbox_ids {
             ui.draw(&mut renderer, *checkbox_id)?;
+        }
+
+        for textbox_label_id in &textbox_label_ids {
+            ui.draw(&mut renderer, *textbox_label_id)?;
+        }
+
+        for textbox_id in &textbox_ids {
+            ui.draw(&mut renderer, *textbox_id)?;
         }
 
         window.swap_buffers();
