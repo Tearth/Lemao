@@ -229,38 +229,38 @@ impl Button {
     /* #endregion */
 
     /* #region Label properties */
-    pub fn get_font_id(&self) -> usize {
+    pub fn get_label_font_id(&self) -> usize {
         self.label_font_id
     }
 
-    pub fn set_font_id(&mut self, font_id: usize) {
-        self.label_font_id = font_id;
+    pub fn set_label_font_id(&mut self, label_font_id: usize) {
+        self.label_font_id = label_font_id;
         self.dirty = true;
     }
 
-    pub fn get_text(&self) -> &str {
+    pub fn get_label_text(&self) -> &str {
         &self.label_text
     }
 
-    pub fn set_text(&mut self, text: String) {
+    pub fn set_label_text(&mut self, text: String) {
         self.label_text = text;
         self.dirty = true;
     }
 
-    pub fn get_horizontal_alignment(&self) -> HorizontalAlignment {
+    pub fn get_label_horizontal_alignment(&self) -> HorizontalAlignment {
         self.label_horizontal_alignment
     }
 
-    pub fn set_horizontal_alignment(&mut self, label_horizontal_alignment: HorizontalAlignment) {
+    pub fn set_label_horizontal_alignment(&mut self, label_horizontal_alignment: HorizontalAlignment) {
         self.label_horizontal_alignment = label_horizontal_alignment;
         self.dirty = true;
     }
 
-    pub fn get_vertical_alignment(&self) -> VerticalAlignment {
+    pub fn get_label_vertical_alignment(&self) -> VerticalAlignment {
         self.label_vertical_alignment
     }
 
-    pub fn set_vertical_alignment(&mut self, label_vertical_alignment: VerticalAlignment) {
+    pub fn set_label_vertical_alignment(&mut self, label_vertical_alignment: VerticalAlignment) {
         self.label_vertical_alignment = label_vertical_alignment;
         self.dirty = true;
     }

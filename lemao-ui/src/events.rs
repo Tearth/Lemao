@@ -7,6 +7,7 @@ pub enum UiEvent {
     MouseButtonPressed(usize, MouseButton),
     MouseButtonReleased(usize, MouseButton),
     ButtonClicked(usize, MouseButton),
+
     CheckboxChecked(usize, MouseButton),
     CheckboxUnchecked(usize, MouseButton),
     CheckboxChanged(usize, MouseButton, bool),

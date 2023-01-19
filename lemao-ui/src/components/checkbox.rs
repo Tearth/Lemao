@@ -174,20 +174,20 @@ impl Checkbox {
     /* #endregion */
 
     /* #region Label properties */
-    pub fn get_font_id(&self) -> usize {
+    pub fn get_label_font_id(&self) -> usize {
         self.label_font_id
     }
 
-    pub fn set_font_id(&mut self, font_id: usize) {
-        self.label_font_id = font_id;
+    pub fn set_label_font_id(&mut self, label_font_id: usize) {
+        self.label_font_id = label_font_id;
         self.dirty = true;
     }
 
-    pub fn get_text(&self) -> &str {
+    pub fn get_label_text(&self) -> &str {
         &self.label_text
     }
 
-    pub fn set_text(&mut self, text: String) {
+    pub fn set_label_text(&mut self, text: String) {
         self.label_text = text;
         self.dirty = true;
     }

@@ -109,9 +109,9 @@ pub fn main() -> Result<(), String> {
     progressbar.set_bar_to(1, 0.55);
     progressbar.set_bar_color(1, Color::Gradient(bar_2_gradient.clone()));
     progressbar.set_bar_corner_rounding(1, ComponentCornerRounding::new(3.0, 3.0, 3.0, 3.0));
-    progressbar.set_text("Research: Iron Working (3)".to_string());
-    progressbar.set_horizontal_alignment(lemao_ui::components::HorizontalAlignment::Middle);
-    progressbar.set_vertical_alignment(lemao_ui::components::VerticalAlignment::Middle);
+    progressbar.set_label_text("Research: Iron Working (3)".to_string());
+    progressbar.set_label_horizontal_alignment(lemao_ui::components::HorizontalAlignment::Middle);
+    progressbar.set_label_vertical_alignment(lemao_ui::components::VerticalAlignment::Middle);
     progressbar.set_label_offset(Vec2::new(0.0, -1.0));
     progressbar.set_label_shadow_enabled_flag(true);
     progressbar.set_label_shadow_offset(Vec2::new(1.0, -1.0));
@@ -314,10 +314,10 @@ pub fn main() -> Result<(), String> {
     ok_button.set_color(Color::Gradient(ok_button_filling_gradient));
     ok_button.set_border_thickness(ComponentBorderThickness::new(1.0, 1.0, 1.0, 1.0))?;
     ok_button.set_border_color(Color::SolidColor(SolidColor::new(0.5, 0.5, 0.5, 1.0)));
-    ok_button.set_text("Ok".to_string());
+    ok_button.set_label_text("Ok".to_string());
     ok_button.set_margin(ComponentMargin::new(0.0, 0.0, 0.0, 0.0));
-    ok_button.set_horizontal_alignment(lemao_ui::components::HorizontalAlignment::Middle);
-    ok_button.set_vertical_alignment(lemao_ui::components::VerticalAlignment::Middle);
+    ok_button.set_label_horizontal_alignment(lemao_ui::components::HorizontalAlignment::Middle);
+    ok_button.set_label_vertical_alignment(lemao_ui::components::VerticalAlignment::Middle);
     ok_button.set_label_offset(Vec2::new(0.0, 0.0));
     ok_button.set_label_color(Color::SolidColor(SolidColor::new_rgb(117, 95, 72, 255)));
     ok_button.set_offset(Vec2::new(0.0, 30.0));
@@ -378,7 +378,7 @@ pub fn main() -> Result<(), String> {
         checkbox.set_margin(ComponentMargin::new(3.0, 3.0, 3.0, 10.0));
         checkbox.set_label_offset(Vec2::new(20.0, 0.0));
         checkbox.set_box_offset(Vec2::new(0.0, 4.0));
-        checkbox.set_text(checkbox_label.to_string());
+        checkbox.set_label_text(checkbox_label.to_string());
         checkbox.set_label_shadow_enabled_flag(true);
         checkbox.set_label_shadow_offset(Vec2::new(1.0, -1.0));
         checkbox.set_label_shadow_color(Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 1.0)));
@@ -411,7 +411,7 @@ pub fn main() -> Result<(), String> {
         textbox.set_size(ComponentSize::Absolute(Vec2::new(180.0, 30.0)));
         textbox.set_offset(Vec2::new(110.0, -350.0 - 30.0 * textbox_ids.len() as f32));
         textbox.set_margin(ComponentMargin::new(3.0, 3.0, 3.0, 10.0));
-        textbox.set_horizontal_alignment(HorizontalAlignment::Left);
+        textbox.set_label_horizontal_alignment(HorizontalAlignment::Left);
         textbox.set_label_offset(Vec2::new(3.0, -1.0));
         textbox.set_color(Color::SolidColor(SolidColor::new_rgb(38, 41, 52, 255)));
         textbox.set_border_color(Color::SolidColor(SolidColor::new_rgb(199, 178, 153, 255)));
