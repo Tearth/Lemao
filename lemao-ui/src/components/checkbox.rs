@@ -159,7 +159,7 @@ impl Checkbox {
     }
 
     pub fn set_box_color(&mut self, box_color: Color) {
-        self.label_color = box_color;
+        self.box_color = box_color;
         self.dirty = true;
     }
 

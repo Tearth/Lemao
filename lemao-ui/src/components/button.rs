@@ -539,12 +539,6 @@ impl Component for Button {
             }
             InputEvent::MouseButtonReleased(button, cursor_position) => {
                 if self.is_point_inside(*cursor_position) {
-                    if let Some(f) = self.on_mouse_button_released {
-                        (f)(self, *button, *cursor_position);
-                        self.dirty = true;
-                    };
-                    events.push(UiEvent::MouseButtonReleased(self.id, *button));
-
                     if self.pressed {
                         if let Some(f) = self.on_button_clicked {
                             (f)(self, *button);
@@ -553,6 +547,12 @@ impl Component for Button {
                         events.push(UiEvent::ButtonClicked(self.id, *button));
                     }
                 }
+
+                if let Some(f) = self.on_mouse_button_released {
+                    (f)(self, *button, *cursor_position);
+                    self.dirty = true;
+                };
+                events.push(UiEvent::MouseButtonReleased(self.id, *button));
 
                 self.pressed = false;
             }

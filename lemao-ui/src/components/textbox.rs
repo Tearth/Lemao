@@ -346,6 +346,16 @@ impl TextBox {
     }
     /* #endregion */
 
+    /* #region Component-specific properties */
+    pub fn is_active(&self) -> bool {
+        self.active
+    }
+
+    pub fn set_active_flag(&mut self, active: bool) {
+        self.active = active;
+    }
+    /* #endregion */
+
     fn is_point_inside(&self, point: Vec2) -> bool {
         if let Some(event_mask) = self.event_mask {
             let event_mask_left_bottom = event_mask.position;
