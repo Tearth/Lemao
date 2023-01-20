@@ -1,7 +1,6 @@
 #![allow(clippy::uninlined_format_args)]
 
 use lemao_core::lemao_common_platform::input::InputEvent;
-use lemao_core::lemao_common_platform::input::Key;
 use lemao_core::lemao_common_platform::window::WindowStyle;
 use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::gradient::Gradient;
@@ -56,16 +55,21 @@ pub fn main() -> Result<(), String> {
     let coin_icon = bmp::load("./assets/coin.bmp")?;
     let hammer_icon = bmp::load("./assets/hammer.bmp")?;
     let happiness_icon = bmp::load("./assets/happiness.bmp")?;
-    let mut regular_font = bff::load("./assets/regular.bff")?;
-    let bold_font = bff::load("./assets/bold.bff")?;
     let header_font = bff::load("./assets/header.bff")?;
+    let mut regular_font = bff::load("./assets/regular.bff")?;
+    let mut bold_font = bff::load("./assets/bold.bff")?;
+
     regular_font.set_character(200, Vec2::new(0.0, 4.0), &coin_icon);
     regular_font.set_character(201, Vec2::new(0.0, 3.0), &hammer_icon);
     regular_font.set_character(202, Vec2::new(0.0, 3.0), &happiness_icon);
 
-    let font_id = fonts.lock().unwrap().store(Font::new(&renderer, &regular_font));
-    let bold_id = fonts.lock().unwrap().store(Font::new(&renderer, &bold_font));
-    let header_id = fonts.lock().unwrap().store(Font::new(&renderer, &header_font));
+    bold_font.set_character(200, Vec2::new(0.0, 4.0), &coin_icon);
+    bold_font.set_character(201, Vec2::new(0.0, 3.0), &hammer_icon);
+    bold_font.set_character(202, Vec2::new(0.0, 3.0), &happiness_icon);
+
+    let regular_font_id = fonts.lock().unwrap().store(Font::new(&renderer, &regular_font));
+    let bold_font_id = fonts.lock().unwrap().store(Font::new(&renderer, &bold_font));
+    let header_font_id = fonts.lock().unwrap().store(Font::new(&renderer, &header_font));
     let texture_id = textures.lock().unwrap().store(Texture::new(&renderer, &bmp::load("./assets/wheat.bmp")?));
     let box_checked_id = textures.lock().unwrap().store(Texture::new(&renderer, &bmp::load("./assets/box_checked.bmp")?));
     let box_unchecked_id = textures.lock().unwrap().store(Texture::new(&renderer, &bmp::load("./assets/box_unchecked.bmp")?));
@@ -88,7 +92,7 @@ pub fn main() -> Result<(), String> {
     bar_2_gradient.steps.push(GradientStep::new(SolidColor::new_rgb(10, 152, 38, 255), 0.55));
     bar_2_gradient.steps.push(GradientStep::new(SolidColor::new_rgb(10, 152, 38, 255), 1.0));
 
-    let progressbar_id = ui.create_progressbar(&mut renderer, font_id)?;
+    let progressbar_id = ui.create_progressbar(&mut renderer, regular_font_id)?;
     let progressbar = ui.get_component_with_type_mut::<ProgressBar>(progressbar_id)?;
     progressbar.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.5, 1.0)));
     progressbar.set_size(ComponentSize::Relative(Vec2::new(0.6, 1.0)));
@@ -147,7 +151,7 @@ pub fn main() -> Result<(), String> {
     main_window.set_shadow_scale(Vec2::new(1.01, 1.01));
     ui.get_main_canvas_mut()?.add_child(main_window_id);
 
-    let window_title_id = ui.create_label(&mut renderer, header_id)?;
+    let window_title_id = ui.create_label(&mut renderer, header_font_id)?;
     let window_title = ui.get_component_with_type_mut::<Label>(window_title_id)?;
     window_title.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.5, 1.0)));
     window_title.set_anchor(Vec2::new(0.5, 0.5));
@@ -189,7 +193,7 @@ pub fn main() -> Result<(), String> {
     quote_panel.set_border_color(Color::SolidColor(SolidColor::new_rgb(86, 92, 107, 255)));
     ui.get_component_mut(main_window_id)?.add_child(quote_panel_id);
 
-    let quote_id = ui.create_label(&mut renderer, font_id)?;
+    let quote_id = ui.create_label(&mut renderer, regular_font_id)?;
     let quote = ui.get_component_with_type_mut::<Label>(quote_id)?;
     quote.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0)));
     quote.set_anchor(Vec2::new(0.0, 1.0));
@@ -236,7 +240,7 @@ pub fn main() -> Result<(), String> {
     description_scrollbox.set_padding(Vec2::new(0.0, 20.0));
     ui.get_component_mut(description_panel_id)?.add_child(description_scrollbox_id);
 
-    let description_id = ui.create_label(&mut renderer, font_id)?;
+    let description_id = ui.create_label(&mut renderer, regular_font_id)?;
     let description = ui.get_component_with_type_mut::<Label>(description_id)?;
     description.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0)));
     description.set_anchor(Vec2::new(0.0, 1.0));
@@ -281,7 +285,7 @@ pub fn main() -> Result<(), String> {
     effect_panel_2.set_corner_rounding(ComponentCornerRounding::new(5.0, 5.0, 5.0, 5.0));
     ui.get_component_mut(main_window_id)?.add_child(effect_panel_2_id);
 
-    let effect_id = ui.create_label(&mut renderer, font_id)?;
+    let effect_id = ui.create_label(&mut renderer, regular_font_id)?;
     let effect = ui.get_component_with_type_mut::<Label>(effect_id)?;
     effect.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0)));
     effect.set_anchor(Vec2::new(0.0, 1.0));
@@ -289,7 +293,7 @@ pub fn main() -> Result<(), String> {
     effect.set_text(
         "+1 \u{CA} and +1 \u{C9} per military unit stationed in the city\n".to_string()
             + "+10% \u{CA} for every farm belonging to capital (but not more than 50%)\n"
-            + "+10% \u{C8} for every specialist\n"
+            + "+20% \u{C8} for every specialist\n"
             + "+1 \u{C8} worker mainteance",
     );
     effect.set_shadow_enabled_flag(true);
@@ -297,21 +301,16 @@ pub fn main() -> Result<(), String> {
     effect.set_shadow_color(Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 0.5)));
     ui.get_component_mut(effect_panel_2_id)?.add_child(effect_id);
 
-    let mut ok_button_filling_gradient = Gradient::new(GradientType::Vertical, Vec2::new(0.0, 0.0));
-    ok_button_filling_gradient.steps.push(GradientStep::new(SolidColor::new_rgb(159, 148, 135, 255), 0.0));
-    ok_button_filling_gradient.steps.push(GradientStep::new(SolidColor::new_rgb(234, 221, 198, 255), 1.0));
+    let mut button_filling_gradient = Gradient::new(GradientType::Vertical, Vec2::new(0.0, 0.0));
+    button_filling_gradient.steps.push(GradientStep::new(SolidColor::new_rgb(159, 148, 135, 255), 0.0));
+    button_filling_gradient.steps.push(GradientStep::new(SolidColor::new_rgb(234, 221, 198, 255), 1.0));
 
-    let mut ok_button_shadow_gradient = Gradient::new(GradientType::Rectangular, Vec2::new(0.0, 0.0));
-    ok_button_shadow_gradient.steps.push(GradientStep::new(SolidColor::new_rgb(0, 0, 0, 255), 0.0));
-    ok_button_shadow_gradient.steps.push(GradientStep::new(SolidColor::new_rgb(0, 0, 0, 255), 0.99));
-    ok_button_shadow_gradient.steps.push(GradientStep::new(SolidColor::new_rgb(0, 0, 0, 0), 1.0));
-
-    let ok_button_id = ui.create_button(&mut renderer, ComponentShape::Rectangle, bold_id)?;
+    let ok_button_id = ui.create_button(&mut renderer, ComponentShape::Rectangle, bold_font_id)?;
     let ok_button = ui.get_component_with_type_mut::<Button>(ok_button_id)?;
     ok_button.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.5, 0.0)));
     ok_button.set_size(ComponentSize::Absolute(Vec2::new(100.0, 25.0)));
     ok_button.set_anchor(Vec2::new(0.5, 0.5));
-    ok_button.set_color(Color::Gradient(ok_button_filling_gradient));
+    ok_button.set_color(Color::Gradient(button_filling_gradient.clone()));
     ok_button.set_border_thickness(ComponentBorderThickness::new(1.0, 1.0, 1.0, 1.0))?;
     ok_button.set_border_color(Color::SolidColor(SolidColor::new(0.5, 0.5, 0.5, 1.0)));
     ok_button.set_label_text("Ok".to_string());
@@ -324,9 +323,19 @@ pub fn main() -> Result<(), String> {
     ok_button.set_corner_rounding(ComponentCornerRounding::new(5.0, 5.0, 5.0, 5.0));
     ok_button.set_shadow_enabled_flag(true);
     ok_button.set_shadow_offset(Vec2::new(2.0, -2.0));
-    ok_button.set_shadow_color(Color::Gradient(ok_button_shadow_gradient));
+    ok_button.set_shadow_color(Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 1.0)));
     ok_button.set_shadow_corner_rounding(ComponentCornerRounding::new(5.0, 5.0, 5.0, 5.0))?;
     ok_button.set_shadow_scale(Vec2::new(1.01, 1.01));
+    ok_button.on_button_pressed = Some(|button, _, _| {
+        button.set_color(button.get_color().clone().set_alpha(0.8));
+        button.set_border_color(button.get_border_color().clone().set_alpha(0.8));
+        button.set_shadow_color(button.get_shadow_color().clone().set_alpha(0.4));
+    });
+    ok_button.on_button_released = Some(|button, _, _| {
+        button.set_color(button.get_color().clone().set_alpha(1.0));
+        button.set_border_color(button.get_border_color().clone().set_alpha(1.0));
+        button.set_shadow_color(button.get_shadow_color().clone().set_alpha(1.0));
+    });
     ui.get_component_mut(main_window_id)?.add_child(ok_button_id);
 
     let side_window_id = ui.create_panel(&mut renderer, ComponentShape::Rectangle)?;
@@ -346,7 +355,7 @@ pub fn main() -> Result<(), String> {
     side_window.set_shadow_scale(Vec2::new(1.01, 1.01));
     ui.get_main_canvas_mut()?.add_child(side_window_id);
 
-    let side_window_title_id = ui.create_label(&mut renderer, header_id)?;
+    let side_window_title_id = ui.create_label(&mut renderer, header_font_id)?;
     let side_window_title = ui.get_component_with_type_mut::<Label>(side_window_title_id)?;
     side_window_title.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.5, 1.0)));
     side_window_title.set_anchor(Vec2::new(0.5, 0.5));
@@ -371,7 +380,7 @@ pub fn main() -> Result<(), String> {
     ];
 
     for checkbox_label in checkbox_labels {
-        let checkbox_id = ui.create_checkbox(&mut renderer, font_id, box_checked_id, box_unchecked_id)?;
+        let checkbox_id = ui.create_checkbox(&mut renderer, regular_font_id, box_checked_id, box_unchecked_id)?;
         let checkbox = ui.get_component_with_type_mut::<Checkbox>(checkbox_id)?;
         checkbox.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0)));
         checkbox.set_offset(Vec2::new(0.0, -75.0 - 30.0 * checkbox_ids.len() as f32));
@@ -382,6 +391,8 @@ pub fn main() -> Result<(), String> {
         checkbox.set_label_shadow_enabled_flag(true);
         checkbox.set_label_shadow_offset(Vec2::new(1.0, -1.0));
         checkbox.set_label_shadow_color(Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 1.0)));
+        checkbox.on_cursor_enter = Some(|checkbox, _| checkbox.set_box_color(checkbox.get_box_color().clone().set_alpha(0.8)));
+        checkbox.on_cursor_leave = Some(|checkbox, _| checkbox.set_box_color(checkbox.get_box_color().clone().set_alpha(1.0)));
         ui.get_component_mut(side_window_id)?.add_child(checkbox_id);
 
         checkbox_ids.push(checkbox_id);
@@ -392,7 +403,7 @@ pub fn main() -> Result<(), String> {
     let textbox_labels = ["Player name:", "Empire name:", "World name:"];
 
     for textbox_label in textbox_labels {
-        let label_id = ui.create_label(&mut renderer, font_id)?;
+        let label_id = ui.create_label(&mut renderer, regular_font_id)?;
         let label = ui.get_component_with_type_mut::<Label>(label_id)?;
         label.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0)));
         label.set_offset(Vec2::new(0.0, -350.0 - 30.0 * textbox_label_ids.len() as f32));
@@ -405,7 +416,7 @@ pub fn main() -> Result<(), String> {
 
         textbox_label_ids.push(label_id);
 
-        let textbox_id = ui.create_textbox(&mut renderer, font_id)?;
+        let textbox_id = ui.create_textbox(&mut renderer, regular_font_id)?;
         let textbox = ui.get_component_with_type_mut::<TextBox>(textbox_id)?;
         textbox.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0)));
         textbox.set_size(ComponentSize::Absolute(Vec2::new(180.0, 30.0)));
@@ -418,9 +429,74 @@ pub fn main() -> Result<(), String> {
         textbox.set_border_thickness(ComponentBorderThickness::new(1.0, 1.0, 1.0, 1.0))?;
         textbox.set_corner_rounding(ComponentCornerRounding::new(3.0, 3.0, 3.0, 3.0));
         textbox.set_label_max_length(15);
+        textbox.on_cursor_enter = Some(|textbox, _| {
+            if !textbox.is_active() {
+                textbox.set_color(textbox.get_color().clone().set_alpha(0.8));
+            }
+        });
+        textbox.on_cursor_leave = Some(|textbox, _| {
+            if !textbox.is_active() {
+                textbox.set_color(textbox.get_color().clone().set_alpha(1.0));
+            }
+        });
+        textbox.on_activation = Some(|textbox, _| textbox.set_color(textbox.get_color().clone().set_alpha(0.5)));
+        textbox.on_deactivation = Some(|textbox, _| textbox.set_color(textbox.get_color().clone().set_alpha(1.0)));
         ui.get_component_mut(side_window_id)?.add_child(textbox_id);
 
         textbox_ids.push(textbox_id);
+    }
+
+    let side_window_focuses_title_id = ui.create_label(&mut renderer, header_font_id)?;
+    let side_window_focuses = ui.get_component_with_type_mut::<Label>(side_window_focuses_title_id)?;
+    side_window_focuses.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.5, 1.0)));
+    side_window_focuses.set_anchor(Vec2::new(0.5, 0.5));
+    side_window_focuses.set_offset(Vec2::new(0.0, -450.0));
+    side_window_focuses.set_text("City focuses".to_string());
+    side_window_focuses.set_shadow_enabled_flag(true);
+    side_window_focuses.set_shadow_offset(Vec2::new(1.0, -1.0));
+    side_window_focuses.set_shadow_color(Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 1.0)));
+    ui.get_component_mut(side_window_id)?.add_child(side_window_focuses_title_id);
+
+    let mut toggle_button_ids = Vec::new();
+    let toggle_button_labels = ["\u{C8}", "\u{C9}", "\u{CA}"];
+
+    for toggle_button_label in toggle_button_labels {
+        let button_id = ui.create_button(&mut renderer, ComponentShape::Rectangle, regular_font_id)?;
+        let button = ui.get_component_with_type_mut::<Button>(button_id)?;
+        button.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0)));
+        button.set_size(ComponentSize::Absolute(Vec2::new(40.0, 30.0)));
+        button.set_offset(Vec2::new(100.0 + 50.0 * toggle_button_ids.len() as f32, -485.0));
+        button.set_anchor(Vec2::new(0.5, 0.5));
+        button.set_color(Color::Gradient(button_filling_gradient.clone()));
+        button.set_border_thickness(ComponentBorderThickness::new(1.0, 1.0, 1.0, 1.0))?;
+        button.set_border_color(Color::SolidColor(SolidColor::new(0.5, 0.5, 0.5, 1.0)));
+        button.set_label_text(toggle_button_label.to_string());
+        button.set_margin(ComponentMargin::new(0.0, 0.0, 0.0, 0.0));
+        button.set_label_horizontal_alignment(lemao_ui::components::HorizontalAlignment::Middle);
+        button.set_label_vertical_alignment(lemao_ui::components::VerticalAlignment::Middle);
+        button.set_label_offset(Vec2::new(0.0, -2.0));
+        button.set_corner_rounding(ComponentCornerRounding::new(5.0, 5.0, 5.0, 5.0));
+        button.set_shadow_enabled_flag(true);
+        button.set_shadow_offset(Vec2::new(2.0, -2.0));
+        button.set_shadow_color(Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 1.0)));
+        button.set_shadow_corner_rounding(ComponentCornerRounding::new(5.0, 5.0, 5.0, 5.0))?;
+        button.set_shadow_scale(Vec2::new(1.01, 1.01));
+        button.set_toggleable_flag(true);
+        button.on_button_pressed = Some(|button, _, _| {
+            button.set_color(button.get_color().clone().set_alpha(0.4));
+            button.set_border_color(button.get_border_color().clone().set_alpha(0.4));
+            button.set_shadow_color(button.get_shadow_color().clone().set_alpha(0.0));
+            button.set_label_color(button.get_label_color().clone().set_alpha(0.2));
+        });
+        button.on_button_released = Some(|button, _, _| {
+            button.set_color(button.get_color().clone().set_alpha(1.0));
+            button.set_border_color(button.get_border_color().clone().set_alpha(1.0));
+            button.set_shadow_color(button.get_shadow_color().clone().set_alpha(1.0));
+            button.set_label_color(button.get_label_color().clone().set_alpha(1.0));
+        });
+        ui.get_component_mut(side_window_id)?.add_child(button_id);
+
+        toggle_button_ids.push(button_id);
     }
 
     let mut is_running = true;
@@ -448,7 +524,11 @@ pub fn main() -> Result<(), String> {
                 UiEvent::CursorLeave(component_id, cursor_position) => println!("LEAVE {} {:?}", component_id, cursor_position),
                 UiEvent::MouseButtonPressed(component_id, button) => println!("PRESSED {} {:?}", component_id, button),
                 UiEvent::MouseButtonReleased(component_id, button) => println!("RELEASED {} {:?}", component_id, button),
-                UiEvent::ButtonClicked(component_id, button) => println!("CLICKED {} {:?}", component_id, button),
+
+                UiEvent::ButtonPressed(component_id, button) => println!("BUTTON PRESSED {} {:?}", component_id, button),
+                UiEvent::ButtonReleased(component_id, button) => println!("BUTTON RELEASED {} {:?}", component_id, button),
+                UiEvent::ButtonClicked(component_id, button) => println!("BUTTON CLICKED {} {:?}", component_id, button),
+
                 UiEvent::CheckboxChecked(component_id, button) => println!("CHECKBOX CHECKED {} {:?}", component_id, button),
                 UiEvent::CheckboxUnchecked(component_id, button) => println!("CHECKBOX UNCHECKED {} {:?}", component_id, button),
                 UiEvent::CheckboxChanged(component_id, button, checked) => println!("CHECKBOX CHANGED {} {:?} {}", component_id, button, checked),
@@ -465,19 +545,6 @@ pub fn main() -> Result<(), String> {
             }
         }
 
-        let camera = renderer.get_active_camera_mut()?;
-        if window.is_key_pressed(Key::ArrowUp) {
-            camera.move_toward(Vec2::new(0.0, 200.0 * 0.01));
-        }
-        if window.is_key_pressed(Key::ArrowDown) {
-            camera.move_toward(Vec2::new(0.0, -200.0 * 0.01));
-        }
-        if window.is_key_pressed(Key::ArrowLeft) {
-            camera.move_toward(Vec2::new(-200.0 * 0.01, 0.0));
-        }
-        if window.is_key_pressed(Key::ArrowRight) {
-            camera.move_toward(Vec2::new(200.0 * 0.01, 0.0));
-        }
         ui.update(&mut renderer)?;
 
         renderer.clear(SolidColor::new(0.5, 0.5, 0.5, 1.0));
@@ -512,6 +579,12 @@ pub fn main() -> Result<(), String> {
 
         for textbox_id in &textbox_ids {
             ui.draw(&mut renderer, *textbox_id)?;
+        }
+
+        ui.draw(&mut renderer, side_window_focuses_title_id)?;
+
+        for button_id in &toggle_button_ids {
+            ui.draw(&mut renderer, *button_id)?;
         }
 
         window.swap_buffers();

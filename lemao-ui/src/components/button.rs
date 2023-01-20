@@ -79,12 +79,15 @@ pub struct Button {
 
     // Component-specific properties
     pressed: bool,
+    toggleable: bool,
 
     // Event handlers
     pub on_cursor_enter: Option<fn(component: &mut Self, cursor_position: Vec2)>,
     pub on_cursor_leave: Option<fn(component: &mut Self, cursor_position: Vec2)>,
     pub on_mouse_button_pressed: Option<fn(component: &mut Self, mouse_button: MouseButton, cursor_position: Vec2)>,
     pub on_mouse_button_released: Option<fn(component: &mut Self, mouse_button: MouseButton, cursor_position: Vec2)>,
+    pub on_button_pressed: Option<fn(component: &mut Self, mouse_button: MouseButton, cursor_position: Vec2)>,
+    pub on_button_released: Option<fn(component: &mut Self, mouse_button: MouseButton, cursor_position: Vec2)>,
     pub on_button_clicked: Option<fn(component: &mut Self, mouse_button: MouseButton)>,
 }
 
@@ -154,12 +157,15 @@ impl Button {
 
             // Component-specific properties
             pressed: false,
+            toggleable: false,
 
             // Event handlers
             on_cursor_enter: None,
             on_cursor_leave: None,
             on_mouse_button_pressed: None,
             on_mouse_button_released: None,
+            on_button_pressed: None,
+            on_button_released: None,
             on_button_clicked: None,
         })
     }
@@ -362,6 +368,14 @@ impl Button {
     pub fn set_pressed_flag(&mut self, pressed: bool) {
         self.pressed = pressed;
     }
+
+    pub fn is_toggleable(&self) -> bool {
+        self.toggleable
+    }
+
+    pub fn set_toggleable_flag(&mut self, toggleable: bool) {
+        self.toggleable = toggleable;
+    }
     /* #endregion */
 
     fn is_point_inside(&self, point: Vec2) -> bool {
@@ -534,27 +548,58 @@ impl Component for Button {
                         self.dirty = true;
                     };
                     events.push(UiEvent::MouseButtonPressed(self.id, *button));
-                    self.pressed = true;
+
+                    self.pressed = if !self.toggleable { true } else { !self.pressed };
+
+                    if self.pressed {
+                        if let Some(f) = self.on_button_pressed {
+                            (f)(self, *button, *cursor_position);
+                            self.dirty = true;
+                        };
+                        events.push(UiEvent::ButtonPressed(self.id, *button));
+                    } else {
+                        if let Some(f) = self.on_button_released {
+                            (f)(self, *button, *cursor_position);
+                            self.dirty = true;
+                        };
+                        events.push(UiEvent::ButtonReleased(self.id, *button));
+                    }
                 }
             }
             InputEvent::MouseButtonReleased(button, cursor_position) => {
+                let pressed = self.pressed;
+
                 if self.is_point_inside(*cursor_position) {
-                    if self.pressed {
+                    if !self.toggleable && self.pressed {
                         if let Some(f) = self.on_button_clicked {
                             (f)(self, *button);
                             self.dirty = true;
                         };
                         events.push(UiEvent::ButtonClicked(self.id, *button));
                     }
+
+                    if pressed {
+                        if !self.toggleable {
+                            self.pressed = false;
+                        }
+
+                        if let Some(f) = self.on_mouse_button_released {
+                            (f)(self, *button, *cursor_position);
+                            self.dirty = true;
+                        };
+                        events.push(UiEvent::MouseButtonReleased(self.id, *button));
+                    }
                 }
 
-                if let Some(f) = self.on_mouse_button_released {
-                    (f)(self, *button, *cursor_position);
-                    self.dirty = true;
-                };
-                events.push(UiEvent::MouseButtonReleased(self.id, *button));
+                if !self.toggleable && pressed {
+                    self.pressed = false;
 
-                self.pressed = false;
+                    if let Some(f) = self.on_button_released {
+                        (f)(self, *button, *cursor_position);
+                        self.dirty = true;
+                    };
+                    events.push(UiEvent::ButtonReleased(self.id, *button));
+                }
             }
             _ => {}
         }
