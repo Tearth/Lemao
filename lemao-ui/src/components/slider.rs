@@ -3,25 +3,24 @@ use super::ComponentBorderThickness;
 use super::ComponentCornerRounding;
 use super::ComponentMargin;
 use super::ComponentPosition;
+use super::ComponentShape;
 use super::ComponentSize;
 use super::EventMask;
-use super::HorizontalAlignment;
-use super::VerticalAlignment;
 use crate::events::UiEvent;
 use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_common_platform::input::MouseButton;
+use lemao_core::lemao_common_platform::input::MouseWheelDirection;
 use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::context::RendererContext;
+use lemao_core::renderer::drawable::circle::Circle;
 use lemao_core::renderer::drawable::frame::Frame;
 use lemao_core::renderer::drawable::rectangle::Rectangle;
-use lemao_core::renderer::drawable::text::Text;
 use lemao_core::renderer::drawable::Color;
-use lemao_core::renderer::drawable::Drawable;
 use lemao_core::renderer::textures::Texture;
 use std::any::Any;
 
-pub struct TextBox {
+pub struct Slider {
     pub(crate) id: usize,
 
     // Common properties
@@ -51,16 +50,6 @@ pub struct TextBox {
     border_color: Color,
     border_thickness: ComponentBorderThickness,
 
-    // Label properties
-    label_id: usize,
-    label_font_id: usize,
-    label_text: String,
-    label_horizontal_alignment: HorizontalAlignment,
-    label_vertical_alignment: VerticalAlignment,
-    label_offset: Vec2,
-    label_color: Color,
-    label_max_length: usize,
-
     // Shadow properties
     shadow_id: usize,
     shadow_enabled: bool,
@@ -69,26 +58,43 @@ pub struct TextBox {
     shadow_scale: Vec2,
     shadow_corner_rounding: ComponentCornerRounding,
 
-    // Label shadow properties
-    label_shadow_enabled: bool,
-    label_shadow_offset: Vec2,
-    label_shadow_color: Color,
+    // Bar properties
+    bar_id: usize,
+    bar_color: Color,
+
+    // Selector properties
+    selector_id: usize,
+    selector_shape: ComponentShape,
+    selector_position: Vec2,
+    selector_size: Vec2,
+    selector_color: Color,
+
+    // Selector border properties
+    selector_border_id: usize,
+    selector_border_color: Color,
+    selector_border_thickness: ComponentBorderThickness,
 
     // Component-specific properties
-    active: bool,
+    phase: f32,
+    phase_unrounded: f32,
+    selector_pressed: bool,
+    steps_count: u32,
+    mouse_wheel_step: f32,
 
     // Event handlers
     pub on_cursor_enter: Option<fn(component: &mut Self, cursor_position: Vec2)>,
     pub on_cursor_leave: Option<fn(component: &mut Self, cursor_position: Vec2)>,
     pub on_mouse_button_pressed: Option<fn(component: &mut Self, mouse_button: MouseButton, cursor_position: Vec2)>,
     pub on_mouse_button_released: Option<fn(component: &mut Self, mouse_button: MouseButton, cursor_position: Vec2)>,
-    pub on_activation: Option<fn(component: &mut Self, mouse_button: MouseButton)>,
-    pub on_deactivation: Option<fn(component: &mut Self, mouse_button: MouseButton)>,
-    pub on_content_changed: Option<fn(component: &mut Self, character: char)>,
+    pub on_selector_move: Option<fn(component: &mut Self, direction: f32)>,
+    pub on_cursor_selector_enter: Option<fn(component: &mut Self, cursor_position: Vec2)>,
+    pub on_cursor_selector_leave: Option<fn(component: &mut Self, cursor_position: Vec2)>,
+    pub on_mouse_button_selector_pressed: Option<fn(component: &mut Self, mouse_button: MouseButton, cursor_position: Vec2)>,
+    pub on_mouse_button_selector_released: Option<fn(component: &mut Self, mouse_button: MouseButton, cursor_position: Vec2)>,
 }
 
-impl TextBox {
-    pub fn new(id: usize, renderer: &mut RendererContext, label_font_id: usize) -> Result<Self, String> {
+impl Slider {
+    pub fn new(id: usize, renderer: &mut RendererContext, selector_shape: ComponentShape) -> Result<Self, String> {
         Ok(Self {
             id,
 
@@ -119,16 +125,6 @@ impl TextBox {
             border_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             border_thickness: Default::default(),
 
-            // Label properties
-            label_id: renderer.create_text(label_font_id)?,
-            label_font_id,
-            label_text: Default::default(),
-            label_horizontal_alignment: HorizontalAlignment::Middle,
-            label_vertical_alignment: VerticalAlignment::Middle,
-            label_offset: Default::default(),
-            label_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
-            label_max_length: usize::MAX,
-
             // Shadow properties
             shadow_id: renderer.create_rectangle()?,
             shadow_enabled: false,
@@ -137,22 +133,45 @@ impl TextBox {
             shadow_scale: Vec2::new(1.0, 1.0),
             shadow_corner_rounding: Default::default(),
 
-            // Label shadow properties
-            label_shadow_enabled: false,
-            label_shadow_offset: Default::default(),
-            label_shadow_color: Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 1.0)),
+            // Bar properties
+            bar_id: renderer.create_rectangle()?,
+            bar_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
+
+            // Selector properties
+            selector_id: match selector_shape {
+                ComponentShape::Rectangle => renderer.create_rectangle()?,
+                ComponentShape::Disc => renderer.create_disc(0.0, 512)?,
+            },
+            selector_shape,
+            selector_position: Default::default(),
+            selector_size: Vec2::new(20.0, 20.0),
+            selector_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
+
+            // Selector border properties
+            selector_border_id: match selector_shape {
+                ComponentShape::Rectangle => renderer.create_frame(Default::default())?,
+                ComponentShape::Disc => renderer.create_circle(0.0, 512)?,
+            },
+            selector_border_thickness: Default::default(),
+            selector_border_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
 
             // Component-specific properties
-            active: false,
+            phase: 0.0,
+            phase_unrounded: 0.0,
+            selector_pressed: false,
+            steps_count: u32::MAX,
+            mouse_wheel_step: 0.05,
 
             // Event handlers
             on_cursor_enter: None,
             on_cursor_leave: None,
             on_mouse_button_pressed: None,
             on_mouse_button_released: None,
-            on_activation: None,
-            on_deactivation: None,
-            on_content_changed: None,
+            on_selector_move: None,
+            on_cursor_selector_enter: None,
+            on_cursor_selector_leave: None,
+            on_mouse_button_selector_pressed: None,
+            on_mouse_button_selector_released: None,
         })
     }
 
@@ -212,70 +231,6 @@ impl TextBox {
     }
     /* #endregion */
 
-    /* #region Label properties */
-    pub fn get_label_font_id(&self) -> usize {
-        self.label_font_id
-    }
-
-    pub fn set_label_font_id(&mut self, label_font_id: usize) {
-        self.label_font_id = label_font_id;
-        self.dirty = true;
-    }
-
-    pub fn get_label_text(&self) -> &str {
-        &self.label_text
-    }
-
-    pub fn set_label_text(&mut self, text: String) {
-        self.label_text = text;
-        self.dirty = true;
-    }
-
-    pub fn get_label_horizontal_alignment(&self) -> HorizontalAlignment {
-        self.label_horizontal_alignment
-    }
-
-    pub fn set_label_horizontal_alignment(&mut self, label_horizontal_alignment: HorizontalAlignment) {
-        self.label_horizontal_alignment = label_horizontal_alignment;
-        self.dirty = true;
-    }
-
-    pub fn get_label_vertical_alignment(&self) -> VerticalAlignment {
-        self.label_vertical_alignment
-    }
-
-    pub fn set_label_vertical_alignment(&mut self, label_vertical_alignment: VerticalAlignment) {
-        self.label_vertical_alignment = label_vertical_alignment;
-        self.dirty = true;
-    }
-
-    pub fn get_label_offset(&self) -> Vec2 {
-        self.label_offset
-    }
-
-    pub fn set_label_offset(&mut self, label_offset: Vec2) {
-        self.label_offset = label_offset;
-        self.dirty = true;
-    }
-
-    pub fn get_label_color(&self) -> &Color {
-        &self.label_color
-    }
-
-    pub fn set_label_color(&mut self, label_color: Color) {
-        self.label_color = label_color;
-        self.dirty = true;
-    }
-
-    pub fn get_label_max_length(&self) -> usize {
-        self.label_max_length
-    }
-
-    pub fn set_label_max_length(&mut self, label_max_length: usize) {
-        self.label_max_length = label_max_length;
-    }
-    /* #endregion */
-
     /* #region Shadow properties */
     pub fn is_shadow_enabled(&self) -> bool {
         self.shadow_enabled
@@ -320,39 +275,91 @@ impl TextBox {
     }
     /* #endregion */
 
-    /* #region Label shadow properties */
-    pub fn is_label_shadow_enabled(&self) -> bool {
-        self.label_shadow_enabled
+    /* #region Bar properties */
+    pub fn get_bar_color(&self) -> &Color {
+        &self.bar_color
     }
 
-    pub fn set_label_shadow_enabled_flag(&mut self, label_shadow_enabled: bool) {
-        self.label_shadow_enabled = label_shadow_enabled;
+    pub fn set_bar_color(&mut self, bar_color: Color) {
+        self.bar_color = bar_color;
+        self.dirty = true;
+    }
+    /* #endregion */
+
+    /* #region Selector properties */
+    pub fn get_shape(&self) -> ComponentShape {
+        self.selector_shape
     }
 
-    pub fn get_label_shadow_offset(&self) -> Vec2 {
-        self.label_shadow_offset
+    pub fn get_selector_position(&self) -> Vec2 {
+        self.selector_position
     }
 
-    pub fn set_label_shadow_offset(&mut self, label_shadow_offset: Vec2) {
-        self.label_shadow_offset = label_shadow_offset;
+    pub fn get_selector_size(&self) -> Vec2 {
+        self.selector_size
     }
 
-    pub fn get_label_shadow_color(&self) -> &Color {
-        &self.label_shadow_color
+    pub fn set_selector_size(&mut self, selector_size: Vec2) {
+        self.selector_size = selector_size;
+        self.dirty = true;
     }
 
-    pub fn set_label_shadow_color(&mut self, get_label_shadow_color: Color) {
-        self.label_shadow_color = get_label_shadow_color;
+    pub fn get_selector_color(&self) -> &Color {
+        &self.selector_color
+    }
+
+    pub fn set_selector_color(&mut self, selector_color: Color) {
+        self.selector_color = selector_color;
+        self.dirty = true;
+    }
+    /* #endregion */
+
+    /* #region Selector border properties */
+    pub fn get_selector_border_color(&self) -> &Color {
+        &self.selector_border_color
+    }
+
+    pub fn set_selector_border_color(&mut self, selector_border_color: Color) {
+        self.selector_border_color = selector_border_color;
+        self.dirty = true;
+    }
+
+    pub fn get_selector_border_thickness(&self) -> ComponentBorderThickness {
+        self.selector_border_thickness
+    }
+
+    pub fn set_selector_border_thickness(&mut self, selector_border_thickness: ComponentBorderThickness) {
+        self.selector_border_thickness = selector_border_thickness;
+        self.dirty = true;
     }
     /* #endregion */
 
     /* #region Component-specific properties */
-    pub fn is_active(&self) -> bool {
-        self.active
+    pub fn get_phase(&self) -> f32 {
+        self.phase
     }
 
-    pub fn set_active_flag(&mut self, active: bool) {
-        self.active = active;
+    pub fn set_phase(&mut self, phase: f32) {
+        self.phase = phase;
+        self.phase_unrounded = phase;
+        self.dirty = true;
+    }
+
+    pub fn get_steps_count(&self) -> u32 {
+        self.steps_count
+    }
+
+    pub fn set_steps_count(&mut self, steps_count: u32) {
+        self.steps_count = steps_count;
+        self.dirty = true;
+    }
+
+    pub fn get_mouse_wheel_step(&self) -> f32 {
+        self.mouse_wheel_step
+    }
+
+    pub fn set_mouse_wheel_step(&mut self, mouse_wheel_step: f32) {
+        self.mouse_wheel_step = mouse_wheel_step;
     }
     /* #endregion */
 
@@ -367,16 +374,59 @@ impl TextBox {
             }
         }
 
-        let x1 = self.screen_position.x;
-        let y1 = self.screen_position.y;
-        let x2 = self.screen_position.x + self.screen_size.x;
-        let y2 = self.screen_position.y + self.screen_size.y;
+        let x1 = self.screen_position.x - self.selector_size.x / 2.0;
+        let y1 = self.screen_position.y - self.selector_size.y / 2.0;
+        let x2 = self.screen_position.x + self.screen_size.x + self.selector_size.x / 2.0;
+        let y2 = self.screen_position.y + self.screen_size.y + self.selector_size.y / 2.0;
 
         point.x >= x1 && point.y >= y1 && point.x <= x2 && point.y <= y2
     }
+
+    fn is_point_inside_selector(&self, point: Vec2) -> bool {
+        if let Some(event_mask) = self.event_mask {
+            let event_mask_left_bottom = event_mask.position;
+            let event_mask_right_top = event_mask.position + event_mask.size;
+
+            if point.x < event_mask_left_bottom.x || point.y < event_mask_left_bottom.y || point.x > event_mask_right_top.x || point.y > event_mask_right_top.y
+            {
+                return false;
+            }
+        }
+
+        let x1 = self.selector_position.x - self.selector_size.x / 2.0;
+        let y1 = self.selector_position.y - self.selector_size.y / 2.0;
+        let x2 = self.selector_position.x + self.selector_size.x / 2.0;
+        let y2 = self.selector_position.y + self.selector_size.y / 2.0;
+
+        point.x >= x1 && point.y >= y1 && point.x <= x2 && point.y <= y2
+    }
+
+    fn update_selector(&mut self, new_phase: f32, events: &mut Vec<UiEvent>) {
+        let difference = new_phase - self.phase;
+        let last_phase = self.phase;
+
+        if self.steps_count == u32::MAX {
+            self.phase = new_phase;
+            self.phase = self.phase.clamp(0.0, 1.0);
+        } else {
+            self.phase_unrounded = new_phase;
+            self.phase_unrounded = self.phase_unrounded.clamp(0.0, 1.0);
+
+            self.phase = (self.phase_unrounded * (self.steps_count as f32 - 1.0)).round() / (self.steps_count as f32 - 1.0);
+        }
+
+        if self.phase != last_phase {
+            if let Some(f) = self.on_selector_move {
+                (f)(self, difference);
+                self.dirty = true;
+            };
+            events.push(UiEvent::SelectorMoved(self.id, difference));
+            self.dirty = true;
+        }
+    }
 }
 
-impl Component for TextBox {
+impl Component for Slider {
     /* #region Common properties */
     fn get_position(&self) -> ComponentPosition {
         self.position
@@ -490,6 +540,7 @@ impl Component for TextBox {
     fn process_window_event(&mut self, event: &InputEvent) -> Vec<UiEvent> {
         let mut events: Vec<UiEvent> = Default::default();
 
+        // Component
         match event {
             InputEvent::MouseMoved(cursor_position, previous_cursor_position) => {
                 if self.is_point_inside(*cursor_position) {
@@ -517,24 +568,10 @@ impl Component for TextBox {
                         self.dirty = true;
                     };
                     events.push(UiEvent::MouseButtonPressed(self.id, *button));
+                    self.selector_pressed = true;
 
-                    if !self.active {
-                        if let Some(f) = self.on_activation {
-                            (f)(self, *button);
-                            self.dirty = true;
-                        };
-                        events.push(UiEvent::TextBoxActivated(self.id, *button));
-                        self.active = true;
-                    }
-                } else {
-                    if self.active {
-                        if let Some(f) = self.on_deactivation {
-                            (f)(self, *button);
-                            self.dirty = true;
-                        };
-                        events.push(UiEvent::TextBoxDeactivated(self.id, *button));
-                        self.active = false;
-                    }
+                    let new_phase = ((cursor_position.x - self.screen_position.x) / self.screen_size.x).clamp(0.0, 1.0);
+                    self.update_selector(new_phase, &mut events);
                 }
             }
             InputEvent::MouseButtonReleased(button, cursor_position) => {
@@ -546,33 +583,77 @@ impl Component for TextBox {
                     events.push(UiEvent::MouseButtonReleased(self.id, *button));
                 }
             }
-            InputEvent::CharPressed(c) => {
-                if self.active {
-                    let mut content_changed = false;
-
-                    if c.is_control() {
-                        // Backspace
-                        if *c as u8 == 8 && !self.label_text.is_empty() {
-                            self.label_text.pop();
-                            self.dirty = true;
-                            content_changed = true;
+            InputEvent::MouseWheelRotated(direction, cursor_position) => {
+                if self.is_point_inside(*cursor_position) {
+                    let difference = if self.steps_count == u32::MAX {
+                        match direction {
+                            MouseWheelDirection::Up => -self.mouse_wheel_step,
+                            MouseWheelDirection::Down => self.mouse_wheel_step,
+                            _ => 0.0,
                         }
                     } else {
-                        if self.label_text.len() < self.label_max_length {
-                            self.label_text.push(*c);
-                            self.dirty = true;
-                            content_changed = true;
+                        let step = 1.0 / self.steps_count as f32;
+                        match direction {
+                            MouseWheelDirection::Up => -step,
+                            MouseWheelDirection::Down => step,
+                            _ => 0.0,
                         }
-                    }
+                    } as f32;
 
-                    if content_changed {
-                        if let Some(f) = self.on_content_changed {
-                            (f)(self, *c);
+                    let new_phase = (self.get_phase() + difference).clamp(0.0, 1.0);
+                    self.update_selector(new_phase, &mut events);
+                }
+            }
+            _ => {}
+        }
+
+        // Selector
+        match event {
+            InputEvent::MouseMoved(cursor_position, previous_cursor_position) => {
+                if self.is_point_inside_selector(*cursor_position) {
+                    if !self.is_point_inside_selector(*previous_cursor_position) {
+                        if let Some(f) = self.on_cursor_selector_enter {
+                            (f)(self, *cursor_position);
                             self.dirty = true;
                         };
-                        events.push(UiEvent::TextBoxContentChanged(self.id, *c));
+
+                        events.push(UiEvent::SelectorCursorEnter(self.id, *cursor_position));
+                    }
+                } else {
+                    if self.is_point_inside_selector(*previous_cursor_position) {
+                        if let Some(f) = self.on_cursor_selector_leave {
+                            (f)(self, *cursor_position);
+                            self.dirty = true;
+                        };
+                        events.push(UiEvent::SelectorCursorLeave(self.id, *cursor_position));
                     }
                 }
+
+                if self.selector_pressed {
+                    let new_phase = ((cursor_position.x - self.screen_position.x) / self.screen_size.x).clamp(0.0, 1.0);
+                    self.update_selector(new_phase, &mut events);
+                }
+            }
+            InputEvent::MouseButtonPressed(button, cursor_position) => {
+                if self.is_point_inside_selector(*cursor_position) {
+                    if let Some(f) = self.on_mouse_button_selector_pressed {
+                        (f)(self, *button, *cursor_position);
+                        self.dirty = true;
+                    };
+                    events.push(UiEvent::SelectorMouseButtonPressed(self.id, *button));
+                    self.selector_pressed = true;
+                }
+            }
+            InputEvent::MouseButtonReleased(button, cursor_position) => {
+                if self.is_point_inside_selector(*cursor_position) {
+                    if let Some(f) = self.on_mouse_button_selector_released {
+                        (f)(self, *button, *cursor_position);
+                        self.dirty = true;
+                    };
+                    events.push(UiEvent::SelectorMouseButtonReleased(self.id, *button));
+                }
+
+                self.selector_pressed = false;
             }
             _ => {}
         }
@@ -638,31 +719,45 @@ impl Component for TextBox {
 
         renderer.get_drawable_mut(self.filling_id)?.set_size(self.screen_size);
 
+        let bar = renderer.get_drawable_mut(self.bar_id)?;
+        bar.set_position(self.screen_position);
+        bar.set_color(self.bar_color.clone());
+        bar.set_size(self.screen_size * Vec2::new(self.phase, 1.0));
+
+        self.selector_position = Vec2::new(self.screen_position.x + self.screen_size.x * self.phase, self.screen_position.y + self.screen_size.y / 2.0);
+        let mut selector_size_offset = Default::default();
+
+        if self.selector_border_thickness != Default::default() {
+            let border_rectangle = renderer.get_drawable_mut(self.selector_border_id)?;
+            border_rectangle.set_position(self.selector_position);
+            border_rectangle.set_size(self.selector_size);
+            border_rectangle.set_anchor(Vec2::new(0.5, 0.5));
+            border_rectangle.set_color(self.selector_border_color.clone());
+
+            match self.selector_shape {
+                ComponentShape::Rectangle => {
+                    renderer.get_drawable_with_type_mut::<Frame>(self.selector_border_id)?.set_thickness(self.selector_border_thickness.into())
+                }
+                ComponentShape::Disc => renderer
+                    .get_drawable_with_type_mut::<Circle>(self.selector_border_id)?
+                    .set_thickness(Vec2::new(self.selector_border_thickness.left, self.selector_border_thickness.top)),
+            }
+
+            selector_size_offset = Vec2::new(
+                self.selector_border_thickness.left + self.selector_border_thickness.right,
+                self.selector_border_thickness.top + self.selector_border_thickness.bottom,
+            );
+        }
+
+        let selector = renderer.get_drawable_mut(self.selector_id)?;
+        selector.set_position(self.selector_position);
+        selector.set_anchor(Vec2::new(0.5, 0.5));
+        selector.set_color(self.selector_color.clone());
+        selector.set_size(self.selector_size - selector_size_offset);
+
         renderer.get_drawable_with_type_mut::<Rectangle>(self.filling_id)?.set_corner_rounding(self.corner_rounding.into());
+        renderer.get_drawable_with_type_mut::<Rectangle>(self.bar_id)?.set_corner_rounding(self.corner_rounding.into());
         renderer.get_drawable_with_type_mut::<Frame>(self.border_id)?.set_corner_rounding(self.corner_rounding.into());
-
-        let font_storage = renderer.get_fonts();
-        let font_storage_lock = font_storage.lock().unwrap();
-        let font = font_storage_lock.get(self.label_font_id)?;
-        let label = renderer.get_drawable_with_type_mut::<Text>(self.label_id)?;
-        label.set_font(font);
-        label.set_text(&self.label_text);
-        label.set_color(self.label_color.clone());
-
-        let (horizontal_position, horizontal_anchor) = match self.label_horizontal_alignment {
-            HorizontalAlignment::Left => (Vec2::new(self.screen_position.x, 0.0), Vec2::new(0.0, 0.0)),
-            HorizontalAlignment::Middle => (Vec2::new(self.screen_position.x + (self.screen_size.x) / 2.0, 0.0), Vec2::new(0.5, 0.0)),
-            HorizontalAlignment::Right => (Vec2::new(self.screen_position.x + self.screen_size.x, 0.0), Vec2::new(1.0, 0.0)),
-        };
-
-        let (vertical_position, vertical_anchor) = match self.label_vertical_alignment {
-            VerticalAlignment::Top => (Vec2::new(0.0, self.screen_position.y), Vec2::new(0.0, 0.0)),
-            VerticalAlignment::Middle => (Vec2::new(0.0, self.screen_position.y + (self.screen_size.y) / 2.0), Vec2::new(0.0, 0.5)),
-            VerticalAlignment::Bottom => (Vec2::new(0.0, self.screen_position.y + self.screen_size.y), Vec2::new(0.0, 1.0)),
-        };
-
-        label.set_position((horizontal_position + vertical_position + self.label_offset).floor());
-        label.set_anchor(horizontal_anchor + vertical_anchor);
 
         if self.shadow_enabled {
             let shadow = renderer.get_drawable_mut(self.shadow_id)?;
@@ -687,26 +782,16 @@ impl Component for TextBox {
         }
 
         renderer.draw(self.filling_id)?;
-
-        if self.label_shadow_enabled {
-            let drawable = renderer.get_drawable_mut(self.label_id)?;
-            let original_position = drawable.get_position();
-            let original_color = drawable.get_color().clone();
-
-            let drawable = renderer.get_drawable_mut(self.label_id)?;
-            drawable.set_position(original_position + self.label_shadow_offset);
-            drawable.set_color(self.label_shadow_color.clone());
-            renderer.draw(self.label_id)?;
-
-            let drawable = renderer.get_drawable_mut(self.label_id)?;
-            drawable.set_position(original_position);
-            drawable.set_color(original_color);
-        }
-
-        renderer.draw(self.label_id)?;
+        renderer.draw(self.bar_id)?;
 
         if self.border_thickness != Default::default() {
             renderer.draw(self.border_id)?;
+        }
+
+        renderer.draw(self.selector_id)?;
+
+        if self.selector_border_thickness != Default::default() {
+            renderer.draw(self.selector_border_id)?;
         }
 
         Ok(())

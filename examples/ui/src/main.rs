@@ -21,6 +21,7 @@ use lemao_ui::components::label::Label;
 use lemao_ui::components::panel::Panel;
 use lemao_ui::components::progressbar::ProgressBar;
 use lemao_ui::components::scrollbox::Scrollbox;
+use lemao_ui::components::slider::Slider;
 use lemao_ui::components::textbox::TextBox;
 use lemao_ui::components::Component;
 use lemao_ui::components::ComponentBorderThickness;
@@ -376,7 +377,7 @@ pub fn main() -> Result<(), String> {
         "Aggresive AI",
         "No technology trading",
         "Always war",
-        "Always piece",
+        "Always peace",
     ];
 
     for checkbox_label in checkbox_labels {
@@ -385,7 +386,7 @@ pub fn main() -> Result<(), String> {
         checkbox.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0)));
         checkbox.set_offset(Vec2::new(0.0, -75.0 - 30.0 * checkbox_ids.len() as f32));
         checkbox.set_margin(ComponentMargin::new(3.0, 3.0, 3.0, 10.0));
-        checkbox.set_label_offset(Vec2::new(20.0, 0.0));
+        checkbox.set_label_offset(Vec2::new(25.0, 1.0));
         checkbox.set_box_offset(Vec2::new(0.0, 4.0));
         checkbox.set_label_text(checkbox_label.to_string());
         checkbox.set_label_shadow_enabled_flag(true);
@@ -406,7 +407,7 @@ pub fn main() -> Result<(), String> {
         let label_id = ui.create_label(&mut renderer, regular_font_id)?;
         let label = ui.get_component_with_type_mut::<Label>(label_id)?;
         label.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0)));
-        label.set_offset(Vec2::new(0.0, -350.0 - 30.0 * textbox_label_ids.len() as f32));
+        label.set_offset(Vec2::new(0.0, -348.0 - 30.0 * textbox_label_ids.len() as f32));
         label.set_margin(ComponentMargin::new(3.0, 3.0, 3.0, 10.0));
         label.set_text(textbox_label.to_string());
         label.set_shadow_enabled_flag(true);
@@ -450,7 +451,7 @@ pub fn main() -> Result<(), String> {
     let side_window_focuses = ui.get_component_with_type_mut::<Label>(side_window_focuses_title_id)?;
     side_window_focuses.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.5, 1.0)));
     side_window_focuses.set_anchor(Vec2::new(0.5, 0.5));
-    side_window_focuses.set_offset(Vec2::new(0.0, -450.0));
+    side_window_focuses.set_offset(Vec2::new(0.0, -445.0));
     side_window_focuses.set_text("City focuses".to_string());
     side_window_focuses.set_shadow_enabled_flag(true);
     side_window_focuses.set_shadow_offset(Vec2::new(1.0, -1.0));
@@ -465,7 +466,7 @@ pub fn main() -> Result<(), String> {
         let button = ui.get_component_with_type_mut::<Button>(button_id)?;
         button.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0)));
         button.set_size(ComponentSize::Absolute(Vec2::new(40.0, 30.0)));
-        button.set_offset(Vec2::new(100.0 + 50.0 * toggle_button_ids.len() as f32, -485.0));
+        button.set_offset(Vec2::new(100.0 + 50.0 * toggle_button_ids.len() as f32, -480.0));
         button.set_anchor(Vec2::new(0.5, 0.5));
         button.set_color(Color::Gradient(button_filling_gradient.clone()));
         button.set_border_thickness(ComponentBorderThickness::new(1.0, 1.0, 1.0, 1.0))?;
@@ -497,6 +498,53 @@ pub fn main() -> Result<(), String> {
         ui.get_component_mut(side_window_id)?.add_child(button_id);
 
         toggle_button_ids.push(button_id);
+    }
+
+    let mut selector_filling_gradient = Gradient::new(GradientType::Vertical, Vec2::new(0.0, 0.0));
+    selector_filling_gradient.steps.push(GradientStep::new(SolidColor::new_rgb(159, 148, 135, 255), 0.0));
+    selector_filling_gradient.steps.push(GradientStep::new(SolidColor::new_rgb(234, 221, 198, 255), 1.0));
+
+    let mut slider_ids = Vec::new();
+    let mut slider_label_ids = Vec::new();
+    let slider_labels = ["\u{C8} (50%):", "\u{C9} (50%):", "\u{CA} (50%):"];
+    let slider_steps_count = [5, 11, u32::MAX];
+
+    for slider_label in slider_labels {
+        let label_id = ui.create_label(&mut renderer, regular_font_id)?;
+        let label = ui.get_component_with_type_mut::<Label>(label_id)?;
+        label.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0)));
+        label.set_anchor(Vec2::new(0.0, 0.5));
+        label.set_offset(Vec2::new(0.0, -530.0 - 30.0 * slider_label_ids.len() as f32));
+        label.set_margin(ComponentMargin::new(3.0, 3.0, 3.0, 10.0));
+        label.set_text(slider_label.to_string());
+        label.set_shadow_enabled_flag(true);
+        label.set_shadow_offset(Vec2::new(1.0, -1.0));
+        label.set_shadow_color(Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 1.0)));
+        ui.get_component_mut(side_window_id)?.add_child(label_id);
+
+        slider_label_ids.push(label_id);
+
+        let slider_id = ui.create_slider(&mut renderer, ComponentShape::Disc)?;
+        let slider = ui.get_component_with_type_mut::<Slider>(slider_id)?;
+        slider.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.5, 1.0)));
+        slider.set_size(ComponentSize::Absolute(Vec2::new(210.0, 10.0)));
+        slider.set_anchor(Vec2::new(0.5, 0.5));
+        slider.set_offset(Vec2::new(35.0, -530.0 - 30.0 * slider_ids.len() as f32));
+        slider.set_margin(ComponentMargin::new(3.0, 3.0, 3.0, 10.0));
+        slider.set_color(Color::SolidColor(SolidColor::new_rgb(38, 41, 52, 255)));
+        slider.set_bar_color(Color::SolidColor(SolidColor::new_rgb(219, 198, 173, 255)));
+        slider.set_phase(0.5);
+        slider.set_border_thickness(ComponentBorderThickness::new(1.0, 1.0, 1.0, 1.0))?;
+        slider.set_border_color(Color::SolidColor(SolidColor::new_rgb(199, 178, 153, 255)));
+        slider.set_corner_rounding(ComponentCornerRounding::new(1.0, 1.0, 1.0, 1.0));
+        slider.set_selector_size(Vec2::new(15.0, 15.0));
+        slider.set_selector_color(Color::Gradient(selector_filling_gradient.clone()));
+        slider.set_steps_count(slider_steps_count[slider_ids.len()]);
+        slider.set_selector_border_thickness(ComponentBorderThickness::new(1.0, 1.0, 1.0, 1.0));
+        slider.set_selector_border_color(Color::SolidColor(SolidColor::new_rgb(199, 178, 153, 255)));
+        ui.get_component_mut(side_window_id)?.add_child(slider_id);
+
+        slider_ids.push(slider_id);
     }
 
     let mut is_running = true;
@@ -539,6 +587,19 @@ pub fn main() -> Result<(), String> {
                 UiEvent::ScrollMouseButtonReleased(component_id, button) => println!("SCROLL RELEASED {} {:?}", component_id, button),
                 UiEvent::ScrollMoved(component_id, direction) => println!("SCROLL {} {:?}", component_id, direction),
 
+                UiEvent::SelectorCursorEnter(component_id, cursor_position) => println!("SELECTOR ENTER {} {:?}", component_id, cursor_position),
+                UiEvent::SelectorCursorLeave(component_id, cursor_position) => println!("SELECTOR LEAVE {} {:?}", component_id, cursor_position),
+                UiEvent::SelectorMouseButtonPressed(component_id, button) => println!("SELECTOR PRESSED {} {:?}", component_id, button),
+                UiEvent::SelectorMouseButtonReleased(component_id, button) => println!("SELECTOR RELEASED {} {:?}", component_id, button),
+                UiEvent::SelectorMoved(component_id, direction) => {
+                    println!("SELECTOR {} {:?}", component_id, direction);
+
+                    let phase = ui.get_component_with_type_mut::<Slider>(component_id)?.get_phase();
+                    let label_index = slider_ids.iter().position(|&p| p == component_id).unwrap();
+                    let label_content = slider_labels[label_index].replace("50%", &format!("{:.0}%", phase * 100.0));
+
+                    ui.get_component_with_type_mut::<Label>(slider_label_ids[label_index])?.set_text(label_content);
+                }
                 UiEvent::TextBoxActivated(component_id, button) => println!("TEXTBOX ACTIVATED {} {:?}", component_id, button),
                 UiEvent::TextBoxDeactivated(component_id, button) => println!("TEXTBOX DEACTIVATED {} {:?}", component_id, button),
                 UiEvent::TextBoxContentChanged(component_id, c) => println!("TEXTBOX CHANGED {} {}", component_id, c),
@@ -585,6 +646,14 @@ pub fn main() -> Result<(), String> {
 
         for button_id in &toggle_button_ids {
             ui.draw(&mut renderer, *button_id)?;
+        }
+
+        for slider_label_id in &slider_label_ids {
+            ui.draw(&mut renderer, *slider_label_id)?;
+        }
+
+        for slider_id in &slider_ids {
+            ui.draw(&mut renderer, *slider_id)?;
         }
 
         window.swap_buffers();

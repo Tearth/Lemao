@@ -74,7 +74,7 @@ pub struct Scrollbox {
     pub on_cursor_leave: Option<fn(component: &mut Self, cursor_position: Vec2)>,
     pub on_mouse_button_pressed: Option<fn(component: &mut Self, mouse_button: MouseButton, cursor_position: Vec2)>,
     pub on_mouse_button_released: Option<fn(component: &mut Self, mouse_button: MouseButton, cursor_position: Vec2)>,
-    pub on_scroll: Option<fn(component: &mut Self, direction: MouseWheelDirection)>,
+    pub on_scroll: Option<fn(component: &mut Self, direction: f32)>,
     pub on_cursor_scroll_enter: Option<fn(component: &mut Self, cursor_position: Vec2)>,
     pub on_cursor_scroll_leave: Option<fn(component: &mut Self, cursor_position: Vec2)>,
     pub on_mouse_button_scroll_pressed: Option<fn(component: &mut Self, mouse_button: MouseButton, cursor_position: Vec2)>,
@@ -510,20 +510,20 @@ impl Component for Scrollbox {
             InputEvent::MouseWheelRotated(direction, cursor_position) => {
                 if self.is_point_inside(*cursor_position) {
                     let last_delta = self.scroll_delta;
-
-                    match direction {
-                        MouseWheelDirection::Up => self.scroll_delta -= Vec2::new(0.0, self.scroll_speed.y),
-                        MouseWheelDirection::Down => self.scroll_delta += Vec2::new(0.0, self.scroll_speed.y),
-                        _ => {}
+                    let difference = match direction {
+                        MouseWheelDirection::Up => -self.scroll_speed.y,
+                        MouseWheelDirection::Down => self.scroll_speed.y,
+                        _ => 0.0,
                     };
 
+                    self.scroll_delta += Vec2::new(0.0, difference);
                     self.scroll_delta = self.scroll_delta.clamp(Vec2::new(0.0, 0.0), self.scroll_difference);
 
                     if self.scroll_delta != last_delta {
                         if let Some(f) = self.on_scroll {
-                            (f)(self, *direction);
+                            (f)(self, difference);
                         };
-                        events.push(UiEvent::ScrollMoved(self.id, *direction));
+                        events.push(UiEvent::ScrollMoved(self.id, difference));
                         self.dirty = true;
                     }
                 }
@@ -562,12 +562,11 @@ impl Component for Scrollbox {
                     self.scroll_delta = self.scroll_delta.clamp(Vec2::new(0.0, 0.0), self.scroll_difference);
 
                     if self.scroll_delta != last_delta {
-                        let direction = if difference > 0.0 { MouseWheelDirection::Down } else { MouseWheelDirection::Up };
                         if let Some(f) = self.on_scroll {
-                            (f)(self, direction);
+                            (f)(self, difference);
                             self.dirty = true;
                         };
-                        events.push(UiEvent::ScrollMoved(self.id, direction));
+                        events.push(UiEvent::ScrollMoved(self.id, difference));
                         self.dirty = true;
                     }
                 }

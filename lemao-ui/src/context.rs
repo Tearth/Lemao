@@ -5,6 +5,7 @@ use crate::components::label::Label;
 use crate::components::panel::Panel;
 use crate::components::progressbar::ProgressBar;
 use crate::components::scrollbox::Scrollbox;
+use crate::components::slider::Slider;
 use crate::components::textbox::TextBox;
 use crate::components::Component;
 use crate::components::ComponentPosition;
@@ -128,6 +129,14 @@ impl UiContext {
         let id = self.components.len();
         let scrollbox = Box::new(Scrollbox::new(id, renderer)?);
         self.components.push(Some(scrollbox));
+
+        Ok(id)
+    }
+
+    pub fn create_slider(&mut self, renderer: &mut RendererContext, selector_shape: ComponentShape) -> Result<usize, String> {
+        let id = self.components.len();
+        let slider = Box::new(Slider::new(id, renderer, selector_shape)?);
+        self.components.push(Some(slider));
 
         Ok(id)
     }

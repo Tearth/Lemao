@@ -19,7 +19,13 @@ pub enum UiEvent {
     ScrollCursorLeave(usize, Vec2),
     ScrollMouseButtonPressed(usize, MouseButton),
     ScrollMouseButtonReleased(usize, MouseButton),
-    ScrollMoved(usize, MouseWheelDirection),
+    ScrollMoved(usize, f32),
+
+    SelectorCursorEnter(usize, Vec2),
+    SelectorCursorLeave(usize, Vec2),
+    SelectorMouseButtonPressed(usize, MouseButton),
+    SelectorMouseButtonReleased(usize, MouseButton),
+    SelectorMoved(usize, f32),
 
     TextBoxActivated(usize, MouseButton),
     TextBoxDeactivated(usize, MouseButton),

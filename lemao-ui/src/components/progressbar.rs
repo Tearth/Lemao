@@ -41,9 +41,6 @@ pub struct ProgressBar {
     children: Vec<usize>,
     event_mask: Option<EventMask>,
 
-    // Bar properties
-    bars: Vec<Bar>,
-
     // Shape properties
     filling_id: usize,
     color: Color,
@@ -77,6 +74,9 @@ pub struct ProgressBar {
     label_shadow_enabled: bool,
     label_shadow_offset: Vec2,
     label_shadow_color: Color,
+
+    // Bar properties
+    bars: Vec<Bar>,
 
     // Event handlers
     pub on_cursor_enter: Option<fn(component: &mut Self, cursor_position: Vec2)>,
@@ -123,9 +123,6 @@ impl ProgressBar {
             children: Default::default(),
             event_mask: None,
 
-            // Bar properties
-            bars: std::iter::repeat_with(|| Bar::new(renderer).unwrap()).take(MAX_BARS_COUNT).collect::<Vec<_>>(),
-
             // Shape properties
             filling_id: renderer.create_rectangle()?,
             color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
@@ -160,6 +157,9 @@ impl ProgressBar {
             label_shadow_offset: Default::default(),
             label_shadow_color: Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 1.0)),
 
+            // Bar properties
+            bars: std::iter::repeat_with(|| Bar::new(renderer).unwrap()).take(MAX_BARS_COUNT).collect::<Vec<_>>(),
+
             // Event handlers
             on_cursor_enter: None,
             on_cursor_leave: None,
@@ -171,17 +171,6 @@ impl ProgressBar {
     pub fn get_id(&self) -> usize {
         self.id
     }
-
-    /* #region Bar common properties */
-    pub fn get_bar_visibility(&self, bar_id: usize) -> bool {
-        self.bars[bar_id].visible
-    }
-
-    pub fn set_bar_visibility(&mut self, bar_id: usize, visible: bool) {
-        self.bars[bar_id].visible = visible;
-        self.dirty = true;
-    }
-    /* #endregion */
 
     /* #region Bar shape properties */
     pub fn get_bar_color(&self, bar_id: usize) -> &Color {
@@ -426,6 +415,17 @@ impl ProgressBar {
 
     pub fn set_label_shadow_color(&mut self, get_label_shadow_color: Color) {
         self.label_shadow_color = get_label_shadow_color;
+    }
+    /* #endregion */
+
+    /* #region Bar properties */
+    pub fn get_bar_visibility(&self, bar_id: usize) -> bool {
+        self.bars[bar_id].visible
+    }
+
+    pub fn set_bar_visibility(&mut self, bar_id: usize, visible: bool) {
+        self.bars[bar_id].visible = visible;
+        self.dirty = true;
     }
     /* #endregion */
 
