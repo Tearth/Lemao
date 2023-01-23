@@ -570,8 +570,10 @@ impl Component for Slider {
                     events.push(UiEvent::MouseButtonPressed(self.id, *button));
                     self.selector_pressed = true;
 
-                    let new_phase = ((cursor_position.x - self.screen_position.x) / self.screen_size.x).clamp(0.0, 1.0);
-                    self.update_selector(new_phase, &mut events);
+                    if !self.is_point_inside_selector(*cursor_position) {
+                        let new_phase = ((cursor_position.x - self.screen_position.x) / self.screen_size.x).clamp(0.0, 1.0);
+                        self.update_selector(new_phase, &mut events);
+                    }
                 }
             }
             InputEvent::MouseButtonReleased(button, cursor_position) => {
