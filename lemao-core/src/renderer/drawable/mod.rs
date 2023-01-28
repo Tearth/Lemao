@@ -64,7 +64,7 @@ impl Color {
         match self {
             Self::SolidColor(solid) => Color::SolidColor(SolidColor::new(solid.r, solid.g, solid.b, alpha)),
             Self::Gradient(gradient) => {
-                let mut gradient = gradient.clone();
+                let mut gradient = gradient;
                 for step in &mut gradient.steps {
                     step.color = SolidColor::new(step.color.r, step.color.g, step.color.b, alpha);
                 }

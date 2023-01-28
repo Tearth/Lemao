@@ -1,4 +1,4 @@
-use lemao_core::lemao_common_platform::input::{MouseButton, MouseWheelDirection};
+use lemao_core::lemao_common_platform::input::MouseButton;
 use lemao_math::vec2::Vec2;
 
 pub enum UiEvent {

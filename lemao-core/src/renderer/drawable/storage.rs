@@ -76,7 +76,7 @@ impl DrawableStorage {
 
         match &self.data[id] {
             Some(drawable) => Ok(drawable.as_ref()),
-            None => return Err(format!("Drawable with id {} not found", id)),
+            None => Err(format!("Drawable with id {} not found", id)),
         }
     }
 
@@ -87,7 +87,7 @@ impl DrawableStorage {
 
         match &mut self.data[id] {
             Some(drawable) => Ok(drawable.as_mut()),
-            None => return Err(format!("Drawable with id {} not found", id)),
+            None => Err(format!("Drawable with id {} not found", id)),
         }
     }
 

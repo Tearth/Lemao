@@ -600,7 +600,7 @@ impl Component for Slider {
                             MouseWheelDirection::Down => step,
                             _ => 0.0,
                         }
-                    } as f32;
+                    };
 
                     let new_phase = (self.get_phase() + difference).clamp(0.0, 1.0);
                     self.update_selector(new_phase, &mut events);

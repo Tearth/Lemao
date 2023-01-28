@@ -156,7 +156,7 @@ impl UiContext {
 
         match &self.components[component_id] {
             Some(component) => Ok(component.as_ref()),
-            None => return Err(format!("Component with id {} not found", component_id)),
+            None => Err(format!("Component with id {} not found", component_id)),
         }
     }
 
@@ -171,7 +171,7 @@ impl UiContext {
 
         match &mut self.components[component_id] {
             Some(drawable) => Ok(drawable.as_mut()),
-            None => return Err(format!("Component with id {} not found", component_id)),
+            None => Err(format!("Component with id {} not found", component_id)),
         }
     }
 
