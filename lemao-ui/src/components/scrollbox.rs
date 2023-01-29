@@ -14,9 +14,14 @@ use lemao_core::renderer::context::RendererContext;
 use lemao_core::renderer::drawable::frame::Frame;
 use lemao_core::renderer::drawable::rectangle::Rectangle;
 use lemao_core::renderer::drawable::Color;
-use lemao_core::renderer::textures::Texture;
 use lemao_math::color::SolidColor;
 use std::any::Any;
+
+#[derive(Debug, Copy, Clone)]
+pub enum ScrollboxOrientation {
+    Vertical,
+    Horizontal,
+}
 
 pub struct Scrollbox {
     pub(crate) id: usize,
@@ -36,49 +41,71 @@ pub struct Scrollbox {
     children: Vec<usize>,
     event_mask: Option<EventMask>,
 
-    // Scroll background properties
-    scroll_background_id: usize,
-    scroll_background_color: Color,
-    scroll_background_corner_rounding: ComponentCornerRounding,
-    scroll_background_texture_id: Option<usize>,
+    // Vertical scroll background properties
+    vertical_scroll_background_id: usize,
+    vertical_scroll_background_color: Color,
+    vertical_scroll_background_corner_rounding: ComponentCornerRounding,
 
-    // Scroll background border properties
-    scroll_background_border_id: usize,
-    scroll_background_border_color: Color,
-    scroll_background_border_thickness: ComponentBorderThickness,
+    // Horizontal scroll background properties
+    horizontal_scroll_background_id: usize,
+    horizontal_scroll_background_color: Color,
+    horizontal_scroll_background_corner_rounding: ComponentCornerRounding,
 
-    // Scroll properties
-    scroll_id: usize,
-    scroll_color: Color,
-    scroll_corner_rounding: ComponentCornerRounding,
-    scroll_texture_id: Option<usize>,
+    // Vertical scroll background border properties
+    vertical_scroll_background_border_id: usize,
+    vertical_scroll_background_border_color: Color,
+    vertical_scroll_background_border_thickness: ComponentBorderThickness,
 
-    // Scroll border properties
-    scroll_border_id: usize,
-    scroll_border_color: Color,
-    scroll_border_thickness: ComponentBorderThickness,
+    // Horizontal scroll background border properties
+    horizontal_scroll_background_border_id: usize,
+    horizontal_scroll_background_border_color: Color,
+    horizontal_scroll_background_border_thickness: ComponentBorderThickness,
+
+    // Vertical scroll properties
+    vertical_scroll_id: usize,
+    vertical_scroll_color: Color,
+    vertical_scroll_corner_rounding: ComponentCornerRounding,
+
+    // Horizontal scroll properties
+    horizontal_scroll_id: usize,
+    horizontal_scroll_color: Color,
+    horizontal_scroll_corner_rounding: ComponentCornerRounding,
+
+    // Vertical sScroll border properties
+    vertical_scroll_border_id: usize,
+    vertical_scroll_border_color: Color,
+    vertical_scroll_border_thickness: ComponentBorderThickness,
+
+    // Horizontal scroll border properties
+    horizontal_scroll_border_id: usize,
+    horizontal_scroll_border_color: Color,
+    horizontal_scroll_border_thickness: ComponentBorderThickness,
 
     // Component-specific properties
     total_size: Vec2,
     padding: Vec2,
-    scroll_position: Vec2,
-    scroll_size: Vec2,
     scroll_difference: Vec2,
     scroll_delta: Vec2,
     scroll_speed: Vec2,
-    scroll_width: f32,
-    scroll_pressed: bool,
+    scroll_width: Vec2,
+    vertical_scroll_position: Vec2,
+    vertical_scroll_size: Vec2,
+    vertical_scroll_pressed: bool,
+    horizontal_scroll_position: Vec2,
+    horizontal_scroll_size: Vec2,
+    horizontal_scroll_pressed: bool,
+    mouse_wheel_mode: ScrollboxOrientation,
 
     // Event handlers
     pub on_cursor_enter: Option<fn(component: &mut Self, cursor_position: Vec2)>,
     pub on_cursor_leave: Option<fn(component: &mut Self, cursor_position: Vec2)>,
     pub on_mouse_button_pressed: Option<fn(component: &mut Self, mouse_button: MouseButton, cursor_position: Vec2)>,
     pub on_mouse_button_released: Option<fn(component: &mut Self, mouse_button: MouseButton, cursor_position: Vec2)>,
-    pub on_scroll: Option<fn(component: &mut Self, direction: f32)>,
-    pub on_cursor_scroll_enter: Option<fn(component: &mut Self, cursor_position: Vec2)>,
-    pub on_cursor_scroll_leave: Option<fn(component: &mut Self, cursor_position: Vec2)>,
-    pub on_mouse_button_scroll_pressed: Option<fn(component: &mut Self, mouse_button: MouseButton, cursor_position: Vec2)>,
-    pub on_mouse_button_scroll_released: Option<fn(component: &mut Self, mouse_button: MouseButton, cursor_position: Vec2)>,
+    pub on_scroll: Option<fn(component: &mut Self, orientation: ScrollboxOrientation, direction: f32)>,
+    pub on_cursor_scroll_enter: Option<fn(component: &mut Self, orientation: ScrollboxOrientation, cursor_position: Vec2)>,
+    pub on_cursor_scroll_leave: Option<fn(component: &mut Self, orientation: ScrollboxOrientation, cursor_position: Vec2)>,
+    pub on_mouse_button_scroll_pressed: Option<fn(component: &mut Self, orientation: ScrollboxOrientation, mouse_button: MouseButton, cursor_position: Vec2)>,
+    pub on_mouse_button_scroll_released: Option<fn(component: &mut Self, orientation: ScrollboxOrientation, mouse_button: MouseButton, cursor_position: Vec2)>,
 }
 
 impl Scrollbox {
@@ -100,39 +127,61 @@ impl Scrollbox {
             children: Default::default(),
             event_mask: None,
 
-            // Scroll background properties
-            scroll_background_id: renderer.create_rectangle()?,
-            scroll_background_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
-            scroll_background_corner_rounding: Default::default(),
-            scroll_background_texture_id: None,
+            // Vertical scroll background properties
+            vertical_scroll_background_id: renderer.create_rectangle()?,
+            vertical_scroll_background_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
+            vertical_scroll_background_corner_rounding: Default::default(),
 
-            // Scroll background border properties
-            scroll_background_border_id: renderer.create_frame(Default::default())?,
-            scroll_background_border_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
-            scroll_background_border_thickness: Default::default(),
+            // Horizontal scroll background properties
+            horizontal_scroll_background_id: renderer.create_rectangle()?,
+            horizontal_scroll_background_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
+            horizontal_scroll_background_corner_rounding: Default::default(),
 
-            // Scroll properties
-            scroll_id: renderer.create_rectangle()?,
-            scroll_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
-            scroll_corner_rounding: Default::default(),
-            scroll_texture_id: None,
+            // Vertical scroll background border properties
+            vertical_scroll_background_border_id: renderer.create_frame(Default::default())?,
+            vertical_scroll_background_border_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
+            vertical_scroll_background_border_thickness: Default::default(),
 
-            // Scroll border properties
-            scroll_border_id: renderer.create_frame(Default::default())?,
-            scroll_border_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
-            scroll_border_thickness: Default::default(),
+            // Horizontal scroll background border properties
+            horizontal_scroll_background_border_id: renderer.create_frame(Default::default())?,
+            horizontal_scroll_background_border_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
+            horizontal_scroll_background_border_thickness: Default::default(),
+
+            // Vertical scroll properties
+            vertical_scroll_id: renderer.create_rectangle()?,
+            vertical_scroll_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
+            vertical_scroll_corner_rounding: Default::default(),
+
+            // Horizontal scroll properties
+            horizontal_scroll_id: renderer.create_rectangle()?,
+            horizontal_scroll_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
+            horizontal_scroll_corner_rounding: Default::default(),
+
+            // Vertical scroll border properties
+            vertical_scroll_border_id: renderer.create_frame(Default::default())?,
+            vertical_scroll_border_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
+            vertical_scroll_border_thickness: Default::default(),
+
+            // Horizontal scroll border properties
+            horizontal_scroll_border_id: renderer.create_frame(Default::default())?,
+            horizontal_scroll_border_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
+            horizontal_scroll_border_thickness: Default::default(),
 
             // Component-specific properties
             total_size: Default::default(),
             padding: Default::default(),
-            scroll_position: Default::default(),
-            scroll_size: Default::default(),
             scroll_offset: Default::default(),
             scroll_difference: Default::default(),
             scroll_delta: Default::default(),
             scroll_speed: Vec2::new(5.0, 5.0),
-            scroll_width: 20.0,
-            scroll_pressed: false,
+            scroll_width: Vec2::new(20.0, 20.0),
+            vertical_scroll_position: Default::default(),
+            vertical_scroll_size: Default::default(),
+            vertical_scroll_pressed: false,
+            horizontal_scroll_position: Default::default(),
+            horizontal_scroll_size: Default::default(),
+            horizontal_scroll_pressed: false,
+            mouse_wheel_mode: ScrollboxOrientation::Vertical,
 
             // Event handlers
             on_cursor_enter: None,
@@ -151,102 +200,172 @@ impl Scrollbox {
         self.id
     }
 
-    /* #region Scroll properties */
-    pub fn get_scroll_color(&self) -> &Color {
-        &self.scroll_color
+    /* #region Vertical scroll properties */
+    pub fn get_vertical_scroll_color(&self) -> &Color {
+        &self.vertical_scroll_color
     }
 
-    pub fn set_scroll_color(&mut self, scroll_color: Color) {
-        self.scroll_color = scroll_color;
+    pub fn set_vertical_scroll_color(&mut self, vertical_scroll_color: Color) {
+        self.vertical_scroll_color = vertical_scroll_color;
         self.dirty = true;
     }
 
-    pub fn get_scroll_corner_rounding(&self) -> ComponentCornerRounding {
-        self.scroll_corner_rounding
+    pub fn get_vertical_scroll_corner_rounding(&self) -> ComponentCornerRounding {
+        self.vertical_scroll_corner_rounding
     }
 
-    pub fn set_scroll_corner_rounding(&mut self, scroll_corner_rounding: ComponentCornerRounding) -> Result<(), String> {
-        self.scroll_corner_rounding = scroll_corner_rounding;
+    pub fn set_vertical_scroll_corner_rounding(&mut self, vertical_scroll_corner_rounding: ComponentCornerRounding) -> Result<(), String> {
+        self.vertical_scroll_corner_rounding = vertical_scroll_corner_rounding;
+        self.dirty = true;
+        Ok(())
+    }
+    /* #endregion */
+
+    /* #region Horizontal scroll properties */
+    pub fn get_horizontal_scroll_color(&self) -> &Color {
+        &self.horizontal_scroll_color
+    }
+
+    pub fn set_horizontal_scroll_color(&mut self, horizontal_scroll_color: Color) {
+        self.horizontal_scroll_color = horizontal_scroll_color;
+        self.dirty = true;
+    }
+
+    pub fn get_horizontal_scroll_corner_rounding(&self) -> ComponentCornerRounding {
+        self.horizontal_scroll_corner_rounding
+    }
+
+    pub fn set_horizontal_scroll_corner_rounding(&mut self, horizontal_scroll_corner_rounding: ComponentCornerRounding) -> Result<(), String> {
+        self.horizontal_scroll_corner_rounding = horizontal_scroll_corner_rounding;
+        self.dirty = true;
+        Ok(())
+    }
+    /* #endregion */
+
+    /* #region Vertical scroll border properties */
+    pub fn get_vertical_scroll_border_color(&self) -> &Color {
+        &self.vertical_scroll_border_color
+    }
+
+    pub fn set_vertical_scroll_border_color(&mut self, vertical_scroll_border_color: Color) {
+        self.vertical_scroll_border_color = vertical_scroll_border_color;
+        self.dirty = true;
+    }
+
+    pub fn get_vertical_scroll_border_thickness(&self) -> ComponentBorderThickness {
+        self.vertical_scroll_border_thickness
+    }
+
+    pub fn set_vertical_scroll_border_thickness(&mut self, vertical_scroll_border_thickness: ComponentBorderThickness) {
+        self.vertical_scroll_border_thickness = vertical_scroll_border_thickness;
+        self.dirty = true;
+    }
+    /* #endregion */
+
+    /* #region Horizontal scroll border properties */
+    pub fn get_horizontal_scroll_border_color(&self) -> &Color {
+        &self.horizontal_scroll_border_color
+    }
+
+    pub fn set_horizontal_scroll_border_color(&mut self, horizontal_scroll_border_color: Color) {
+        self.horizontal_scroll_border_color = horizontal_scroll_border_color;
+        self.dirty = true;
+    }
+
+    pub fn get_horizontal_scroll_border_thickness(&self) -> ComponentBorderThickness {
+        self.horizontal_scroll_border_thickness
+    }
+
+    pub fn set_horizontal_scroll_border_thickness(&mut self, horizontal_scroll_border_thickness: ComponentBorderThickness) {
+        self.horizontal_scroll_border_thickness = horizontal_scroll_border_thickness;
+        self.dirty = true;
+    }
+    /* #endregion */
+
+    /* #region Vertical scroll background properties */
+    pub fn get_vertical_scroll_background_color(&self) -> &Color {
+        &self.vertical_scroll_background_color
+    }
+
+    pub fn set_vertical_scroll_background_color(&mut self, vertical_scroll_background_color: Color) {
+        self.vertical_scroll_background_color = vertical_scroll_background_color;
+        self.dirty = true;
+    }
+
+    pub fn set_vertical_scroll_background_corner_rounding(
+        &mut self,
+        vertical_scroll_background_corner_rounding: ComponentCornerRounding,
+    ) -> Result<(), String> {
+        self.vertical_scroll_background_corner_rounding = vertical_scroll_background_corner_rounding;
         self.dirty = true;
         Ok(())
     }
 
-    pub fn get_scroll_texture_id(&self) -> Option<usize> {
-        self.scroll_texture_id
-    }
-
-    pub fn set_scroll_texture_id(&mut self, scroll_texture: &Texture) {
-        self.scroll_texture_id = Some(scroll_texture.get_id());
-        self.dirty = true;
+    pub fn get_vertical_scroll_background_corner_rounding(&self) -> ComponentCornerRounding {
+        self.vertical_scroll_background_corner_rounding
     }
     /* #endregion */
 
-    /* #region Scroll border properties */
-    pub fn get_scroll_border_color(&self) -> &Color {
-        &self.scroll_border_color
+    /* #region Horizontal scroll background properties */
+    pub fn get_horizontal_scroll_background_color(&self) -> &Color {
+        &self.horizontal_scroll_background_color
     }
 
-    pub fn set_scroll_border_color(&mut self, scroll_border_color: Color) {
-        self.scroll_border_color = scroll_border_color;
+    pub fn set_horizontal_scroll_background_color(&mut self, horizontal_scroll_background_color: Color) {
+        self.horizontal_scroll_background_color = horizontal_scroll_background_color;
         self.dirty = true;
     }
 
-    pub fn get_scroll_border_thickness(&self) -> ComponentBorderThickness {
-        self.scroll_border_thickness
-    }
-
-    pub fn set_scroll_border_thickness(&mut self, scroll_border_thickness: ComponentBorderThickness) {
-        self.scroll_border_thickness = scroll_border_thickness;
-        self.dirty = true;
-    }
-    /* #endregion */
-
-    /* #region Scroll background properties */
-    pub fn get_scroll_background_color(&self) -> &Color {
-        &self.scroll_background_color
-    }
-
-    pub fn set_scroll_background_color(&mut self, scroll_background_color: Color) {
-        self.scroll_background_color = scroll_background_color;
-        self.dirty = true;
-    }
-
-    pub fn set_scroll_background_corner_rounding(&mut self, scroll_background_corner_rounding: ComponentCornerRounding) -> Result<(), String> {
-        self.scroll_background_corner_rounding = scroll_background_corner_rounding;
+    pub fn set_horizontal_scroll_background_corner_rounding(
+        &mut self,
+        horizontal_scroll_background_corner_rounding: ComponentCornerRounding,
+    ) -> Result<(), String> {
+        self.horizontal_scroll_background_corner_rounding = horizontal_scroll_background_corner_rounding;
         self.dirty = true;
         Ok(())
     }
 
-    pub fn get_scroll_background_corner_rounding(&self) -> ComponentCornerRounding {
-        self.scroll_background_corner_rounding
+    pub fn get_horizontal_scroll_background_corner_rounding(&self) -> ComponentCornerRounding {
+        self.horizontal_scroll_background_corner_rounding
+    }
+    /* #endregion */
+
+    /* #region Vertical scroll background border properties */
+    pub fn get_vertical_scroll_background_border_color(&self) -> &Color {
+        &self.vertical_scroll_background_border_color
     }
 
-    pub fn get_scroll_background_texture_id(&self) -> Option<usize> {
-        self.scroll_background_texture_id
+    pub fn set_vertical_scroll_background_border_color(&mut self, vertical_scroll_background_border_color: Color) {
+        self.vertical_scroll_background_border_color = vertical_scroll_background_border_color;
+        self.dirty = true;
     }
 
-    pub fn set_scroll_background_texture_id(&mut self, scroll_background_texture: &Texture) {
-        self.scroll_background_texture_id = Some(scroll_background_texture.get_id());
+    pub fn get_vertical_scroll_background_border_thickness(&self) -> ComponentBorderThickness {
+        self.vertical_scroll_background_border_thickness
+    }
+
+    pub fn set_vertical_scroll_background_border_thickness(&mut self, vertical_scroll_background_border_thickness: ComponentBorderThickness) {
+        self.vertical_scroll_background_border_thickness = vertical_scroll_background_border_thickness;
         self.dirty = true;
     }
     /* #endregion */
 
-    /* #region Scroll background border properties */
-    pub fn get_scroll_background_border_color(&self) -> &Color {
-        &self.scroll_background_border_color
+    /* #region Horizontal scroll background border properties */
+    pub fn get_horizontal_scroll_background_border_color(&self) -> &Color {
+        &self.horizontal_scroll_background_border_color
     }
 
-    pub fn set_scroll_background_border_color(&mut self, scroll_background_border_color: Color) {
-        self.scroll_background_border_color = scroll_background_border_color;
+    pub fn set_horizontal_scroll_background_border_color(&mut self, horizontal_scroll_background_border_color: Color) {
+        self.horizontal_scroll_background_border_color = horizontal_scroll_background_border_color;
         self.dirty = true;
     }
 
-    pub fn get_scroll_background_border_thickness(&self) -> ComponentBorderThickness {
-        self.scroll_background_border_thickness
+    pub fn get_horizontal_scroll_background_border_thickness(&self) -> ComponentBorderThickness {
+        self.horizontal_scroll_background_border_thickness
     }
 
-    pub fn set_scroll_background_border_thickness(&mut self, scroll_background_border_thickness: ComponentBorderThickness) {
-        self.scroll_background_border_thickness = scroll_background_border_thickness;
+    pub fn set_horizontal_scroll_background_border_thickness(&mut self, horizontal_scroll_background_border_thickness: ComponentBorderThickness) {
+        self.horizontal_scroll_background_border_thickness = horizontal_scroll_background_border_thickness;
         self.dirty = true;
     }
     /* #endregion */
@@ -270,16 +389,8 @@ impl Scrollbox {
         self.padding
     }
 
-    pub fn get_scroll_position(&self) -> Vec2 {
-        self.scroll_position
-    }
-
-    pub fn get_scroll_size(&self) -> Vec2 {
-        self.scroll_size
-    }
-
     pub fn get_scroll_delta(&self) -> Vec2 {
-        self.scroll_delta
+        Vec2::new(-self.scroll_delta.x, self.scroll_delta.y)
     }
 
     pub fn set_scroll_delta(&mut self, scroll_delta: Vec2) {
@@ -296,22 +407,55 @@ impl Scrollbox {
         self.dirty = true;
     }
 
-    pub fn get_scroll_width(&self) -> f32 {
+    pub fn get_scroll_width(&self) -> Vec2 {
         self.scroll_width
     }
 
-    pub fn set_scroll_width(&mut self, scroll_width: f32) {
+    pub fn set_scroll_width(&mut self, scroll_width: Vec2) {
         self.scroll_width = scroll_width;
         self.dirty = true;
     }
 
-    pub fn is_scroll_pressed(&self) -> bool {
-        self.scroll_pressed
+    pub fn get_vertical_scroll_position(&self) -> Vec2 {
+        self.vertical_scroll_position
     }
 
-    pub fn set_scroll_pressed_flag(&mut self, scroll_pressed: bool) {
-        self.scroll_pressed = scroll_pressed;
+    pub fn get_vertical_scroll_size(&self) -> Vec2 {
+        self.vertical_scroll_size
+    }
+
+    pub fn is_vertical_scroll_pressed(&self) -> bool {
+        self.vertical_scroll_pressed
+    }
+
+    pub fn set_vertical_scroll_pressed_flag(&mut self, vertical_scroll_pressed: bool) {
+        self.vertical_scroll_pressed = vertical_scroll_pressed;
         self.dirty = true;
+    }
+
+    pub fn get_horizontal_scroll_position(&self) -> Vec2 {
+        self.horizontal_scroll_position
+    }
+
+    pub fn get_horizontal_scroll_size(&self) -> Vec2 {
+        self.horizontal_scroll_size
+    }
+
+    pub fn is_horizontal_scroll_pressed(&self) -> bool {
+        self.horizontal_scroll_pressed
+    }
+
+    pub fn set_horizontal_scroll_pressed_flag(&mut self, horizontal_scroll_pressed: bool) {
+        self.horizontal_scroll_pressed = horizontal_scroll_pressed;
+        self.dirty = true;
+    }
+
+    pub fn get_mouse_wheel_mode(&self) -> ScrollboxOrientation {
+        self.mouse_wheel_mode
+    }
+
+    pub fn set_mouse_wheel_mode(&mut self, mouse_wheel_mode: ScrollboxOrientation) {
+        self.mouse_wheel_mode = mouse_wheel_mode;
     }
     /* #endregion */
 
@@ -334,21 +478,20 @@ impl Scrollbox {
         point.x >= x1 && point.y >= y1 && point.x <= x2 && point.y <= y2
     }
 
-    fn is_point_inside_scroll(&self, point: Vec2) -> bool {
-        if let Some(event_mask) = self.event_mask {
-            let event_mask_left_bottom = event_mask.position;
-            let event_mask_right_top = event_mask.position + event_mask.size;
+    fn is_point_inside_vertical_scroll(&self, point: Vec2) -> bool {
+        let x1 = self.vertical_scroll_position.x - self.vertical_scroll_size.x;
+        let y1 = self.vertical_scroll_position.y - self.vertical_scroll_size.y;
+        let x2 = self.vertical_scroll_position.x;
+        let y2 = self.vertical_scroll_position.y;
 
-            if point.x < event_mask_left_bottom.x || point.y < event_mask_left_bottom.y || point.x > event_mask_right_top.x || point.y > event_mask_right_top.y
-            {
-                return false;
-            }
-        }
+        point.x >= x1 && point.y >= y1 && point.x <= x2 && point.y <= y2
+    }
 
-        let x1 = self.scroll_position.x - self.scroll_size.x;
-        let y1 = self.scroll_position.y - self.scroll_size.y;
-        let x2 = self.scroll_position.x;
-        let y2 = self.scroll_position.y;
+    fn is_point_inside_horizontal_scroll(&self, point: Vec2) -> bool {
+        let x1 = self.horizontal_scroll_position.x;
+        let y1 = self.horizontal_scroll_position.y;
+        let x2 = self.horizontal_scroll_position.x + self.horizontal_scroll_size.x;
+        let y2 = self.horizontal_scroll_position.y + self.horizontal_scroll_size.y;
 
         point.x >= x1 && point.y >= y1 && point.x <= x2 && point.y <= y2
     }
@@ -361,7 +504,7 @@ impl Component for Scrollbox {
     }
 
     fn get_work_area_position(&self) -> Vec2 {
-        self.screen_position
+        self.screen_position + Vec2::new(0.0, self.scroll_width.y)
     }
 
     fn set_position(&mut self, position: ComponentPosition) {
@@ -374,7 +517,7 @@ impl Component for Scrollbox {
     }
 
     fn get_work_area_size(&self) -> Vec2 {
-        self.screen_size
+        self.screen_size - self.scroll_width
     }
 
     fn set_size(&mut self, size: ComponentSize) {
@@ -509,52 +652,75 @@ impl Component for Scrollbox {
             }
             InputEvent::MouseWheelRotated(direction, cursor_position) => {
                 if self.is_point_inside(*cursor_position) {
-                    let last_delta = self.scroll_delta;
-                    let difference = match direction {
-                        MouseWheelDirection::Up => -self.scroll_speed.y,
-                        MouseWheelDirection::Down => self.scroll_speed.y,
-                        _ => 0.0,
-                    };
+                    match self.mouse_wheel_mode {
+                        ScrollboxOrientation::Vertical => {
+                            let last_delta = self.scroll_delta;
+                            let difference = match direction {
+                                MouseWheelDirection::Up => -self.scroll_speed.y,
+                                MouseWheelDirection::Down => self.scroll_speed.y,
+                                _ => 0.0,
+                            };
 
-                    self.scroll_delta += Vec2::new(0.0, difference);
-                    self.scroll_delta = self.scroll_delta.clamp(Vec2::new(0.0, 0.0), self.scroll_difference);
+                            self.scroll_delta += Vec2::new(0.0, difference);
+                            self.scroll_delta = self.scroll_delta.clamp(Vec2::new(0.0, 0.0), self.scroll_difference);
 
-                    if self.scroll_delta != last_delta {
-                        if let Some(f) = self.on_scroll {
-                            (f)(self, difference);
-                        };
-                        events.push(UiEvent::ScrollMoved(self.id, difference));
-                        self.dirty = true;
+                            if self.scroll_delta != last_delta {
+                                if let Some(f) = self.on_scroll {
+                                    (f)(self, ScrollboxOrientation::Vertical, difference);
+                                };
+                                events.push(UiEvent::ScrollMoved(self.id, difference));
+                                self.dirty = true;
+                            }
+                        }
+                        ScrollboxOrientation::Horizontal => {
+                            let last_delta = self.scroll_delta;
+                            let difference = match direction {
+                                MouseWheelDirection::Up => -self.scroll_speed.x,
+                                MouseWheelDirection::Down => self.scroll_speed.x,
+                                _ => 0.0,
+                            };
+
+                            self.scroll_delta += Vec2::new(difference, 0.0);
+                            self.scroll_delta = self.scroll_delta.clamp(Vec2::new(0.0, 0.0), self.scroll_difference);
+
+                            if self.scroll_delta != last_delta {
+                                if let Some(f) = self.on_scroll {
+                                    (f)(self, ScrollboxOrientation::Horizontal, difference);
+                                };
+                                events.push(UiEvent::ScrollMoved(self.id, difference));
+                                self.dirty = true;
+                            }
+                        }
                     }
                 }
             }
             _ => {}
         }
 
-        // Scrollbar
+        // Vertical scrollbar
         match event {
             InputEvent::MouseMoved(cursor_position, previous_cursor_position) => {
-                if self.is_point_inside_scroll(*cursor_position) {
-                    if !self.is_point_inside_scroll(*previous_cursor_position) {
+                if self.is_point_inside_vertical_scroll(*cursor_position) {
+                    if !self.is_point_inside_vertical_scroll(*previous_cursor_position) {
                         if let Some(f) = self.on_cursor_scroll_enter {
-                            (f)(self, *cursor_position);
+                            (f)(self, ScrollboxOrientation::Vertical, *cursor_position);
                             self.dirty = true;
                         };
 
                         events.push(UiEvent::ScrollCursorEnter(self.id, *cursor_position));
                     }
                 } else {
-                    if self.is_point_inside_scroll(*previous_cursor_position) {
+                    if self.is_point_inside_vertical_scroll(*previous_cursor_position) {
                         if let Some(f) = self.on_cursor_scroll_leave {
-                            (f)(self, *cursor_position);
+                            (f)(self, ScrollboxOrientation::Vertical, *cursor_position);
                             self.dirty = true;
                         };
                         events.push(UiEvent::ScrollCursorLeave(self.id, *cursor_position));
                     }
                 }
 
-                if self.scroll_pressed {
-                    let scroll_ratio = self.total_size.y / self.screen_size.y;
+                if self.vertical_scroll_pressed {
+                    let scroll_ratio = (self.total_size.y + self.scroll_width.y) / self.screen_size.y;
                     let difference = (previous_cursor_position.y - cursor_position.y) * scroll_ratio;
                     let last_delta = self.scroll_delta;
 
@@ -563,7 +729,7 @@ impl Component for Scrollbox {
 
                     if self.scroll_delta != last_delta {
                         if let Some(f) = self.on_scroll {
-                            (f)(self, difference);
+                            (f)(self, ScrollboxOrientation::Vertical, difference);
                             self.dirty = true;
                         };
                         events.push(UiEvent::ScrollMoved(self.id, difference));
@@ -572,25 +738,89 @@ impl Component for Scrollbox {
                 }
             }
             InputEvent::MouseButtonPressed(button, cursor_position) => {
-                if self.is_point_inside_scroll(*cursor_position) {
+                if self.is_point_inside_vertical_scroll(*cursor_position) {
                     if let Some(f) = self.on_mouse_button_scroll_pressed {
-                        (f)(self, *button, *cursor_position);
+                        (f)(self, ScrollboxOrientation::Vertical, *button, *cursor_position);
                         self.dirty = true;
                     };
                     events.push(UiEvent::ScrollMouseButtonPressed(self.id, *button));
-                    self.scroll_pressed = true;
+                    self.vertical_scroll_pressed = true;
                 }
             }
             InputEvent::MouseButtonReleased(button, cursor_position) => {
-                if self.is_point_inside_scroll(*cursor_position) {
+                if self.is_point_inside_vertical_scroll(*cursor_position) {
                     if let Some(f) = self.on_mouse_button_scroll_released {
-                        (f)(self, *button, *cursor_position);
+                        (f)(self, ScrollboxOrientation::Vertical, *button, *cursor_position);
                         self.dirty = true;
                     };
                     events.push(UiEvent::ScrollMouseButtonReleased(self.id, *button));
                 }
 
-                self.scroll_pressed = false;
+                self.vertical_scroll_pressed = false;
+            }
+            _ => {}
+        }
+
+        // Horizontal scrollbar
+        match event {
+            InputEvent::MouseMoved(cursor_position, previous_cursor_position) => {
+                if self.is_point_inside_horizontal_scroll(*cursor_position) {
+                    if !self.is_point_inside_horizontal_scroll(*previous_cursor_position) {
+                        if let Some(f) = self.on_cursor_scroll_enter {
+                            (f)(self, ScrollboxOrientation::Horizontal, *cursor_position);
+                            self.dirty = true;
+                        };
+
+                        events.push(UiEvent::ScrollCursorEnter(self.id, *cursor_position));
+                    }
+                } else {
+                    if self.is_point_inside_horizontal_scroll(*previous_cursor_position) {
+                        if let Some(f) = self.on_cursor_scroll_leave {
+                            (f)(self, ScrollboxOrientation::Horizontal, *cursor_position);
+                            self.dirty = true;
+                        };
+                        events.push(UiEvent::ScrollCursorLeave(self.id, *cursor_position));
+                    }
+                }
+
+                if self.horizontal_scroll_pressed {
+                    let scroll_ratio = (self.total_size.x + self.scroll_width.x) / self.screen_size.x;
+                    let difference = (previous_cursor_position.x - cursor_position.x) * scroll_ratio;
+                    let last_delta = self.scroll_delta;
+
+                    self.scroll_delta -= Vec2::new(difference, 0.0);
+                    self.scroll_delta = self.scroll_delta.clamp(Vec2::new(0.0, 0.0), self.scroll_difference);
+
+                    if self.scroll_delta != last_delta {
+                        if let Some(f) = self.on_scroll {
+                            (f)(self, ScrollboxOrientation::Horizontal, -difference);
+                            self.dirty = true;
+                        };
+                        events.push(UiEvent::ScrollMoved(self.id, -difference));
+                        self.dirty = true;
+                    }
+                }
+            }
+            InputEvent::MouseButtonPressed(button, cursor_position) => {
+                if self.is_point_inside_horizontal_scroll(*cursor_position) {
+                    if let Some(f) = self.on_mouse_button_scroll_pressed {
+                        (f)(self, ScrollboxOrientation::Horizontal, *button, *cursor_position);
+                        self.dirty = true;
+                    };
+                    events.push(UiEvent::ScrollMouseButtonPressed(self.id, *button));
+                    self.horizontal_scroll_pressed = true;
+                }
+            }
+            InputEvent::MouseButtonReleased(button, cursor_position) => {
+                if self.is_point_inside_horizontal_scroll(*cursor_position) {
+                    if let Some(f) = self.on_mouse_button_scroll_released {
+                        (f)(self, ScrollboxOrientation::Horizontal, *button, *cursor_position);
+                        self.dirty = true;
+                    };
+                    events.push(UiEvent::ScrollMouseButtonReleased(self.id, *button));
+                }
+
+                self.horizontal_scroll_pressed = false;
             }
             _ => {}
         }
@@ -621,82 +851,141 @@ impl Component for Scrollbox {
         self.screen_size = self.screen_size.floor();
         self.screen_position = self.screen_position.floor();
 
-        let mut scroll_background_position = self.screen_position + self.screen_size;
-        let mut scroll_background_size = Vec2::new(self.scroll_width, self.screen_size.y);
+        /* #region Vertical scroll */
+        let mut vertical_scroll_background_position = self.screen_position + self.screen_size;
+        let mut vertical_scroll_background_size = Vec2::new(self.scroll_width.x, self.screen_size.y - self.scroll_width.y);
 
-        if self.scroll_background_border_thickness != Default::default() {
-            let border_rectangle = renderer.get_drawable_mut(self.scroll_background_border_id)?;
-            border_rectangle.set_position(scroll_background_position);
-            border_rectangle.set_size(scroll_background_size);
+        if self.vertical_scroll_background_border_thickness != Default::default() {
+            let border_rectangle = renderer.get_drawable_mut(self.vertical_scroll_background_border_id)?;
+            border_rectangle.set_position(vertical_scroll_background_position);
+            border_rectangle.set_size(vertical_scroll_background_size);
             border_rectangle.set_anchor(Vec2::new(1.0, 1.0));
-            border_rectangle.set_color(self.scroll_background_border_color.clone());
+            border_rectangle.set_color(self.vertical_scroll_background_border_color.clone());
 
-            renderer.get_drawable_with_type_mut::<Frame>(self.scroll_background_border_id)?.set_thickness(self.scroll_background_border_thickness.into());
+            renderer
+                .get_drawable_with_type_mut::<Frame>(self.vertical_scroll_background_border_id)?
+                .set_thickness(self.vertical_scroll_background_border_thickness.into());
 
-            scroll_background_position -= Vec2::new(self.scroll_background_border_thickness.right, self.scroll_background_border_thickness.top);
-            scroll_background_size -= Vec2::new(
-                self.scroll_background_border_thickness.left + self.scroll_background_border_thickness.right,
-                self.scroll_background_border_thickness.top + self.scroll_background_border_thickness.bottom,
+            vertical_scroll_background_position -=
+                Vec2::new(self.vertical_scroll_background_border_thickness.right, self.vertical_scroll_background_border_thickness.top);
+            vertical_scroll_background_size -= Vec2::new(
+                self.vertical_scroll_background_border_thickness.left + self.vertical_scroll_background_border_thickness.right,
+                self.vertical_scroll_background_border_thickness.top + self.vertical_scroll_background_border_thickness.bottom,
             );
         }
 
-        let scroll_background = renderer.get_drawable_mut(self.scroll_background_id)?;
-        scroll_background.set_position(scroll_background_position);
-        scroll_background.set_size(scroll_background_size);
-        scroll_background.set_anchor(Vec2::new(1.0, 1.0));
-        scroll_background.set_color(self.scroll_background_color.clone());
+        let vertical_scroll_background = renderer.get_drawable_mut(self.vertical_scroll_background_id)?;
+        vertical_scroll_background.set_position(vertical_scroll_background_position);
+        vertical_scroll_background.set_size(vertical_scroll_background_size);
+        vertical_scroll_background.set_anchor(Vec2::new(1.0, 1.0));
+        vertical_scroll_background.set_color(self.vertical_scroll_background_color.clone());
 
-        if let Some(scroll_background_texture_id) = self.scroll_background_texture_id {
-            let texture_storage = renderer.get_textures();
-            let texture_storage_lock = texture_storage.lock().unwrap();
-            let texture = texture_storage_lock.get(scroll_background_texture_id)?;
+        self.scroll_difference.y = (self.total_size.y + self.scroll_width.y - self.screen_size.y).clamp(0.0, f32::MAX);
 
-            renderer.get_drawable_with_type_mut::<Rectangle>(self.scroll_background_id)?.set_texture(texture);
-        }
+        let vertical_scroll_height = (self.screen_size.y * self.screen_size.y / (self.total_size.y + self.scroll_width.y)).floor();
+        let vertical_scroll_free_space = self.screen_size.y - self.scroll_width.y - vertical_scroll_height;
+        let vertical_scroll_offset = (vertical_scroll_free_space * self.scroll_delta.y / self.scroll_difference.y).floor();
 
-        self.scroll_difference = (self.total_size - self.screen_size).clamp(Vec2::new(0.0, 0.0), Vec2::new(f32::MAX, f32::MAX));
+        self.vertical_scroll_position = self.screen_position + self.screen_size - Vec2::new(0.0, vertical_scroll_offset);
+        self.vertical_scroll_size = Vec2::new(self.scroll_width.x, vertical_scroll_height);
 
-        let scroll_height = (self.screen_size.y * self.screen_size.y / self.total_size.y).floor();
-        let scroll_free_space_left = self.screen_size.y - scroll_height;
-        let scroll_offset = (scroll_free_space_left * self.scroll_delta.y / self.scroll_difference.y).floor();
-
-        self.scroll_position = self.screen_position + self.screen_size - Vec2::new(0.0, scroll_offset);
-        self.scroll_size = Vec2::new(self.scroll_width, scroll_height);
-
-        if self.scroll_border_thickness != Default::default() {
-            let border_rectangle = renderer.get_drawable_mut(self.scroll_border_id)?;
-            border_rectangle.set_position(self.scroll_position);
-            border_rectangle.set_size(self.scroll_size);
+        if self.vertical_scroll_border_thickness != Default::default() {
+            let border_rectangle = renderer.get_drawable_mut(self.vertical_scroll_border_id)?;
+            border_rectangle.set_position(self.vertical_scroll_position);
+            border_rectangle.set_size(self.vertical_scroll_size);
             border_rectangle.set_anchor(Vec2::new(1.0, 1.0));
-            border_rectangle.set_color(self.scroll_border_color.clone());
+            border_rectangle.set_color(self.vertical_scroll_border_color.clone());
 
-            renderer.get_drawable_with_type_mut::<Frame>(self.scroll_border_id)?.set_thickness(self.scroll_border_thickness.into());
+            renderer.get_drawable_with_type_mut::<Frame>(self.vertical_scroll_border_id)?.set_thickness(self.vertical_scroll_border_thickness.into());
 
-            self.scroll_position -= Vec2::new(self.scroll_border_thickness.right, self.scroll_border_thickness.top);
-            self.scroll_size -= Vec2::new(
-                self.scroll_border_thickness.left + self.scroll_border_thickness.right,
-                self.scroll_border_thickness.top + self.scroll_border_thickness.bottom,
+            self.vertical_scroll_position -= Vec2::new(self.vertical_scroll_border_thickness.right, self.vertical_scroll_border_thickness.top);
+            self.vertical_scroll_size -= Vec2::new(
+                self.vertical_scroll_border_thickness.left + self.vertical_scroll_border_thickness.right,
+                self.vertical_scroll_border_thickness.top + self.vertical_scroll_border_thickness.bottom,
             );
         }
 
-        let scroll = renderer.get_drawable_mut(self.scroll_id)?;
-        scroll.set_position(self.scroll_position);
-        scroll.set_size(self.scroll_size);
-        scroll.set_anchor(Vec2::new(1.0, 1.0));
-        scroll.set_color(self.scroll_color.clone());
+        let vertical_scroll = renderer.get_drawable_mut(self.vertical_scroll_id)?;
+        vertical_scroll.set_position(self.vertical_scroll_position);
+        vertical_scroll.set_size(self.vertical_scroll_size);
+        vertical_scroll.set_anchor(Vec2::new(1.0, 1.0));
+        vertical_scroll.set_color(self.vertical_scroll_color.clone());
 
-        if let Some(scroll_texture_id) = self.scroll_texture_id {
-            let texture_storage = renderer.get_textures();
-            let texture_storage_lock = texture_storage.lock().unwrap();
-            let texture = texture_storage_lock.get(scroll_texture_id)?;
+        renderer.get_drawable_with_type_mut::<Rectangle>(self.vertical_scroll_id)?.set_corner_rounding(self.vertical_scroll_corner_rounding.into());
+        renderer.get_drawable_with_type_mut::<Frame>(self.vertical_scroll_border_id)?.set_corner_rounding(self.vertical_scroll_corner_rounding.into());
+        renderer
+            .get_drawable_with_type_mut::<Rectangle>(self.vertical_scroll_background_id)?
+            .set_corner_rounding(self.vertical_scroll_background_corner_rounding.into());
+        renderer
+            .get_drawable_with_type_mut::<Frame>(self.vertical_scroll_background_border_id)?
+            .set_corner_rounding(self.vertical_scroll_background_corner_rounding.into());
+        /* #endregion */
 
-            renderer.get_drawable_with_type_mut::<Rectangle>(self.scroll_id)?.set_texture(texture);
+        /* #region Horizontal scroll */
+        let mut horizontal_scroll_background_position = self.screen_position;
+        let mut horizontal_scroll_background_size = Vec2::new(self.screen_size.x - self.scroll_width.x, self.scroll_width.y);
+
+        if self.horizontal_scroll_background_border_thickness != Default::default() {
+            let border_rectangle = renderer.get_drawable_mut(self.horizontal_scroll_background_border_id)?;
+            border_rectangle.set_position(horizontal_scroll_background_position);
+            border_rectangle.set_size(horizontal_scroll_background_size);
+            border_rectangle.set_color(self.horizontal_scroll_background_border_color.clone());
+
+            renderer
+                .get_drawable_with_type_mut::<Frame>(self.horizontal_scroll_background_border_id)?
+                .set_thickness(self.horizontal_scroll_background_border_thickness.into());
+
+            horizontal_scroll_background_position +=
+                Vec2::new(self.horizontal_scroll_background_border_thickness.right, self.horizontal_scroll_background_border_thickness.top);
+            horizontal_scroll_background_size -= Vec2::new(
+                self.horizontal_scroll_background_border_thickness.left + self.horizontal_scroll_background_border_thickness.right,
+                self.horizontal_scroll_background_border_thickness.top + self.horizontal_scroll_background_border_thickness.bottom,
+            );
         }
 
-        renderer.get_drawable_with_type_mut::<Rectangle>(self.scroll_id)?.set_corner_rounding(self.scroll_corner_rounding.into());
-        renderer.get_drawable_with_type_mut::<Frame>(self.scroll_border_id)?.set_corner_rounding(self.scroll_corner_rounding.into());
-        renderer.get_drawable_with_type_mut::<Rectangle>(self.scroll_background_id)?.set_corner_rounding(self.scroll_background_corner_rounding.into());
-        renderer.get_drawable_with_type_mut::<Frame>(self.scroll_background_border_id)?.set_corner_rounding(self.scroll_background_corner_rounding.into());
+        let horizontal_scroll_background = renderer.get_drawable_mut(self.horizontal_scroll_background_id)?;
+        horizontal_scroll_background.set_position(horizontal_scroll_background_position);
+        horizontal_scroll_background.set_size(horizontal_scroll_background_size);
+        horizontal_scroll_background.set_color(self.horizontal_scroll_background_color.clone());
+
+        self.scroll_difference.x = (self.total_size.x + self.scroll_width.x - self.screen_size.x).clamp(0.0, f32::MAX);
+
+        let horizontal_scroll_width = (self.screen_size.x * self.screen_size.x / (self.total_size.x + self.scroll_width.x)).floor();
+        let horizontal_scroll_free_space = self.screen_size.x - horizontal_scroll_width;
+        let horizontal_scroll_offset = (horizontal_scroll_free_space * self.scroll_delta.x / self.scroll_difference.x).floor();
+
+        self.horizontal_scroll_position = self.screen_position + Vec2::new(horizontal_scroll_offset, 0.0);
+        self.horizontal_scroll_size = Vec2::new(horizontal_scroll_width - self.scroll_width.x, self.scroll_width.y);
+
+        if self.horizontal_scroll_border_thickness != Default::default() {
+            let border_rectangle = renderer.get_drawable_mut(self.horizontal_scroll_border_id)?;
+            border_rectangle.set_position(self.horizontal_scroll_position);
+            border_rectangle.set_size(self.horizontal_scroll_size);
+            border_rectangle.set_color(self.horizontal_scroll_border_color.clone());
+
+            renderer.get_drawable_with_type_mut::<Frame>(self.horizontal_scroll_border_id)?.set_thickness(self.horizontal_scroll_border_thickness.into());
+
+            self.horizontal_scroll_position += Vec2::new(self.horizontal_scroll_border_thickness.right, self.horizontal_scroll_border_thickness.top);
+            self.horizontal_scroll_size -= Vec2::new(
+                self.horizontal_scroll_border_thickness.left + self.horizontal_scroll_border_thickness.right,
+                self.horizontal_scroll_border_thickness.top + self.horizontal_scroll_border_thickness.bottom,
+            );
+        }
+
+        let horizontal_scroll = renderer.get_drawable_mut(self.horizontal_scroll_id)?;
+        horizontal_scroll.set_position(self.horizontal_scroll_position);
+        horizontal_scroll.set_size(self.horizontal_scroll_size);
+        horizontal_scroll.set_color(self.horizontal_scroll_color.clone());
+
+        renderer.get_drawable_with_type_mut::<Rectangle>(self.horizontal_scroll_id)?.set_corner_rounding(self.horizontal_scroll_corner_rounding.into());
+        renderer.get_drawable_with_type_mut::<Frame>(self.horizontal_scroll_border_id)?.set_corner_rounding(self.horizontal_scroll_corner_rounding.into());
+        renderer
+            .get_drawable_with_type_mut::<Rectangle>(self.horizontal_scroll_background_id)?
+            .set_corner_rounding(self.horizontal_scroll_background_corner_rounding.into());
+        renderer
+            .get_drawable_with_type_mut::<Frame>(self.horizontal_scroll_background_border_id)?
+            .set_corner_rounding(self.horizontal_scroll_background_corner_rounding.into());
+        /* #endregion */
 
         self.dirty = false;
 
@@ -704,15 +993,30 @@ impl Component for Scrollbox {
     }
 
     fn draw(&mut self, renderer: &mut RendererContext) -> Result<(), String> {
-        renderer.draw(self.scroll_background_id)?;
-        renderer.draw(self.scroll_id)?;
+        if self.scroll_width.x > 0.0 {
+            renderer.draw(self.vertical_scroll_background_id)?;
+            renderer.draw(self.vertical_scroll_id)?;
 
-        if self.scroll_background_border_thickness != Default::default() {
-            renderer.draw(self.scroll_background_border_id)?;
+            if self.vertical_scroll_background_border_thickness != Default::default() {
+                renderer.draw(self.vertical_scroll_background_border_id)?;
+            }
+
+            if self.vertical_scroll_border_thickness != Default::default() {
+                renderer.draw(self.vertical_scroll_border_id)?;
+            }
         }
 
-        if self.scroll_border_thickness != Default::default() {
-            renderer.draw(self.scroll_border_id)?;
+        if self.scroll_width.y > 0.0 {
+            renderer.draw(self.horizontal_scroll_background_id)?;
+            renderer.draw(self.horizontal_scroll_id)?;
+
+            if self.horizontal_scroll_background_border_thickness != Default::default() {
+                renderer.draw(self.horizontal_scroll_background_border_id)?;
+            }
+
+            if self.horizontal_scroll_border_thickness != Default::default() {
+                renderer.draw(self.horizontal_scroll_border_id)?;
+            }
         }
 
         Ok(())
