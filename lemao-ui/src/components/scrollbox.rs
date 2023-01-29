@@ -88,6 +88,7 @@ pub struct Scrollbox {
     scroll_delta: Vec2,
     scroll_speed: Vec2,
     scroll_width: Vec2,
+    scroll_press_point_offset: Vec2,
     vertical_scroll_position: Vec2,
     vertical_scroll_size: Vec2,
     vertical_scroll_pressed: bool,
@@ -175,6 +176,7 @@ impl Scrollbox {
             scroll_delta: Default::default(),
             scroll_speed: Vec2::new(5.0, 5.0),
             scroll_width: Vec2::new(20.0, 20.0),
+            scroll_press_point_offset: Default::default(),
             vertical_scroll_position: Default::default(),
             vertical_scroll_size: Default::default(),
             vertical_scroll_pressed: false,
@@ -720,12 +722,12 @@ impl Component for Scrollbox {
                 }
 
                 if self.vertical_scroll_pressed {
-                    let scroll_ratio = (self.total_size.y + self.scroll_width.y) / self.screen_size.y;
-                    let difference = (previous_cursor_position.y - cursor_position.y) * scroll_ratio;
+                    let scroll_ratio = (self.total_size.y + self.scroll_width.y) / (self.screen_size.y - self.scroll_width.y);
                     let last_delta = self.scroll_delta;
 
-                    self.scroll_delta += Vec2::new(0.0, difference);
+                    self.scroll_delta.y = (self.screen_position.y + self.screen_size.y - (cursor_position.y + self.scroll_press_point_offset.y)) * scroll_ratio;
                     self.scroll_delta = self.scroll_delta.clamp(Vec2::new(0.0, 0.0), self.scroll_difference);
+                    let difference = self.scroll_delta.y - last_delta.y;
 
                     if self.scroll_delta != last_delta {
                         if let Some(f) = self.on_scroll {
@@ -745,6 +747,7 @@ impl Component for Scrollbox {
                     };
                     events.push(UiEvent::ScrollMouseButtonPressed(self.id, *button));
                     self.vertical_scroll_pressed = true;
+                    self.scroll_press_point_offset = self.vertical_scroll_position - *cursor_position;
                 }
             }
             InputEvent::MouseButtonReleased(button, cursor_position) => {
@@ -784,19 +787,19 @@ impl Component for Scrollbox {
                 }
 
                 if self.horizontal_scroll_pressed {
-                    let scroll_ratio = (self.total_size.x + self.scroll_width.x) / self.screen_size.x;
-                    let difference = (previous_cursor_position.x - cursor_position.x) * scroll_ratio;
+                    let scroll_ratio = (self.total_size.x + self.scroll_width.x) / (self.screen_size.x - self.scroll_width.x);
                     let last_delta = self.scroll_delta;
 
-                    self.scroll_delta -= Vec2::new(difference, 0.0);
+                    self.scroll_delta.x = ((cursor_position.x + self.scroll_press_point_offset.x) - self.screen_position.x) * scroll_ratio;
                     self.scroll_delta = self.scroll_delta.clamp(Vec2::new(0.0, 0.0), self.scroll_difference);
+                    let difference = self.scroll_delta.x - last_delta.x;
 
                     if self.scroll_delta != last_delta {
                         if let Some(f) = self.on_scroll {
-                            (f)(self, ScrollboxOrientation::Horizontal, -difference);
+                            (f)(self, ScrollboxOrientation::Horizontal, difference);
                             self.dirty = true;
                         };
-                        events.push(UiEvent::ScrollMoved(self.id, -difference));
+                        events.push(UiEvent::ScrollMoved(self.id, difference));
                         self.dirty = true;
                     }
                 }
@@ -809,6 +812,7 @@ impl Component for Scrollbox {
                     };
                     events.push(UiEvent::ScrollMouseButtonPressed(self.id, *button));
                     self.horizontal_scroll_pressed = true;
+                    self.scroll_press_point_offset = self.horizontal_scroll_position - *cursor_position;
                 }
             }
             InputEvent::MouseButtonReleased(button, cursor_position) => {
@@ -874,6 +878,16 @@ impl Component for Scrollbox {
             );
         }
 
+        /*
+        self.scroll_difference.x = (self.total_size.x + self.scroll_width.x - self.screen_size.x).clamp(0.0, f32::MAX);
+
+        let horizontal_scroll_width = (self.screen_size.x * self.screen_size.x / (self.total_size.x + self.scroll_width.x)).floor();
+        let horizontal_scroll_free_space = self.screen_size.x - horizontal_scroll_width;
+        let horizontal_scroll_offset = (horizontal_scroll_free_space * self.scroll_delta.x / self.scroll_difference.x).floor();
+
+        self.horizontal_scroll_position = self.screen_position + Vec2::new(horizontal_scroll_offset, 0.0);
+        self.horizontal_scroll_size = Vec2::new(horizontal_scroll_width - self.scroll_width.x, self.scroll_width.y); */
+
         let vertical_scroll_background = renderer.get_drawable_mut(self.vertical_scroll_background_id)?;
         vertical_scroll_background.set_position(vertical_scroll_background_position);
         vertical_scroll_background.set_size(vertical_scroll_background_size);
@@ -882,12 +896,17 @@ impl Component for Scrollbox {
 
         self.scroll_difference.y = (self.total_size.y + self.scroll_width.y - self.screen_size.y).clamp(0.0, f32::MAX);
 
-        let vertical_scroll_height = (self.screen_size.y * self.screen_size.y / (self.total_size.y + self.scroll_width.y)).floor();
-        let vertical_scroll_free_space = self.screen_size.y - self.scroll_width.y - vertical_scroll_height;
-        let vertical_scroll_offset = (vertical_scroll_free_space * self.scroll_delta.y / self.scroll_difference.y).floor();
+        if self.scroll_difference.y > 0.0 {
+            let vertical_scroll_height = ((self.screen_size.y - self.scroll_width.y) * self.screen_size.y / (self.total_size.y + self.scroll_width.y)).floor();
+            let vertical_scroll_free_space = self.screen_size.y - self.scroll_width.y - vertical_scroll_height;
+            let vertical_scroll_offset = (vertical_scroll_free_space * self.scroll_delta.y / self.scroll_difference.y).floor();
 
-        self.vertical_scroll_position = self.screen_position + self.screen_size - Vec2::new(0.0, vertical_scroll_offset);
-        self.vertical_scroll_size = Vec2::new(self.scroll_width.x, vertical_scroll_height);
+            self.vertical_scroll_position = self.screen_position + self.screen_size - Vec2::new(0.0, vertical_scroll_offset);
+            self.vertical_scroll_size = Vec2::new(self.scroll_width.x, vertical_scroll_height);
+        } else {
+            self.vertical_scroll_position = self.screen_position + self.screen_size;
+            self.vertical_scroll_size = Vec2::new(self.scroll_width.x, self.screen_size.y - self.scroll_width.y);
+        }
 
         if self.vertical_scroll_border_thickness != Default::default() {
             let border_rectangle = renderer.get_drawable_mut(self.vertical_scroll_border_id)?;
@@ -950,12 +969,17 @@ impl Component for Scrollbox {
 
         self.scroll_difference.x = (self.total_size.x + self.scroll_width.x - self.screen_size.x).clamp(0.0, f32::MAX);
 
-        let horizontal_scroll_width = (self.screen_size.x * self.screen_size.x / (self.total_size.x + self.scroll_width.x)).floor();
-        let horizontal_scroll_free_space = self.screen_size.x - horizontal_scroll_width;
-        let horizontal_scroll_offset = (horizontal_scroll_free_space * self.scroll_delta.x / self.scroll_difference.x).floor();
+        if self.scroll_difference.x > 0.0 {
+            let horizontal_scroll_width = ((self.screen_size.x - self.scroll_width.x) * self.screen_size.x / (self.total_size.x + self.scroll_width.x)).floor();
+            let horizontal_scroll_free_space = self.screen_size.x - self.scroll_width.x - horizontal_scroll_width;
+            let horizontal_scroll_offset = (horizontal_scroll_free_space * self.scroll_delta.x / self.scroll_difference.x).floor();
 
-        self.horizontal_scroll_position = self.screen_position + Vec2::new(horizontal_scroll_offset, 0.0);
-        self.horizontal_scroll_size = Vec2::new(horizontal_scroll_width - self.scroll_width.x, self.scroll_width.y);
+            self.horizontal_scroll_position = self.screen_position + Vec2::new(horizontal_scroll_offset, 0.0);
+            self.horizontal_scroll_size = Vec2::new(horizontal_scroll_width, self.scroll_width.y);
+        } else {
+            self.horizontal_scroll_position = self.screen_position;
+            self.horizontal_scroll_size = Vec2::new(self.screen_size.x - self.scroll_width.x, self.scroll_width.y);
+        }
 
         if self.horizontal_scroll_border_thickness != Default::default() {
             let border_rectangle = renderer.get_drawable_mut(self.horizontal_scroll_border_id)?;
