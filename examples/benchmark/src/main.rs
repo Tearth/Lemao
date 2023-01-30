@@ -107,7 +107,7 @@ pub fn main() -> Result<(), String> {
         }
 
         if now.elapsed().as_millis() >= 1000 {
-            renderer.get_drawable_with_type_mut::<Text>(fps_text_id)?.set_text(&format!("FPS:{}", frames));
+            renderer.get_drawable_with_type_mut::<Text>(fps_text_id)?.set_text(&format!("FPS:{frames}"));
             now = Instant::now();
             frames = 0;
         }
