@@ -750,6 +750,15 @@ impl Component for Button {
         Ok(())
     }
 
+    fn release_internal_resources(&mut self, renderer: &mut RendererContext) -> Result<(), String> {
+        renderer.remove_drawable(self.filling_id)?;
+        renderer.remove_drawable(self.border_id)?;
+        renderer.remove_drawable(self.shadow_id)?;
+        renderer.remove_drawable(self.label_id)?;
+
+        Ok(())
+    }
+
     fn as_any(&self) -> &dyn Any {
         self
     }

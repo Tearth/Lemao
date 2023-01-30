@@ -7,9 +7,9 @@ pub struct ShaderStorage {
 
 impl ShaderStorage {
     pub fn store(&mut self, mut shader: Shader) -> usize {
-        let id = self.data.len();
+        let id = self.get_free_component_id();
         shader.id = id;
-        self.data.push(Some(shader));
+        self.data[id] = Some(shader);
 
         id
     }
@@ -37,5 +37,14 @@ impl ShaderStorage {
         self.data[id] = None;
 
         Ok(())
+    }
+
+    fn get_free_component_id(&mut self) -> usize {
+        if let Some(id) = self.data.iter().position(|p| p.is_none()) {
+            id
+        } else {
+            self.data.push(None);
+            self.data.len() - 1
+        }
     }
 }

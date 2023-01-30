@@ -90,7 +90,7 @@ pub struct Bar {
     visible: bool,
 
     // Shape properties
-    bar_id: usize,
+    filling_id: usize,
     color: Color,
     from: f32,
     to: f32,
@@ -706,12 +706,12 @@ impl Component for ProgressBar {
 
         for bar in &mut self.bars {
             if bar.visible {
-                let filling_rectangle = renderer.get_drawable_mut(bar.bar_id)?;
+                let filling_rectangle = renderer.get_drawable_mut(bar.filling_id)?;
                 filling_rectangle.set_position(Vec2::new(self.screen_position.x + self.screen_size.x * bar.from, self.screen_position.y));
                 filling_rectangle.set_size(Vec2::new((bar.to - bar.from) * self.screen_size.x, self.screen_size.y));
                 filling_rectangle.set_color(bar.color.clone());
 
-                renderer.get_drawable_with_type_mut::<Rectangle>(bar.bar_id)?.set_corner_rounding(bar.corner_rounding.into());
+                renderer.get_drawable_with_type_mut::<Rectangle>(bar.filling_id)?.set_corner_rounding(bar.corner_rounding.into());
             }
         }
 
@@ -728,7 +728,7 @@ impl Component for ProgressBar {
 
         for bar in self.bars.iter().rev() {
             if bar.visible {
-                renderer.draw(bar.bar_id)?;
+                renderer.draw(bar.filling_id)?;
 
                 if bar.border_thickness != Default::default() {
                     renderer.draw(bar.border_id)?;
@@ -760,6 +760,20 @@ impl Component for ProgressBar {
         Ok(())
     }
 
+    fn release_internal_resources(&mut self, renderer: &mut RendererContext) -> Result<(), String> {
+        renderer.remove_drawable(self.filling_id)?;
+        renderer.remove_drawable(self.border_id)?;
+        renderer.remove_drawable(self.shadow_id)?;
+        renderer.remove_drawable(self.label_id)?;
+
+        for bar in &mut self.bars {
+            renderer.remove_drawable(bar.filling_id)?;
+            renderer.remove_drawable(bar.border_id)?;
+        }
+
+        Ok(())
+    }
+
     fn as_any(&self) -> &dyn Any {
         self
     }
@@ -776,7 +790,7 @@ impl Bar {
             visible: false,
 
             // Shape properties
-            bar_id: renderer.create_rectangle()?,
+            filling_id: renderer.create_rectangle()?,
             color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             from: 0.0,
             to: 1.0,

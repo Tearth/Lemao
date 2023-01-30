@@ -7,9 +7,9 @@ pub struct TextureStorage {
 
 impl TextureStorage {
     pub fn store(&mut self, mut texture: Texture) -> usize {
-        let id = self.data.len();
+        let id = self.get_free_component_id();
         texture.id = id;
-        self.data.push(Some(texture));
+        self.data[id] = Some(texture);
 
         id
     }
@@ -37,5 +37,14 @@ impl TextureStorage {
         self.data[id] = None;
 
         Ok(())
+    }
+
+    fn get_free_component_id(&mut self) -> usize {
+        if let Some(id) = self.data.iter().position(|p| p.is_none()) {
+            id
+        } else {
+            self.data.push(None);
+            self.data.len() - 1
+        }
     }
 }

@@ -799,6 +799,17 @@ impl Component for Slider {
         Ok(())
     }
 
+    fn release_internal_resources(&mut self, renderer: &mut RendererContext) -> Result<(), String> {
+        renderer.remove_drawable(self.filling_id)?;
+        renderer.remove_drawable(self.border_id)?;
+        renderer.remove_drawable(self.shadow_id)?;
+        renderer.remove_drawable(self.bar_id)?;
+        renderer.remove_drawable(self.selector_id)?;
+        renderer.remove_drawable(self.selector_border_id)?;
+
+        Ok(())
+    }
+
     fn as_any(&self) -> &dyn Any {
         self
     }

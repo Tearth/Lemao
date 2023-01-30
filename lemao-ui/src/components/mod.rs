@@ -118,6 +118,8 @@ pub trait Component {
     fn get_event_mask(&self) -> Option<EventMask>;
     fn set_event_mask(&mut self, event_mask: Option<EventMask>);
 
+    fn release_internal_resources(&mut self, renderer: &mut RendererContext) -> Result<(), String>;
+
     fn as_any(&self) -> &dyn Any;
     fn as_any_mut(&mut self) -> &mut dyn Any;
 }

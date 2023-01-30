@@ -878,16 +878,6 @@ impl Component for Scrollbox {
             );
         }
 
-        /*
-        self.scroll_difference.x = (self.total_size.x + self.scroll_width.x - self.screen_size.x).clamp(0.0, f32::MAX);
-
-        let horizontal_scroll_width = (self.screen_size.x * self.screen_size.x / (self.total_size.x + self.scroll_width.x)).floor();
-        let horizontal_scroll_free_space = self.screen_size.x - horizontal_scroll_width;
-        let horizontal_scroll_offset = (horizontal_scroll_free_space * self.scroll_delta.x / self.scroll_difference.x).floor();
-
-        self.horizontal_scroll_position = self.screen_position + Vec2::new(horizontal_scroll_offset, 0.0);
-        self.horizontal_scroll_size = Vec2::new(horizontal_scroll_width - self.scroll_width.x, self.scroll_width.y); */
-
         let vertical_scroll_background = renderer.get_drawable_mut(self.vertical_scroll_background_id)?;
         vertical_scroll_background.set_position(vertical_scroll_background_position);
         vertical_scroll_background.set_size(vertical_scroll_background_size);
@@ -1042,6 +1032,17 @@ impl Component for Scrollbox {
                 renderer.draw(self.horizontal_scroll_border_id)?;
             }
         }
+
+        Ok(())
+    }
+
+    fn release_internal_resources(&mut self, renderer: &mut RendererContext) -> Result<(), String> {
+        renderer.remove_drawable(self.vertical_scroll_id)?;
+        renderer.remove_drawable(self.vertical_scroll_border_id)?;
+        renderer.remove_drawable(self.vertical_scroll_background_id)?;
+        renderer.remove_drawable(self.horizontal_scroll_id)?;
+        renderer.remove_drawable(self.horizontal_scroll_border_id)?;
+        renderer.remove_drawable(self.horizontal_scroll_border_id)?;
 
         Ok(())
     }

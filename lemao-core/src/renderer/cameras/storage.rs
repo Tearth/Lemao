@@ -7,9 +7,9 @@ pub struct CameraStorage {
 
 impl CameraStorage {
     pub fn store(&mut self, mut camera: Camera) -> usize {
-        let id = self.data.len();
+        let id = self.get_free_component_id();
         camera.id = id;
-        self.data.push(Some(camera));
+        self.data[id] = Some(camera);
 
         id
     }
@@ -37,5 +37,14 @@ impl CameraStorage {
         self.data[id] = None;
 
         Ok(())
+    }
+
+    fn get_free_component_id(&mut self) -> usize {
+        if let Some(id) = self.data.iter().position(|p| p.is_none()) {
+            id
+        } else {
+            self.data.push(None);
+            self.data.len() - 1
+        }
     }
 }

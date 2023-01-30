@@ -522,6 +522,13 @@ impl Component for Checkbox {
         Ok(())
     }
 
+    fn release_internal_resources(&mut self, renderer: &mut RendererContext) -> Result<(), String> {
+        renderer.remove_drawable(self.box_id)?;
+        renderer.remove_drawable(self.label_id)?;
+
+        Ok(())
+    }
+
     fn as_any(&self) -> &dyn Any {
         self
     }

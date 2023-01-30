@@ -411,6 +411,12 @@ impl Component for Label {
         Ok(())
     }
 
+    fn release_internal_resources(&mut self, renderer: &mut RendererContext) -> Result<(), String> {
+        renderer.remove_drawable(self.label_id)?;
+
+        Ok(())
+    }
+
     fn as_any(&self) -> &dyn Any {
         self
     }

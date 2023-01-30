@@ -7,9 +7,9 @@ pub struct SampleStorage {
 
 impl SampleStorage {
     pub fn store(&mut self, mut sample: Sample) -> usize {
-        let id = self.data.len();
+        let id = self.get_free_component_id();
         sample.id = id;
-        self.data.push(Some(sample));
+        self.data[id] = Some(sample);
 
         id
     }
@@ -29,5 +29,14 @@ impl SampleStorage {
         self.data[id] = None;
 
         Ok(())
+    }
+
+    fn get_free_component_id(&mut self) -> usize {
+        if let Some(id) = self.data.iter().position(|p| p.is_none()) {
+            id
+        } else {
+            self.data.push(None);
+            self.data.len() - 1
+        }
     }
 }

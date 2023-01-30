@@ -72,17 +72,17 @@ impl UiContext {
     }
 
     pub fn create_button(&mut self, renderer: &mut RendererContext, shape: ComponentShape, label_font_id: usize) -> Result<usize, String> {
-        let id = self.components.len();
+        let id = self.get_free_component_id();
         let button = Box::new(Button::new(id, renderer, shape, label_font_id)?);
-        self.components.push(Some(button));
+        self.components[id] = Some(button);
 
         Ok(id)
     }
 
     pub fn create_canvas(&mut self, _renderer: &mut RendererContext) -> Result<usize, String> {
-        let id = self.components.len();
+        let id = self.get_free_component_id();
         let canvas = Box::new(Canvas::new(id)?);
-        self.components.push(Some(canvas));
+        self.components[id] = Some(canvas);
 
         Ok(id)
     }
@@ -94,57 +94,57 @@ impl UiContext {
         tick_on_texture_id: usize,
         tick_off_texture_id: usize,
     ) -> Result<usize, String> {
-        let id = self.components.len();
+        let id = self.get_free_component_id();
         let checkbox = Box::new(Checkbox::new(id, renderer, label_font_id, tick_on_texture_id, tick_off_texture_id)?);
-        self.components.push(Some(checkbox));
+        self.components[id] = Some(checkbox);
 
         Ok(id)
     }
 
     pub fn create_label(&mut self, renderer: &mut RendererContext, label_font_id: usize) -> Result<usize, String> {
-        let id = self.components.len();
+        let id = self.get_free_component_id();
         let label = Box::new(Label::new(id, renderer, label_font_id)?);
-        self.components.push(Some(label));
+        self.components[id] = Some(label);
 
         Ok(id)
     }
 
     pub fn create_panel(&mut self, renderer: &mut RendererContext, shape: ComponentShape) -> Result<usize, String> {
-        let id = self.components.len();
+        let id = self.get_free_component_id();
         let panel = Box::new(Panel::new(id, renderer, shape)?);
-        self.components.push(Some(panel));
+        self.components[id] = Some(panel);
 
         Ok(id)
     }
 
     pub fn create_progressbar(&mut self, renderer: &mut RendererContext, label_font_id: usize) -> Result<usize, String> {
-        let id = self.components.len();
+        let id = self.get_free_component_id();
         let progressbar = Box::new(ProgressBar::new(id, renderer, label_font_id)?);
-        self.components.push(Some(progressbar));
+        self.components[id] = Some(progressbar);
 
         Ok(id)
     }
 
     pub fn create_scrollbox(&mut self, renderer: &mut RendererContext) -> Result<usize, String> {
-        let id = self.components.len();
+        let id = self.get_free_component_id();
         let scrollbox = Box::new(Scrollbox::new(id, renderer)?);
-        self.components.push(Some(scrollbox));
+        self.components[id] = Some(scrollbox);
 
         Ok(id)
     }
 
     pub fn create_slider(&mut self, renderer: &mut RendererContext, selector_shape: ComponentShape) -> Result<usize, String> {
-        let id = self.components.len();
+        let id = self.get_free_component_id();
         let slider = Box::new(Slider::new(id, renderer, selector_shape)?);
-        self.components.push(Some(slider));
+        self.components[id] = Some(slider);
 
         Ok(id)
     }
 
     pub fn create_textbox(&mut self, renderer: &mut RendererContext, label_font_id: usize) -> Result<usize, String> {
-        let id = self.components.len();
+        let id = self.get_free_component_id();
         let textbox = Box::new(TextBox::new(id, renderer, label_font_id)?);
-        self.components.push(Some(textbox));
+        self.components[id] = Some(textbox);
 
         Ok(id)
     }
@@ -185,6 +185,13 @@ impl UiContext {
 
     pub fn get_main_canvas_mut(&mut self) -> Result<&mut dyn Component, String> {
         self.get_component_mut(self.main_canvas_id)
+    }
+
+    pub fn remove_component(&mut self, component_id: usize, renderer: &mut RendererContext) -> Result<(), String> {
+        self.get_component_mut(component_id)?.release_internal_resources(renderer)?;
+        self.components[component_id] = None;
+
+        Ok(())
     }
 
     pub fn begin_scrollbox(&self, scrollbox_id: usize, renderer: &RendererContext) -> Result<(), String> {
@@ -282,5 +289,14 @@ impl UiContext {
 
         renderer.set_camera_as_active(active_camera_id)?;
         Ok(())
+    }
+
+    fn get_free_component_id(&mut self) -> usize {
+        if let Some(id) = self.components.iter().position(|p| p.is_none()) {
+            id
+        } else {
+            self.components.push(None);
+            self.components.len() - 1
+        }
     }
 }

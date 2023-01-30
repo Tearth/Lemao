@@ -343,6 +343,10 @@ impl RendererContext {
         self.get_drawable_mut(drawable_id)?.as_any_mut().downcast_mut::<T>().ok_or(format!("Drawable object with id {} cannot be downcasted", drawable_id))
     }
 
+    pub fn remove_drawable(&mut self, drawable_id: usize) -> Result<(), String> {
+        self.drawables.as_mut().unwrap().remove(drawable_id)
+    }
+
     pub fn enable_scissor(&self, position: Vec2, size: Vec2) {
         unsafe {
             (self.gl.glEnable)(opengl::GL_SCISSOR_TEST);

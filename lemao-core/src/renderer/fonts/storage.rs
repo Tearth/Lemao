@@ -7,9 +7,9 @@ pub struct FontStorage {
 
 impl FontStorage {
     pub fn store(&mut self, mut font: Font) -> usize {
-        let id = self.data.len();
+        let id = self.get_free_component_id();
         font.id = id;
-        self.data.push(Some(font));
+        self.data[id] = Some(font);
 
         id
     }
@@ -37,5 +37,14 @@ impl FontStorage {
         self.data[id] = None;
 
         Ok(())
+    }
+
+    fn get_free_component_id(&mut self) -> usize {
+        if let Some(id) = self.data.iter().position(|p| p.is_none()) {
+            id
+        } else {
+            self.data.push(None);
+            self.data.len() - 1
+        }
     }
 }
