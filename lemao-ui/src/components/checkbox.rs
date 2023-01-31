@@ -453,8 +453,8 @@ impl Component for Checkbox {
     fn update(&mut self, renderer: &mut RendererContext, area_position: Vec2, area_size: Vec2) -> Result<(), String> {
         // We have to set text first, to get the size used later
         let font_storage = renderer.get_fonts();
-        let font_storage_lock = font_storage.lock().unwrap();
-        let font = font_storage_lock.get(self.label_font_id)?;
+        let font_storage = font_storage.read().unwrap();
+        let font = font_storage.get(self.label_font_id)?;
         renderer.get_drawable_with_type_mut::<Text>(self.label_id)?.set_font(font);
         renderer.get_drawable_with_type_mut::<Text>(self.label_id)?.set_text(&self.label_text);
 
@@ -480,14 +480,14 @@ impl Component for Checkbox {
         r#box.set_color(self.box_color.clone());
 
         let texture_storage = renderer.get_textures();
-        let texture_storage_lock = texture_storage.lock().unwrap();
+        let texture_storage = texture_storage.read().unwrap();
 
         if self.checked {
-            let texture = texture_storage_lock.get(self.box_checked_texture_id)?;
+            let texture = texture_storage.get(self.box_checked_texture_id)?;
             self.box_size = texture.get_size();
             renderer.get_drawable_with_type_mut::<Rectangle>(self.box_id)?.set_texture(texture);
         } else {
-            let texture = texture_storage_lock.get(self.box_unchecked_texture_id)?;
+            let texture = texture_storage.get(self.box_unchecked_texture_id)?;
             self.box_size = texture.get_size();
             renderer.get_drawable_with_type_mut::<Rectangle>(self.box_id)?.set_texture(texture);
         }

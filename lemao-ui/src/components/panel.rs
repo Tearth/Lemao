@@ -474,8 +474,8 @@ impl Component for Panel {
 
         if let Some(texture_id) = self.texture_id {
             let texture_storage = renderer.get_textures();
-            let texture_storage_lock = texture_storage.lock().unwrap();
-            let texture = texture_storage_lock.get(texture_id)?;
+            let texture_storage = texture_storage.read().unwrap();
+            let texture = texture_storage.get(texture_id)?;
 
             match self.shape {
                 ComponentShape::Rectangle => renderer.get_drawable_with_type_mut::<Rectangle>(self.filling_id)?.set_texture(texture),

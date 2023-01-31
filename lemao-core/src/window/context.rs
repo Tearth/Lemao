@@ -1,7 +1,5 @@
 use crate::renderer::cameras::Camera;
 use crate::renderer::context::RendererContext;
-use crate::renderer::fonts::storage::FontStorage;
-use crate::renderer::textures::storage::TextureStorage;
 use lemao_common_platform::input::InputEvent;
 use lemao_common_platform::input::Key;
 use lemao_common_platform::input::MouseButton;
@@ -9,8 +7,6 @@ use lemao_common_platform::window::WindowPlatformSpecific;
 use lemao_common_platform::window::WindowStyle;
 use lemao_math::vec2::Vec2;
 use std::collections::VecDeque;
-use std::sync::Arc;
-use std::sync::Mutex;
 
 pub struct WindowContext {
     window: Box<dyn WindowPlatformSpecific>,
@@ -36,9 +32,9 @@ impl WindowContext {
         self.events.pop_front()
     }
 
-    pub fn create_renderer(&mut self, textures: Arc<Mutex<TextureStorage>>, fonts: Arc<Mutex<FontStorage>>) -> Result<RendererContext, String> {
+    pub fn create_renderer(&mut self) -> Result<RendererContext, String> {
         let renderer_platform_specific = self.window.create_renderer()?;
-        let mut renderer = RendererContext::new(renderer_platform_specific, self.window.get_size(), textures, fonts)?;
+        let mut renderer = RendererContext::new(renderer_platform_specific, self.window.get_size())?;
         renderer.init()?;
 
         Ok(renderer)

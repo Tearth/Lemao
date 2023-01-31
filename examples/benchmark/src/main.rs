@@ -6,14 +6,10 @@ use lemao_core::renderer::drawable::rectangle::Rectangle;
 use lemao_core::renderer::drawable::text::Text;
 use lemao_core::renderer::drawable::Drawable;
 use lemao_core::renderer::fonts::bff;
-use lemao_core::renderer::fonts::storage::FontStorage;
 use lemao_core::renderer::fonts::Font;
 use lemao_core::renderer::textures::bmp;
-use lemao_core::renderer::textures::storage::TextureStorage;
 use lemao_core::renderer::textures::Texture;
 use lemao_core::window::context::WindowContext;
-use std::sync::Arc;
-use std::sync::Mutex;
 use std::time::Instant;
 
 #[no_mangle]
@@ -22,7 +18,7 @@ pub static NvOptimusEnablement: i32 = 1;
 #[no_mangle]
 pub static AmdPowerXpressRequestHighPerformance: i32 = 1;
 
-const CELLS_COUNT: usize = 10000;
+const CELLS_COUNT: usize = 5000;
 const MAX_SPEED: f32 = 1.0;
 
 pub struct CellData {
@@ -32,17 +28,24 @@ pub struct CellData {
 }
 
 pub fn main() -> Result<(), String> {
-    let textures = Arc::new(Mutex::new(TextureStorage::default()));
-    let fonts = Arc::new(Mutex::new(FontStorage::default()));
-
     let window_position = Default::default();
     let mut window_size = Vec2::new(1366.0, 768.0);
 
     let mut window = WindowContext::new("Audio", WindowStyle::Window { position: window_position, size: window_size })?;
-    let mut renderer = window.create_renderer(textures.clone(), fonts.clone())?;
+    let mut renderer = window.create_renderer()?;
 
-    let cell_texture_id = textures.lock().unwrap().store(Texture::new(&renderer, &bmp::load("./assets/cell.bmp")?));
-    let font_id = fonts.lock().unwrap().store(Font::new(&renderer, &bff::load("./assets/inconsolata.bff")?));
+    let texture_storage = renderer.get_textures();
+    let mut texture_storage = texture_storage.write().unwrap();
+    let cell_texture_id = texture_storage.store(Texture::new(&renderer, &bmp::load("./assets/cell.bmp")?));
+
+    drop(texture_storage);
+
+    let font_storage = renderer.get_fonts();
+    let mut font_storage = font_storage.write().unwrap();
+    let font_id = font_storage.store(Font::new(&renderer, &bff::load("./assets/inconsolata.bff")?));
+
+    drop(font_storage);
+
     let fps_text_id = renderer.create_text(font_id)?;
 
     let fps_text = renderer.get_drawable_with_type_mut::<Text>(fps_text_id)?;
@@ -50,10 +53,13 @@ pub fn main() -> Result<(), String> {
     fps_text.set_anchor(Vec2::new(0.0, 1.0));
 
     let mut cells = Vec::new();
+    let texture_storage = renderer.get_textures();
+    let texture_storage = texture_storage.read().unwrap();
+
     for _ in 0..CELLS_COUNT {
         let sprite_id = renderer.create_rectangle()?;
         let sprite = renderer.get_drawable_with_type_mut::<Rectangle>(sprite_id)?;
-        sprite.set_texture(textures.lock().unwrap().get(cell_texture_id)?);
+        sprite.set_texture(texture_storage.get(cell_texture_id)?);
         sprite.set_anchor(Vec2::new(0.5, 0.5));
 
         cells.push(CellData {
@@ -62,6 +68,8 @@ pub fn main() -> Result<(), String> {
             velocity: Vec2 { x: MAX_SPEED * (fastrand::f32() * 2.0 - 1.0), y: MAX_SPEED * (fastrand::f32() * 2.0 - 1.0) },
         });
     }
+
+    drop(texture_storage);
 
     let mut now = Instant::now();
     let mut frames = 0;

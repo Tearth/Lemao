@@ -11,13 +11,9 @@ use lemao_core::renderer::drawable::rectangle::Rectangle;
 use lemao_core::renderer::drawable::text::Text;
 use lemao_core::renderer::drawable::Drawable;
 use lemao_core::renderer::fonts::bff;
-use lemao_core::renderer::fonts::storage::FontStorage;
 use lemao_core::renderer::fonts::Font;
-use lemao_core::renderer::textures::storage::TextureStorage;
 use lemao_core::window::context::CoordinationSystem;
 use lemao_core::window::context::WindowContext;
-use std::sync::Arc;
-use std::sync::Mutex;
 
 #[rustfmt::skip]
 const DESCRIPTION: &str = 
@@ -26,16 +22,17 @@ const DESCRIPTION: &str =
  Scroll - set size";
 
 pub fn main() -> Result<(), String> {
-    let textures = Arc::new(Mutex::new(TextureStorage::default()));
-    let fonts = Arc::new(Mutex::new(FontStorage::default()));
-
     let window_position = Default::default();
     let window_size = Vec2::new(1366.0, 768.0);
 
     let mut window = WindowContext::new("Rectangle", WindowStyle::Window { position: window_position, size: window_size })?;
-    let mut renderer = window.create_renderer(textures, fonts.clone())?;
+    let mut renderer = window.create_renderer()?;
 
-    let font_id = fonts.lock().unwrap().store(Font::new(&renderer, &bff::load("./assets/inconsolata.bff")?));
+    let font_storage = renderer.get_fonts();
+    let mut font_storage = font_storage.write().unwrap();
+    let font_id = font_storage.store(Font::new(&renderer, &bff::load("./assets/inconsolata.bff")?));
+
+    drop(font_storage);
 
     let rectangle_id = renderer.create_rectangle().unwrap();
     let description_text_id = renderer.create_text(font_id)?;

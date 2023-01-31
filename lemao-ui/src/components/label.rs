@@ -360,8 +360,8 @@ impl Component for Label {
         }
 
         let font_storage = renderer.get_fonts();
-        let font_storage_lock = font_storage.lock().unwrap();
-        let font = font_storage_lock.get(self.label_font_id)?;
+        let font_storage = font_storage.read().unwrap();
+        let font = font_storage.get(self.label_font_id)?;
         renderer.get_drawable_with_type_mut::<Text>(self.label_id)?.set_font(font);
         renderer.get_drawable_with_type_mut::<Text>(self.label_id)?.set_text(&label_text_processed);
 

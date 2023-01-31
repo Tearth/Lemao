@@ -662,8 +662,8 @@ impl Component for Button {
 
         if let Some(texture_id) = self.texture_id {
             let texture_storage = renderer.get_textures();
-            let texture_storage_lock = texture_storage.lock().unwrap();
-            let texture = texture_storage_lock.get(texture_id)?;
+            let texture_storage = texture_storage.read().unwrap();
+            let texture = texture_storage.get(texture_id)?;
 
             match self.shape {
                 ComponentShape::Rectangle => renderer.get_drawable_with_type_mut::<Rectangle>(self.filling_id)?.set_texture(texture),
@@ -679,8 +679,8 @@ impl Component for Button {
         }
 
         let font_storage = renderer.get_fonts();
-        let font_storage_lock = font_storage.lock().unwrap();
-        let font = font_storage_lock.get(self.label_font_id)?;
+        let font_storage = font_storage.read().unwrap();
+        let font = font_storage.get(self.label_font_id)?;
         let label = renderer.get_drawable_with_type_mut::<Text>(self.label_id)?;
         label.set_font(font);
         label.set_text(&self.label_text);

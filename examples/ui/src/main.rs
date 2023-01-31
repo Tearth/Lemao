@@ -9,10 +9,8 @@ use lemao_core::lemao_math::gradient::GradientType;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::drawable::Color;
 use lemao_core::renderer::fonts::bff;
-use lemao_core::renderer::fonts::storage::FontStorage;
 use lemao_core::renderer::fonts::Font;
 use lemao_core::renderer::textures::bmp;
-use lemao_core::renderer::textures::storage::TextureStorage;
 use lemao_core::renderer::textures::Texture;
 use lemao_core::window::context::WindowContext;
 use lemao_ui::components::button::Button;
@@ -33,13 +31,8 @@ use lemao_ui::components::ComponentSize;
 use lemao_ui::components::HorizontalAlignment;
 use lemao_ui::context::UiContext;
 use lemao_ui::events::UiEvent;
-use std::sync::Arc;
-use std::sync::Mutex;
 
 pub fn main() -> Result<(), String> {
-    let textures = Arc::new(Mutex::new(TextureStorage::default()));
-    let fonts = Arc::new(Mutex::new(FontStorage::default()));
-
     let window_position = Default::default();
     let window_size = Vec2::new(1366.0, 768.0);
 
@@ -48,7 +41,7 @@ pub fn main() -> Result<(), String> {
         Err(message) => panic!("{}", message),
     };
 
-    let mut renderer = match window.create_renderer(textures.clone(), fonts.clone()) {
+    let mut renderer = match window.create_renderer() {
         Ok(renderer) => renderer,
         Err(message) => panic!("{}", message),
     };
@@ -68,13 +61,24 @@ pub fn main() -> Result<(), String> {
     bold_font.set_character(201, Vec2::new(0.0, 3.0), &hammer_icon);
     bold_font.set_character(202, Vec2::new(0.0, 3.0), &happiness_icon);
 
-    let regular_font_id = fonts.lock().unwrap().store(Font::new(&renderer, &regular_font));
-    let bold_font_id = fonts.lock().unwrap().store(Font::new(&renderer, &bold_font));
-    let header_font_id = fonts.lock().unwrap().store(Font::new(&renderer, &header_font));
-    let texture_id = textures.lock().unwrap().store(Texture::new(&renderer, &bmp::load("./assets/wheat.bmp")?));
-    let box_checked_id = textures.lock().unwrap().store(Texture::new(&renderer, &bmp::load("./assets/box_checked.bmp")?));
-    let box_unchecked_id = textures.lock().unwrap().store(Texture::new(&renderer, &bmp::load("./assets/box_unchecked.bmp")?));
+    let font_storage = renderer.get_fonts();
+    let mut font_storage = font_storage.write().unwrap();
+
+    let regular_font_id = font_storage.store(Font::new(&renderer, &regular_font));
+    let bold_font_id = font_storage.store(Font::new(&renderer, &bold_font));
+    let header_font_id = font_storage.store(Font::new(&renderer, &header_font));
+
+    drop(font_storage);
+
+    let texture_storage = renderer.get_textures();
+    let mut texture_storage = texture_storage.write().unwrap();
+
+    let texture_id = texture_storage.store(Texture::new(&renderer, &bmp::load("./assets/wheat.bmp")?));
+    let box_checked_id = texture_storage.store(Texture::new(&renderer, &bmp::load("./assets/box_checked.bmp")?));
+    let box_unchecked_id = texture_storage.store(Texture::new(&renderer, &bmp::load("./assets/box_unchecked.bmp")?));
     let mut ui = UiContext::new(&mut renderer)?;
+
+    drop(texture_storage);
 
     let mut progressbar_background_gradient = Gradient::new(GradientType::Vertical, Vec2::new(0.0, 0.0));
     progressbar_background_gradient.steps.push(GradientStep::new(SolidColor::new_rgb(72, 79, 92, 255), 0.0));
@@ -163,9 +167,12 @@ pub fn main() -> Result<(), String> {
     window_title.set_shadow_color(Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 1.0)));
     ui.get_component_mut(main_window_id)?.add_child(window_title_id);
 
+    let texture_storage = renderer.get_textures();
+    let texture_storage = texture_storage.read().unwrap();
+
     let image_id = ui.create_panel(&mut renderer, ComponentShape::Rectangle)?;
     let image = ui.get_component_with_type_mut::<Panel>(image_id)?;
-    image.set_texture(textures.lock().unwrap().get(texture_id)?);
+    image.set_texture(texture_storage.get(texture_id)?);
     image.set_size(ComponentSize::Absolute(Vec2::new(300.0, 150.0)));
     image.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0)));
     image.set_anchor(Vec2::new(0.0, 1.0));
@@ -175,6 +182,8 @@ pub fn main() -> Result<(), String> {
     image.set_border_thickness(ComponentBorderThickness::new(1.0, 1.0, 1.0, 1.0))?;
     image.set_corner_rounding(ComponentCornerRounding::new(4.0, 4.0, 4.0, 4.0));
     ui.get_component_mut(main_window_id)?.add_child(image_id);
+
+    drop(texture_storage);
 
     let mut quote_panel_gradient = Gradient::new(GradientType::Vertical, Vec2::new(0.0, 0.0));
     quote_panel_gradient.steps.push(GradientStep::new(SolidColor::new_rgb(96, 97, 115, 0), 0.0));

@@ -10,15 +10,11 @@ use lemao_core::renderer::drawable::rectangle::Rectangle;
 use lemao_core::renderer::drawable::text::Text;
 use lemao_core::renderer::drawable::Drawable;
 use lemao_core::renderer::fonts::bff;
-use lemao_core::renderer::fonts::storage::FontStorage;
 use lemao_core::renderer::fonts::Font;
-use lemao_core::renderer::textures::storage::TextureStorage;
 use lemao_core::renderer::textures::RawTexture;
 use lemao_core::renderer::textures::Texture;
 use lemao_core::window::context::CoordinationSystem;
 use lemao_core::window::context::WindowContext;
-use std::sync::Arc;
-use std::sync::Mutex;
 
 #[rustfmt::skip]
 const DESCRIPTION: &str = 
@@ -26,24 +22,36 @@ const DESCRIPTION: &str =
  LMB - put white pixel";
 
 pub fn main() -> Result<(), String> {
-    let textures = Arc::new(Mutex::new(TextureStorage::default()));
-    let fonts = Arc::new(Mutex::new(FontStorage::default()));
-
     let window_position = Default::default();
     let window_size = Vec2::new(1366.0, 768.0);
 
     let mut window = WindowContext::new("Paint", WindowStyle::Window { position: window_position, size: window_size })?;
-    let mut renderer = window.create_renderer(textures.clone(), fonts.clone())?;
+    let mut renderer = window.create_renderer()?;
 
     let mut texture_data = vec![0; (window_size.x * window_size.y * 4.0) as usize];
-    let texture_id = textures.lock().unwrap().store(Texture::new(&renderer, &RawTexture::new(window_size, texture_data.clone())));
-    let font_id = fonts.lock().unwrap().store(Font::new(&renderer, &bff::load("./assets/inconsolata.bff")?));
+
+    let texture_storage = renderer.get_textures();
+    let mut texture_storage = texture_storage.write().unwrap();
+    let texture_id = texture_storage.store(Texture::new(&renderer, &RawTexture::new(window_size, texture_data.clone())));
+
+    drop(texture_storage);
+
+    let font_storage = renderer.get_fonts();
+    let mut font_storage = font_storage.write().unwrap();
+    let font_id = font_storage.store(Font::new(&renderer, &bff::load("./assets/inconsolata.bff")?));
+
+    drop(font_storage);
 
     let sprite_id = renderer.create_rectangle()?;
     let description_text_id = renderer.create_text(font_id)?;
 
+    let texture_storage = renderer.get_textures();
+    let texture_storage = texture_storage.read().unwrap();
+
     let sprite = renderer.get_drawable_with_type_mut::<Rectangle>(sprite_id)?;
-    sprite.set_texture(textures.lock().unwrap().get(texture_id)?);
+    sprite.set_texture(texture_storage.get(texture_id)?);
+
+    drop(texture_storage);
 
     let description_text = renderer.get_drawable_with_type_mut::<Text>(description_text_id)?;
     description_text.set_text(DESCRIPTION);
@@ -82,7 +90,8 @@ pub fn main() -> Result<(), String> {
                 texture_data[index * 4 + 2] = 255;
                 texture_data[index * 4 + 3] = 255;
 
-                let texture_storage = textures.lock().unwrap();
+                let texture_storage = renderer.get_textures();
+                let texture_storage = texture_storage.read().unwrap();
                 let texture = texture_storage.get(texture_id).unwrap();
                 texture.set_data(window_size, &texture_data);
             }

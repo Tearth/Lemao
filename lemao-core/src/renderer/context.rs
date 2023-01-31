@@ -32,7 +32,7 @@ use std::ffi::c_void;
 use std::fs;
 use std::rc::Rc;
 use std::sync::Arc;
-use std::sync::Mutex;
+use std::sync::RwLock;
 
 pub struct RendererContext {
     pub(crate) gl: Rc<OpenGLPointers>,
@@ -49,8 +49,8 @@ pub struct RendererContext {
     default_texture_id: usize,
 
     renderer_platform_specific: Box<dyn RendererPlatformSpecific>,
-    textures: Arc<Mutex<TextureStorage>>,
-    fonts: Arc<Mutex<FontStorage>>,
+    textures: Arc<RwLock<TextureStorage>>,
+    fonts: Arc<RwLock<FontStorage>>,
     cameras: Option<CameraStorage>,
     shaders: Option<ShaderStorage>,
     drawables: Option<DrawableStorage>,
@@ -59,12 +59,7 @@ pub struct RendererContext {
 }
 
 impl RendererContext {
-    pub fn new(
-        renderer_platform_specific: Box<dyn RendererPlatformSpecific>,
-        viewport_size: Vec2,
-        textures: Arc<Mutex<TextureStorage>>,
-        fonts: Arc<Mutex<FontStorage>>,
-    ) -> Result<Self, String> {
+    pub fn new(renderer_platform_specific: Box<dyn RendererPlatformSpecific>, viewport_size: Vec2) -> Result<Self, String> {
         Ok(RendererContext {
             gl: Default::default(),
 
@@ -80,8 +75,8 @@ impl RendererContext {
             default_texture_id: 0,
 
             renderer_platform_specific,
-            textures,
-            fonts,
+            textures: Arc::new(RwLock::new(Default::default())),
+            fonts: Arc::new(RwLock::new(Default::default())),
             shaders: None,
             drawables: None,
             cameras: None,
@@ -179,7 +174,7 @@ impl RendererContext {
 
     pub fn init_default_texture(&mut self) {
         let texture = Texture::new(self, &RawTexture::new(Vec2::new(1.0, 1.0), vec![255, 255, 255, 255]));
-        self.default_texture_id = self.textures.lock().unwrap().store(texture);
+        self.default_texture_id = self.textures.write().unwrap().store(texture);
     }
 
     pub fn init_batch_renderer(&mut self) {
@@ -261,16 +256,16 @@ impl RendererContext {
         self.set_camera_as_active(self.default_camera_id)
     }
 
-    pub fn get_fonts(&self) -> Arc<Mutex<FontStorage>> {
+    pub fn get_fonts(&self) -> Arc<RwLock<FontStorage>> {
         self.fonts.clone()
     }
 
-    pub fn get_textures(&self) -> Arc<Mutex<TextureStorage>> {
+    pub fn get_textures(&self) -> Arc<RwLock<TextureStorage>> {
         self.textures.clone()
     }
 
     pub fn create_animation(&mut self, texture_id: usize, tile_size: Vec2) -> Result<usize, String> {
-        let texture_storage = self.textures.lock().unwrap();
+        let texture_storage = self.textures.read().unwrap();
         let texture = texture_storage.get(texture_id)?;
         let animation = Box::new(Animation::new(self, texture, tile_size));
 
@@ -278,7 +273,7 @@ impl RendererContext {
     }
 
     pub fn create_circle(&mut self, radius: f32, sides: u32) -> Result<usize, String> {
-        let texture_storage = self.textures.lock().unwrap();
+        let texture_storage = self.textures.read().unwrap();
         let texture = texture_storage.get(self.default_texture_id)?;
         let circle = Box::new(Circle::new(self, texture, radius, sides));
 
@@ -286,7 +281,7 @@ impl RendererContext {
     }
 
     pub fn create_disc(&mut self, radius: f32, sides: u32) -> Result<usize, String> {
-        let texture_storage = self.textures.lock().unwrap();
+        let texture_storage = self.textures.read().unwrap();
         let texture = texture_storage.get(self.default_texture_id)?;
         let disc = Box::new(Disc::new(self, texture, radius, sides));
 
@@ -294,7 +289,7 @@ impl RendererContext {
     }
 
     pub fn create_frame(&mut self, size: Vec2) -> Result<usize, String> {
-        let texture_storage = self.textures.lock().unwrap();
+        let texture_storage = self.textures.read().unwrap();
         let texture = texture_storage.get(self.default_texture_id)?;
         let frame = Box::new(Frame::new(self, texture, size));
 
@@ -303,7 +298,7 @@ impl RendererContext {
 
     pub fn create_line(&mut self, from: Vec2, to: Vec2) -> Result<usize, String> {
         let shape = self.shapes.as_ref().unwrap().get(self.default_line_shape_id)?;
-        let texture_storage = self.textures.lock().unwrap();
+        let texture_storage = self.textures.read().unwrap();
         let texture = texture_storage.get(self.default_texture_id)?;
         let line = Box::new(Line::new(self, shape, texture, from, to));
 
@@ -312,7 +307,7 @@ impl RendererContext {
 
     pub fn create_rectangle(&mut self) -> Result<usize, String> {
         let shape = self.shapes.as_ref().unwrap().get(self.default_rectangle_shape_id)?;
-        let texture_storage = self.textures.lock().unwrap();
+        let texture_storage = self.textures.read().unwrap();
         let texture = texture_storage.get(self.default_texture_id)?;
         let rectangle = Box::new(Rectangle::new(self, shape, texture));
 
@@ -320,7 +315,7 @@ impl RendererContext {
     }
 
     pub fn create_text(&mut self, font_id: usize) -> Result<usize, String> {
-        let font_storage = self.fonts.lock().unwrap();
+        let font_storage = self.fonts.read().unwrap();
         let font = font_storage.get(font_id)?;
         let text = Box::new(Text::new(self, font));
 
