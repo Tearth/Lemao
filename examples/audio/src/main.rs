@@ -1,5 +1,4 @@
 use lemao_core::audio::context::AudioContext;
-use lemao_core::audio::samples::storage::SampleStorage;
 use lemao_core::audio::samples::wav;
 use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_common_platform::input::Key;
@@ -11,8 +10,6 @@ use lemao_core::renderer::drawable::Drawable;
 use lemao_core::renderer::fonts::bff;
 use lemao_core::renderer::fonts::Font;
 use lemao_core::window::context::WindowContext;
-use std::sync::Arc;
-use std::sync::Mutex;
 
 #[rustfmt::skip]
 const DESCRIPTION: &str = 
@@ -27,21 +24,24 @@ Volume:
  F - down";
 
 pub fn main() -> Result<(), String> {
-    let samples = Arc::new(Mutex::new(SampleStorage::default()));
-
     let window_position = Default::default();
     let window_size = Vec2::new(1366.0, 768.0);
 
     let mut window = WindowContext::new("Audio", WindowStyle::Window { position: window_position, size: window_size })?;
     let mut renderer = window.create_renderer()?;
-    let mut audio = AudioContext::new(samples.clone())?;
+    let mut audio = AudioContext::new()?;
 
     let font_storage = renderer.get_fonts();
     let mut font_storage = font_storage.write().unwrap();
     let font_id = font_storage.store(Font::new(&renderer, &bff::load("./assets/inconsolata.bff")?));
+
     drop(font_storage);
 
-    let chopin_sample_id = samples.lock().unwrap().store(wav::load(&audio, "./assets/chopin.wav")?);
+    let sample_storage = audio.get_samples();
+    let mut sample_storage = sample_storage.write().unwrap();
+    let chopin_sample_id = sample_storage.store(wav::load(&audio, "./assets/chopin.wav")?);
+
+    drop(sample_storage);
 
     let description_text_id = renderer.create_text(font_id)?;
     let status_text_id = renderer.create_text(font_id)?;

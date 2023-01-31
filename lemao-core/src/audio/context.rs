@@ -4,17 +4,17 @@ use super::sounds::Sound;
 use lemao_openal::bindings::openal;
 use std::ptr;
 use std::sync::Arc;
-use std::sync::Mutex;
+use std::sync::RwLock;
 
 pub struct AudioContext {
     device: *mut openal::ALCdevice_struct,
     context: *mut openal::ALCcontext_struct,
-    samples: Arc<Mutex<SampleStorage>>,
+    samples: Arc<RwLock<SampleStorage>>,
     sounds: SoundStorage,
 }
 
 impl AudioContext {
-    pub fn new(samples: Arc<Mutex<SampleStorage>>) -> Result<Self, String> {
+    pub fn new() -> Result<Self, String> {
         unsafe {
             let device_id = openal::alcOpenDevice(ptr::null());
             let error = openal::alcGetError(device_id);
@@ -37,15 +37,19 @@ impl AudioContext {
                 return Err(format!("Error while making context as current: {}", error));
             }
 
-            Ok(Self { device: device_id, context: context_id, samples, sounds: Default::default() })
+            Ok(Self { device: device_id, context: context_id, samples: Arc::new(RwLock::new(Default::default())), sounds: Default::default() })
         }
     }
 
     pub fn create_sound(&mut self, sample_id: usize) -> Result<usize, String> {
-        let sample_storage = self.samples.lock().unwrap();
+        let sample_storage = self.samples.read().unwrap();
         let sample = sample_storage.get(sample_id)?;
 
         Ok(self.sounds.store(Sound::new(sample)?))
+    }
+
+    pub fn get_samples(&self) -> Arc<RwLock<SampleStorage>> {
+        self.samples.clone()
     }
 
     pub fn get_sound(&self, sound_id: usize) -> Result<&Sound, String> {

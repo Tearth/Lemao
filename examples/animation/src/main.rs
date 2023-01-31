@@ -36,6 +36,7 @@ pub fn main() -> Result<(), String> {
     let font_storage = renderer.get_fonts();
     let mut font_storage = font_storage.write().unwrap();
     let font_id = font_storage.store(Font::new(&renderer, &bff::load("./assets/inconsolata.bff")?));
+
     drop(font_storage);
 
     let animation_id = renderer.create_animation(explosion_id, Vec2::new(128.0, 128.0)).unwrap();

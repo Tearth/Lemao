@@ -77,10 +77,10 @@ impl RendererContext {
             renderer_platform_specific,
             textures: Arc::new(RwLock::new(Default::default())),
             fonts: Arc::new(RwLock::new(Default::default())),
-            shaders: None,
-            drawables: None,
-            cameras: None,
-            shapes: None,
+            shaders: Some(Default::default()),
+            drawables: Some(Default::default()),
+            cameras: Some(Default::default()),
+            shapes: Some(Default::default()),
             batch_renderer: None,
         })
     }
@@ -93,7 +93,6 @@ impl RendererContext {
         // }
 
         self.set_viewport_size(self.viewport_size);
-        self.init_storages();
         self.init_default_camera()?;
         self.init_default_shaders()?;
         self.init_default_shapes();
@@ -101,13 +100,6 @@ impl RendererContext {
         self.init_batch_renderer();
 
         Ok(())
-    }
-
-    pub fn init_storages(&mut self) {
-        self.cameras = Some(Default::default());
-        self.shaders = Some(Default::default());
-        self.drawables = Some(Default::default());
-        self.shapes = Some(Default::default());
     }
 
     pub fn init_default_camera(&mut self) -> Result<(), String> {
