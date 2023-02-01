@@ -28,7 +28,8 @@ pub struct Circle {
     anchor: Vec2,
     color: Color,
     sides: u32,
-    angle: f32,
+    start_angle: f32,
+    end_angle: f32,
     thickness: Vec2,
     squircle_factor: f32,
     elements_count: u32,
@@ -54,7 +55,8 @@ impl Circle {
             anchor: Default::default(),
             color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             sides,
-            angle: 2.0 * std::f32::consts::PI,
+            start_angle: 0.0,
+            end_angle: 2.0 * std::f32::consts::PI,
             thickness: Vec2::new(1.0, 1.0),
             squircle_factor: 0.0,
             elements_count: 0,
@@ -108,12 +110,21 @@ impl Circle {
         self.update();
     }
 
-    pub fn get_angle(&self) -> f32 {
-        self.angle
+    pub fn get_start_angle(&self) -> f32 {
+        self.start_angle
     }
 
-    pub fn set_angle(&mut self, angle: f32) {
-        self.angle = angle;
+    pub fn set_start_angle(&mut self, angle: f32) {
+        self.start_angle = angle;
+        self.update();
+    }
+
+    pub fn get_end_angle(&self) -> f32 {
+        self.end_angle
+    }
+
+    pub fn set_end_angle(&mut self, angle: f32) {
+        self.end_angle = angle;
         self.update();
     }
 
@@ -137,13 +148,15 @@ impl Circle {
 
     fn update(&mut self) {
         unsafe {
-            let mut angle = 0.0f32;
+            let mut angle = self.start_angle;
+            let step = 2.0 * std::f32::consts::PI / (self.sides as f32);
             let radius = self.size / 2.0;
+            let mut last_fragment = false;
 
             self.vertices.clear();
             self.indices.clear();
 
-            for n in 0..self.sides {
+            for n in 0..self.sides + 1 {
                 let (x, y) = if self.squircle_factor == 0.0 || angle.sin().abs() < 0.00001 || angle.cos().abs() < 0.00001 {
                     (angle.cos(), angle.sin())
                 } else {
@@ -169,15 +182,18 @@ impl Circle {
                     self.indices.extend_from_slice(&[n * 2 - 2, n * 2 - 1, n * 2, n * 2 - 1, n * 2, n * 2 + 1]);
                 }
 
-                angle += 2.0 * std::f32::consts::PI / (self.sides as f32);
+                angle += step;
 
-                if angle > self.angle {
-                    break;
+                // Ensure that the disc is always drawn to the end
+                if angle >= self.end_angle - step / 2.0 {
+                    if !last_fragment {
+                        angle = self.end_angle;
+                        last_fragment = true;
+                        continue;
+                    } else if last_fragment {
+                        break;
+                    }
                 }
-            }
-
-            if self.angle == 2.0 * std::f32::consts::PI {
-                self.indices.extend_from_slice(&[self.sides * 2 - 2, self.sides * 2 - 1, 0, self.sides * 2 - 1, 0, 1]);
             }
 
             self.elements_count = self.indices.len() as u32;
