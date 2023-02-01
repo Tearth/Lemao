@@ -37,8 +37,12 @@ impl AudioContext {
                 return Err(format!("Error while making context as current: {}", error));
             }
 
-            Ok(Self { device: device_id, context: context_id, samples: Arc::new(RwLock::new(Default::default())), sounds: Default::default() })
+            Ok(Self { device: device_id, context: context_id, samples: Default::default(), sounds: Default::default() })
         }
+    }
+
+    pub fn get_samples(&self) -> Arc<RwLock<SampleStorage>> {
+        self.samples.clone()
     }
 
     pub fn create_sound(&mut self, sample_id: usize) -> Result<usize, String> {
@@ -46,10 +50,6 @@ impl AudioContext {
         let sample = sample_storage.get(sample_id)?;
 
         Ok(self.sounds.store(Sound::new(sample)?))
-    }
-
-    pub fn get_samples(&self) -> Arc<RwLock<SampleStorage>> {
-        self.samples.clone()
     }
 
     pub fn get_sound(&self, sound_id: usize) -> Result<&Sound, String> {

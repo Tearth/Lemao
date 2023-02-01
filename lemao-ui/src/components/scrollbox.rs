@@ -1040,9 +1040,11 @@ impl Component for Scrollbox {
         renderer.remove_drawable(self.vertical_scroll_id)?;
         renderer.remove_drawable(self.vertical_scroll_border_id)?;
         renderer.remove_drawable(self.vertical_scroll_background_id)?;
+        renderer.remove_drawable(self.vertical_scroll_background_border_id)?;
         renderer.remove_drawable(self.horizontal_scroll_id)?;
         renderer.remove_drawable(self.horizontal_scroll_border_id)?;
-        renderer.remove_drawable(self.horizontal_scroll_border_id)?;
+        renderer.remove_drawable(self.horizontal_scroll_background_id)?;
+        renderer.remove_drawable(self.horizontal_scroll_background_border_id)?;
 
         Ok(())
     }

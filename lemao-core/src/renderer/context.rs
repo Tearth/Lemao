@@ -75,8 +75,8 @@ impl RendererContext {
             default_texture_id: 0,
 
             renderer_platform_specific,
-            textures: Arc::new(RwLock::new(Default::default())),
-            fonts: Arc::new(RwLock::new(Default::default())),
+            textures: Default::default(),
+            fonts: Default::default(),
             shaders: Some(Default::default()),
             drawables: Some(Default::default()),
             cameras: Some(Default::default()),
