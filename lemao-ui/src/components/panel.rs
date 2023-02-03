@@ -43,6 +43,8 @@ pub struct Panel {
     shape: ComponentShape,
     color: Color,
     corner_rounding: ComponentCornerRounding,
+    start_angle: f32,
+    end_angle: f32,
     texture_id: Option<usize>,
     texture_original_size: Vec2,
 
@@ -94,6 +96,8 @@ impl Panel {
             shape,
             color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             corner_rounding: Default::default(),
+            start_angle: 0.0,
+            end_angle: std::f32::consts::PI * 2.0,
             texture_id: None,
             texture_original_size: Default::default(),
 
@@ -148,6 +152,24 @@ impl Panel {
 
     pub fn set_corner_rounding(&mut self, corner_rounding: ComponentCornerRounding) {
         self.corner_rounding = corner_rounding;
+        self.dirty = true;
+    }
+
+    pub fn get_start_angle(&self) -> f32 {
+        self.start_angle
+    }
+
+    pub fn set_start_angle(&mut self, start_angle: f32) {
+        self.start_angle = start_angle;
+        self.dirty = true;
+    }
+
+    pub fn get_end_angle(&self) -> f32 {
+        self.end_angle
+    }
+
+    pub fn set_end_angle(&mut self, end_angle: f32) {
+        self.end_angle = end_angle;
         self.dirty = true;
     }
 
@@ -256,7 +278,13 @@ impl Panel {
             let normalized_point = point - component_center;
             let scaled_point = normalized_point * Vec2::new(1.0, scale);
 
-            scaled_point.distance(Vec2::new(0.0, 0.0)) <= self.screen_size.x / 2.0
+            let mut angle = Vec2::new_from_angle(self.start_angle).signed_angle(point - component_center);
+            if angle < 0.0 {
+                angle += std::f32::consts::PI * 2.0;
+            }
+
+            let within_angle = angle >= 0.0 && angle <= self.end_angle - self.start_angle;
+            within_angle && scaled_point.distance(Vec2::new(0.0, 0.0)) <= self.screen_size.x / 2.0
         }
     }
 }
@@ -456,9 +484,12 @@ impl Component for Panel {
 
             match self.shape {
                 ComponentShape::Rectangle => renderer.get_drawable_with_type_mut::<Frame>(self.border_id)?.set_thickness(self.border_thickness.into()),
-                ComponentShape::Disc => renderer
-                    .get_drawable_with_type_mut::<Circle>(self.border_id)?
-                    .set_thickness(Vec2::new(self.border_thickness.left, self.border_thickness.top)),
+                ComponentShape::Disc => {
+                    let circle = renderer.get_drawable_with_type_mut::<Circle>(self.border_id)?;
+                    circle.set_thickness(Vec2::new(self.border_thickness.left, self.border_thickness.top));
+                    circle.set_start_angle(self.start_angle);
+                    circle.set_end_angle(self.end_angle);
+                }
             }
 
             self.screen_position += Vec2::new(self.border_thickness.left, self.border_thickness.bottom);
@@ -485,9 +516,22 @@ impl Component for Panel {
 
         renderer.get_drawable_mut(self.filling_id)?.set_size(self.screen_size);
 
-        if self.shape == ComponentShape::Rectangle {
-            renderer.get_drawable_with_type_mut::<Rectangle>(self.filling_id)?.set_corner_rounding(self.corner_rounding.into());
-            renderer.get_drawable_with_type_mut::<Frame>(self.border_id)?.set_corner_rounding(self.corner_rounding.into());
+        if self.shape == ComponentShape::Rectangle {}
+
+        match self.shape {
+            ComponentShape::Rectangle => {
+                renderer.get_drawable_with_type_mut::<Rectangle>(self.filling_id)?.set_corner_rounding(self.corner_rounding.into());
+                renderer.get_drawable_with_type_mut::<Frame>(self.border_id)?.set_corner_rounding(self.corner_rounding.into())
+            }
+            ComponentShape::Disc => {
+                let filling = renderer.get_drawable_with_type_mut::<Disc>(self.filling_id)?;
+                filling.set_start_angle(self.start_angle);
+                filling.set_end_angle(self.end_angle);
+
+                let border = renderer.get_drawable_with_type_mut::<Circle>(self.border_id)?;
+                border.set_start_angle(self.start_angle);
+                border.set_end_angle(self.end_angle);
+            }
         }
 
         if self.shadow_enabled {
@@ -498,8 +542,15 @@ impl Component for Panel {
             shadow.set_color(self.shadow_color.clone());
             shadow.set_scale(self.shadow_scale);
 
-            if let Ok(rectangle) = renderer.get_drawable_with_type_mut::<Rectangle>(self.shadow_id) {
-                rectangle.set_corner_rounding(self.shadow_corner_rounding.into());
+            match self.shape {
+                ComponentShape::Rectangle => {
+                    renderer.get_drawable_with_type_mut::<Rectangle>(self.shadow_id)?.set_corner_rounding(self.shadow_corner_rounding.into());
+                }
+                ComponentShape::Disc => {
+                    let filling = renderer.get_drawable_with_type_mut::<Disc>(self.shadow_id)?;
+                    filling.set_start_angle(self.start_angle);
+                    filling.set_end_angle(self.end_angle);
+                }
             }
         }
 

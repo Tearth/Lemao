@@ -49,6 +49,7 @@ pub fn main() -> Result<(), String> {
     let coin_icon = bmp::load("./assets/coin.bmp")?;
     let hammer_icon = bmp::load("./assets/hammer.bmp")?;
     let happiness_icon = bmp::load("./assets/happiness.bmp")?;
+    let blank_icon = bmp::load("./assets/blank.bmp")?;
     let header_font = bff::load("./assets/header.bff")?;
     let mut regular_font = bff::load("./assets/regular.bff")?;
     let mut bold_font = bff::load("./assets/bold.bff")?;
@@ -56,6 +57,7 @@ pub fn main() -> Result<(), String> {
     regular_font.set_character(200, Vec2::new(0.0, 4.0), &coin_icon);
     regular_font.set_character(201, Vec2::new(0.0, 3.0), &hammer_icon);
     regular_font.set_character(202, Vec2::new(0.0, 3.0), &happiness_icon);
+    regular_font.set_character(203, Vec2::new(0.0, 3.0), &blank_icon);
 
     bold_font.set_character(200, Vec2::new(0.0, 4.0), &coin_icon);
     bold_font.set_character(201, Vec2::new(0.0, 3.0), &hammer_icon);
@@ -80,6 +82,7 @@ pub fn main() -> Result<(), String> {
 
     drop(texture_storage);
 
+    /* #region Progress bar */
     let mut progressbar_background_gradient = Gradient::new(GradientType::Vertical, Vec2::new(0.0, 0.0));
     progressbar_background_gradient.steps.push(GradientStep::new(SolidColor::new_rgb(72, 79, 92, 255), 0.0));
     progressbar_background_gradient.steps.push(GradientStep::new(SolidColor::new_rgb(8, 12, 20, 255), 0.5));
@@ -126,7 +129,9 @@ pub fn main() -> Result<(), String> {
     progressbar.set_label_shadow_offset(Vec2::new(1.0, -1.0));
     progressbar.set_label_shadow_color(Color::SolidColor(SolidColor::new_rgb(0, 0, 0, 120)));
     ui.get_main_canvas_mut()?.add_child(progressbar_id);
+    /* #endregion */
 
+    /* #region Main window */
     let mut window_filling_gradient = Gradient::new(GradientType::Radial, Vec2::new(0.3, -0.3));
     window_filling_gradient.steps.push(GradientStep::new(SolidColor::new_rgb(66, 90, 150, 255), 0.0));
     window_filling_gradient.steps.push(GradientStep::new(SolidColor::new_rgb(50, 67, 114, 255), 1.0));
@@ -357,7 +362,9 @@ pub fn main() -> Result<(), String> {
         button.set_shadow_color(button.get_shadow_color().clone().set_alpha(1.0));
     });
     ui.get_component_mut(main_window_id)?.add_child(ok_button_id);
+    /* #endregion */
 
+    /* #region Right side window */
     let right_window_id = ui.create_panel(&mut renderer, ComponentShape::Rectangle)?;
     let right_window = ui.get_component_with_type_mut::<Panel>(right_window_id)?;
     right_window.set_position(ComponentPosition::RelativeToParent(Vec2::new(1.0, 0.5)));
@@ -565,7 +572,9 @@ pub fn main() -> Result<(), String> {
 
         slider_ids.push(slider_id);
     }
+    /* #endregion */
 
+    /* #region Left side window */
     let left_window_id = ui.create_panel(&mut renderer, ComponentShape::Rectangle)?;
     let left_window = ui.get_component_with_type_mut::<Panel>(left_window_id)?;
     left_window.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.0, 0.5)));
@@ -582,6 +591,90 @@ pub fn main() -> Result<(), String> {
     left_window.set_shadow_corner_rounding(ComponentCornerRounding::new(20.0, 20.0, 20.0, 20.0))?;
     left_window.set_shadow_scale(Vec2::new(1.03, 1.03));
     ui.get_main_canvas_mut()?.add_child(left_window_id);
+
+    let left_window_title_id = ui.create_label(&mut renderer, header_font_id)?;
+    let left_window_title = ui.get_component_with_type_mut::<Label>(left_window_title_id)?;
+    left_window_title.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.5, 1.0)));
+    left_window_title.set_anchor(Vec2::new(0.5, 0.5));
+    left_window_title.set_offset(Vec2::new(0.0, -27.0));
+    left_window_title.set_text("Statistics".to_string());
+    left_window_title.set_shadow_enabled_flag(true);
+    left_window_title.set_shadow_offset(Vec2::new(1.0, -1.0));
+    left_window_title.set_shadow_color(Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 1.0)));
+    ui.get_component_mut(left_window_id)?.add_child(left_window_title_id);
+
+    let mut pie_chart_1_filling_gradient = Gradient::new(GradientType::Radial, Vec2::new(0.0, 0.0));
+    pie_chart_1_filling_gradient.steps.push(GradientStep::new(SolidColor::new_rgb(254, 135, 177, 255), 0.0));
+    pie_chart_1_filling_gradient.steps.push(GradientStep::new(SolidColor::new_rgb(234, 95, 137, 255), 1.0));
+
+    let pie_chart_1_id = ui.create_panel(&mut renderer, ComponentShape::Disc)?;
+    let pie_chart_1 = ui.get_component_with_type_mut::<Panel>(pie_chart_1_id)?;
+    pie_chart_1.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.5, 1.0)));
+    pie_chart_1.set_offset(Vec2::new(0.0, -180.0));
+    pie_chart_1.set_size(ComponentSize::Absolute(Vec2::new(250.0, 250.0)));
+    pie_chart_1.set_anchor(Vec2::new(0.5, 0.5));
+    pie_chart_1.set_color(Color::Gradient(pie_chart_1_filling_gradient));
+    pie_chart_1.set_border_color(Color::SolidColor(SolidColor::new_rgb(0, 0, 0, 255)));
+    pie_chart_1.set_border_thickness(ComponentBorderThickness::new(1.0, 1.0, 1.0, 1.0))?;
+    pie_chart_1.set_start_angle(0.0);
+    pie_chart_1.set_end_angle(std::f32::consts::PI * 0.7);
+    pie_chart_1.on_cursor_enter = Some(|panel, _| panel.set_color(panel.get_color().clone().set_alpha(0.5)));
+    pie_chart_1.on_cursor_leave = Some(|panel, _| panel.set_color(panel.get_color().clone().set_alpha(1.0)));
+    ui.get_component_mut(left_window_id)?.add_child(pie_chart_1_id);
+
+    let mut pie_chart_2_filling_gradient = Gradient::new(GradientType::Radial, Vec2::new(0.0, 0.0));
+    pie_chart_2_filling_gradient.steps.push(GradientStep::new(SolidColor::new_rgb(175, 69, 166, 255), 0.0));
+    pie_chart_2_filling_gradient.steps.push(GradientStep::new(SolidColor::new_rgb(135, 29, 126, 255), 1.0));
+
+    let pie_chart_2_id = ui.create_panel(&mut renderer, ComponentShape::Disc)?;
+    let pie_chart_2 = ui.get_component_with_type_mut::<Panel>(pie_chart_2_id)?;
+    pie_chart_2.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.5, 1.0)));
+    pie_chart_2.set_offset(Vec2::new(0.0, -180.0));
+    pie_chart_2.set_size(ComponentSize::Absolute(Vec2::new(250.0, 250.0)));
+    pie_chart_2.set_anchor(Vec2::new(0.5, 0.5));
+    pie_chart_2.set_color(Color::Gradient(pie_chart_2_filling_gradient));
+    pie_chart_2.set_border_color(Color::SolidColor(SolidColor::new_rgb(0, 0, 0, 255)));
+    pie_chart_2.set_border_thickness(ComponentBorderThickness::new(1.0, 1.0, 1.0, 1.0))?;
+    pie_chart_2.set_start_angle(std::f32::consts::PI * 0.7);
+    pie_chart_2.set_end_angle(std::f32::consts::PI * 1.3);
+    pie_chart_2.on_cursor_enter = Some(|panel, _| panel.set_color(panel.get_color().clone().set_alpha(0.5)));
+    pie_chart_2.on_cursor_leave = Some(|panel, _| panel.set_color(panel.get_color().clone().set_alpha(1.0)));
+    ui.get_component_mut(left_window_id)?.add_child(pie_chart_2_id);
+
+    let mut pie_chart_3_filling_gradient = Gradient::new(GradientType::Radial, Vec2::new(0.0, 0.0));
+    pie_chart_3_filling_gradient.steps.push(GradientStep::new(SolidColor::new_rgb(147, 82, 186, 255), 0.0));
+    pie_chart_3_filling_gradient.steps.push(GradientStep::new(SolidColor::new_rgb(107, 42, 146, 255), 1.0));
+
+    let pie_chart_3_id = ui.create_panel(&mut renderer, ComponentShape::Disc)?;
+    let pie_chart_3 = ui.get_component_with_type_mut::<Panel>(pie_chart_3_id)?;
+    pie_chart_3.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.5, 1.0)));
+    pie_chart_3.set_offset(Vec2::new(0.0, -180.0));
+    pie_chart_3.set_size(ComponentSize::Absolute(Vec2::new(250.0, 250.0)));
+    pie_chart_3.set_anchor(Vec2::new(0.5, 0.5));
+    pie_chart_3.set_color(Color::Gradient(pie_chart_3_filling_gradient));
+    pie_chart_3.set_border_color(Color::SolidColor(SolidColor::new_rgb(0, 0, 0, 255)));
+    pie_chart_3.set_border_thickness(ComponentBorderThickness::new(1.0, 1.0, 1.0, 1.0))?;
+    pie_chart_3.set_start_angle(std::f32::consts::PI * 1.3);
+    pie_chart_3.set_end_angle(std::f32::consts::PI * 2.0);
+    pie_chart_3.on_cursor_enter = Some(|panel, _| panel.set_color(panel.get_color().clone().set_alpha(0.5)));
+    pie_chart_3.on_cursor_leave = Some(|panel, _| panel.set_color(panel.get_color().clone().set_alpha(1.0)));
+    ui.get_component_mut(left_window_id)?.add_child(pie_chart_3_id);
+
+    let pie_chart_legend_id = ui.create_label(&mut renderer, regular_font_id)?;
+    let pie_chart_legend = ui.get_component_with_type_mut::<Label>(pie_chart_legend_id)?;
+    pie_chart_legend.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.5, 1.0)));
+    pie_chart_legend.set_anchor(Vec2::new(0.5, 1.0));
+    pie_chart_legend.set_offset(Vec2::new(0.0, -320.0));
+    pie_chart_legend.set_text(
+        "°254,135,177,255°\u{CB}°255,255,255,255° - import ".to_string()
+            + "°175,69,166,255°\u{CB}°255,255,255,255° - export "
+            + "°147,82,186,255°\u{CB}°255,255,255,255° - domestic",
+    );
+    pie_chart_legend.set_shadow_enabled_flag(true);
+    pie_chart_legend.set_shadow_offset(Vec2::new(1.0, -1.0));
+    pie_chart_legend.set_shadow_color(Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 0.5)));
+    ui.get_component_mut(left_window_id)?.add_child(pie_chart_legend_id);
+    /* #endregion */
 
     let mut is_running = true;
 
@@ -693,6 +786,11 @@ pub fn main() -> Result<(), String> {
         }
 
         ui.draw(&mut renderer, left_window_id)?;
+        ui.draw(&mut renderer, left_window_title_id)?;
+        ui.draw(&mut renderer, pie_chart_1_id)?;
+        ui.draw(&mut renderer, pie_chart_2_id)?;
+        ui.draw(&mut renderer, pie_chart_3_id)?;
+        ui.draw(&mut renderer, pie_chart_legend_id)?;
 
         window.swap_buffers();
     }

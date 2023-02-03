@@ -148,7 +148,10 @@ impl Circle {
 
     fn update(&mut self) {
         unsafe {
-            let mut angle = self.start_angle;
+            let fixed_start_angle = self.start_angle + std::f32::consts::PI / 2.0;
+            let fixed_end_angle = self.end_angle + std::f32::consts::PI / 2.0;
+
+            let mut angle = fixed_start_angle;
             let step = 2.0 * std::f32::consts::PI / (self.sides as f32);
             let radius = self.size / 2.0;
             let mut last_fragment = false;
@@ -185,9 +188,9 @@ impl Circle {
                 angle += step;
 
                 // Ensure that the disc is always drawn to the end
-                if angle >= self.end_angle - step / 2.0 {
+                if angle >= fixed_end_angle - step / 2.0 {
                     if !last_fragment {
-                        angle = self.end_angle;
+                        angle = fixed_end_angle;
                         last_fragment = true;
                         continue;
                     } else if last_fragment {
