@@ -440,12 +440,12 @@ impl ProgressBar {
             }
         }
 
-        let scale = self.screen_size.x / self.screen_size.y;
-        let component_center = self.screen_position + self.screen_size / 2.0;
-        let normalized_point = point - component_center;
-        let scaled_point = normalized_point * Vec2::new(1.0, scale);
+        let x1 = self.screen_position.x;
+        let y1 = self.screen_position.y;
+        let x2 = self.screen_position.x + self.screen_size.x;
+        let y2 = self.screen_position.y + self.screen_size.y;
 
-        scaled_point.distance(Vec2::new(0.0, 0.0)) <= self.screen_size.x / 2.0
+        point.x >= x1 && point.y >= y1 && point.x <= x2 && point.y <= y2
     }
 }
 

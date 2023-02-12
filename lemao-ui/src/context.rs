@@ -7,6 +7,7 @@ use crate::components::progressbar::ProgressBar;
 use crate::components::scrollbox::Scrollbox;
 use crate::components::slider::Slider;
 use crate::components::textbox::TextBox;
+use crate::components::wire::Wire;
 use crate::components::Component;
 use crate::components::ComponentPosition;
 use crate::components::ComponentShape;
@@ -145,6 +146,14 @@ impl UiContext {
         let id = self.get_free_component_id();
         let textbox = Box::new(TextBox::new(id, renderer, label_font_id)?);
         self.components[id] = Some(textbox);
+
+        Ok(id)
+    }
+
+    pub fn create_wire(&mut self, renderer: &mut RendererContext) -> Result<usize, String> {
+        let id = self.get_free_component_id();
+        let wire = Box::new(Wire::new(id, renderer)?);
+        self.components[id] = Some(wire);
 
         Ok(id)
     }

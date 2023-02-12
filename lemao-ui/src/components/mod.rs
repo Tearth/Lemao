@@ -15,6 +15,7 @@ pub mod progressbar;
 pub mod scrollbox;
 pub mod slider;
 pub mod textbox;
+pub mod wire;
 
 #[derive(Copy, Clone, Debug)]
 pub enum ComponentPosition {

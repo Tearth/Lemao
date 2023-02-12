@@ -21,6 +21,8 @@ use lemao_ui::components::progressbar::ProgressBar;
 use lemao_ui::components::scrollbox::Scrollbox;
 use lemao_ui::components::slider::Slider;
 use lemao_ui::components::textbox::TextBox;
+use lemao_ui::components::wire::Wire;
+use lemao_ui::components::wire::WireChunkData;
 use lemao_ui::components::Component;
 use lemao_ui::components::ComponentBorderThickness;
 use lemao_ui::components::ComponentCornerRounding;
@@ -674,6 +676,33 @@ pub fn main() -> Result<(), String> {
     pie_chart_legend.set_shadow_offset(Vec2::new(1.0, -1.0));
     pie_chart_legend.set_shadow_color(Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 0.5)));
     ui.get_component_mut(left_window_id)?.add_child(pie_chart_legend_id);
+
+    let line_chart_id = ui.create_wire(&mut renderer)?;
+    let line_chart = ui.get_component_with_type_mut::<Wire>(line_chart_id)?;
+    line_chart.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.5, 1.0)));
+    line_chart.set_offset(Vec2::new(0.0, -480.0));
+    line_chart.set_size(ComponentSize::Absolute(Vec2::new(250.0, 250.0)));
+    line_chart.set_anchor(Vec2::new(0.5, 0.5));
+    line_chart.set_data(vec![
+        // Helper lines
+        WireChunkData::new(Color::SolidColor(SolidColor::new_rgb(255, 255, 255, 50)), Vec2::new(0.0, 0.2), Vec2::new(1.0, 0.2), 1.0),
+        WireChunkData::new(Color::SolidColor(SolidColor::new_rgb(255, 255, 255, 50)), Vec2::new(0.0, 0.4), Vec2::new(1.0, 0.4), 1.0),
+        WireChunkData::new(Color::SolidColor(SolidColor::new_rgb(255, 255, 255, 50)), Vec2::new(0.0, 0.6), Vec2::new(1.0, 0.6), 1.0),
+        WireChunkData::new(Color::SolidColor(SolidColor::new_rgb(255, 255, 255, 50)), Vec2::new(0.0, 0.8), Vec2::new(1.0, 0.8), 1.0),
+        // Data 1
+        WireChunkData::new(Color::SolidColor(SolidColor::new_rgb(150, 150, 255, 255)), Vec2::new(0.0, 0.0), Vec2::new(0.5, 0.5), 2.0),
+        WireChunkData::new(Color::SolidColor(SolidColor::new_rgb(150, 150, 255, 255)), Vec2::new(0.5, 0.5), Vec2::new(0.6, 0.4), 2.0),
+        WireChunkData::new(Color::SolidColor(SolidColor::new_rgb(150, 150, 255, 255)), Vec2::new(0.6, 0.4), Vec2::new(1.0, 1.0), 2.0),
+        // Data 2
+        WireChunkData::new(Color::SolidColor(SolidColor::new_rgb(255, 150, 150, 255)), Vec2::new(0.0, 1.0), Vec2::new(0.25, 0.6), 2.0),
+        WireChunkData::new(Color::SolidColor(SolidColor::new_rgb(255, 150, 150, 255)), Vec2::new(0.25, 0.6), Vec2::new(0.50, 0.4), 2.0),
+        WireChunkData::new(Color::SolidColor(SolidColor::new_rgb(255, 150, 150, 255)), Vec2::new(0.50, 0.4), Vec2::new(0.75, 0.2), 2.0),
+        WireChunkData::new(Color::SolidColor(SolidColor::new_rgb(255, 150, 150, 255)), Vec2::new(0.75, 0.2), Vec2::new(1.00, 0.15), 2.0),
+        // Axis
+        WireChunkData::new(Color::SolidColor(SolidColor::new_rgb(255, 255, 255, 255)), Vec2::new(0.0, 1.0), Vec2::new(0.0, 0.0), 1.0),
+        WireChunkData::new(Color::SolidColor(SolidColor::new_rgb(255, 255, 255, 255)), Vec2::new(0.0, 0.0), Vec2::new(1.0, 0.0), 1.0),
+    ]);
+    ui.get_component_mut(left_window_id)?.add_child(line_chart_id);
     /* #endregion */
 
     let mut is_running = true;
@@ -791,6 +820,7 @@ pub fn main() -> Result<(), String> {
         ui.draw(&mut renderer, pie_chart_2_id)?;
         ui.draw(&mut renderer, pie_chart_3_id)?;
         ui.draw(&mut renderer, pie_chart_legend_id)?;
+        ui.draw(&mut renderer, line_chart_id)?;
 
         window.swap_buffers();
     }
