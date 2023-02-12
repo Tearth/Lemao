@@ -6,7 +6,6 @@ use lemao_math::mat4x4::Mat4x4;
 use lemao_math::vec2::Vec2;
 use std::any::Any;
 
-pub mod animation;
 pub mod circle;
 pub mod disc;
 pub mod frame;
@@ -14,6 +13,7 @@ pub mod line;
 pub mod rectangle;
 pub mod storage;
 pub mod text;
+pub mod tilemap;
 
 #[derive(Clone, PartialEq)]
 pub enum Color {

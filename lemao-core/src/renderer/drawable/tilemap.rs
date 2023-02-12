@@ -12,7 +12,7 @@ use std::mem;
 use std::ptr;
 use std::rc::Rc;
 
-pub struct Animation {
+pub struct Tilemap {
     pub(crate) id: usize,
     pub(crate) vao_gl_id: u32,
     pub(crate) vbo_gl_id: u32,
@@ -35,10 +35,10 @@ pub struct Animation {
     indices: Vec<u32>,
 }
 
-impl Animation {
+impl Tilemap {
     pub fn new(renderer: &RendererContext, texture: &Texture, tile_size: Vec2) -> Self {
         let texture_size = texture.get_size();
-        let mut animation = Animation {
+        let mut tilemap = Tilemap {
             id: 0,
             vao_gl_id: 0,
             vbo_gl_id: 0,
@@ -62,27 +62,27 @@ impl Animation {
         };
 
         unsafe {
-            (animation.gl.glGenVertexArrays)(1, &mut animation.vao_gl_id);
-            (animation.gl.glBindVertexArray)(animation.vao_gl_id);
+            (tilemap.gl.glGenVertexArrays)(1, &mut tilemap.vao_gl_id);
+            (tilemap.gl.glBindVertexArray)(tilemap.vao_gl_id);
 
-            (animation.gl.glGenBuffers)(1, &mut animation.vbo_gl_id);
-            (animation.gl.glBindBuffer)(opengl::GL_ARRAY_BUFFER, animation.vbo_gl_id);
+            (tilemap.gl.glGenBuffers)(1, &mut tilemap.vbo_gl_id);
+            (tilemap.gl.glBindBuffer)(opengl::GL_ARRAY_BUFFER, tilemap.vbo_gl_id);
 
-            (animation.gl.glGenBuffers)(1, &mut animation.ebo_gl_id);
-            (animation.gl.glBindBuffer)(opengl::GL_ELEMENT_ARRAY_BUFFER, animation.ebo_gl_id);
+            (tilemap.gl.glGenBuffers)(1, &mut tilemap.ebo_gl_id);
+            (tilemap.gl.glBindBuffer)(opengl::GL_ELEMENT_ARRAY_BUFFER, tilemap.ebo_gl_id);
 
             let attrib_size = (9 * mem::size_of::<f32>()) as i32;
-            (animation.gl.glVertexAttribPointer)(0, 3, opengl::GL_FLOAT, opengl::GL_FALSE as u8, attrib_size, ptr::null_mut());
-            (animation.gl.glVertexAttribPointer)(1, 4, opengl::GL_FLOAT, opengl::GL_FALSE as u8, attrib_size, (3 * mem::size_of::<f32>()) as *const c_void);
-            (animation.gl.glVertexAttribPointer)(2, 2, opengl::GL_FLOAT, opengl::GL_FALSE as u8, attrib_size, (7 * mem::size_of::<f32>()) as *const c_void);
+            (tilemap.gl.glVertexAttribPointer)(0, 3, opengl::GL_FLOAT, opengl::GL_FALSE as u8, attrib_size, ptr::null_mut());
+            (tilemap.gl.glVertexAttribPointer)(1, 4, opengl::GL_FLOAT, opengl::GL_FALSE as u8, attrib_size, (3 * mem::size_of::<f32>()) as *const c_void);
+            (tilemap.gl.glVertexAttribPointer)(2, 2, opengl::GL_FLOAT, opengl::GL_FALSE as u8, attrib_size, (7 * mem::size_of::<f32>()) as *const c_void);
 
-            (animation.gl.glEnableVertexAttribArray)(0);
-            (animation.gl.glEnableVertexAttribArray)(1);
-            (animation.gl.glEnableVertexAttribArray)(2);
+            (tilemap.gl.glEnableVertexAttribArray)(0);
+            (tilemap.gl.glEnableVertexAttribArray)(1);
+            (tilemap.gl.glEnableVertexAttribArray)(2);
         }
 
-        animation.set_frame(0);
-        animation
+        tilemap.set_frame(0);
+        tilemap
     }
 
     pub fn get_id(&self) -> usize {
@@ -198,7 +198,7 @@ impl Animation {
     }
 }
 
-impl Drawable for Animation {
+impl Drawable for Tilemap {
     fn get_position(&self) -> Vec2 {
         self.position
     }
@@ -291,7 +291,7 @@ impl Drawable for Animation {
     }
 }
 
-impl Drop for Animation {
+impl Drop for Tilemap {
     fn drop(&mut self) {
         unsafe {
             if self.vbo_gl_id != 0 {

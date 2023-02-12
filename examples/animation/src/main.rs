@@ -6,8 +6,8 @@ use lemao_core::lemao_common_platform::input::MouseWheelDirection;
 use lemao_core::lemao_common_platform::window::WindowStyle;
 use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
-use lemao_core::renderer::drawable::animation::Animation;
 use lemao_core::renderer::drawable::text::Text;
+use lemao_core::renderer::drawable::tilemap::Tilemap;
 use lemao_core::renderer::drawable::Drawable;
 use lemao_core::renderer::fonts::bff;
 use lemao_core::renderer::fonts::Font;
@@ -39,10 +39,10 @@ pub fn main() -> Result<(), String> {
 
     drop(font_storage);
 
-    let animation_id = renderer.create_animation(explosion_id, Vec2::new(128.0, 128.0)).unwrap();
+    let animation_id = renderer.create_tilemap(explosion_id, Vec2::new(128.0, 128.0)).unwrap();
     let description_text_id = renderer.create_text(font_id)?;
 
-    let animation = renderer.get_drawable_with_type_mut::<Animation>(animation_id)?;
+    let animation = renderer.get_drawable_with_type_mut::<Tilemap>(animation_id)?;
     animation.set_anchor(Vec2::new(0.5, 0.5));
     animation.set_position(window_size / 2.0);
 
@@ -85,7 +85,7 @@ pub fn main() -> Result<(), String> {
         }
 
         std::thread::sleep(std::time::Duration::from_millis(sleep_duration));
-        renderer.get_drawable_with_type_mut::<Animation>(animation_id)?.set_next_frame();
+        renderer.get_drawable_with_type_mut::<Tilemap>(animation_id)?.set_next_frame();
 
         renderer.clear(SolidColor::new(0.5, 0.5, 0.5, 1.0));
         renderer.draw(animation_id)?;

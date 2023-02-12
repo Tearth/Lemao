@@ -1,7 +1,6 @@
 use super::batcher::BatchRenderer;
 use super::cameras::storage::CameraStorage;
 use super::cameras::Camera;
-use super::drawable::animation::Animation;
 use super::drawable::circle::Circle;
 use super::drawable::disc::Disc;
 use super::drawable::frame::Frame;
@@ -9,6 +8,7 @@ use super::drawable::line::Line;
 use super::drawable::rectangle::Rectangle;
 use super::drawable::storage::DrawableStorage;
 use super::drawable::text::Text;
+use super::drawable::tilemap::Tilemap;
 use super::drawable::Color;
 use super::drawable::Drawable;
 use super::fonts::storage::FontStorage;
@@ -256,14 +256,6 @@ impl RendererContext {
         self.textures.clone()
     }
 
-    pub fn create_animation(&mut self, texture_id: usize, tile_size: Vec2) -> Result<usize, String> {
-        let texture_storage = self.textures.read().unwrap();
-        let texture = texture_storage.get(texture_id)?;
-        let animation = Box::new(Animation::new(self, texture, tile_size));
-
-        Ok(self.drawables.as_mut().unwrap().store_animation(animation))
-    }
-
     pub fn create_circle(&mut self, radius: f32, sides: u32) -> Result<usize, String> {
         let texture_storage = self.textures.read().unwrap();
         let texture = texture_storage.get(self.default_texture_id)?;
@@ -312,6 +304,14 @@ impl RendererContext {
         let text = Box::new(Text::new(self, font));
 
         Ok(self.drawables.as_mut().unwrap().store_text(text))
+    }
+
+    pub fn create_tilemap(&mut self, texture_id: usize, tile_size: Vec2) -> Result<usize, String> {
+        let texture_storage = self.textures.read().unwrap();
+        let texture = texture_storage.get(texture_id)?;
+        let tilemap = Box::new(Tilemap::new(self, texture, tile_size));
+
+        Ok(self.drawables.as_mut().unwrap().store_tilemap(tilemap))
     }
 
     pub fn get_drawable(&self, drawable_id: usize) -> Result<&dyn Drawable, String> {

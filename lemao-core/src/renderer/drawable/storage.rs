@@ -1,10 +1,10 @@
-use super::animation::Animation;
 use super::circle::Circle;
 use super::disc::Disc;
 use super::frame::Frame;
 use super::line::Line;
 use super::rectangle::Rectangle;
 use super::text::Text;
+use super::tilemap::Tilemap;
 use super::*;
 
 #[derive(Default)]
@@ -13,14 +13,6 @@ pub struct DrawableStorage {
 }
 
 impl DrawableStorage {
-    pub fn store_animation(&mut self, mut animation: Box<Animation>) -> usize {
-        let id = self.get_free_component_id();
-        animation.id = id;
-        self.data[id] = Some(animation);
-
-        id
-    }
-
     pub fn store_circle(&mut self, mut circle: Box<Circle>) -> usize {
         let id = self.get_free_component_id();
         circle.id = id;
@@ -65,6 +57,14 @@ impl DrawableStorage {
         let id = self.get_free_component_id();
         text.id = id;
         self.data[id] = Some(text);
+
+        id
+    }
+
+    pub fn store_tilemap(&mut self, mut tilemap: Box<Tilemap>) -> usize {
+        let id = self.get_free_component_id();
+        tilemap.id = id;
+        self.data[id] = Some(tilemap);
 
         id
     }
