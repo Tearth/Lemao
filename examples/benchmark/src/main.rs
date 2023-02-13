@@ -33,6 +33,7 @@ pub fn main() -> Result<(), String> {
 
     let mut window = WindowContext::new("Audio", WindowStyle::Window { position: window_position, size: window_size })?;
     let mut renderer = window.create_renderer()?;
+    renderer.set_swap_interval(0);
 
     let texture_storage = renderer.get_textures();
     let mut texture_storage = texture_storage.write().unwrap();

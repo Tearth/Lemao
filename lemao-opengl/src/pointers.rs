@@ -59,6 +59,9 @@ pub struct OpenGLPointers {
     #[cfg(windows)]
     pub wglCreateContextAttribsARB: crate::bindings::wgl::PFNWGLCREATECONTEXTATTRIBSARBPROC,
 
+    #[cfg(windows)]
+    pub wglSwapIntervalEXT: crate::bindings::wgl::PFNWGLSWAPINTERVALEXTPROC,
+
     #[cfg(unix)]
     pub glXCreateContextAttribsARB: crate::bindings::glx::PFNGLXCREATECONTEXTATTRIBSARBPROC,
 }
@@ -120,6 +123,9 @@ impl Default for OpenGLPointers {
 
             #[cfg(windows)]
             wglCreateContextAttribsARB: get_proc_address::<crate::bindings::wgl::PFNWGLCREATECONTEXTATTRIBSARBPROC>("wglCreateContextAttribsARB"),
+
+            #[cfg(windows)]
+            wglSwapIntervalEXT: get_proc_address::<crate::bindings::wgl::PFNWGLSWAPINTERVALEXTPROC>("wglSwapIntervalEXT"),
 
             #[cfg(unix)]
             glXCreateContextAttribsARB: get_proc_address::<crate::bindings::glx::PFNGLXCREATECONTEXTATTRIBSARBPROC>("glXCreateContextAttribsARB"),

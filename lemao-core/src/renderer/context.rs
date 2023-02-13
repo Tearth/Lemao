@@ -408,6 +408,10 @@ impl RendererContext {
         }
     }
 
+    pub fn set_swap_interval(&self, interval: u32) {
+        self.renderer_platform_specific.set_swap_interval(interval);
+    }
+
     pub fn close(&self) {
         self.renderer_platform_specific.close();
     }

@@ -11,6 +11,7 @@ use std::rc::Rc;
 
 pub struct WindowsWinAPIRenderer {
     gl_context: winapi::HGLRC,
+    gl: OpenGLPointers,
 }
 
 impl WindowsWinAPIRenderer {
@@ -58,7 +59,7 @@ impl WindowsWinAPIRenderer {
                 return Err(format!("Error while creating fake OpenGL context, GetLastError()={}", winapi::GetLastError()));
             }
 
-            let gl: Rc<OpenGLPointers> = Default::default();
+            let gl: OpenGLPointers = Default::default();
 
             winapi::wglDeleteContext(fake_gl_context);
             fake_window.close();
@@ -105,12 +106,18 @@ impl WindowsWinAPIRenderer {
                 return Err(format!("Error while creating OpenGL context for desired window, GetLastError()={}", winapi::GetLastError()));
             }
 
-            Ok(Self { gl_context })
+            Ok(Self { gl_context, gl })
         }
     }
 }
 
 impl RendererPlatformSpecific for WindowsWinAPIRenderer {
+    fn set_swap_interval(&self, interval: u32) {
+        unsafe {
+            (self.gl.wglSwapIntervalEXT)(interval as i32);
+        }
+    }
+
     fn close(&self) {
         unsafe {
             winapi::wglDeleteContext(self.gl_context);
