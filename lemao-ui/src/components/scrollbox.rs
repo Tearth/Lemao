@@ -37,6 +37,7 @@ pub struct Scrollbox {
     margin: ComponentMargin,
     offset: Vec2,
     scroll_offset: Vec2,
+    active: bool,
     dirty: bool,
     children: Vec<usize>,
     event_mask: Option<EventMask>,
@@ -124,6 +125,7 @@ impl Scrollbox {
             anchor: Default::default(),
             margin: Default::default(),
             offset: Default::default(),
+            active: true,
             dirty: true,
             children: Default::default(),
             event_mask: None,
@@ -462,6 +464,10 @@ impl Scrollbox {
     /* #endregion */
 
     fn is_point_inside(&self, point: Vec2) -> bool {
+        if !self.active {
+            return false;
+        }
+
         if let Some(event_mask) = self.event_mask {
             let event_mask_left_bottom = event_mask.position;
             let event_mask_right_top = event_mask.position + event_mask.size;
@@ -481,6 +487,10 @@ impl Scrollbox {
     }
 
     fn is_point_inside_vertical_scroll(&self, point: Vec2) -> bool {
+        if !self.active {
+            return false;
+        }
+
         let x1 = self.vertical_scroll_position.x - self.vertical_scroll_size.x;
         let y1 = self.vertical_scroll_position.y - self.vertical_scroll_size.y;
         let x2 = self.vertical_scroll_position.x;
@@ -490,6 +500,10 @@ impl Scrollbox {
     }
 
     fn is_point_inside_horizontal_scroll(&self, point: Vec2) -> bool {
+        if !self.active {
+            return false;
+        }
+
         let x1 = self.horizontal_scroll_position.x;
         let y1 = self.horizontal_scroll_position.y;
         let x2 = self.horizontal_scroll_position.x + self.horizontal_scroll_size.x;
@@ -612,6 +626,10 @@ impl Component for Scrollbox {
 
     fn process_window_event(&mut self, event: &InputEvent) -> Vec<UiEvent> {
         let mut events: Vec<UiEvent> = Default::default();
+
+        if !self.active {
+            return events;
+        }
 
         // Component
         match event {
@@ -1034,6 +1052,14 @@ impl Component for Scrollbox {
         }
 
         Ok(())
+    }
+
+    fn is_active(&self) -> bool {
+        self.active
+    }
+
+    fn set_active_flag(&mut self, active: bool) {
+        self.active = active;
     }
 
     fn release_internal_resources(&mut self, renderer: &mut RendererContext) -> Result<(), String> {

@@ -214,6 +214,17 @@ impl UiContext {
         renderer.disable_scissor();
     }
 
+    pub fn set_active_flag_for_tree(&mut self, root_component: usize, active: bool) -> Result<(), String> {
+        let component = self.get_component_mut(root_component)?;
+        component.set_active_flag(active);
+
+        for child_id in component.get_children().clone() {
+            self.set_active_flag_for_tree(child_id, active)?;
+        }
+
+        Ok(())
+    }
+
     pub fn update(&mut self, renderer: &mut RendererContext) -> Result<(), String> {
         let main_canvas = self.get_main_canvas()?;
         let area_position = match main_canvas.get_position() {

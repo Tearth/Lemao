@@ -37,6 +37,7 @@ pub struct ProgressBar {
     margin: ComponentMargin,
     offset: Vec2,
     scroll_offset: Vec2,
+    active: bool,
     dirty: bool,
     children: Vec<usize>,
     event_mask: Option<EventMask>,
@@ -119,6 +120,7 @@ impl ProgressBar {
             margin: Default::default(),
             offset: Default::default(),
             scroll_offset: Default::default(),
+            active: true,
             dirty: true,
             children: Default::default(),
             event_mask: None,
@@ -430,6 +432,10 @@ impl ProgressBar {
     /* #endregion */
 
     fn is_point_inside(&self, point: Vec2) -> bool {
+        if !self.active {
+            return false;
+        }
+
         if let Some(event_mask) = self.event_mask {
             let event_mask_left_bottom = event_mask.position;
             let event_mask_right_top = event_mask.position + event_mask.size;
@@ -562,6 +568,10 @@ impl Component for ProgressBar {
 
     fn process_window_event(&mut self, event: &InputEvent) -> Vec<UiEvent> {
         let mut events: Vec<UiEvent> = Default::default();
+
+        if !self.active {
+            return events;
+        }
 
         match event {
             InputEvent::MouseMoved(cursor_position, previous_cursor_position) => {
@@ -758,6 +768,14 @@ impl Component for ProgressBar {
         }
 
         Ok(())
+    }
+
+    fn is_active(&self) -> bool {
+        self.active
+    }
+
+    fn set_active_flag(&mut self, active: bool) {
+        self.active = active;
     }
 
     fn release_internal_resources(&mut self, renderer: &mut RendererContext) -> Result<(), String> {

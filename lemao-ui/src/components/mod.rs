@@ -113,6 +113,9 @@ pub trait Component {
     fn update(&mut self, renderer: &mut RendererContext, area_position: Vec2, area_size: Vec2) -> Result<(), String>;
     fn draw(&mut self, renderer: &mut RendererContext) -> Result<(), String>;
 
+    fn is_active(&self) -> bool;
+    fn set_active_flag(&mut self, active: bool);
+
     fn is_dirty(&self) -> bool;
     fn set_dirty_flag(&mut self, dirty: bool);
 
