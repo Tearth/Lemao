@@ -528,22 +528,22 @@ impl Component for TextBox {
                     };
                     events.push(UiEvent::MouseButtonPressed(self.id, *button));
 
-                    if !self.active {
+                    if !self.focused {
                         if let Some(f) = self.on_activation {
                             (f)(self, *button);
                             self.dirty = true;
                         };
                         events.push(UiEvent::TextBoxActivated(self.id, *button));
-                        self.active = true;
+                        self.focused = true;
                     }
                 } else {
-                    if self.active {
+                    if self.focused {
                         if let Some(f) = self.on_deactivation {
                             (f)(self, *button);
                             self.dirty = true;
                         };
                         events.push(UiEvent::TextBoxDeactivated(self.id, *button));
-                        self.active = false;
+                        self.focused = false;
                     }
                 }
             }
@@ -557,7 +557,7 @@ impl Component for TextBox {
                 }
             }
             InputEvent::CharPressed(c) => {
-                if self.active {
+                if self.focused {
                     let mut content_changed = false;
 
                     if c.is_control() {
