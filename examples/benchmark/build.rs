@@ -1,5 +1,8 @@
 fn main() {
+    #[cfg(windows)]
     println!("cargo:rustc-link-arg=/EXPORT:NvOptimusEnablement");
+
+    #[cfg(windows)]
     println!("cargo:rustc-link-arg=/EXPORT:AmdPowerXpressRequestHighPerformance");
 
     #[cfg(windows)]

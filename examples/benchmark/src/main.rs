@@ -13,9 +13,11 @@ use lemao_core::window::context::WindowContext;
 use std::time::Instant;
 
 #[no_mangle]
+#[cfg(windows)]
 pub static NvOptimusEnablement: i32 = 1;
 
 #[no_mangle]
+#[cfg(windows)]
 pub static AmdPowerXpressRequestHighPerformance: i32 = 1;
 
 const CELLS_COUNT: usize = 5000;

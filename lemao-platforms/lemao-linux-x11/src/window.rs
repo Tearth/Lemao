@@ -4,6 +4,7 @@ use crate::renderer::LinuxX11Renderer;
 use lemao_common_platform::input::InputEvent;
 use lemao_common_platform::input::Key;
 use lemao_common_platform::input::MouseButton;
+use lemao_common_platform::input::MouseWheelDirection;
 use lemao_common_platform::renderer::RendererPlatformSpecific;
 use lemao_common_platform::window::WindowPlatformSpecific;
 use lemao_common_platform::window::WindowStyle;
@@ -26,6 +27,7 @@ pub struct WindowX11 {
     style: WindowStyle,
     position: Vec2,
     size: Vec2,
+    last_cursor_position: Vec2,
 }
 
 impl WindowX11 {
@@ -179,6 +181,7 @@ impl WindowX11 {
                 style,
                 position: Default::default(),
                 size: Default::default(),
+                last_cursor_position: Default::default(),
             });
 
             context.set_style(style)?;
@@ -195,11 +198,10 @@ impl WindowPlatformSpecific for WindowX11 {
                 x11::XNextEvent(self.display, &mut event);
 
                 match event.type_ as u32 {
-                    //winapi::WM_CHAR => return Some(event.into()),
                     x11::ConfigureNotify => {
                         if event.xconfigure.width != (self.size.x as i32) || event.xconfigure.height != (self.size.y as i32) {
                             self.size = Vec2::new(event.xconfigure.width as f32, event.xconfigure.height as f32);
-                            return vec![InputEvent::WindowSizeChanged(event.xconfigure.width as u32, event.xconfigure.height as u32)];
+                            return vec![InputEvent::WindowSizeChanged(Vec2::new(event.xconfigure.width as f32, event.xconfigure.height as f32))];
                         }
                     }
                     x11::KeyPress => {
@@ -224,25 +226,30 @@ impl WindowPlatformSpecific for WindowX11 {
                     x11::ButtonPress => {
                         self.mouse_state[(event.xbutton.button as usize) - 1] = true;
                         return vec![match event.xbutton.button {
-                            x11::Button1 => InputEvent::MouseButtonPressed(MouseButton::Left),
-                            x11::Button2 => InputEvent::MouseButtonPressed(MouseButton::Right),
-                            x11::Button3 => InputEvent::MouseButtonPressed(MouseButton::Middle),
-                            _ => InputEvent::MouseButtonPressed(MouseButton::Unknown),
+                            x11::Button1 => InputEvent::MouseButtonPressed(MouseButton::Left, self.get_cursor_position()),
+                            x11::Button2 => InputEvent::MouseButtonPressed(MouseButton::Right, self.get_cursor_position()),
+                            x11::Button3 => InputEvent::MouseButtonPressed(MouseButton::Middle, self.get_cursor_position()),
+                            _ => InputEvent::MouseButtonPressed(MouseButton::Unknown, self.get_cursor_position()),
                         }];
                     }
                     x11::ButtonRelease => {
                         self.mouse_state[(event.xbutton.button as usize) - 1] = false;
                         return vec![match event.xbutton.button {
-                            x11::Button1 => InputEvent::MouseButtonReleased(MouseButton::Left),
-                            x11::Button2 => InputEvent::MouseButtonReleased(MouseButton::Right),
-                            x11::Button3 => InputEvent::MouseButtonReleased(MouseButton::Middle),
-                            x11::Button4 => InputEvent::MouseWheelRotated(1),
-                            x11::Button5 => InputEvent::MouseWheelRotated(-1),
-                            _ => InputEvent::MouseButtonReleased(MouseButton::Unknown),
+                            x11::Button1 => InputEvent::MouseButtonReleased(MouseButton::Left, self.get_cursor_position()),
+                            x11::Button2 => InputEvent::MouseButtonReleased(MouseButton::Right, self.get_cursor_position()),
+                            x11::Button3 => InputEvent::MouseButtonReleased(MouseButton::Middle, self.get_cursor_position()),
+                            x11::Button4 => InputEvent::MouseWheelRotated(MouseWheelDirection::Up, self.get_cursor_position()),
+                            x11::Button5 => InputEvent::MouseWheelRotated(MouseWheelDirection::Down, self.get_cursor_position()),
+                            _ => InputEvent::MouseButtonReleased(MouseButton::Unknown, self.get_cursor_position()),
                         }];
                     }
                     x11::MotionNotify => {
-                        return vec![InputEvent::MouseMoved(event.xmotion.x, event.xmotion.y)];
+                        let position = Vec2::new(event.xmotion.x as f32, event.xmotion.y as f32);
+                        let screen_position = Vec2::new(position.x, self.size.y - position.y);
+                        let last_cursor_position = self.last_cursor_position;
+                        self.last_cursor_position = screen_position;
+
+                        return vec![InputEvent::MouseMoved(screen_position, last_cursor_position)];
                     }
                     x11::ClientMessage => {
                         if event.xclient.data.l[0] == self.delete_window_atom as i64 {
@@ -376,7 +383,7 @@ impl WindowPlatformSpecific for WindowX11 {
                 &mut mask,
             );
 
-            Vec2::new(window_cursor_position_x as f32, window_cursor_position_y as f32)
+            Vec2::new(window_cursor_position_x as f32, self.size.y - window_cursor_position_y as f32)
         }
     }
 

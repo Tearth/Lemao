@@ -1,11 +1,16 @@
 use crate::bindings::x11;
 use lemao_common_platform::renderer::RendererPlatformSpecific;
-use lemao_opengl::bindings::glx;
+use lemao_opengl::bindings::glx::{self, __GLXcontextRec};
 use lemao_opengl::pointers::OpenGLPointers;
 use std::rc::Rc;
 use std::{mem, ptr};
 
-pub struct LinuxX11Renderer {}
+pub struct LinuxX11Renderer {
+    display: *mut x11::_XDisplay,
+    window: u64,
+    gl: OpenGLPointers,
+    gl_context: *mut __GLXcontextRec,
+}
 
 impl LinuxX11Renderer {
     pub unsafe fn new(display: *mut x11::_XDisplay, frame_buffer_config: *mut glx::__GLXFBConfigRec, window: u64) -> Self {
@@ -21,19 +26,23 @@ impl LinuxX11Renderer {
             ];
             let context_attributes_ptr = context_attributes.as_ptr() as *const i32;
 
-            let gl: Rc<OpenGLPointers> = Default::default();
-            let context = (gl.glXCreateContextAttribsARB)(mem::transmute(display), frame_buffer_config, ptr::null_mut(), 1, context_attributes_ptr);
+            let gl: OpenGLPointers = Default::default();
+            let gl_context = (gl.glXCreateContextAttribsARB)(mem::transmute(display), frame_buffer_config, ptr::null_mut(), 1, context_attributes_ptr);
 
             x11::XSync(display, 0);
-            glx::glXMakeCurrent(mem::transmute(display), window, context);
+            glx::glXMakeCurrent(mem::transmute(display), window, gl_context);
 
-            Self {}
+            Self { display, window, gl, gl_context }
         }
     }
 }
 
 impl RendererPlatformSpecific for LinuxX11Renderer {
+    fn set_swap_interval(&self, interval: u32) {
+        unsafe { (self.gl.glXSwapIntervalEXT)(mem::transmute(self.display), self.window, interval as i32) }
+    }
+
     fn close(&self) {
-        // unsafe {}
+        unsafe { glx::glXDestroyContext(mem::transmute(self.display), self.gl_context) }
     }
 }
