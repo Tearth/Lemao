@@ -1,12 +1,13 @@
 use super::context::RendererContext;
+use crate::utils::storage::StorageItem;
 use lemao_math::vec2::Vec2;
 use lemao_opengl::bindings::opengl;
 use lemao_opengl::pointers::OpenGLPointers;
+use std::any::Any;
 use std::ffi::c_void;
 use std::rc::Rc;
 
 pub mod bmp;
-pub mod storage;
 
 pub struct RawTexture {
     size: Vec2,
@@ -75,6 +76,24 @@ impl Texture {
             (self.gl.glTexImage2D)(opengl::GL_TEXTURE_2D, 0, format as i32, texture_width, texture_height, 0, format, opengl::GL_UNSIGNED_BYTE, texture_ptr);
             (self.gl.glGenerateMipmap)(opengl::GL_TEXTURE_2D);
         }
+    }
+}
+
+impl StorageItem for Texture {
+    fn get_id(&self) -> usize {
+        self.id
+    }
+
+    fn set_id(&mut self, id: usize) {
+        self.id = id;
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+
+    fn as_any_mut(&mut self) -> &mut dyn Any {
+        self
     }
 }
 

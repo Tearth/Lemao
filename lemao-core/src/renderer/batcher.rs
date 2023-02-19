@@ -85,7 +85,7 @@ impl BatchRenderer {
         }
     }
 
-    pub fn add(&mut self, drawable: &dyn Drawable, batch: &Batch) -> Result<(), String> {
+    pub fn add(&mut self, transformation_matrix: Mat4x4, batch: &Batch) -> Result<(), String> {
         if self.first_batch_added {
             if self.texture_gl_id != batch.texture_gl_id.unwrap() {
                 return Err("Invalid texture".to_string());
@@ -109,7 +109,6 @@ impl BatchRenderer {
             return Err("Too many indices".to_string());
         }
 
-        let transformation_matrix = drawable.get_transformation_matrix();
         for index in 0..(vertices.len() / 9) {
             let position = Vec4::new(vertices[index * 9 + 0], vertices[index * 9 + 1], vertices[index * 9 + 2], 1.0);
             let transformed_position = transformation_matrix * position;

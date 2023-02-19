@@ -1,6 +1,6 @@
-use super::samples::storage::SampleStorage;
-use super::sounds::storage::SoundStorage;
+use super::samples::Sample;
 use super::sounds::Sound;
+use crate::utils::storage::Storage;
 use lemao_openal::bindings::openal;
 use std::ptr;
 use std::sync::Arc;
@@ -9,8 +9,8 @@ use std::sync::RwLock;
 pub struct AudioContext {
     device: *mut openal::ALCdevice_struct,
     context: *mut openal::ALCcontext_struct,
-    samples: Arc<RwLock<SampleStorage>>,
-    sounds: SoundStorage,
+    samples: Arc<RwLock<Storage>>,
+    sounds: Storage,
 }
 
 impl AudioContext {
@@ -41,23 +41,23 @@ impl AudioContext {
         }
     }
 
-    pub fn get_samples(&self) -> Arc<RwLock<SampleStorage>> {
+    pub fn get_samples(&self) -> Arc<RwLock<Storage>> {
         self.samples.clone()
     }
 
     pub fn create_sound(&mut self, sample_id: usize) -> Result<usize, String> {
         let sample_storage = self.samples.read().unwrap();
-        let sample = sample_storage.get(sample_id)?;
+        let sample = sample_storage.get_and_cast::<Sample>(sample_id)?;
 
-        Ok(self.sounds.store(Sound::new(sample)?))
+        Ok(self.sounds.store(Box::new(Sound::new(sample)?)))
     }
 
     pub fn get_sound(&self, sound_id: usize) -> Result<&Sound, String> {
-        self.sounds.get(sound_id)
+        self.sounds.get_and_cast::<Sound>(sound_id)
     }
 
     pub fn get_sound_mut(&mut self, sound_id: usize) -> Result<&mut Sound, String> {
-        self.sounds.get_mut(sound_id)
+        self.sounds.get_and_cast_mut::<Sound>(sound_id)
     }
 }
 

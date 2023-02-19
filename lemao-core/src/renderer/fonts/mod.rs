@@ -1,13 +1,15 @@
+use crate::utils::storage::StorageItem;
+
 use super::context::RendererContext;
 use super::textures::RawTexture;
 use lemao_math::vec2::Vec2;
 use lemao_opengl::bindings::opengl;
 use lemao_opengl::pointers::OpenGLPointers;
+use std::any::Any;
 use std::ffi::c_void;
 use std::rc::Rc;
 
 pub mod bff;
-pub mod storage;
 
 pub struct RawFont {
     size: Vec2,
@@ -139,6 +141,24 @@ impl Font {
 
     pub fn get_character_widths(&self) -> Vec<u8> {
         self.character_widths.clone()
+    }
+}
+
+impl StorageItem for Font {
+    fn get_id(&self) -> usize {
+        self.id
+    }
+
+    fn set_id(&mut self, id: usize) {
+        self.id = id;
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+
+    fn as_any_mut(&mut self) -> &mut dyn Any {
+        self
     }
 }
 

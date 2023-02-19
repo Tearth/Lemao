@@ -33,13 +33,13 @@ pub fn main() -> Result<(), String> {
 
     let texture_storage = renderer.get_textures();
     let mut texture_storage = texture_storage.write().unwrap();
-    let kaela_rgb = texture_storage.store(Texture::new(&renderer, &bmp::load("./assets/disc.bmp")?));
+    let kaela_rgb = texture_storage.store(Box::new(Texture::new(&renderer, &bmp::load("./assets/disc.bmp")?)));
 
     drop(texture_storage);
 
     let font_storage = renderer.get_fonts();
     let mut font_storage = font_storage.write().unwrap();
-    let font_id = font_storage.store(Font::new(&renderer, &bff::load("./assets/inconsolata.bff")?));
+    let font_id = font_storage.store(Box::new(Font::new(&renderer, &bff::load("./assets/inconsolata.bff")?)));
 
     drop(font_storage);
 
@@ -51,7 +51,7 @@ pub fn main() -> Result<(), String> {
     let texture_storage = texture_storage.read().unwrap();
 
     let sprite = renderer.get_drawable_with_type_mut::<Rectangle>(sprite_id)?;
-    sprite.set_texture(texture_storage.get(kaela_rgb)?);
+    sprite.set_texture(texture_storage.get_and_cast::<Texture>(kaela_rgb)?);
     sprite.set_anchor(Vec2::new(0.5, 0.5));
     sprite.set_position(Vec2::new(400.0, 300.0));
 

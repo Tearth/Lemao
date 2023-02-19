@@ -1,8 +1,8 @@
+use crate::utils::storage::StorageItem;
 use lemao_math::mat4x4::Mat4x4;
 use lemao_math::vec2::Vec2;
 use lemao_math::vec3::Vec3;
-
-pub mod storage;
+use std::any::Any;
 
 pub struct Camera {
     pub(crate) id: usize,
@@ -58,5 +58,23 @@ impl Camera {
 
     pub(crate) fn get_view_matrix(&self) -> Mat4x4 {
         Mat4x4::translate(Vec3::new(-self.position.x, -self.position.y, -1.0))
+    }
+}
+
+impl StorageItem for Camera {
+    fn get_id(&self) -> usize {
+        self.id
+    }
+
+    fn set_id(&mut self, id: usize) {
+        self.id = id;
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+
+    fn as_any_mut(&mut self) -> &mut dyn Any {
+        self
     }
 }

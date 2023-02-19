@@ -13,6 +13,7 @@ use lemao_core::renderer::drawable::rectangle::Rectangle;
 use lemao_core::renderer::drawable::text::Text;
 use lemao_core::renderer::drawable::Color;
 use lemao_core::renderer::drawable::Drawable;
+use lemao_core::renderer::fonts::Font;
 use lemao_core::renderer::textures::Texture;
 use std::any::Any;
 
@@ -464,7 +465,7 @@ impl Component for Checkbox {
         // We have to set text first, to get the size used later
         let font_storage = renderer.get_fonts();
         let font_storage = font_storage.read().unwrap();
-        let font = font_storage.get(self.label_font_id)?;
+        let font = font_storage.get_and_cast::<Font>(self.label_font_id)?;
         renderer.get_drawable_with_type_mut::<Text>(self.label_id)?.set_font(font);
         renderer.get_drawable_with_type_mut::<Text>(self.label_id)?.set_text(&self.label_text);
 
@@ -493,11 +494,11 @@ impl Component for Checkbox {
         let texture_storage = texture_storage.read().unwrap();
 
         if self.checked {
-            let texture = texture_storage.get(self.box_checked_texture_id)?;
+            let texture = texture_storage.get_and_cast::<Texture>(self.box_checked_texture_id)?;
             self.box_size = texture.get_size();
             renderer.get_drawable_with_type_mut::<Rectangle>(self.box_id)?.set_texture(texture);
         } else {
-            let texture = texture_storage.get(self.box_unchecked_texture_id)?;
+            let texture = texture_storage.get_and_cast::<Texture>(self.box_unchecked_texture_id)?;
             self.box_size = texture.get_size();
             renderer.get_drawable_with_type_mut::<Rectangle>(self.box_id)?.set_texture(texture);
         }

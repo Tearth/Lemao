@@ -1,15 +1,16 @@
+use crate::utils::storage::StorageItem;
+
 use super::context::RendererContext;
 use lemao_math::color::SolidColor;
 use lemao_math::vec2::Vec2;
 use lemao_math::vec3::Vec3;
 use lemao_opengl::bindings::opengl;
 use lemao_opengl::pointers::OpenGLPointers;
+use std::any::Any;
 use std::ffi::c_void;
 use std::mem;
 use std::ptr;
 use std::rc::Rc;
-
-pub mod storage;
 
 pub struct Shape {
     pub(crate) id: usize,
@@ -85,6 +86,24 @@ impl Shape {
 
     pub fn get_indices(&self) -> &Vec<u32> {
         &self.indices
+    }
+}
+
+impl StorageItem for Shape {
+    fn get_id(&self) -> usize {
+        self.id
+    }
+
+    fn set_id(&mut self, id: usize) {
+        self.id = id;
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+
+    fn as_any_mut(&mut self) -> &mut dyn Any {
+        self
     }
 }
 

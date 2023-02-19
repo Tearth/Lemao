@@ -1,6 +1,7 @@
 use super::*;
 use crate::renderer::context::RendererContext;
 use crate::renderer::textures::Texture;
+use crate::utils::storage::StorageItem;
 use lemao_math::mat4x4::Mat4x4;
 use lemao_math::vec2::Vec2;
 use lemao_math::vec3::Vec3;
@@ -86,10 +87,6 @@ impl Circle {
 
         circle.update();
         circle
-    }
-
-    pub fn get_id(&self) -> usize {
-        self.id
     }
 
     pub fn get_texture_id(&self) -> usize {
@@ -333,6 +330,32 @@ impl Drawable for Circle {
 
     fn as_any_mut(&mut self) -> &mut dyn Any {
         self
+    }
+}
+
+impl StorageItem for Circle {
+    fn get_id(&self) -> usize {
+        self.id
+    }
+
+    fn set_id(&mut self, id: usize) {
+        self.id = id;
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+
+    fn as_any_mut(&mut self) -> &mut dyn Any {
+        self
+    }
+
+    fn as_drawable(&self) -> Option<&dyn Drawable> {
+        Some(self)
+    }
+
+    fn as_drawable_mut(&mut self) -> Option<&mut dyn Drawable> {
+        Some(self)
     }
 }
 

@@ -39,13 +39,13 @@ pub fn main() -> Result<(), String> {
 
     let texture_storage = renderer.get_textures();
     let mut texture_storage = texture_storage.write().unwrap();
-    let cell_texture_id = texture_storage.store(Texture::new(&renderer, &bmp::load("./assets/cell.bmp")?));
+    let cell_texture_id = texture_storage.store(Box::new(Texture::new(&renderer, &bmp::load("./assets/cell.bmp")?)));
 
     drop(texture_storage);
 
     let font_storage = renderer.get_fonts();
     let mut font_storage = font_storage.write().unwrap();
-    let font_id = font_storage.store(Font::new(&renderer, &bff::load("./assets/inconsolata.bff")?));
+    let font_id = font_storage.store(Box::new(Font::new(&renderer, &bff::load("./assets/inconsolata.bff")?)));
 
     drop(font_storage);
 
@@ -62,7 +62,7 @@ pub fn main() -> Result<(), String> {
     for _ in 0..CELLS_COUNT {
         let sprite_id = renderer.create_rectangle()?;
         let sprite = renderer.get_drawable_with_type_mut::<Rectangle>(sprite_id)?;
-        sprite.set_texture(texture_storage.get(cell_texture_id)?);
+        sprite.set_texture(texture_storage.get_and_cast::<Texture>(cell_texture_id)?);
         sprite.set_anchor(Vec2::new(0.5, 0.5));
 
         cells.push(CellData {

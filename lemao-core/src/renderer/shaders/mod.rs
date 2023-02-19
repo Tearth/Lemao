@@ -1,13 +1,14 @@
+use crate::utils::storage::StorageItem;
+
 use super::context::RendererContext;
 use super::drawable::Color;
 use lemao_opengl::bindings::opengl;
 use lemao_opengl::pointers::OpenGLPointers;
+use std::any::Any;
 use std::collections::HashMap;
 use std::ffi::CString;
 use std::ptr;
 use std::rc::Rc;
-
-pub mod storage;
 
 pub const MAX_UNIFORM_NAME_LENGTH: usize = 32;
 pub const ERROR_LENGTH: usize = 1024;
@@ -182,6 +183,24 @@ impl Shader {
             (self.gl.glEnable)(opengl::GL_BLEND);
             (self.gl.glBlendFunc)(opengl::GL_SRC_ALPHA, opengl::GL_ONE_MINUS_SRC_ALPHA);
         }
+    }
+}
+
+impl StorageItem for Shader {
+    fn get_id(&self) -> usize {
+        self.id
+    }
+
+    fn set_id(&mut self, id: usize) {
+        self.id = id;
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+
+    fn as_any_mut(&mut self) -> &mut dyn Any {
+        self
     }
 }
 

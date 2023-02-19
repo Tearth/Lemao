@@ -32,13 +32,13 @@ pub fn main() -> Result<(), String> {
 
     let texture_storage = renderer.get_textures();
     let mut texture_storage = texture_storage.write().unwrap();
-    let texture_id = texture_storage.store(Texture::new(&renderer, &RawTexture::new(window_size, texture_data.clone())));
+    let texture_id = texture_storage.store(Box::new(Texture::new(&renderer, &RawTexture::new(window_size, texture_data.clone()))));
 
     drop(texture_storage);
 
     let font_storage = renderer.get_fonts();
     let mut font_storage = font_storage.write().unwrap();
-    let font_id = font_storage.store(Font::new(&renderer, &bff::load("./assets/inconsolata.bff")?));
+    let font_id = font_storage.store(Box::new(Font::new(&renderer, &bff::load("./assets/inconsolata.bff")?)));
 
     drop(font_storage);
 
@@ -49,7 +49,7 @@ pub fn main() -> Result<(), String> {
     let texture_storage = texture_storage.read().unwrap();
 
     let sprite = renderer.get_drawable_with_type_mut::<Rectangle>(sprite_id)?;
-    sprite.set_texture(texture_storage.get(texture_id)?);
+    sprite.set_texture(texture_storage.get_and_cast::<Texture>(texture_id)?);
 
     drop(texture_storage);
 
@@ -92,7 +92,7 @@ pub fn main() -> Result<(), String> {
 
                 let texture_storage = renderer.get_textures();
                 let texture_storage = texture_storage.read().unwrap();
-                let texture = texture_storage.get(texture_id).unwrap();
+                let texture = texture_storage.get_and_cast::<Texture>(texture_id).unwrap();
                 texture.set_data(window_size, &texture_data);
             }
         }

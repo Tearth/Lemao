@@ -12,6 +12,7 @@ use lemao_core::renderer::context::RendererContext;
 use lemao_core::renderer::drawable::text::Text;
 use lemao_core::renderer::drawable::Color;
 use lemao_core::renderer::drawable::Drawable;
+use lemao_core::renderer::fonts::Font;
 use std::any::Any;
 
 pub struct Label {
@@ -371,7 +372,7 @@ impl Component for Label {
 
         let font_storage = renderer.get_fonts();
         let font_storage = font_storage.read().unwrap();
-        let font = font_storage.get(self.label_font_id)?;
+        let font = font_storage.get_and_cast::<Font>(self.label_font_id)?;
         renderer.get_drawable_with_type_mut::<Text>(self.label_id)?.set_font(font);
         renderer.get_drawable_with_type_mut::<Text>(self.label_id)?.set_text(&label_text_processed);
 
