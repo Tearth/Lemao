@@ -47,10 +47,10 @@ pub struct RendererContext {
     renderer_platform_specific: Box<dyn RendererPlatformSpecific>,
     textures: Arc<RwLock<Storage>>,
     fonts: Arc<RwLock<Storage>>,
-    cameras: Option<Storage>,
-    shaders: Option<Storage>,
-    drawables: Option<Storage>,
-    shapes: Option<Storage>,
+    cameras: Storage,
+    shaders: Storage,
+    drawables: Storage,
+    shapes: Storage,
     batch_renderer: Option<BatchRenderer>,
 }
 
@@ -73,10 +73,10 @@ impl RendererContext {
             renderer_platform_specific,
             textures: Default::default(),
             fonts: Default::default(),
-            shaders: Some(Default::default()),
-            drawables: Some(Default::default()),
-            cameras: Some(Default::default()),
-            shapes: Some(Default::default()),
+            shaders: Default::default(),
+            drawables: Default::default(),
+            cameras: Default::default(),
+            shapes: Default::default(),
             batch_renderer: None,
         })
     }
@@ -100,7 +100,7 @@ impl RendererContext {
 
     pub fn init_default_camera(&mut self) -> Result<(), String> {
         let camera = Box::new(Camera::new(Default::default(), Default::default()));
-        self.default_camera_id = self.cameras.as_mut().unwrap().store(camera);
+        self.default_camera_id = self.cameras.store(camera);
         self.set_default_camera()?;
 
         Ok(())
@@ -108,10 +108,10 @@ impl RendererContext {
 
     pub fn init_default_shaders(&mut self) -> Result<(), String> {
         let solid_shader = Box::new(Shader::new(self, DEFAULT_VERTEX_SHADER, SOLID_FRAGMENT_SHADER)?);
-        self.default_solid_shader_id = self.shaders.as_mut().unwrap().store(solid_shader);
+        self.default_solid_shader_id = self.shaders.store(solid_shader);
 
         let gradient_shader = Box::new(Shader::new(self, DEFAULT_VERTEX_SHADER, GRADIENT_FRAGMENT_SHADER)?);
-        self.default_gradient_shader_id = self.shaders.as_mut().unwrap().store(gradient_shader);
+        self.default_gradient_shader_id = self.shaders.store(gradient_shader);
 
         Ok(())
     }
@@ -129,7 +129,7 @@ impl RendererContext {
                 SolidColor::new(1.0, 1.0, 1.0, 1.0),
             ],
         ));
-        self.default_sprite_shape_id = self.shapes.as_mut().unwrap().store(sprite_shape);
+        self.default_sprite_shape_id = self.shapes.store(sprite_shape);
 
         let line_shape = Box::new(Shape::new(
             self,
@@ -143,7 +143,7 @@ impl RendererContext {
                 SolidColor::new(1.0, 1.0, 1.0, 1.0),
             ],
         ));
-        self.default_line_shape_id = self.shapes.as_mut().unwrap().store(line_shape);
+        self.default_line_shape_id = self.shapes.store(line_shape);
 
         let rectangle_shape = Box::new(Shape::new(
             self,
@@ -157,7 +157,7 @@ impl RendererContext {
                 SolidColor::new(1.0, 1.0, 1.0, 1.0),
             ],
         ));
-        self.default_rectangle_shape_id = self.shapes.as_mut().unwrap().store(rectangle_shape);
+        self.default_rectangle_shape_id = self.shapes.store(rectangle_shape);
     }
 
     pub fn init_default_texture(&mut self) {
@@ -191,19 +191,19 @@ impl RendererContext {
         };
 
         let shader = Box::new(Shader::new(self, &vertex_shader, &fragment_shader)?);
-        Ok(self.shaders.as_mut().unwrap().store(shader))
+        Ok(self.shaders.store(shader))
     }
 
     pub fn get_shader(&self, shader_id: usize) -> Result<&Shader, String> {
-        self.shaders.as_ref().unwrap().get_and_cast::<Shader>(shader_id)
+        self.shaders.get_and_cast::<Shader>(shader_id)
     }
 
     pub fn get_shader_mut(&mut self, shader_id: usize) -> Result<&mut Shader, String> {
-        self.shaders.as_mut().unwrap().get_and_cast_mut::<Shader>(shader_id)
+        self.shaders.get_and_cast_mut::<Shader>(shader_id)
     }
 
     pub fn set_shader_as_active(&mut self, shader_id: usize) -> Result<(), String> {
-        let shader = self.shaders.as_mut().unwrap().get_and_cast_mut::<Shader>(shader_id)?;
+        let shader = self.shaders.get_and_cast_mut::<Shader>(shader_id)?;
 
         self.active_shader_id = shader_id;
         shader.set_as_active();
@@ -212,27 +212,27 @@ impl RendererContext {
 
     pub fn create_camera(&mut self, position: Vec2, size: Vec2) -> Result<usize, String> {
         let camera = Box::new(Camera::new(position, size));
-        Ok(self.cameras.as_mut().unwrap().store(camera))
+        Ok(self.cameras.store(camera))
     }
 
     pub fn get_camera(&self, camera_id: usize) -> Result<&Camera, String> {
-        self.cameras.as_ref().unwrap().get_and_cast::<Camera>(camera_id)
+        self.cameras.get_and_cast::<Camera>(camera_id)
     }
 
     pub fn get_camera_mut(&mut self, camera_id: usize) -> Result<&mut Camera, String> {
-        self.cameras.as_mut().unwrap().get_and_cast_mut::<Camera>(camera_id)
+        self.cameras.get_and_cast_mut::<Camera>(camera_id)
     }
 
     pub fn get_active_camera(&self) -> Result<&Camera, String> {
-        self.cameras.as_ref().unwrap().get_and_cast::<Camera>(self.active_camera_id)
+        self.cameras.get_and_cast::<Camera>(self.active_camera_id)
     }
 
     pub fn get_active_camera_mut(&mut self) -> Result<&mut Camera, String> {
-        self.cameras.as_mut().unwrap().get_and_cast_mut::<Camera>(self.active_camera_id)
+        self.cameras.get_and_cast_mut::<Camera>(self.active_camera_id)
     }
 
     pub fn set_camera_as_active(&mut self, camera_id: usize) -> Result<(), String> {
-        let camera = self.cameras.as_mut().unwrap().get_and_cast_mut::<Camera>(camera_id)?;
+        let camera = self.cameras.get_and_cast_mut::<Camera>(camera_id)?;
 
         self.active_camera_id = camera_id;
         camera.set_dirty_flag(true);
@@ -257,7 +257,7 @@ impl RendererContext {
         let texture = texture_storage.get_and_cast::<Texture>(self.default_texture_id)?;
         let circle = Box::new(Circle::new(self, texture, radius, sides));
 
-        Ok(self.drawables.as_mut().unwrap().store(circle))
+        Ok(self.drawables.store(circle))
     }
 
     pub fn create_disc(&mut self, radius: f32, sides: u32) -> Result<usize, String> {
@@ -265,7 +265,7 @@ impl RendererContext {
         let texture = texture_storage.get_and_cast::<Texture>(self.default_texture_id)?;
         let disc = Box::new(Disc::new(self, texture, radius, sides));
 
-        Ok(self.drawables.as_mut().unwrap().store(disc))
+        Ok(self.drawables.store(disc))
     }
 
     pub fn create_frame(&mut self, size: Vec2) -> Result<usize, String> {
@@ -273,25 +273,25 @@ impl RendererContext {
         let texture = texture_storage.get_and_cast::<Texture>(self.default_texture_id)?;
         let frame = Box::new(Frame::new(self, texture, size));
 
-        Ok(self.drawables.as_mut().unwrap().store(frame))
+        Ok(self.drawables.store(frame))
     }
 
     pub fn create_line(&mut self, from: Vec2, to: Vec2) -> Result<usize, String> {
-        let shape = self.shapes.as_ref().unwrap().get_and_cast::<Shape>(self.default_line_shape_id)?;
+        let shape = self.shapes.get_and_cast::<Shape>(self.default_line_shape_id)?;
         let texture_storage = self.textures.read().unwrap();
         let texture = texture_storage.get_and_cast::<Texture>(self.default_texture_id)?;
         let line = Box::new(Line::new(self, shape, texture, from, to));
 
-        Ok(self.drawables.as_mut().unwrap().store(line))
+        Ok(self.drawables.store(line))
     }
 
     pub fn create_rectangle(&mut self) -> Result<usize, String> {
-        let shape = self.shapes.as_ref().unwrap().get_and_cast::<Shape>(self.default_rectangle_shape_id)?;
+        let shape = self.shapes.get_and_cast::<Shape>(self.default_rectangle_shape_id)?;
         let texture_storage = self.textures.read().unwrap();
         let texture = texture_storage.get_and_cast::<Texture>(self.default_texture_id)?;
         let rectangle = Box::new(Rectangle::new(self, shape, texture));
 
-        Ok(self.drawables.as_mut().unwrap().store(rectangle))
+        Ok(self.drawables.store(rectangle))
     }
 
     pub fn create_text(&mut self, font_id: usize) -> Result<usize, String> {
@@ -299,7 +299,7 @@ impl RendererContext {
         let font = font_storage.get_and_cast::<Font>(font_id)?;
         let text = Box::new(Text::new(self, font));
 
-        Ok(self.drawables.as_mut().unwrap().store(text))
+        Ok(self.drawables.store(text))
     }
 
     pub fn create_tilemap(&mut self, texture_id: usize, tile_size: Vec2) -> Result<usize, String> {
@@ -307,27 +307,30 @@ impl RendererContext {
         let texture = texture_storage.get_and_cast::<Texture>(texture_id)?;
         let tilemap = Box::new(Tilemap::new(self, texture, tile_size));
 
-        Ok(self.drawables.as_mut().unwrap().store(tilemap))
+        Ok(self.drawables.store(tilemap))
     }
 
     pub fn get_drawable(&self, drawable_id: usize) -> Result<&dyn Drawable, String> {
-        self.drawables.as_ref().unwrap().get(drawable_id)?.as_drawable().ok_or_else(|| "test".to_string())
+        self.drawables.get(drawable_id)?.as_drawable().ok_or_else(|| format!("Storage item with id {} is not drawable", drawable_id))
     }
 
     pub fn get_drawable_with_type<T: 'static>(&self, drawable_id: usize) -> Result<&T, String> {
-        unsafe { Ok(self.get_drawable(drawable_id)?.as_any().downcast_ref::<T>().unwrap_unchecked()) }
+        self.get_drawable(drawable_id)?.as_any().downcast_ref::<T>().ok_or_else(|| format!("Drawable object with id {} cannot be downcasted", drawable_id))
     }
 
     pub fn get_drawable_mut(&mut self, drawable_id: usize) -> Result<&mut dyn Drawable, String> {
-        self.drawables.as_mut().unwrap().get_mut(drawable_id)?.as_drawable_mut().ok_or_else(|| "test2".to_string())
+        self.drawables.get_mut(drawable_id)?.as_drawable_mut().ok_or_else(|| format!("Storage item with id {} is not drawable", drawable_id))
     }
 
     pub fn get_drawable_with_type_mut<T: 'static>(&mut self, drawable_id: usize) -> Result<&mut T, String> {
-        unsafe { Ok(self.get_drawable_mut(drawable_id)?.as_any_mut().downcast_mut::<T>().unwrap_unchecked()) }
+        self.get_drawable_mut(drawable_id)?
+            .as_any_mut()
+            .downcast_mut::<T>()
+            .ok_or_else(|| format!("Drawable object with id {} cannot be downcasted", drawable_id))
     }
 
     pub fn remove_drawable(&mut self, drawable_id: usize) -> Result<(), String> {
-        self.drawables.as_mut().unwrap().remove(drawable_id)
+        self.drawables.remove(drawable_id)
     }
 
     pub fn enable_scissor(&self, position: Vec2, size: Vec2) {
@@ -345,12 +348,12 @@ impl RendererContext {
 
     pub fn batcher_add_drawable(&mut self, drawable_id: usize) -> Result<(), String> {
         //let drawable = self.get_drawable(drawable_id)?;
-        let drawable = self.drawables.as_ref().unwrap().get(drawable_id)?.as_drawable().ok_or_else(|| "test".to_string())?;
+        let drawable = self.drawables.get(drawable_id)?.as_drawable().ok_or_else(|| "test".to_string())?;
         let transformation_matrix = drawable.get_transformation_matrix();
         let mut batch = drawable.get_batch();
 
         if let Some(shape_id) = batch.shape_id {
-            let shape = self.shapes.as_ref().unwrap().get_and_cast::<Shape>(shape_id)?;
+            let shape = self.shapes.get_and_cast::<Shape>(shape_id)?;
             batch.vertices = Some(shape.get_vertices());
             batch.indices = Some(shape.get_indices());
         }
@@ -365,17 +368,17 @@ impl RendererContext {
             Color::Gradient(_) => self.default_gradient_shader_id,
         };
 
-        if shader_id != self.active_shader_id || self.cameras.as_mut().unwrap().get_and_cast::<Camera>(self.active_camera_id)?.is_dirty() {
+        if shader_id != self.active_shader_id || self.cameras.get_and_cast::<Camera>(self.active_camera_id)?.is_dirty() {
             self.set_shader_as_active(shader_id)?;
 
-            let camera = self.cameras.as_mut().unwrap().get_and_cast_mut::<Camera>(self.active_camera_id)?;
-            let shader = self.shaders.as_ref().unwrap().get_and_cast::<Shader>(shader_id)?;
+            let camera = self.cameras.get_and_cast_mut::<Camera>(self.active_camera_id)?;
+            let shader = self.shaders.get_and_cast::<Shader>(shader_id)?;
             shader.set_parameter("proj", camera.get_projection_matrix().as_ptr())?;
             shader.set_parameter("view", camera.get_view_matrix().as_ptr())?;
             camera.set_dirty_flag(false);
         }
 
-        self.batch_renderer.as_mut().unwrap().draw(self.shaders.as_ref().unwrap().get_and_cast::<Shader>(shader_id)?)
+        self.batch_renderer.as_mut().unwrap().draw(self.shaders.get_and_cast::<Shader>(shader_id)?)
     }
 
     pub fn draw(&mut self, drawable_id: usize) -> Result<(), String> {
@@ -385,17 +388,17 @@ impl RendererContext {
             Color::Gradient(_) => self.default_gradient_shader_id,
         };
 
-        if shader_id != self.active_shader_id || self.cameras.as_mut().unwrap().get_and_cast::<Camera>(self.active_camera_id)?.is_dirty() {
+        if shader_id != self.active_shader_id || self.cameras.get_and_cast::<Camera>(self.active_camera_id)?.is_dirty() {
             self.set_shader_as_active(shader_id)?;
 
-            let camera = self.cameras.as_mut().unwrap().get_and_cast_mut::<Camera>(self.active_camera_id)?;
-            let shader = self.shaders.as_ref().unwrap().get_and_cast::<Shader>(shader_id)?;
+            let camera = self.cameras.get_and_cast_mut::<Camera>(self.active_camera_id)?;
+            let shader = self.shaders.get_and_cast::<Shader>(shader_id)?;
             shader.set_parameter("proj", camera.get_projection_matrix().as_ptr())?;
             shader.set_parameter("view", camera.get_view_matrix().as_ptr())?;
             camera.set_dirty_flag(false);
         }
 
-        self.get_drawable(drawable_id)?.draw(self.shaders.as_ref().unwrap().get_and_cast::<Shader>(shader_id)?)?;
+        self.get_drawable(drawable_id)?.draw(self.shaders.get_and_cast::<Shader>(shader_id)?)?;
         Ok(())
     }
 

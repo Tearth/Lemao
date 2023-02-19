@@ -1,4 +1,3 @@
-use crate::audio::samples::Sample;
 use crate::renderer::drawable::Drawable;
 use crate::utils::hasher::StorageHasherBuilder;
 use crate::utils::rand;
@@ -45,7 +44,7 @@ impl Storage {
     where
         C: 'static,
     {
-        self.get(id)?.as_any().downcast_ref::<C>().ok_or_else(|| "err".to_string())
+        self.get(id)?.as_any().downcast_ref::<C>().ok_or_else(|| format!("Storage item with id {} cannot be downcasted", id))
     }
 
     pub fn get_mut(&mut self, id: usize) -> Result<&mut dyn StorageItem, String> {
@@ -59,7 +58,7 @@ impl Storage {
     where
         C: 'static,
     {
-        self.get_mut(id)?.as_any_mut().downcast_mut::<C>().ok_or_else(|| "err".to_string())
+        self.get_mut(id)?.as_any_mut().downcast_mut::<C>().ok_or_else(|| format!("Storage item with id {} cannot be downcasted", id))
     }
 
     pub fn remove(&mut self, id: usize) -> Result<(), String> {

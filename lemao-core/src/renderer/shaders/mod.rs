@@ -120,10 +120,6 @@ impl Shader {
         }
     }
 
-    pub fn get_id(&self) -> usize {
-        self.id
-    }
-
     pub fn set_parameter<T>(&self, name: &str, data: *const T) -> Result<(), String>
     where
         T: Copy + Into<f32>,

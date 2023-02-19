@@ -56,10 +56,6 @@ impl Texture {
         }
     }
 
-    pub fn get_id(&self) -> usize {
-        self.id
-    }
-
     pub fn get_size(&self) -> Vec2 {
         self.size
     }

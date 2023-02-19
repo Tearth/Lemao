@@ -92,10 +92,6 @@ impl Text {
         text
     }
 
-    pub fn get_id(&self) -> usize {
-        self.id
-    }
-
     pub fn get_font_id(&self) -> usize {
         self.font_id
     }

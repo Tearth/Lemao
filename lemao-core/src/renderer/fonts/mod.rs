@@ -35,10 +35,6 @@ impl RawFont {
         Self { size, cell_size, base_character_offset, character_widths, data }
     }
 
-    pub fn get_size(&self) -> Vec2 {
-        self.size
-    }
-
     pub fn get_cell_size(&self) -> Vec2 {
         self.cell_size
     }
@@ -121,10 +117,6 @@ impl Font {
                 character_widths: raw.character_widths.clone(),
             }
         }
-    }
-
-    pub fn get_id(&self) -> usize {
-        self.id
     }
 
     pub fn get_size(&self) -> Vec2 {

@@ -87,10 +87,6 @@ impl Disc {
         disc
     }
 
-    pub fn get_id(&self) -> usize {
-        self.id
-    }
-
     pub fn get_texture_id(&self) -> usize {
         self.texture_id
     }

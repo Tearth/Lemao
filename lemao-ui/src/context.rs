@@ -17,6 +17,7 @@ use crate::events::UiEvent;
 use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::context::RendererContext;
+use lemao_core::utils::storage::StorageItem;
 use std::collections::VecDeque;
 
 pub struct UiContext {
@@ -170,7 +171,7 @@ impl UiContext {
     }
 
     pub fn get_component_with_type<T: 'static>(&self, component_id: usize) -> Result<&T, String> {
-        self.get_component(component_id)?.as_any().downcast_ref::<T>().ok_or(format!("Component with id {} cannot be downcasted", component_id))
+        self.get_component(component_id)?.as_any().downcast_ref::<T>().ok_or_else(|| format!("Component with id {} cannot be downcasted", component_id))
     }
 
     pub fn get_component_mut(&mut self, component_id: usize) -> Result<&mut dyn Component, String> {
@@ -185,7 +186,7 @@ impl UiContext {
     }
 
     pub fn get_component_with_type_mut<T: 'static>(&mut self, component_id: usize) -> Result<&mut T, String> {
-        self.get_component_mut(component_id)?.as_any_mut().downcast_mut::<T>().ok_or(format!("Component with id {} cannot be downcasted", component_id))
+        self.get_component_mut(component_id)?.as_any_mut().downcast_mut::<T>().ok_or_else(|| format!("Component with id {} cannot be downcasted", component_id))
     }
 
     pub fn get_main_canvas(&self) -> Result<&dyn Component, String> {

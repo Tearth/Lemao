@@ -17,10 +17,6 @@ impl Camera {
         Self { id: 0, position, size, dirty: false }
     }
 
-    pub fn get_id(&self) -> usize {
-        self.id
-    }
-
     pub fn get_position(&self) -> Vec2 {
         self.position
     }

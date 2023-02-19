@@ -18,6 +18,7 @@ use lemao_core::renderer::drawable::frame::Frame;
 use lemao_core::renderer::drawable::rectangle::Rectangle;
 use lemao_core::renderer::drawable::Color;
 use lemao_core::renderer::textures::Texture;
+use lemao_core::utils::storage::StorageItem;
 use std::any::Any;
 
 pub struct Panel {

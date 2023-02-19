@@ -18,11 +18,6 @@ impl Sound {
 
         Ok(sound)
     }
-
-    pub fn get_id(&self) -> usize {
-        self.id
-    }
-
     pub fn get_sample_id(&self) -> usize {
         self.sample_id
     }

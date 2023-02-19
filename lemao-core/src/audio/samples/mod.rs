@@ -40,10 +40,6 @@ impl Sample {
             Ok(Self { id: 0, buffer_id })
         }
     }
-
-    pub fn get_id(&self) -> usize {
-        self.id
-    }
 }
 
 impl Drop for Sample {

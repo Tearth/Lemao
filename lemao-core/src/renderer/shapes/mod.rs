@@ -76,10 +76,6 @@ impl Shape {
         }
     }
 
-    pub fn get_id(&self) -> usize {
-        self.id
-    }
-
     pub fn get_vertices(&self) -> &Vec<f32> {
         &self.vertices
     }
