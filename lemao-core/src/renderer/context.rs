@@ -166,7 +166,7 @@ impl RendererContext {
     }
 
     pub fn init_batch_renderer(&mut self) {
-        self.batch_renderer = Some(BatchRenderer::new(self, 1024 * 1024, 1024 * 100));
+        self.batch_renderer = Some(BatchRenderer::new(self, 1024 * 1024, 1024 * 1024));
     }
 
     pub fn get_viewport_size(&self) -> Vec2 {

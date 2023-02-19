@@ -20,8 +20,8 @@ pub static NvOptimusEnablement: i32 = 1;
 #[cfg(windows)]
 pub static AmdPowerXpressRequestHighPerformance: i32 = 1;
 
-const CELLS_COUNT: usize = 5000;
-const MAX_SPEED: f32 = 1.0;
+const CELLS_COUNT: usize = 20000;
+const MAX_SPEED: f32 = 0.2;
 
 pub struct CellData {
     pub sprite_id: usize,
