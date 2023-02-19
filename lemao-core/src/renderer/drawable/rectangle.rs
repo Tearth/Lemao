@@ -16,6 +16,7 @@ use std::{mem, ptr};
 pub struct Rectangle {
     pub(crate) id: usize,
     pub(crate) shape_id: usize,
+    pub(crate) shape_vao_gl_id: u32,
     pub(crate) vao_gl_id: u32,
     pub(crate) vbo_gl_id: u32,
     pub(crate) ebo_gl_id: u32,
@@ -31,6 +32,8 @@ pub struct Rectangle {
     color: Color,
     corner_rounding: CornerRounding,
     elements_count: u32,
+    custom_shape: bool,
+    custom_shape_initialized: bool,
     vertices: Vec<f32>,
     indices: Vec<u32>,
 }
@@ -40,6 +43,7 @@ impl Rectangle {
         let mut rectangle = Rectangle {
             id: 0,
             shape_id: shape.id,
+            shape_vao_gl_id: shape.vao_gl_id,
             vao_gl_id: 0,
             vbo_gl_id: 0,
             ebo_gl_id: 0,
@@ -55,29 +59,11 @@ impl Rectangle {
             color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             corner_rounding: Default::default(),
             elements_count: 0,
+            custom_shape: false,
+            custom_shape_initialized: false,
             vertices: Vec::new(),
             indices: Vec::new(),
         };
-
-        unsafe {
-            (rectangle.gl.glGenVertexArrays)(1, &mut rectangle.vao_gl_id);
-            (rectangle.gl.glBindVertexArray)(rectangle.vao_gl_id);
-
-            (rectangle.gl.glGenBuffers)(1, &mut rectangle.vbo_gl_id);
-            (rectangle.gl.glBindBuffer)(opengl::GL_ARRAY_BUFFER, rectangle.vbo_gl_id);
-
-            (rectangle.gl.glGenBuffers)(1, &mut rectangle.ebo_gl_id);
-            (rectangle.gl.glBindBuffer)(opengl::GL_ELEMENT_ARRAY_BUFFER, rectangle.ebo_gl_id);
-
-            let attrib_size = (9 * mem::size_of::<f32>()) as i32;
-            (rectangle.gl.glVertexAttribPointer)(0, 3, opengl::GL_FLOAT, opengl::GL_FALSE as u8, attrib_size, ptr::null_mut());
-            (rectangle.gl.glVertexAttribPointer)(1, 4, opengl::GL_FLOAT, opengl::GL_FALSE as u8, attrib_size, (3 * mem::size_of::<f32>()) as *const c_void);
-            (rectangle.gl.glVertexAttribPointer)(2, 2, opengl::GL_FLOAT, opengl::GL_FALSE as u8, attrib_size, (7 * mem::size_of::<f32>()) as *const c_void);
-
-            (rectangle.gl.glEnableVertexAttribArray)(0);
-            (rectangle.gl.glEnableVertexAttribArray)(1);
-            (rectangle.gl.glEnableVertexAttribArray)(2);
-        }
 
         rectangle.update();
         rectangle
@@ -100,125 +86,150 @@ impl Rectangle {
 
     pub fn set_corner_rounding(&mut self, corner_rounding: CornerRounding) {
         self.corner_rounding = corner_rounding;
+        self.custom_shape = true;
         self.update();
     }
 
     fn update(&mut self) {
         unsafe {
-            self.vertices.clear();
-            self.indices.clear();
+            if self.custom_shape && !self.custom_shape_initialized {
+                (self.gl.glGenVertexArrays)(1, &mut self.vao_gl_id);
+                (self.gl.glBindVertexArray)(self.vao_gl_id);
 
-            // Center
-            self.vertices.extend_from_slice(&self.get_vertices(self.size / 2.0, Vec2::new(0.5, 0.5), SolidColor::new(1.0, 1.0, 1.0, 1.0)));
+                (self.gl.glGenBuffers)(1, &mut self.vbo_gl_id);
+                (self.gl.glBindBuffer)(opengl::GL_ARRAY_BUFFER, self.vbo_gl_id);
 
-            // Left-bottom
-            self.vertices.extend_from_slice(&self.get_vertices(
-                Vec2::new(self.corner_rounding.left_bottom, 0.0),
-                Vec2::new(self.corner_rounding.left_bottom, 0.0) / self.size,
-                SolidColor::new(1.0, 1.0, 1.0, 1.0),
-            ));
+                (self.gl.glGenBuffers)(1, &mut self.ebo_gl_id);
+                (self.gl.glBindBuffer)(opengl::GL_ELEMENT_ARRAY_BUFFER, self.ebo_gl_id);
 
-            // Right-bottom
-            self.vertices.extend_from_slice(&self.get_vertices(
-                Vec2::new(self.size.x - self.corner_rounding.right_bottom, 0.0),
-                Vec2::new(self.size.x - self.corner_rounding.right_bottom, 0.0) / self.size,
-                SolidColor::new(1.0, 1.0, 1.0, 1.0),
-            ));
+                let attrib_size = (9 * mem::size_of::<f32>()) as i32;
+                (self.gl.glVertexAttribPointer)(0, 3, opengl::GL_FLOAT, opengl::GL_FALSE as u8, attrib_size, ptr::null_mut());
+                (self.gl.glVertexAttribPointer)(1, 4, opengl::GL_FLOAT, opengl::GL_FALSE as u8, attrib_size, (3 * mem::size_of::<f32>()) as *const c_void);
+                (self.gl.glVertexAttribPointer)(2, 2, opengl::GL_FLOAT, opengl::GL_FALSE as u8, attrib_size, (7 * mem::size_of::<f32>()) as *const c_void);
 
-            // Right-bottom
-            self.vertices.extend_from_slice(&self.get_vertices(
-                Vec2::new(self.size.x, self.corner_rounding.right_bottom),
-                Vec2::new(self.size.x, self.corner_rounding.right_bottom) / self.size,
-                SolidColor::new(1.0, 1.0, 1.0, 1.0),
-            ));
+                (self.gl.glEnableVertexAttribArray)(0);
+                (self.gl.glEnableVertexAttribArray)(1);
+                (self.gl.glEnableVertexAttribArray)(2);
 
-            // Right-top
-            self.vertices.extend_from_slice(&self.get_vertices(
-                Vec2::new(self.size.x, self.size.y - self.corner_rounding.right_top),
-                Vec2::new(self.size.x, self.size.y - self.corner_rounding.right_top) / self.size,
-                SolidColor::new(1.0, 1.0, 1.0, 1.0),
-            ));
-
-            // Right-top
-            self.vertices.extend_from_slice(&self.get_vertices(
-                Vec2::new(self.size.x - self.corner_rounding.right_top, self.size.y),
-                Vec2::new(self.size.x - self.corner_rounding.right_top, self.size.y) / self.size,
-                SolidColor::new(1.0, 1.0, 1.0, 1.0),
-            ));
-
-            // Left-top
-            self.vertices.extend_from_slice(&self.get_vertices(
-                Vec2::new(self.corner_rounding.left_top, self.size.y),
-                Vec2::new(self.corner_rounding.left_top, self.size.y) / self.size,
-                SolidColor::new(1.0, 1.0, 1.0, 1.0),
-            ));
-
-            // Left-top
-            self.vertices.extend_from_slice(&self.get_vertices(
-                Vec2::new(0.0, self.size.y - self.corner_rounding.left_top),
-                Vec2::new(0.0, self.size.y - self.corner_rounding.left_top) / self.size,
-                SolidColor::new(1.0, 1.0, 1.0, 1.0),
-            ));
-
-            // Left-bottom
-            self.vertices.extend_from_slice(&self.get_vertices(
-                Vec2::new(0.0, self.corner_rounding.left_bottom),
-                Vec2::new(0.0, self.corner_rounding.left_bottom) / self.size,
-                SolidColor::new(1.0, 1.0, 1.0, 1.0),
-            ));
-
-            self.indices.extend_from_slice(&[0, 1, 2, 0, 3, 4, 0, 5, 6, 0, 7, 8]);
-
-            if self.corner_rounding.left_bottom > 0.0 {
-                self.get_corner(
-                    Vec2::new(self.corner_rounding.left_bottom, self.corner_rounding.left_bottom),
-                    self.corner_rounding.left_bottom,
-                    std::f32::consts::PI * 1.0,
-                    std::f32::consts::PI * 1.5,
-                );
+                self.custom_shape_initialized = true;
             }
 
-            if self.corner_rounding.right_bottom > 0.0 {
-                self.get_corner(
-                    Vec2::new(self.size.x - self.corner_rounding.right_bottom, self.corner_rounding.right_bottom),
-                    self.corner_rounding.right_bottom,
-                    std::f32::consts::PI * 1.5,
-                    std::f32::consts::PI * 2.0,
-                );
+            if self.custom_shape {
+                self.vertices.clear();
+                self.indices.clear();
+
+                // Center
+                self.vertices.extend_from_slice(&self.get_vertices(self.size / 2.0, Vec2::new(0.5, 0.5), SolidColor::new(1.0, 1.0, 1.0, 1.0)));
+
+                // Left-bottom
+                self.vertices.extend_from_slice(&self.get_vertices(
+                    Vec2::new(self.corner_rounding.left_bottom, 0.0),
+                    Vec2::new(self.corner_rounding.left_bottom, 0.0) / self.size,
+                    SolidColor::new(1.0, 1.0, 1.0, 1.0),
+                ));
+
+                // Right-bottom
+                self.vertices.extend_from_slice(&self.get_vertices(
+                    Vec2::new(self.size.x - self.corner_rounding.right_bottom, 0.0),
+                    Vec2::new(self.size.x - self.corner_rounding.right_bottom, 0.0) / self.size,
+                    SolidColor::new(1.0, 1.0, 1.0, 1.0),
+                ));
+
+                // Right-bottom
+                self.vertices.extend_from_slice(&self.get_vertices(
+                    Vec2::new(self.size.x, self.corner_rounding.right_bottom),
+                    Vec2::new(self.size.x, self.corner_rounding.right_bottom) / self.size,
+                    SolidColor::new(1.0, 1.0, 1.0, 1.0),
+                ));
+
+                // Right-top
+                self.vertices.extend_from_slice(&self.get_vertices(
+                    Vec2::new(self.size.x, self.size.y - self.corner_rounding.right_top),
+                    Vec2::new(self.size.x, self.size.y - self.corner_rounding.right_top) / self.size,
+                    SolidColor::new(1.0, 1.0, 1.0, 1.0),
+                ));
+
+                // Right-top
+                self.vertices.extend_from_slice(&self.get_vertices(
+                    Vec2::new(self.size.x - self.corner_rounding.right_top, self.size.y),
+                    Vec2::new(self.size.x - self.corner_rounding.right_top, self.size.y) / self.size,
+                    SolidColor::new(1.0, 1.0, 1.0, 1.0),
+                ));
+
+                // Left-top
+                self.vertices.extend_from_slice(&self.get_vertices(
+                    Vec2::new(self.corner_rounding.left_top, self.size.y),
+                    Vec2::new(self.corner_rounding.left_top, self.size.y) / self.size,
+                    SolidColor::new(1.0, 1.0, 1.0, 1.0),
+                ));
+
+                // Left-top
+                self.vertices.extend_from_slice(&self.get_vertices(
+                    Vec2::new(0.0, self.size.y - self.corner_rounding.left_top),
+                    Vec2::new(0.0, self.size.y - self.corner_rounding.left_top) / self.size,
+                    SolidColor::new(1.0, 1.0, 1.0, 1.0),
+                ));
+
+                // Left-bottom
+                self.vertices.extend_from_slice(&self.get_vertices(
+                    Vec2::new(0.0, self.corner_rounding.left_bottom),
+                    Vec2::new(0.0, self.corner_rounding.left_bottom) / self.size,
+                    SolidColor::new(1.0, 1.0, 1.0, 1.0),
+                ));
+
+                self.indices.extend_from_slice(&[0, 1, 2, 0, 3, 4, 0, 5, 6, 0, 7, 8]);
+
+                if self.corner_rounding.left_bottom > 0.0 {
+                    self.get_corner(
+                        Vec2::new(self.corner_rounding.left_bottom, self.corner_rounding.left_bottom),
+                        self.corner_rounding.left_bottom,
+                        std::f32::consts::PI * 1.0,
+                        std::f32::consts::PI * 1.5,
+                    );
+                }
+
+                if self.corner_rounding.right_bottom > 0.0 {
+                    self.get_corner(
+                        Vec2::new(self.size.x - self.corner_rounding.right_bottom, self.corner_rounding.right_bottom),
+                        self.corner_rounding.right_bottom,
+                        std::f32::consts::PI * 1.5,
+                        std::f32::consts::PI * 2.0,
+                    );
+                }
+
+                if self.corner_rounding.right_top > 0.0 {
+                    self.get_corner(
+                        Vec2::new(self.size.x - self.corner_rounding.right_top, self.size.y - self.corner_rounding.right_top),
+                        self.corner_rounding.right_top,
+                        std::f32::consts::PI * 0.0,
+                        std::f32::consts::PI * 0.5,
+                    );
+                }
+
+                if self.corner_rounding.left_top > 0.0 {
+                    self.get_corner(
+                        Vec2::new(self.corner_rounding.left_top, self.size.y - self.corner_rounding.left_top),
+                        self.corner_rounding.left_top,
+                        std::f32::consts::PI * 0.5,
+                        std::f32::consts::PI * 1.0,
+                    );
+                }
+
+                self.elements_count = self.indices.len() as u32;
+
+                let vertices_size = (mem::size_of::<f32>() * self.vertices.len()) as i64;
+                let vertices_ptr = self.vertices.as_ptr() as *const c_void;
+
+                (self.gl.glBindVertexArray)(self.vao_gl_id);
+                (self.gl.glBindBuffer)(opengl::GL_ARRAY_BUFFER, self.vbo_gl_id);
+                (self.gl.glBufferData)(opengl::GL_ARRAY_BUFFER, vertices_size, vertices_ptr, opengl::GL_STATIC_DRAW);
+
+                let indices_size = (mem::size_of::<u32>() * self.indices.len()) as i64;
+                let indices_ptr = self.indices.as_ptr() as *const c_void;
+
+                (self.gl.glBindBuffer)(opengl::GL_ELEMENT_ARRAY_BUFFER, self.ebo_gl_id);
+                (self.gl.glBufferData)(opengl::GL_ELEMENT_ARRAY_BUFFER, indices_size, indices_ptr, opengl::GL_STATIC_DRAW);
             }
-
-            if self.corner_rounding.right_top > 0.0 {
-                self.get_corner(
-                    Vec2::new(self.size.x - self.corner_rounding.right_top, self.size.y - self.corner_rounding.right_top),
-                    self.corner_rounding.right_top,
-                    std::f32::consts::PI * 0.0,
-                    std::f32::consts::PI * 0.5,
-                );
-            }
-
-            if self.corner_rounding.left_top > 0.0 {
-                self.get_corner(
-                    Vec2::new(self.corner_rounding.left_top, self.size.y - self.corner_rounding.left_top),
-                    self.corner_rounding.left_top,
-                    std::f32::consts::PI * 0.5,
-                    std::f32::consts::PI * 1.0,
-                );
-            }
-
-            self.elements_count = self.indices.len() as u32;
-
-            let vertices_size = (mem::size_of::<f32>() * self.vertices.len()) as i64;
-            let vertices_ptr = self.vertices.as_ptr() as *const c_void;
-
-            (self.gl.glBindVertexArray)(self.vao_gl_id);
-            (self.gl.glBindBuffer)(opengl::GL_ARRAY_BUFFER, self.vbo_gl_id);
-            (self.gl.glBufferData)(opengl::GL_ARRAY_BUFFER, vertices_size, vertices_ptr, opengl::GL_STATIC_DRAW);
-
-            let indices_size = (mem::size_of::<u32>() * self.indices.len()) as i64;
-            let indices_ptr = self.indices.as_ptr() as *const c_void;
-
-            (self.gl.glBindBuffer)(opengl::GL_ELEMENT_ARRAY_BUFFER, self.ebo_gl_id);
-            (self.gl.glBufferData)(opengl::GL_ELEMENT_ARRAY_BUFFER, indices_size, indices_ptr, opengl::GL_STATIC_DRAW);
         }
     }
 
@@ -324,14 +335,25 @@ impl Drawable for Rectangle {
 
     fn get_transformation_matrix(&self) -> Mat4x4 {
         let translation = Mat4x4::translate(Vec3::from(self.position));
-        let anchor_offset = Mat4x4::translate(-Vec3::from(self.anchor * self.size));
-        let scale = Mat4x4::scale(Vec3::from(self.scale).floor());
         let rotation = Mat4x4::rotate(self.rotation);
-        translation * rotation * scale * anchor_offset
+
+        if self.custom_shape {
+            let anchor_offset = Mat4x4::translate(-Vec3::from(self.anchor * self.size));
+            let scale = Mat4x4::scale(Vec3::from(self.scale).floor());
+            translation * rotation * scale * anchor_offset
+        } else {
+            let anchor_offset = Mat4x4::translate(-Vec3::from(self.anchor));
+            let scale = Mat4x4::scale(Vec3::from(self.scale * self.size).floor());
+            translation * rotation * scale * anchor_offset
+        }
     }
 
     fn get_batch(&self) -> Batch {
-        Batch::new(None, Some(&self.vertices), Some(&self.indices), Some(self.texture_gl_id), Some(&self.color))
+        if self.custom_shape {
+            Batch::new(None, Some(&self.vertices), Some(&self.indices), Some(self.texture_gl_id), Some(&self.color))
+        } else {
+            Batch::new(Some(self.shape_id), None, None, Some(self.texture_gl_id), Some(&self.color))
+        }
     }
 
     fn draw(&self, shader: &Shader) -> Result<(), String> {
@@ -341,9 +363,15 @@ impl Drawable for Rectangle {
             shader.set_parameter("model", model.as_ptr())?;
             shader.set_color(&self.color)?;
 
-            (self.gl.glBindVertexArray)(self.vao_gl_id);
-            (self.gl.glBindTexture)(opengl::GL_TEXTURE_2D, self.texture_gl_id);
-            (self.gl.glDrawElements)(opengl::GL_TRIANGLES, self.elements_count as i32, opengl::GL_UNSIGNED_INT, ptr::null());
+            if self.custom_shape {
+                (self.gl.glBindVertexArray)(self.vao_gl_id);
+                (self.gl.glBindTexture)(opengl::GL_TEXTURE_2D, self.texture_gl_id);
+                (self.gl.glDrawElements)(opengl::GL_TRIANGLES, self.elements_count as i32, opengl::GL_UNSIGNED_INT, ptr::null());
+            } else {
+                (self.gl.glBindVertexArray)(self.shape_vao_gl_id);
+                (self.gl.glBindTexture)(opengl::GL_TEXTURE_2D, self.texture_gl_id);
+                (self.gl.glDrawElements)(opengl::GL_TRIANGLES, 6, opengl::GL_UNSIGNED_INT, ptr::null());
+            }
 
             Ok(())
         }
