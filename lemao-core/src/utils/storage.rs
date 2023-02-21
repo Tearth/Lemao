@@ -36,7 +36,7 @@ impl Storage {
     pub fn get(&self, id: usize) -> Result<&dyn StorageItem, String> {
         match self.data.get(&id) {
             Some(item) => Ok(item.as_ref()),
-            None => Err(format!("Storage item with id {} not found", id)),
+            None => Err(format!("Storage item {} not found", id)),
         }
     }
 
@@ -44,13 +44,13 @@ impl Storage {
     where
         C: 'static,
     {
-        self.get(id)?.as_any().downcast_ref::<C>().ok_or_else(|| format!("Storage item with id {} cannot be downcasted", id))
+        self.get(id)?.as_any().downcast_ref::<C>().ok_or_else(|| format!("Storage item {} cannot be downcasted", id))
     }
 
     pub fn get_mut(&mut self, id: usize) -> Result<&mut dyn StorageItem, String> {
         match self.data.get_mut(&id) {
             Some(drawable) => Ok(drawable.as_mut()),
-            None => Err(format!("Storage item with id {} not found", id)),
+            None => Err(format!("Storage item {} not found", id)),
         }
     }
 
@@ -58,12 +58,12 @@ impl Storage {
     where
         C: 'static,
     {
-        self.get_mut(id)?.as_any_mut().downcast_mut::<C>().ok_or_else(|| format!("Storage item with id {} cannot be downcasted", id))
+        self.get_mut(id)?.as_any_mut().downcast_mut::<C>().ok_or_else(|| format!("Storage item {} cannot be downcasted", id))
     }
 
     pub fn remove(&mut self, id: usize) -> Result<(), String> {
         if self.data.remove(&id).is_none() {
-            return Err(format!("Storage item with id {} not found", id));
+            return Err(format!("Storage item {} not found", id));
         }
 
         Ok(())

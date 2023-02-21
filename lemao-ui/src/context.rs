@@ -161,32 +161,32 @@ impl UiContext {
 
     pub fn get_component(&self, component_id: usize) -> Result<&dyn Component, String> {
         if component_id >= self.components.len() {
-            return Err(format!("Component with id {} not found", component_id));
+            return Err(format!("Component {} not found", component_id));
         }
 
         match &self.components[component_id] {
             Some(component) => Ok(component.as_ref()),
-            None => Err(format!("Component with id {} not found", component_id)),
+            None => Err(format!("Component {} not found", component_id)),
         }
     }
 
-    pub fn get_component_with_type<T: 'static>(&self, component_id: usize) -> Result<&T, String> {
-        self.get_component(component_id)?.as_any().downcast_ref::<T>().ok_or_else(|| format!("Component with id {} cannot be downcasted", component_id))
+    pub fn get_component_and_cast<T: 'static>(&self, component_id: usize) -> Result<&T, String> {
+        self.get_component(component_id)?.as_any().downcast_ref::<T>().ok_or_else(|| format!("Component {} cannot be downcasted", component_id))
     }
 
     pub fn get_component_mut(&mut self, component_id: usize) -> Result<&mut dyn Component, String> {
         if component_id >= self.components.len() {
-            return Err(format!("Component with id {} not found", component_id));
+            return Err(format!("Component {} not found", component_id));
         }
 
         match &mut self.components[component_id] {
             Some(drawable) => Ok(drawable.as_mut()),
-            None => Err(format!("Component with id {} not found", component_id)),
+            None => Err(format!("Component {} not found", component_id)),
         }
     }
 
-    pub fn get_component_with_type_mut<T: 'static>(&mut self, component_id: usize) -> Result<&mut T, String> {
-        self.get_component_mut(component_id)?.as_any_mut().downcast_mut::<T>().ok_or_else(|| format!("Component with id {} cannot be downcasted", component_id))
+    pub fn get_component_and_cast_mut<T: 'static>(&mut self, component_id: usize) -> Result<&mut T, String> {
+        self.get_component_mut(component_id)?.as_any_mut().downcast_mut::<T>().ok_or_else(|| format!("Component {} cannot be downcasted", component_id))
     }
 
     pub fn get_main_canvas(&self) -> Result<&dyn Component, String> {
@@ -264,7 +264,7 @@ impl UiContext {
 
         let component_area_position = component.get_work_area_position();
         let component_area_size = component.get_work_area_size();
-        let (event_mask, scroll_offset) = if let Ok(scrollbox) = self.get_component_with_type::<Scrollbox>(component_id) {
+        let (event_mask, scroll_offset) = if let Ok(scrollbox) = self.get_component_and_cast::<Scrollbox>(component_id) {
             (Some(EventMask::new(component_area_position, component_area_size)), if update { Some(scrollbox.get_scroll_delta()) } else { None })
         } else {
             (event_mask, Default::default())
@@ -279,7 +279,7 @@ impl UiContext {
         }
 
         // Scrollbox needs to be updated second time, after all children are refreshed
-        if self.get_component_with_type::<Scrollbox>(component_id).is_ok() && any_component_updated {
+        if self.get_component_and_cast::<Scrollbox>(component_id).is_ok() && any_component_updated {
             let mut left_bottom_corner: Vec2 = Vec2::new(f32::MAX, f32::MAX);
             let mut right_top_corner: Vec2 = Vec2::new(f32::MIN, f32::MIN);
 
@@ -294,8 +294,8 @@ impl UiContext {
                 right_top_corner.y = f32::max(right_top_corner.y, child_area_position.y + child_area_size.y);
             }
 
-            self.get_component_with_type_mut::<Scrollbox>(component_id)?.set_total_size(right_top_corner - left_bottom_corner);
-            self.get_component_with_type_mut::<Scrollbox>(component_id)?.update(renderer, area_position, area_size)?;
+            self.get_component_and_cast_mut::<Scrollbox>(component_id)?.set_total_size(right_top_corner - left_bottom_corner);
+            self.get_component_and_cast_mut::<Scrollbox>(component_id)?.update(renderer, area_position, area_size)?;
         }
 
         Ok(any_component_updated)

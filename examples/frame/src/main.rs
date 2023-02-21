@@ -38,11 +38,11 @@ pub fn main() -> Result<(), String> {
     let frame_id = renderer.create_frame(Vec2::new(100.0, 100.0)).unwrap();
     let description_text_id = renderer.create_text(font_id)?;
 
-    let frame = renderer.get_drawable_with_type_mut::<Frame>(frame_id)?;
+    let frame = renderer.get_drawable_and_cast_mut::<Frame>(frame_id)?;
     frame.set_anchor(Vec2::new(0.5, 0.5));
     frame.set_position(Vec2::new(400.0, 300.0));
 
-    let description_text = renderer.get_drawable_with_type_mut::<Text>(description_text_id)?;
+    let description_text = renderer.get_drawable_and_cast_mut::<Text>(description_text_id)?;
     description_text.set_text(DESCRIPTION);
     description_text.set_anchor(Vec2::new(0.0, 1.0));
     description_text.set_line_height(20);
@@ -57,7 +57,7 @@ pub fn main() -> Result<(), String> {
                     }
                 }
                 InputEvent::MouseWheelRotated(direction, _) => {
-                    let frame = renderer.get_drawable_with_type_mut::<Frame>(frame_id)?;
+                    let frame = renderer.get_drawable_and_cast_mut::<Frame>(frame_id)?;
                     if direction == MouseWheelDirection::Up {
                         frame.set_thickness(frame.get_thickness() + FrameThickness::new(1.0, 1.0, 1.0, 1.0));
                     } else {
@@ -78,7 +78,7 @@ pub fn main() -> Result<(), String> {
 
         if window.is_mouse_button_pressed(MouseButton::Left) {
             let position = window.get_cursor_position(CoordinationSystem::Window);
-            renderer.get_drawable_with_type_mut::<Frame>(frame_id)?.set_position(position);
+            renderer.get_drawable_and_cast_mut::<Frame>(frame_id)?.set_position(position);
         }
 
         renderer.clear(SolidColor::new(0.5, 0.5, 0.5, 1.0));

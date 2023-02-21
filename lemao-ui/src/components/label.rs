@@ -351,7 +351,7 @@ impl Component for Label {
 
     fn update(&mut self, renderer: &mut RendererContext, area_position: Vec2, area_size: Vec2) -> Result<(), String> {
         // We have to set text first, to get the size used later
-        let label = renderer.get_drawable_with_type_mut::<Text>(self.label_id)?;
+        let label = renderer.get_drawable_and_cast_mut::<Text>(self.label_id)?;
         let mut label_text_processed = self.label_text.clone();
         if self.multiline {
             let mut line = String::new();
@@ -373,10 +373,10 @@ impl Component for Label {
         let font_storage = renderer.get_fonts();
         let font_storage = font_storage.read().unwrap();
         let font = font_storage.get_and_cast::<Font>(self.label_font_id)?;
-        renderer.get_drawable_with_type_mut::<Text>(self.label_id)?.set_font(font);
-        renderer.get_drawable_with_type_mut::<Text>(self.label_id)?.set_text(&label_text_processed);
+        renderer.get_drawable_and_cast_mut::<Text>(self.label_id)?.set_font(font);
+        renderer.get_drawable_and_cast_mut::<Text>(self.label_id)?.set_text(&label_text_processed);
 
-        self.screen_size = renderer.get_drawable_with_type_mut::<Text>(self.label_id)?.get_size();
+        self.screen_size = renderer.get_drawable_and_cast_mut::<Text>(self.label_id)?.get_size();
         self.size = ComponentSize::Absolute(self.screen_size);
 
         self.screen_position = match self.position {
@@ -393,7 +393,7 @@ impl Component for Label {
         self.screen_size = self.screen_size.floor();
         self.screen_position = self.screen_position.floor();
 
-        let label = renderer.get_drawable_with_type_mut::<Text>(self.label_id)?;
+        let label = renderer.get_drawable_and_cast_mut::<Text>(self.label_id)?;
         label.set_position(self.screen_position);
         label.set_color(self.label_color.clone());
 

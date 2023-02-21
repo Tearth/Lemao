@@ -494,9 +494,9 @@ impl Component for Panel {
             border_rectangle.set_color(self.border_color.clone());
 
             match self.shape {
-                ComponentShape::Rectangle => renderer.get_drawable_with_type_mut::<Frame>(self.border_id)?.set_thickness(self.border_thickness.into()),
+                ComponentShape::Rectangle => renderer.get_drawable_and_cast_mut::<Frame>(self.border_id)?.set_thickness(self.border_thickness.into()),
                 ComponentShape::Disc => {
-                    let circle = renderer.get_drawable_with_type_mut::<Circle>(self.border_id)?;
+                    let circle = renderer.get_drawable_and_cast_mut::<Circle>(self.border_id)?;
                     circle.set_thickness(Vec2::new(self.border_thickness.left, self.border_thickness.top));
                     circle.set_start_angle(self.start_angle);
                     circle.set_end_angle(self.end_angle);
@@ -520,8 +520,8 @@ impl Component for Panel {
             let texture = texture_storage.get_and_cast::<Texture>(texture_id)?;
 
             match self.shape {
-                ComponentShape::Rectangle => renderer.get_drawable_with_type_mut::<Rectangle>(self.filling_id)?.set_texture(texture),
-                ComponentShape::Disc => renderer.get_drawable_with_type_mut::<Disc>(self.filling_id)?.set_texture(texture),
+                ComponentShape::Rectangle => renderer.get_drawable_and_cast_mut::<Rectangle>(self.filling_id)?.set_texture(texture),
+                ComponentShape::Disc => renderer.get_drawable_and_cast_mut::<Disc>(self.filling_id)?.set_texture(texture),
             }
         }
 
@@ -531,15 +531,15 @@ impl Component for Panel {
 
         match self.shape {
             ComponentShape::Rectangle => {
-                renderer.get_drawable_with_type_mut::<Rectangle>(self.filling_id)?.set_corner_rounding(self.corner_rounding.into());
-                renderer.get_drawable_with_type_mut::<Frame>(self.border_id)?.set_corner_rounding(self.corner_rounding.into())
+                renderer.get_drawable_and_cast_mut::<Rectangle>(self.filling_id)?.set_corner_rounding(self.corner_rounding.into());
+                renderer.get_drawable_and_cast_mut::<Frame>(self.border_id)?.set_corner_rounding(self.corner_rounding.into())
             }
             ComponentShape::Disc => {
-                let filling = renderer.get_drawable_with_type_mut::<Disc>(self.filling_id)?;
+                let filling = renderer.get_drawable_and_cast_mut::<Disc>(self.filling_id)?;
                 filling.set_start_angle(self.start_angle);
                 filling.set_end_angle(self.end_angle);
 
-                let border = renderer.get_drawable_with_type_mut::<Circle>(self.border_id)?;
+                let border = renderer.get_drawable_and_cast_mut::<Circle>(self.border_id)?;
                 border.set_start_angle(self.start_angle);
                 border.set_end_angle(self.end_angle);
             }
@@ -555,10 +555,10 @@ impl Component for Panel {
 
             match self.shape {
                 ComponentShape::Rectangle => {
-                    renderer.get_drawable_with_type_mut::<Rectangle>(self.shadow_id)?.set_corner_rounding(self.shadow_corner_rounding.into());
+                    renderer.get_drawable_and_cast_mut::<Rectangle>(self.shadow_id)?.set_corner_rounding(self.shadow_corner_rounding.into());
                 }
                 ComponentShape::Disc => {
-                    let filling = renderer.get_drawable_with_type_mut::<Disc>(self.shadow_id)?;
+                    let filling = renderer.get_drawable_and_cast_mut::<Disc>(self.shadow_id)?;
                     filling.set_start_angle(self.start_angle);
                     filling.set_end_angle(self.end_angle);
                 }

@@ -654,7 +654,7 @@ impl Component for ProgressBar {
             border_rectangle.set_size(self.screen_size);
             border_rectangle.set_color(self.border_color.clone());
 
-            renderer.get_drawable_with_type_mut::<Frame>(self.border_id)?.set_thickness(self.border_thickness.into());
+            renderer.get_drawable_and_cast_mut::<Frame>(self.border_id)?.set_thickness(self.border_thickness.into());
 
             self.screen_position += Vec2::new(self.border_thickness.left, self.border_thickness.bottom);
             self.screen_size -= Vec2::new(self.border_thickness.left + self.border_thickness.right, self.border_thickness.top + self.border_thickness.bottom);
@@ -672,18 +672,18 @@ impl Component for ProgressBar {
             let texture_storage = texture_storage.read().unwrap();
             let texture = texture_storage.get_and_cast::<Texture>(texture_id)?;
 
-            renderer.get_drawable_with_type_mut::<Rectangle>(self.filling_id)?.set_texture(texture)
+            renderer.get_drawable_and_cast_mut::<Rectangle>(self.filling_id)?.set_texture(texture)
         }
 
         renderer.get_drawable_mut(self.filling_id)?.set_size(self.screen_size);
 
-        renderer.get_drawable_with_type_mut::<Rectangle>(self.filling_id)?.set_corner_rounding(self.corner_rounding.into());
-        renderer.get_drawable_with_type_mut::<Frame>(self.border_id)?.set_corner_rounding(self.corner_rounding.into());
+        renderer.get_drawable_and_cast_mut::<Rectangle>(self.filling_id)?.set_corner_rounding(self.corner_rounding.into());
+        renderer.get_drawable_and_cast_mut::<Frame>(self.border_id)?.set_corner_rounding(self.corner_rounding.into());
 
         let font_storage = renderer.get_fonts();
         let font_storage = font_storage.read().unwrap();
         let font = font_storage.get_and_cast::<Font>(self.label_font_id)?;
-        let label = renderer.get_drawable_with_type_mut::<Text>(self.label_id)?;
+        let label = renderer.get_drawable_and_cast_mut::<Text>(self.label_id)?;
         label.set_font(font);
         label.set_text(&self.label_text);
         label.set_color(self.label_color.clone());
@@ -711,7 +711,7 @@ impl Component for ProgressBar {
             shadow.set_color(self.shadow_color.clone());
             shadow.set_scale(self.shadow_scale);
 
-            if let Ok(rectangle) = renderer.get_drawable_with_type_mut::<Rectangle>(self.shadow_id) {
+            if let Ok(rectangle) = renderer.get_drawable_and_cast_mut::<Rectangle>(self.shadow_id) {
                 rectangle.set_corner_rounding(self.shadow_corner_rounding.into());
             }
         }
@@ -723,7 +723,7 @@ impl Component for ProgressBar {
                 filling_rectangle.set_size(Vec2::new((bar.to - bar.from) * self.screen_size.x, self.screen_size.y));
                 filling_rectangle.set_color(bar.color.clone());
 
-                renderer.get_drawable_with_type_mut::<Rectangle>(bar.filling_id)?.set_corner_rounding(bar.corner_rounding.into());
+                renderer.get_drawable_and_cast_mut::<Rectangle>(bar.filling_id)?.set_corner_rounding(bar.corner_rounding.into());
             }
         }
 

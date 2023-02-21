@@ -319,7 +319,7 @@ impl Component for Wire {
 
         for chunk_data in &mut self.data {
             let chunk = WireChunk::new(renderer)?;
-            let line = renderer.get_drawable_with_type_mut::<Line>(chunk.line_id)?;
+            let line = renderer.get_drawable_and_cast_mut::<Line>(chunk.line_id)?;
             line.set_from(self.screen_position + chunk_data.from * self.screen_size);
             line.set_to(self.screen_position + chunk_data.to * self.screen_size);
             line.set_color(chunk_data.color.clone());

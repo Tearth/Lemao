@@ -48,12 +48,12 @@ pub fn main() -> Result<(), String> {
     let texture_storage = renderer.get_textures();
     let texture_storage = texture_storage.read().unwrap();
 
-    let sprite = renderer.get_drawable_with_type_mut::<Rectangle>(sprite_id)?;
+    let sprite = renderer.get_drawable_and_cast_mut::<Rectangle>(sprite_id)?;
     sprite.set_texture(texture_storage.get_and_cast::<Texture>(texture_id)?);
 
     drop(texture_storage);
 
-    let description_text = renderer.get_drawable_with_type_mut::<Text>(description_text_id)?;
+    let description_text = renderer.get_drawable_and_cast_mut::<Text>(description_text_id)?;
     description_text.set_text(DESCRIPTION);
     description_text.set_anchor(Vec2::new(0.0, 1.0));
     description_text.set_line_height(20);

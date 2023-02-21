@@ -655,9 +655,9 @@ impl Component for Button {
             border_rectangle.set_color(self.border_color.clone());
 
             match self.shape {
-                ComponentShape::Rectangle => renderer.get_drawable_with_type_mut::<Frame>(self.border_id)?.set_thickness(self.border_thickness.into()),
+                ComponentShape::Rectangle => renderer.get_drawable_and_cast_mut::<Frame>(self.border_id)?.set_thickness(self.border_thickness.into()),
                 ComponentShape::Disc => renderer
-                    .get_drawable_with_type_mut::<Circle>(self.border_id)?
+                    .get_drawable_and_cast_mut::<Circle>(self.border_id)?
                     .set_thickness(Vec2::new(self.border_thickness.left, self.border_thickness.top)),
             }
 
@@ -678,22 +678,22 @@ impl Component for Button {
             let texture = texture_storage.get_and_cast::<Texture>(texture_id)?;
 
             match self.shape {
-                ComponentShape::Rectangle => renderer.get_drawable_with_type_mut::<Rectangle>(self.filling_id)?.set_texture(texture),
-                ComponentShape::Disc => renderer.get_drawable_with_type_mut::<Disc>(self.filling_id)?.set_texture(texture),
+                ComponentShape::Rectangle => renderer.get_drawable_and_cast_mut::<Rectangle>(self.filling_id)?.set_texture(texture),
+                ComponentShape::Disc => renderer.get_drawable_and_cast_mut::<Disc>(self.filling_id)?.set_texture(texture),
             }
         }
 
         renderer.get_drawable_mut(self.filling_id)?.set_size(self.screen_size);
 
         if self.shape == ComponentShape::Rectangle {
-            renderer.get_drawable_with_type_mut::<Rectangle>(self.filling_id)?.set_corner_rounding(self.corner_rounding.into());
-            renderer.get_drawable_with_type_mut::<Frame>(self.border_id)?.set_corner_rounding(self.corner_rounding.into());
+            renderer.get_drawable_and_cast_mut::<Rectangle>(self.filling_id)?.set_corner_rounding(self.corner_rounding.into());
+            renderer.get_drawable_and_cast_mut::<Frame>(self.border_id)?.set_corner_rounding(self.corner_rounding.into());
         }
 
         let font_storage = renderer.get_fonts();
         let font_storage = font_storage.read().unwrap();
         let font = font_storage.get_and_cast::<Font>(self.label_font_id)?;
-        let label = renderer.get_drawable_with_type_mut::<Text>(self.label_id)?;
+        let label = renderer.get_drawable_and_cast_mut::<Text>(self.label_id)?;
         label.set_font(font);
         label.set_text(&self.label_text);
         label.set_color(self.label_color.clone());
@@ -721,7 +721,7 @@ impl Component for Button {
             shadow.set_color(self.shadow_color.clone());
             shadow.set_scale(self.shadow_scale);
 
-            if let Ok(rectangle) = renderer.get_drawable_with_type_mut::<Rectangle>(self.shadow_id) {
+            if let Ok(rectangle) = renderer.get_drawable_and_cast_mut::<Rectangle>(self.shadow_id) {
                 rectangle.set_corner_rounding(self.shadow_corner_rounding.into());
             }
         }

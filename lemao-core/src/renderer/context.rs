@@ -311,22 +311,19 @@ impl RendererContext {
     }
 
     pub fn get_drawable(&self, drawable_id: usize) -> Result<&dyn Drawable, String> {
-        self.drawables.get(drawable_id)?.as_drawable().ok_or_else(|| format!("Storage item with id {} is not drawable", drawable_id))
+        self.drawables.get(drawable_id)?.as_drawable().ok_or_else(|| format!("Storage item {} is not drawable", drawable_id))
     }
 
-    pub fn get_drawable_with_type<T: 'static>(&self, drawable_id: usize) -> Result<&T, String> {
-        self.get_drawable(drawable_id)?.as_any().downcast_ref::<T>().ok_or_else(|| format!("Drawable object with id {} cannot be downcasted", drawable_id))
+    pub fn get_drawable_and_cast<T: 'static>(&self, drawable_id: usize) -> Result<&T, String> {
+        self.get_drawable(drawable_id)?.as_any().downcast_ref::<T>().ok_or_else(|| format!("Drawable object {} cannot be downcasted", drawable_id))
     }
 
     pub fn get_drawable_mut(&mut self, drawable_id: usize) -> Result<&mut dyn Drawable, String> {
-        self.drawables.get_mut(drawable_id)?.as_drawable_mut().ok_or_else(|| format!("Storage item with id {} is not drawable", drawable_id))
+        self.drawables.get_mut(drawable_id)?.as_drawable_mut().ok_or_else(|| format!("Storage item {} is not drawable", drawable_id))
     }
 
-    pub fn get_drawable_with_type_mut<T: 'static>(&mut self, drawable_id: usize) -> Result<&mut T, String> {
-        self.get_drawable_mut(drawable_id)?
-            .as_any_mut()
-            .downcast_mut::<T>()
-            .ok_or_else(|| format!("Drawable object with id {} cannot be downcasted", drawable_id))
+    pub fn get_drawable_and_cast_mut<T: 'static>(&mut self, drawable_id: usize) -> Result<&mut T, String> {
+        self.get_drawable_mut(drawable_id)?.as_any_mut().downcast_mut::<T>().ok_or_else(|| format!("Drawable {} cannot be downcasted", drawable_id))
     }
 
     pub fn remove_drawable(&mut self, drawable_id: usize) -> Result<(), String> {
@@ -347,8 +344,7 @@ impl RendererContext {
     }
 
     pub fn batcher_add_drawable(&mut self, drawable_id: usize) -> Result<(), String> {
-        //let drawable = self.get_drawable(drawable_id)?;
-        let drawable = self.drawables.get(drawable_id)?.as_drawable().ok_or_else(|| "test".to_string())?;
+        let drawable = self.drawables.get(drawable_id)?.as_drawable().ok_or_else(|| format!("Drawable {} cannot be downcasted", drawable_id))?;
         let transformation_matrix = drawable.get_transformation_matrix();
         let mut batch = drawable.get_batch();
 

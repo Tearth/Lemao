@@ -1,7 +1,8 @@
 use super::context::AudioContext;
 use crate::utils::storage::StorageItem;
 use lemao_openal::bindings::openal;
-use std::{any::Any, ffi::c_void};
+use std::any::Any;
+use std::ffi::c_void;
 
 pub mod wav;
 
@@ -42,16 +43,6 @@ impl Sample {
     }
 }
 
-impl Drop for Sample {
-    fn drop(&mut self) {
-        unsafe {
-            if self.buffer_id != 0 {
-                openal::alDeleteBuffers(1, &self.buffer_id);
-            }
-        }
-    }
-}
-
 impl StorageItem for Sample {
     fn get_id(&self) -> usize {
         self.id
@@ -67,5 +58,15 @@ impl StorageItem for Sample {
 
     fn as_any_mut(&mut self) -> &mut dyn Any {
         self
+    }
+}
+
+impl Drop for Sample {
+    fn drop(&mut self) {
+        unsafe {
+            if self.buffer_id != 0 {
+                openal::alDeleteBuffers(1, &self.buffer_id);
+            }
+        }
     }
 }

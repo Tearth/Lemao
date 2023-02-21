@@ -103,7 +103,7 @@ pub fn main() -> Result<(), String> {
     bar_2_gradient.steps.push(GradientStep::new(SolidColor::new_rgb(10, 152, 38, 255), 1.0));
 
     let progressbar_id = ui.create_progressbar(&mut renderer, regular_font_id)?;
-    let progressbar = ui.get_component_with_type_mut::<ProgressBar>(progressbar_id)?;
+    let progressbar = ui.get_component_and_cast_mut::<ProgressBar>(progressbar_id)?;
     progressbar.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.5, 1.0)));
     progressbar.set_size(ComponentSize::Relative(Vec2::new(0.6, 1.0)));
     progressbar.set_max_size(Vec2::new(f32::MAX, 20.0));
@@ -148,7 +148,7 @@ pub fn main() -> Result<(), String> {
     window_shadow_gradient.steps.push(GradientStep::new(SolidColor::new_rgb(0, 0, 0, 0), 1.0));
 
     let main_window_id = ui.create_panel(&mut renderer, ComponentShape::Rectangle)?;
-    let main_window = ui.get_component_with_type_mut::<Panel>(main_window_id)?;
+    let main_window = ui.get_component_and_cast_mut::<Panel>(main_window_id)?;
     main_window.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.5, 0.5)));
     main_window.set_size(ComponentSize::Absolute(Vec2::new(690.0, 620.0)));
     main_window.set_anchor(Vec2::new(0.5, 0.5));
@@ -164,7 +164,7 @@ pub fn main() -> Result<(), String> {
     ui.get_main_canvas_mut()?.add_child(main_window_id);
 
     let window_title_id = ui.create_label(&mut renderer, header_font_id)?;
-    let window_title = ui.get_component_with_type_mut::<Label>(window_title_id)?;
+    let window_title = ui.get_component_and_cast_mut::<Label>(window_title_id)?;
     window_title.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.5, 1.0)));
     window_title.set_anchor(Vec2::new(0.5, 0.5));
     window_title.set_offset(Vec2::new(0.0, -27.0));
@@ -178,7 +178,7 @@ pub fn main() -> Result<(), String> {
     let texture_storage = texture_storage.read().unwrap();
 
     let image_id = ui.create_panel(&mut renderer, ComponentShape::Rectangle)?;
-    let image = ui.get_component_with_type_mut::<Panel>(image_id)?;
+    let image = ui.get_component_and_cast_mut::<Panel>(image_id)?;
     image.set_texture(texture_storage.get_and_cast::<Texture>(texture_id)?);
     image.set_size(ComponentSize::Absolute(Vec2::new(300.0, 150.0)));
     image.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0)));
@@ -197,7 +197,7 @@ pub fn main() -> Result<(), String> {
     quote_panel_gradient.steps.push(GradientStep::new(SolidColor::new_rgb(96, 97, 115, 255), 1.0));
 
     let quote_panel_id = ui.create_panel(&mut renderer, ComponentShape::Rectangle)?;
-    let quote_panel = ui.get_component_with_type_mut::<Panel>(quote_panel_id)?;
+    let quote_panel = ui.get_component_and_cast_mut::<Panel>(quote_panel_id)?;
     quote_panel.set_position(ComponentPosition::RelativeToParent(Vec2::new(1.0, 1.0)));
     quote_panel.set_size(ComponentSize::Absolute(Vec2::new(400.0, 150.0)));
     quote_panel.set_anchor(Vec2::new(1.0, 1.0));
@@ -211,7 +211,7 @@ pub fn main() -> Result<(), String> {
     ui.get_component_mut(main_window_id)?.add_child(quote_panel_id);
 
     let quote_id = ui.create_label(&mut renderer, regular_font_id)?;
-    let quote = ui.get_component_with_type_mut::<Label>(quote_id)?;
+    let quote = ui.get_component_and_cast_mut::<Label>(quote_id)?;
     quote.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0)));
     quote.set_anchor(Vec2::new(0.0, 1.0));
     quote.set_margin(ComponentMargin::new(10.0, 10.0, 10.0, 10.0));
@@ -226,7 +226,7 @@ pub fn main() -> Result<(), String> {
     ui.get_component_mut(quote_panel_id)?.add_child(quote_id);
 
     let description_panel_id = ui.create_panel(&mut renderer, ComponentShape::Rectangle)?;
-    let description_panel = ui.get_component_with_type_mut::<Panel>(description_panel_id)?;
+    let description_panel = ui.get_component_and_cast_mut::<Panel>(description_panel_id)?;
     description_panel.set_position(ComponentPosition::RelativeToParent(Vec2::new(1.0, 1.0)));
     description_panel.set_size(ComponentSize::Relative(Vec2::new(1.0, 150.0)));
     description_panel.set_anchor(Vec2::new(1.0, 1.0));
@@ -244,7 +244,7 @@ pub fn main() -> Result<(), String> {
     scroll_gradient.steps.push(GradientStep::new(SolidColor::new_rgb(167, 148, 134, 255), 1.0));
 
     let description_scrollbox_id = ui.create_scrollbox(&mut renderer)?;
-    let description_scrollbox = ui.get_component_with_type_mut::<Scrollbox>(description_scrollbox_id)?;
+    let description_scrollbox = ui.get_component_and_cast_mut::<Scrollbox>(description_scrollbox_id)?;
     description_scrollbox.set_size(ComponentSize::Relative(Vec2::new(1.0, 1.0)));
     description_scrollbox.set_vertical_scroll_background_color(Color::SolidColor(SolidColor::new_rgb(0, 0, 0, 120)));
     description_scrollbox.set_vertical_scroll_color(Color::Gradient(scroll_gradient.clone()));
@@ -268,7 +268,7 @@ pub fn main() -> Result<(), String> {
     ui.get_component_mut(description_panel_id)?.add_child(description_scrollbox_id);
 
     let description_id = ui.create_label(&mut renderer, regular_font_id)?;
-    let description = ui.get_component_with_type_mut::<Label>(description_id)?;
+    let description = ui.get_component_and_cast_mut::<Label>(description_id)?;
     description.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0)));
     description.set_anchor(Vec2::new(0.0, 1.0));
     description.set_margin(ComponentMargin::new(10.0, 10.0, 10.0, 10.0));
@@ -289,7 +289,7 @@ pub fn main() -> Result<(), String> {
     effect_panel_1_gradient.steps.push(GradientStep::new(SolidColor::new_rgb(96, 97, 115, 255), 1.0));
 
     let effect_panel_1_id = ui.create_panel(&mut renderer, ComponentShape::Rectangle)?;
-    let effect_panel_1 = ui.get_component_with_type_mut::<Panel>(effect_panel_1_id)?;
+    let effect_panel_1 = ui.get_component_and_cast_mut::<Panel>(effect_panel_1_id)?;
     effect_panel_1.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.5, 0.0)));
     effect_panel_1.set_size(ComponentSize::Relative(Vec2::new(1.0, 1.0)));
     effect_panel_1.set_anchor(Vec2::new(0.5, 0.0));
@@ -301,7 +301,7 @@ pub fn main() -> Result<(), String> {
     ui.get_component_mut(main_window_id)?.add_child(effect_panel_1_id);
 
     let effect_panel_2_id = ui.create_panel(&mut renderer, ComponentShape::Rectangle)?;
-    let effect_panel_2 = ui.get_component_with_type_mut::<Panel>(effect_panel_2_id)?;
+    let effect_panel_2 = ui.get_component_and_cast_mut::<Panel>(effect_panel_2_id)?;
     effect_panel_2.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.5, 0.0)));
     effect_panel_2.set_size(ComponentSize::Relative(Vec2::new(1.0, 1.0)));
     effect_panel_2.set_anchor(Vec2::new(0.5, 0.0));
@@ -313,7 +313,7 @@ pub fn main() -> Result<(), String> {
     ui.get_component_mut(main_window_id)?.add_child(effect_panel_2_id);
 
     let effect_id = ui.create_label(&mut renderer, regular_font_id)?;
-    let effect = ui.get_component_with_type_mut::<Label>(effect_id)?;
+    let effect = ui.get_component_and_cast_mut::<Label>(effect_id)?;
     effect.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0)));
     effect.set_anchor(Vec2::new(0.0, 1.0));
     effect.set_margin(ComponentMargin::new(3.0, 3.0, 3.0, 3.0));
@@ -333,7 +333,7 @@ pub fn main() -> Result<(), String> {
     button_filling_gradient.steps.push(GradientStep::new(SolidColor::new_rgb(234, 221, 198, 255), 1.0));
 
     let ok_button_id = ui.create_button(&mut renderer, ComponentShape::Rectangle, bold_font_id)?;
-    let ok_button = ui.get_component_with_type_mut::<Button>(ok_button_id)?;
+    let ok_button = ui.get_component_and_cast_mut::<Button>(ok_button_id)?;
     ok_button.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.5, 0.0)));
     ok_button.set_size(ComponentSize::Absolute(Vec2::new(100.0, 25.0)));
     ok_button.set_anchor(Vec2::new(0.5, 0.5));
@@ -368,7 +368,7 @@ pub fn main() -> Result<(), String> {
 
     /* #region Right side window */
     let right_window_id = ui.create_panel(&mut renderer, ComponentShape::Rectangle)?;
-    let right_window = ui.get_component_with_type_mut::<Panel>(right_window_id)?;
+    let right_window = ui.get_component_and_cast_mut::<Panel>(right_window_id)?;
     right_window.set_position(ComponentPosition::RelativeToParent(Vec2::new(1.0, 0.5)));
     right_window.set_offset(Vec2::new(-15.0, 0.0));
     right_window.set_size(ComponentSize::Absolute(Vec2::new(300.0, 620.0)));
@@ -385,7 +385,7 @@ pub fn main() -> Result<(), String> {
     ui.get_main_canvas_mut()?.add_child(right_window_id);
 
     let right_window_title_id = ui.create_label(&mut renderer, header_font_id)?;
-    let right_window_title = ui.get_component_with_type_mut::<Label>(right_window_title_id)?;
+    let right_window_title = ui.get_component_and_cast_mut::<Label>(right_window_title_id)?;
     right_window_title.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.5, 1.0)));
     right_window_title.set_anchor(Vec2::new(0.5, 0.5));
     right_window_title.set_offset(Vec2::new(0.0, -27.0));
@@ -410,7 +410,7 @@ pub fn main() -> Result<(), String> {
 
     for checkbox_label in checkbox_labels {
         let checkbox_id = ui.create_checkbox(&mut renderer, regular_font_id, box_checked_id, box_unchecked_id)?;
-        let checkbox = ui.get_component_with_type_mut::<Checkbox>(checkbox_id)?;
+        let checkbox = ui.get_component_and_cast_mut::<Checkbox>(checkbox_id)?;
         checkbox.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0)));
         checkbox.set_offset(Vec2::new(0.0, -75.0 - 30.0 * checkbox_ids.len() as f32));
         checkbox.set_margin(ComponentMargin::new(3.0, 3.0, 3.0, 10.0));
@@ -433,7 +433,7 @@ pub fn main() -> Result<(), String> {
 
     for textbox_label in textbox_labels {
         let label_id = ui.create_label(&mut renderer, regular_font_id)?;
-        let label = ui.get_component_with_type_mut::<Label>(label_id)?;
+        let label = ui.get_component_and_cast_mut::<Label>(label_id)?;
         label.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0)));
         label.set_offset(Vec2::new(0.0, -348.0 - 30.0 * textbox_label_ids.len() as f32));
         label.set_margin(ComponentMargin::new(3.0, 3.0, 3.0, 10.0));
@@ -446,7 +446,7 @@ pub fn main() -> Result<(), String> {
         textbox_label_ids.push(label_id);
 
         let textbox_id = ui.create_textbox(&mut renderer, regular_font_id)?;
-        let textbox = ui.get_component_with_type_mut::<TextBox>(textbox_id)?;
+        let textbox = ui.get_component_and_cast_mut::<TextBox>(textbox_id)?;
         textbox.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0)));
         textbox.set_size(ComponentSize::Absolute(Vec2::new(180.0, 30.0)));
         textbox.set_offset(Vec2::new(110.0, -350.0 - 30.0 * textbox_ids.len() as f32));
@@ -476,7 +476,7 @@ pub fn main() -> Result<(), String> {
     }
 
     let right_window_focuses_title_id = ui.create_label(&mut renderer, header_font_id)?;
-    let right_window_focuses = ui.get_component_with_type_mut::<Label>(right_window_focuses_title_id)?;
+    let right_window_focuses = ui.get_component_and_cast_mut::<Label>(right_window_focuses_title_id)?;
     right_window_focuses.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.5, 1.0)));
     right_window_focuses.set_anchor(Vec2::new(0.5, 0.5));
     right_window_focuses.set_offset(Vec2::new(0.0, -445.0));
@@ -491,7 +491,7 @@ pub fn main() -> Result<(), String> {
 
     for toggle_button_label in toggle_button_labels {
         let button_id = ui.create_button(&mut renderer, ComponentShape::Rectangle, regular_font_id)?;
-        let button = ui.get_component_with_type_mut::<Button>(button_id)?;
+        let button = ui.get_component_and_cast_mut::<Button>(button_id)?;
         button.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0)));
         button.set_size(ComponentSize::Absolute(Vec2::new(40.0, 30.0)));
         button.set_offset(Vec2::new(100.0 + 50.0 * toggle_button_ids.len() as f32, -480.0));
@@ -539,7 +539,7 @@ pub fn main() -> Result<(), String> {
 
     for slider_label in slider_labels {
         let label_id = ui.create_label(&mut renderer, regular_font_id)?;
-        let label = ui.get_component_with_type_mut::<Label>(label_id)?;
+        let label = ui.get_component_and_cast_mut::<Label>(label_id)?;
         label.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0)));
         label.set_anchor(Vec2::new(0.0, 0.5));
         label.set_offset(Vec2::new(0.0, -530.0 - 30.0 * slider_label_ids.len() as f32));
@@ -553,7 +553,7 @@ pub fn main() -> Result<(), String> {
         slider_label_ids.push(label_id);
 
         let slider_id = ui.create_slider(&mut renderer, ComponentShape::Disc)?;
-        let slider = ui.get_component_with_type_mut::<Slider>(slider_id)?;
+        let slider = ui.get_component_and_cast_mut::<Slider>(slider_id)?;
         slider.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.5, 1.0)));
         slider.set_size(ComponentSize::Absolute(Vec2::new(210.0, 10.0)));
         slider.set_anchor(Vec2::new(0.5, 0.5));
@@ -578,7 +578,7 @@ pub fn main() -> Result<(), String> {
 
     /* #region Left side window */
     let left_window_id = ui.create_panel(&mut renderer, ComponentShape::Rectangle)?;
-    let left_window = ui.get_component_with_type_mut::<Panel>(left_window_id)?;
+    let left_window = ui.get_component_and_cast_mut::<Panel>(left_window_id)?;
     left_window.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.0, 0.5)));
     left_window.set_offset(Vec2::new(15.0, 0.0));
     left_window.set_size(ComponentSize::Absolute(Vec2::new(300.0, 620.0)));
@@ -595,7 +595,7 @@ pub fn main() -> Result<(), String> {
     ui.get_main_canvas_mut()?.add_child(left_window_id);
 
     let left_window_title_id = ui.create_label(&mut renderer, header_font_id)?;
-    let left_window_title = ui.get_component_with_type_mut::<Label>(left_window_title_id)?;
+    let left_window_title = ui.get_component_and_cast_mut::<Label>(left_window_title_id)?;
     left_window_title.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.5, 1.0)));
     left_window_title.set_anchor(Vec2::new(0.5, 0.5));
     left_window_title.set_offset(Vec2::new(0.0, -27.0));
@@ -610,7 +610,7 @@ pub fn main() -> Result<(), String> {
     pie_chart_1_filling_gradient.steps.push(GradientStep::new(SolidColor::new_rgb(234, 95, 137, 255), 1.0));
 
     let pie_chart_1_id = ui.create_panel(&mut renderer, ComponentShape::Disc)?;
-    let pie_chart_1 = ui.get_component_with_type_mut::<Panel>(pie_chart_1_id)?;
+    let pie_chart_1 = ui.get_component_and_cast_mut::<Panel>(pie_chart_1_id)?;
     pie_chart_1.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.5, 1.0)));
     pie_chart_1.set_offset(Vec2::new(0.0, -180.0));
     pie_chart_1.set_size(ComponentSize::Absolute(Vec2::new(250.0, 250.0)));
@@ -629,7 +629,7 @@ pub fn main() -> Result<(), String> {
     pie_chart_2_filling_gradient.steps.push(GradientStep::new(SolidColor::new_rgb(135, 29, 126, 255), 1.0));
 
     let pie_chart_2_id = ui.create_panel(&mut renderer, ComponentShape::Disc)?;
-    let pie_chart_2 = ui.get_component_with_type_mut::<Panel>(pie_chart_2_id)?;
+    let pie_chart_2 = ui.get_component_and_cast_mut::<Panel>(pie_chart_2_id)?;
     pie_chart_2.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.5, 1.0)));
     pie_chart_2.set_offset(Vec2::new(0.0, -180.0));
     pie_chart_2.set_size(ComponentSize::Absolute(Vec2::new(250.0, 250.0)));
@@ -648,7 +648,7 @@ pub fn main() -> Result<(), String> {
     pie_chart_3_filling_gradient.steps.push(GradientStep::new(SolidColor::new_rgb(107, 42, 146, 255), 1.0));
 
     let pie_chart_3_id = ui.create_panel(&mut renderer, ComponentShape::Disc)?;
-    let pie_chart_3 = ui.get_component_with_type_mut::<Panel>(pie_chart_3_id)?;
+    let pie_chart_3 = ui.get_component_and_cast_mut::<Panel>(pie_chart_3_id)?;
     pie_chart_3.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.5, 1.0)));
     pie_chart_3.set_offset(Vec2::new(0.0, -180.0));
     pie_chart_3.set_size(ComponentSize::Absolute(Vec2::new(250.0, 250.0)));
@@ -663,7 +663,7 @@ pub fn main() -> Result<(), String> {
     ui.get_component_mut(left_window_id)?.add_child(pie_chart_3_id);
 
     let pie_chart_legend_id = ui.create_label(&mut renderer, regular_font_id)?;
-    let pie_chart_legend = ui.get_component_with_type_mut::<Label>(pie_chart_legend_id)?;
+    let pie_chart_legend = ui.get_component_and_cast_mut::<Label>(pie_chart_legend_id)?;
     pie_chart_legend.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.5, 1.0)));
     pie_chart_legend.set_anchor(Vec2::new(0.5, 1.0));
     pie_chart_legend.set_offset(Vec2::new(0.0, -320.0));
@@ -678,7 +678,7 @@ pub fn main() -> Result<(), String> {
     ui.get_component_mut(left_window_id)?.add_child(pie_chart_legend_id);
 
     let line_chart_id = ui.create_wire(&mut renderer)?;
-    let line_chart = ui.get_component_with_type_mut::<Wire>(line_chart_id)?;
+    let line_chart = ui.get_component_and_cast_mut::<Wire>(line_chart_id)?;
     line_chart.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.5, 1.0)));
     line_chart.set_offset(Vec2::new(0.0, -480.0));
     line_chart.set_size(ComponentSize::Absolute(Vec2::new(250.0, 250.0)));
@@ -752,11 +752,11 @@ pub fn main() -> Result<(), String> {
                 UiEvent::SelectorMoved(component_id, direction) => {
                     println!("SELECTOR {} {:?}", component_id, direction);
 
-                    let phase = ui.get_component_with_type_mut::<Slider>(component_id)?.get_phase();
+                    let phase = ui.get_component_and_cast_mut::<Slider>(component_id)?.get_phase();
                     let label_index = slider_ids.iter().position(|&p| p == component_id).unwrap();
                     let label_content = slider_labels[label_index].replace("50%", &format!("{:.0}%", phase * 100.0));
 
-                    ui.get_component_with_type_mut::<Label>(slider_label_ids[label_index])?.set_text(label_content);
+                    ui.get_component_and_cast_mut::<Label>(slider_label_ids[label_index])?.set_text(label_content);
                 }
                 UiEvent::TextBoxActivated(component_id, button) => println!("TEXTBOX ACTIVATED {} {:?}", component_id, button),
                 UiEvent::TextBoxDeactivated(component_id, button) => println!("TEXTBOX DEACTIVATED {} {:?}", component_id, button),

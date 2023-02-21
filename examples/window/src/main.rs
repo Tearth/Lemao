@@ -44,22 +44,22 @@ pub fn main() -> Result<(), String> {
     let left_bottom_text_id = renderer.create_text(font_id)?;
     let right_bottom_text_id = renderer.create_text(font_id)?;
 
-    let description_text = renderer.get_drawable_with_type_mut::<Text>(description_text_id)?;
+    let description_text = renderer.get_drawable_and_cast_mut::<Text>(description_text_id)?;
     description_text.set_text(DESCRIPTION);
     description_text.set_anchor(Vec2::new(0.0, 1.0));
     description_text.set_line_height(20);
 
-    renderer.get_drawable_with_type_mut::<Text>(left_top_text_id)?.set_anchor(Vec2::new(0.0, 1.0));
-    renderer.get_drawable_with_type_mut::<Text>(right_top_text_id)?.set_anchor(Vec2::new(1.0, 1.0));
-    renderer.get_drawable_with_type_mut::<Text>(left_bottom_text_id)?.set_anchor(Vec2::new(0.0, 0.0));
-    renderer.get_drawable_with_type_mut::<Text>(right_bottom_text_id)?.set_anchor(Vec2::new(1.0, 0.0));
-    renderer.get_drawable_with_type_mut::<Text>(window_status_text_id)?.set_anchor(Vec2::new(0.0, 1.0));
+    renderer.get_drawable_and_cast_mut::<Text>(left_top_text_id)?.set_anchor(Vec2::new(0.0, 1.0));
+    renderer.get_drawable_and_cast_mut::<Text>(right_top_text_id)?.set_anchor(Vec2::new(1.0, 1.0));
+    renderer.get_drawable_and_cast_mut::<Text>(left_bottom_text_id)?.set_anchor(Vec2::new(0.0, 0.0));
+    renderer.get_drawable_and_cast_mut::<Text>(right_bottom_text_id)?.set_anchor(Vec2::new(1.0, 0.0));
+    renderer.get_drawable_and_cast_mut::<Text>(window_status_text_id)?.set_anchor(Vec2::new(0.0, 1.0));
 
-    renderer.get_drawable_with_type_mut::<Text>(left_top_text_id)?.set_text("Left top");
-    renderer.get_drawable_with_type_mut::<Text>(right_top_text_id)?.set_text("Right top");
-    renderer.get_drawable_with_type_mut::<Text>(left_bottom_text_id)?.set_text("Left bottom");
-    renderer.get_drawable_with_type_mut::<Text>(right_bottom_text_id)?.set_text("Right bottom");
-    renderer.get_drawable_with_type_mut::<Text>(window_status_text_id)?.set_text("");
+    renderer.get_drawable_and_cast_mut::<Text>(left_top_text_id)?.set_text("Left top");
+    renderer.get_drawable_and_cast_mut::<Text>(right_top_text_id)?.set_text("Right top");
+    renderer.get_drawable_and_cast_mut::<Text>(left_bottom_text_id)?.set_text("Left bottom");
+    renderer.get_drawable_and_cast_mut::<Text>(right_bottom_text_id)?.set_text("Right bottom");
+    renderer.get_drawable_and_cast_mut::<Text>(window_status_text_id)?.set_text("");
 
     let mut old_position = window_position;
     let mut old_size = window_size;
@@ -74,8 +74,8 @@ pub fn main() -> Result<(), String> {
                 }
 
                 InputEvent::WindowSizeChanged(size) => {
-                    let left_top_text_size = renderer.get_drawable_with_type_mut::<Text>(left_top_text_id)?.get_size();
-                    let description_text_size = renderer.get_drawable_with_type_mut::<Text>(description_text_id)?.get_size();
+                    let left_top_text_size = renderer.get_drawable_and_cast_mut::<Text>(left_top_text_id)?.get_size();
+                    let description_text_size = renderer.get_drawable_and_cast_mut::<Text>(description_text_id)?.get_size();
 
                     let description_text_margin = left_top_text_size.y - 0.0;
                     let window_status_text_margin = left_top_text_size.y + description_text_size.y + 20.0;
@@ -125,7 +125,7 @@ pub fn main() -> Result<(), String> {
         }
 
         if style_changed {
-            renderer.get_drawable_with_type_mut::<Text>(window_status_text_id)?.set_text(&format!(
+            renderer.get_drawable_and_cast_mut::<Text>(window_status_text_id)?.set_text(&format!(
                 "Window position: {:?}\nWindow size: {:?}\nWindow style: {:?}\nCursor position: {:?}",
                 window.get_position(),
                 window.get_size(),

@@ -51,7 +51,7 @@ pub fn main() -> Result<(), String> {
 
     let fps_text_id = renderer.create_text(font_id)?;
 
-    let fps_text = renderer.get_drawable_with_type_mut::<Text>(fps_text_id)?;
+    let fps_text = renderer.get_drawable_and_cast_mut::<Text>(fps_text_id)?;
     fps_text.set_text("FPS:0");
     fps_text.set_anchor(Vec2::new(0.0, 1.0));
 
@@ -61,7 +61,7 @@ pub fn main() -> Result<(), String> {
 
     for _ in 0..CELLS_COUNT {
         let sprite_id = renderer.create_rectangle()?;
-        let sprite = renderer.get_drawable_with_type_mut::<Rectangle>(sprite_id)?;
+        let sprite = renderer.get_drawable_and_cast_mut::<Rectangle>(sprite_id)?;
         sprite.set_texture(texture_storage.get_and_cast::<Texture>(cell_texture_id)?);
         sprite.set_anchor(Vec2::new(0.5, 0.5));
 
@@ -118,7 +118,7 @@ pub fn main() -> Result<(), String> {
         }
 
         if now.elapsed().as_millis() >= 1000 {
-            renderer.get_drawable_with_type_mut::<Text>(fps_text_id)?.set_text(&format!("FPS:{frames}"));
+            renderer.get_drawable_and_cast_mut::<Text>(fps_text_id)?.set_text(&format!("FPS:{frames}"));
             now = Instant::now();
             frames = 0;
         }

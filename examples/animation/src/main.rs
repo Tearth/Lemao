@@ -42,11 +42,11 @@ pub fn main() -> Result<(), String> {
     let animation_id = renderer.create_tilemap(explosion_id, Vec2::new(128.0, 128.0)).unwrap();
     let description_text_id = renderer.create_text(font_id)?;
 
-    let animation = renderer.get_drawable_with_type_mut::<Tilemap>(animation_id)?;
+    let animation = renderer.get_drawable_and_cast_mut::<Tilemap>(animation_id)?;
     animation.set_anchor(Vec2::new(0.5, 0.5));
     animation.set_position(window_size / 2.0);
 
-    let description_text = renderer.get_drawable_with_type_mut::<Text>(description_text_id)?;
+    let description_text = renderer.get_drawable_and_cast_mut::<Text>(description_text_id)?;
     description_text.set_text(DESCRIPTION);
     description_text.set_anchor(Vec2::new(0.0, 1.0));
     description_text.set_line_height(20);
@@ -85,7 +85,7 @@ pub fn main() -> Result<(), String> {
         }
 
         std::thread::sleep(std::time::Duration::from_millis(sleep_duration));
-        renderer.get_drawable_with_type_mut::<Tilemap>(animation_id)?.set_next_frame();
+        renderer.get_drawable_and_cast_mut::<Tilemap>(animation_id)?.set_next_frame();
 
         renderer.clear(SolidColor::new(0.5, 0.5, 0.5, 1.0));
         renderer.draw(animation_id)?;

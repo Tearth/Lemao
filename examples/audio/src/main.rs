@@ -47,12 +47,12 @@ pub fn main() -> Result<(), String> {
     let status_text_id = renderer.create_text(font_id)?;
     let chopin_sound_id = audio.create_sound(chopin_sample_id)?;
 
-    let description_text = renderer.get_drawable_with_type_mut::<Text>(description_text_id)?;
+    let description_text = renderer.get_drawable_and_cast_mut::<Text>(description_text_id)?;
     description_text.set_text(DESCRIPTION);
     description_text.set_anchor(Vec2::new(0.0, 1.0));
     description_text.set_line_height(20);
 
-    let status_text = renderer.get_drawable_with_type_mut::<Text>(status_text_id)?;
+    let status_text = renderer.get_drawable_and_cast_mut::<Text>(status_text_id)?;
     status_text.set_text("Status: stopped");
     status_text.set_anchor(Vec2::new(0.0, 1.0));
 
@@ -63,7 +63,7 @@ pub fn main() -> Result<(), String> {
         while let Some(event) = window.poll_event() {
             match event {
                 InputEvent::WindowSizeChanged(size) => {
-                    let description_text_size = renderer.get_drawable_with_type_mut::<Text>(description_text_id)?.get_size();
+                    let description_text_size = renderer.get_drawable_and_cast_mut::<Text>(description_text_id)?.get_size();
 
                     renderer.set_viewport_size(size);
                     renderer.get_active_camera_mut()?.set_size(size);
@@ -83,7 +83,7 @@ pub fn main() -> Result<(), String> {
             }
         }
 
-        let status_text = renderer.get_drawable_with_type_mut::<Text>(status_text_id)?;
+        let status_text = renderer.get_drawable_and_cast_mut::<Text>(status_text_id)?;
         if chopin_sound.is_playing()? {
             status_text.set_text("Status: playing");
         } else {

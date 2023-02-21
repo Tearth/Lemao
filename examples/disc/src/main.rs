@@ -37,11 +37,11 @@ pub fn main() -> Result<(), String> {
     let disc_id = renderer.create_disc(100.0, 32).unwrap();
     let description_text_id = renderer.create_text(font_id)?;
 
-    let disc = renderer.get_drawable_with_type_mut::<Disc>(disc_id)?;
+    let disc = renderer.get_drawable_and_cast_mut::<Disc>(disc_id)?;
     disc.set_anchor(Vec2::new(0.5, 0.5));
     disc.set_position(Vec2::new(400.0, 300.0));
 
-    let description_text = renderer.get_drawable_with_type_mut::<Text>(description_text_id)?;
+    let description_text = renderer.get_drawable_and_cast_mut::<Text>(description_text_id)?;
     description_text.set_text(DESCRIPTION);
     description_text.set_anchor(Vec2::new(0.0, 1.0));
     description_text.set_line_height(20);
@@ -56,7 +56,7 @@ pub fn main() -> Result<(), String> {
                     }
                 }
                 InputEvent::MouseWheelRotated(direction, _) => {
-                    let disc = renderer.get_drawable_with_type_mut::<Disc>(disc_id)?;
+                    let disc = renderer.get_drawable_and_cast_mut::<Disc>(disc_id)?;
                     if direction == MouseWheelDirection::Up {
                         disc.set_sides(disc.get_sides() + 1);
                     } else {
@@ -79,7 +79,7 @@ pub fn main() -> Result<(), String> {
 
         if window.is_mouse_button_pressed(MouseButton::Left) {
             let position = window.get_cursor_position(CoordinationSystem::Window);
-            renderer.get_drawable_with_type_mut::<Disc>(disc_id)?.set_position(position);
+            renderer.get_drawable_and_cast_mut::<Disc>(disc_id)?.set_position(position);
         }
 
         renderer.clear(SolidColor::new(0.5, 0.5, 0.5, 1.0));

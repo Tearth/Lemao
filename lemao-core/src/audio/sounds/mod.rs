@@ -1,9 +1,7 @@
-use std::any::Any;
-
-use crate::utils::storage::StorageItem;
-
 use super::samples::Sample;
+use crate::utils::storage::StorageItem;
 use lemao_openal::bindings::openal;
+use std::any::Any;
 
 pub struct Sound {
     pub(crate) id: usize,
@@ -18,6 +16,7 @@ impl Sound {
 
         Ok(sound)
     }
+
     pub fn get_sample_id(&self) -> usize {
         self.sample_id
     }

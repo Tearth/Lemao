@@ -467,10 +467,10 @@ impl Component for Checkbox {
         let font_storage = renderer.get_fonts();
         let font_storage = font_storage.read().unwrap();
         let font = font_storage.get_and_cast::<Font>(self.label_font_id)?;
-        renderer.get_drawable_with_type_mut::<Text>(self.label_id)?.set_font(font);
-        renderer.get_drawable_with_type_mut::<Text>(self.label_id)?.set_text(&self.label_text);
+        renderer.get_drawable_and_cast_mut::<Text>(self.label_id)?.set_font(font);
+        renderer.get_drawable_and_cast_mut::<Text>(self.label_id)?.set_text(&self.label_text);
 
-        self.screen_size = renderer.get_drawable_with_type_mut::<Text>(self.label_id)?.get_size();
+        self.screen_size = renderer.get_drawable_and_cast_mut::<Text>(self.label_id)?.get_size();
         self.size = ComponentSize::Absolute(self.screen_size);
 
         self.screen_position = match self.position {
@@ -487,7 +487,7 @@ impl Component for Checkbox {
         self.screen_size = self.screen_size.floor();
         self.screen_position = self.screen_position.floor();
 
-        let r#box = renderer.get_drawable_with_type_mut::<Rectangle>(self.box_id)?;
+        let r#box = renderer.get_drawable_and_cast_mut::<Rectangle>(self.box_id)?;
         r#box.set_position(self.screen_position + self.box_offset);
         r#box.set_color(self.box_color.clone());
 
@@ -497,14 +497,14 @@ impl Component for Checkbox {
         if self.checked {
             let texture = texture_storage.get_and_cast::<Texture>(self.box_checked_texture_id)?;
             self.box_size = texture.get_size();
-            renderer.get_drawable_with_type_mut::<Rectangle>(self.box_id)?.set_texture(texture);
+            renderer.get_drawable_and_cast_mut::<Rectangle>(self.box_id)?.set_texture(texture);
         } else {
             let texture = texture_storage.get_and_cast::<Texture>(self.box_unchecked_texture_id)?;
             self.box_size = texture.get_size();
-            renderer.get_drawable_with_type_mut::<Rectangle>(self.box_id)?.set_texture(texture);
+            renderer.get_drawable_and_cast_mut::<Rectangle>(self.box_id)?.set_texture(texture);
         }
 
-        let label = renderer.get_drawable_with_type_mut::<Text>(self.label_id)?;
+        let label = renderer.get_drawable_and_cast_mut::<Text>(self.label_id)?;
         label.set_position(self.screen_position + self.label_offset);
         label.set_color(self.label_color.clone());
 
