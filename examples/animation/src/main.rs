@@ -29,13 +29,13 @@ pub fn main() -> Result<(), String> {
 
     let texture_storage = renderer.get_textures();
     let mut texture_storage = texture_storage.write().unwrap();
-    let explosion_id = texture_storage.store(Box::new(Texture::new(&renderer, &bmp::load("./assets/explosion.bmp")?)));
+    let explosion_id = texture_storage.store(Box::new(Texture::new(&renderer, &bmp::load("./assets/explosion.bmp")?)?));
 
     drop(texture_storage);
 
     let font_storage = renderer.get_fonts();
     let mut font_storage = font_storage.write().unwrap();
-    let font_id = font_storage.store(Box::new(Font::new(&renderer, &bff::load("./assets/inconsolata.bff")?)));
+    let font_id = font_storage.store(Box::new(Font::new(&renderer, &bff::load("./assets/inconsolata.bff")?)?));
 
     drop(font_storage);
 

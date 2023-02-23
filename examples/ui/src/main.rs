@@ -68,18 +68,18 @@ pub fn main() -> Result<(), String> {
     let font_storage = renderer.get_fonts();
     let mut font_storage = font_storage.write().unwrap();
 
-    let regular_font_id = font_storage.store(Box::new(Font::new(&renderer, &regular_font)));
-    let bold_font_id = font_storage.store(Box::new(Font::new(&renderer, &bold_font)));
-    let header_font_id = font_storage.store(Box::new(Font::new(&renderer, &header_font)));
+    let regular_font_id = font_storage.store(Box::new(Font::new(&renderer, &regular_font)?));
+    let bold_font_id = font_storage.store(Box::new(Font::new(&renderer, &bold_font)?));
+    let header_font_id = font_storage.store(Box::new(Font::new(&renderer, &header_font)?));
 
     drop(font_storage);
 
     let texture_storage = renderer.get_textures();
     let mut texture_storage = texture_storage.write().unwrap();
 
-    let texture_id = texture_storage.store(Box::new(Texture::new(&renderer, &bmp::load("./assets/wheat.bmp")?)));
-    let box_checked_id = texture_storage.store(Box::new(Texture::new(&renderer, &bmp::load("./assets/box_checked.bmp")?)));
-    let box_unchecked_id = texture_storage.store(Box::new(Texture::new(&renderer, &bmp::load("./assets/box_unchecked.bmp")?)));
+    let texture_id = texture_storage.store(Box::new(Texture::new(&renderer, &bmp::load("./assets/wheat.bmp")?)?));
+    let box_checked_id = texture_storage.store(Box::new(Texture::new(&renderer, &bmp::load("./assets/box_checked.bmp")?)?));
+    let box_unchecked_id = texture_storage.store(Box::new(Texture::new(&renderer, &bmp::load("./assets/box_unchecked.bmp")?)?));
     let mut ui = UiContext::new(&mut renderer)?;
 
     drop(texture_storage);

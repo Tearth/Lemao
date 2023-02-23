@@ -35,20 +35,52 @@ impl RawFont {
         Self { size, cell_size, base_character_offset, character_widths, data }
     }
 
+    pub fn get_size(&self) -> Vec2 {
+        self.size
+    }
+
+    pub fn set_size(&mut self, size: Vec2) {
+        self.size = size;
+    }
+
     pub fn get_cell_size(&self) -> Vec2 {
         self.cell_size
+    }
+
+    pub fn set_cell_size(&mut self, cell_size: Vec2) {
+        self.cell_size = cell_size;
     }
 
     pub fn get_base_character_offset(&self) -> u8 {
         self.base_character_offset
     }
 
+    pub fn set_base_character_offset(&mut self, base_character_offset: u8) {
+        self.base_character_offset = base_character_offset;
+    }
+
     pub fn get_character_widths(&self) -> &Vec<u8> {
         &self.character_widths
     }
 
+    pub fn get_character_widths_mut(&mut self) -> &mut Vec<u8> {
+        &mut self.character_widths
+    }
+
+    pub fn set_character_widths(&mut self, character_widths: Vec<u8>) {
+        self.character_widths = character_widths;
+    }
+
     pub fn get_data(&self) -> &Vec<u8> {
         &self.data
+    }
+
+    pub fn get_data_mut(&mut self) -> &mut Vec<u8> {
+        &mut self.data
+    }
+
+    pub fn set_data(&mut self, data: Vec<u8>) {
+        self.data = data;
     }
 
     pub fn set_character(&mut self, char: u8, offset: Vec2, texture: &RawTexture) {
@@ -89,7 +121,7 @@ impl RawFont {
 }
 
 impl Font {
-    pub fn new(renderer: &RendererContext, raw: &RawFont) -> Self {
+    pub fn new(renderer: &RendererContext, raw: &RawFont) -> Result<Self, String> {
         unsafe {
             let gl = renderer.gl.clone();
             let mut texture_gl_id = 0;
@@ -107,7 +139,7 @@ impl Font {
             (gl.glTexImage2D)(opengl::GL_TEXTURE_2D, 0, format as i32, raw.size.x as i32, raw.size.y as i32, 0, format, opengl::GL_UNSIGNED_BYTE, texture_ptr);
             (gl.glGenerateMipmap)(opengl::GL_TEXTURE_2D);
 
-            Self {
+            Ok(Self {
                 id: 0,
                 texture_gl_id,
                 gl,
@@ -115,7 +147,7 @@ impl Font {
                 cell_size: raw.cell_size,
                 base_character_offset: raw.base_character_offset,
                 character_widths: raw.character_widths.clone(),
-            }
+            })
         }
     }
 

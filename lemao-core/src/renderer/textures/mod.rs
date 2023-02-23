@@ -31,13 +31,25 @@ impl RawTexture {
         self.size
     }
 
+    pub fn set_size(&mut self, size: Vec2) {
+        self.size = size;
+    }
+
     pub fn get_data(&self) -> &Vec<u8> {
         &self.data
+    }
+
+    pub fn get_data_mut(&mut self) -> &mut Vec<u8> {
+        &mut self.data
+    }
+
+    pub fn set_data(&mut self, data: Vec<u8>) {
+        self.data = data;
     }
 }
 
 impl Texture {
-    pub fn new(renderer: &RendererContext, raw: &RawTexture) -> Self {
+    pub fn new(renderer: &RendererContext, raw: &RawTexture) -> Result<Self, String> {
         unsafe {
             let gl = renderer.gl.clone();
             let mut texture_gl_id = 0;
@@ -52,7 +64,7 @@ impl Texture {
             let texture = Self { id: 0, texture_gl_id, gl, size: raw.size };
             texture.set_data(raw.size, &raw.data);
 
-            texture
+            Ok(texture)
         }
     }
 

@@ -160,9 +160,11 @@ impl RendererContext {
         self.default_rectangle_shape_id = self.shapes.store(rectangle_shape);
     }
 
-    pub fn init_default_texture(&mut self) {
-        let texture = Box::new(Texture::new(self, &RawTexture::new(Vec2::new(1.0, 1.0), vec![255, 255, 255, 255])));
+    pub fn init_default_texture(&mut self) -> Result<(), String> {
+        let texture = Box::new(Texture::new(self, &RawTexture::new(Vec2::new(1.0, 1.0), vec![255, 255, 255, 255]))?);
         self.default_texture_id = self.textures.write().unwrap().store(texture);
+
+        Ok(())
     }
 
     pub fn init_batch_renderer(&mut self) {

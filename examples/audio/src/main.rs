@@ -1,5 +1,6 @@
 use lemao_core::audio::context::AudioContext;
 use lemao_core::audio::samples::wav;
+use lemao_core::audio::samples::Sample;
 use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_common_platform::input::Key;
 use lemao_core::lemao_common_platform::window::WindowStyle;
@@ -33,13 +34,13 @@ pub fn main() -> Result<(), String> {
 
     let font_storage = renderer.get_fonts();
     let mut font_storage = font_storage.write().unwrap();
-    let font_id = font_storage.store(Box::new(Font::new(&renderer, &bff::load("./assets/inconsolata.bff")?)));
+    let font_id = font_storage.store(Box::new(Font::new(&renderer, &bff::load("./assets/inconsolata.bff")?)?));
 
     drop(font_storage);
 
     let sample_storage = audio.get_samples();
     let mut sample_storage = sample_storage.write().unwrap();
-    let chopin_sample_id = sample_storage.store(Box::new(wav::load(&audio, "./assets/chopin.wav")?));
+    let chopin_sample_id = sample_storage.store(Box::new(Sample::new(&audio, &wav::load("./assets/chopin.wav")?)?));
 
     drop(sample_storage);
 
