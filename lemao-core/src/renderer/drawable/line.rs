@@ -28,6 +28,7 @@ pub struct Line {
     from: Vec2,
     to: Vec2,
     thickness: f32,
+    dirty: bool,
 }
 
 impl Line {
@@ -48,9 +49,9 @@ impl Line {
             from,
             to,
             thickness: 1.0,
+            dirty: true,
         };
 
-        line.calculate_position_rotation_scale();
         line
     }
 
@@ -64,7 +65,7 @@ impl Line {
 
     pub fn set_from(&mut self, from: Vec2) {
         self.from = from;
-        self.calculate_position_rotation_scale();
+        self.dirty = true;
     }
 
     pub fn get_to(&self) -> Vec2 {
@@ -73,7 +74,7 @@ impl Line {
 
     pub fn set_to(&mut self, to: Vec2) {
         self.to = to;
-        self.calculate_position_rotation_scale();
+        self.dirty = true;
     }
 
     pub fn get_thickness(&self) -> f32 {
@@ -82,13 +83,15 @@ impl Line {
 
     pub fn set_thickness(&mut self, thickness: f32) {
         self.thickness = thickness;
-        self.calculate_position_rotation_scale();
+        self.dirty = true;
     }
 
-    fn calculate_position_rotation_scale(&mut self) {
+    fn update(&mut self) {
         self.position = self.from;
         self.rotation = Vec2::new(0.0, 1.0).signed_angle(self.to - self.from);
         self.size = Vec2::new(self.thickness, self.from.distance(self.to) + 1.0);
+
+        self.dirty = false;
     }
 }
 
@@ -161,7 +164,11 @@ impl Drawable for Line {
         Batch::new(Some(self.shape_id), None, None, Some(self.texture_gl_id), Some(&self.color))
     }
 
-    fn draw(&self, shader: &Shader) -> Result<(), String> {
+    fn draw(&mut self, shader: &Shader) -> Result<(), String> {
+        if self.dirty {
+            self.update();
+        }
+
         unsafe {
             let model = self.get_transformation_matrix();
 

@@ -34,6 +34,7 @@ pub struct Frame {
     elements_count: u32,
     vertices: Vec<f32>,
     indices: Vec<u32>,
+    dirty: bool,
 }
 
 #[derive(Copy, Clone, Debug, Default, PartialEq)]
@@ -66,6 +67,7 @@ impl Frame {
             elements_count: 0,
             vertices: Vec::new(),
             indices: Vec::new(),
+            dirty: true,
         };
 
         unsafe {
@@ -88,7 +90,6 @@ impl Frame {
             (frame.gl.glEnableVertexAttribArray)(2);
         }
 
-        frame.update();
         frame
     }
 
@@ -107,7 +108,7 @@ impl Frame {
 
     pub fn set_thickness(&mut self, thickness: FrameThickness) {
         self.thickness = thickness;
-        self.update();
+        self.dirty = true;
     }
 
     pub fn get_corner_rounding(&self) -> CornerRounding {
@@ -116,7 +117,7 @@ impl Frame {
 
     pub fn set_corner_rounding(&mut self, corner_rounding: CornerRounding) {
         self.corner_rounding = corner_rounding;
-        self.update();
+        self.dirty = true;
     }
 
     fn update(&mut self) {
@@ -282,6 +283,8 @@ impl Frame {
 
             (self.gl.glBindBuffer)(opengl::GL_ELEMENT_ARRAY_BUFFER, self.ebo_gl_id);
             (self.gl.glBufferData)(opengl::GL_ELEMENT_ARRAY_BUFFER, indices_size, indices_ptr, opengl::GL_STATIC_DRAW);
+
+            self.dirty = false;
         }
     }
 
@@ -376,7 +379,7 @@ impl Drawable for Frame {
 
     fn set_size(&mut self, size: Vec2) {
         self.size = size;
-        self.update();
+        self.dirty = true;
     }
 
     fn get_anchor(&self) -> Vec2 {
@@ -407,7 +410,11 @@ impl Drawable for Frame {
         Batch::new(None, Some(&self.vertices), Some(&self.indices), Some(self.texture_gl_id), Some(&self.color))
     }
 
-    fn draw(&self, shader: &Shader) -> Result<(), String> {
+    fn draw(&mut self, shader: &Shader) -> Result<(), String> {
+        if self.dirty {
+            self.update();
+        }
+
         unsafe {
             let model = self.get_transformation_matrix();
 

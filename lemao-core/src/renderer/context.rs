@@ -396,7 +396,8 @@ impl RendererContext {
             camera.set_dirty_flag(false);
         }
 
-        self.get_drawable(drawable_id)?.draw(self.shaders.get_and_cast::<Shader>(shader_id)?)?;
+        let drawable = self.drawables.get_mut(drawable_id)?.as_drawable_mut().ok_or_else(|| format!("Storage item {} is not drawable", drawable_id))?;
+        drawable.draw(self.shaders.get_and_cast::<Shader>(shader_id)?)?;
         Ok(())
     }
 

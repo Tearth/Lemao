@@ -27,6 +27,7 @@ pub fn main() -> Result<(), String> {
 
     let mut window = WindowContext::new("Paint", WindowStyle::Window { position: window_position, size: window_size })?;
     let mut renderer = window.create_renderer()?;
+    renderer.set_swap_interval(1);
 
     let mut texture_data = vec![0; (window_size.x * window_size.y * 4.0) as usize];
 

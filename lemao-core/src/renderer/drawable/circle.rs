@@ -36,6 +36,7 @@ pub struct Circle {
     elements_count: u32,
     vertices: Vec<f32>,
     indices: Vec<u32>,
+    dirty: bool,
 }
 
 impl Circle {
@@ -63,6 +64,7 @@ impl Circle {
             elements_count: 0,
             vertices: Vec::new(),
             indices: Vec::new(),
+            dirty: true,
         };
 
         unsafe {
@@ -85,7 +87,6 @@ impl Circle {
             (circle.gl.glEnableVertexAttribArray)(2);
         }
 
-        circle.update();
         circle
     }
 
@@ -104,7 +105,7 @@ impl Circle {
 
     pub fn set_sides(&mut self, sides: u32) {
         self.sides = sides;
-        self.update();
+        self.dirty = true;
     }
 
     pub fn get_start_angle(&self) -> f32 {
@@ -113,7 +114,7 @@ impl Circle {
 
     pub fn set_start_angle(&mut self, angle: f32) {
         self.start_angle = angle;
-        self.update();
+        self.dirty = true;
     }
 
     pub fn get_end_angle(&self) -> f32 {
@@ -122,7 +123,7 @@ impl Circle {
 
     pub fn set_end_angle(&mut self, angle: f32) {
         self.end_angle = angle;
-        self.update();
+        self.dirty = true;
     }
 
     pub fn get_thickness(&self) -> Vec2 {
@@ -131,7 +132,7 @@ impl Circle {
 
     pub fn set_thickness(&mut self, thickness: Vec2) {
         self.thickness = thickness;
-        self.update();
+        self.dirty = true;
     }
 
     pub fn get_squircle_factor(&self) -> f32 {
@@ -140,7 +141,7 @@ impl Circle {
 
     pub fn set_squircle_factor(&mut self, squircle_factor: f32) {
         self.squircle_factor = squircle_factor;
-        self.update();
+        self.dirty = true;
     }
 
     fn update(&mut self) {
@@ -210,6 +211,8 @@ impl Circle {
 
             (self.gl.glBindBuffer)(opengl::GL_ELEMENT_ARRAY_BUFFER, self.ebo_gl_id);
             (self.gl.glBufferData)(opengl::GL_ELEMENT_ARRAY_BUFFER, indices_size, indices_ptr, opengl::GL_STATIC_DRAW);
+
+            self.dirty = false;
         }
     }
 
@@ -278,7 +281,7 @@ impl Drawable for Circle {
 
     fn set_size(&mut self, size: Vec2) {
         self.size = size;
-        self.update();
+        self.dirty = true;
     }
 
     fn get_anchor(&self) -> Vec2 {
@@ -309,7 +312,11 @@ impl Drawable for Circle {
         Batch::new(None, Some(&self.vertices), Some(&self.indices), Some(self.texture_gl_id), Some(&self.color))
     }
 
-    fn draw(&self, shader: &Shader) -> Result<(), String> {
+    fn draw(&mut self, shader: &Shader) -> Result<(), String> {
+        if self.dirty {
+            self.update();
+        }
+
         unsafe {
             let model = self.get_transformation_matrix();
 

@@ -36,6 +36,7 @@ pub struct Rectangle {
     custom_shape_initialized: bool,
     vertices: Vec<f32>,
     indices: Vec<u32>,
+    dirty: bool,
 }
 
 impl Rectangle {
@@ -63,9 +64,9 @@ impl Rectangle {
             custom_shape_initialized: false,
             vertices: Vec::new(),
             indices: Vec::new(),
+            dirty: true,
         };
 
-        rectangle.update();
         rectangle
     }
 
@@ -77,7 +78,7 @@ impl Rectangle {
         self.texture_id = texture.id;
         self.texture_gl_id = texture.texture_gl_id;
         self.size = texture.get_size();
-        self.update();
+        self.dirty = true;
     }
 
     pub fn get_corner_rounding(&self) -> CornerRounding {
@@ -87,7 +88,7 @@ impl Rectangle {
     pub fn set_corner_rounding(&mut self, corner_rounding: CornerRounding) {
         self.corner_rounding = corner_rounding;
         self.custom_shape = true;
-        self.update();
+        self.dirty = true;
     }
 
     fn update(&mut self) {
@@ -229,6 +230,8 @@ impl Rectangle {
 
                 (self.gl.glBindBuffer)(opengl::GL_ELEMENT_ARRAY_BUFFER, self.ebo_gl_id);
                 (self.gl.glBufferData)(opengl::GL_ELEMENT_ARRAY_BUFFER, indices_size, indices_ptr, opengl::GL_STATIC_DRAW);
+
+                self.dirty = false;
             }
         }
     }
@@ -314,7 +317,7 @@ impl Drawable for Rectangle {
 
     fn set_size(&mut self, size: Vec2) {
         self.size = size;
-        self.update();
+        self.dirty = true;
     }
 
     fn get_anchor(&self) -> Vec2 {
@@ -356,7 +359,11 @@ impl Drawable for Rectangle {
         }
     }
 
-    fn draw(&self, shader: &Shader) -> Result<(), String> {
+    fn draw(&mut self, shader: &Shader) -> Result<(), String> {
+        if self.dirty {
+            self.update();
+        }
+
         unsafe {
             let model = self.get_transformation_matrix();
 

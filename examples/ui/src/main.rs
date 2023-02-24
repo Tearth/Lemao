@@ -47,6 +47,7 @@ pub fn main() -> Result<(), String> {
         Ok(renderer) => renderer,
         Err(message) => panic!("{}", message),
     };
+    renderer.set_swap_interval(1);
 
     let coin_icon = bmp::load("./assets/coin.bmp")?;
     let hammer_icon = bmp::load("./assets/hammer.bmp")?;

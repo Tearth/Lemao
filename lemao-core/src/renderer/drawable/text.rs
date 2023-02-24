@@ -33,6 +33,7 @@ pub struct Text {
     elements_count: u32,
     vertices: Vec<f32>,
     indices: Vec<u32>,
+    dirty: bool,
 
     font_size: Vec2,
     font_cell_size: Vec2,
@@ -62,6 +63,7 @@ impl Text {
             elements_count: 0,
             vertices: Vec::new(),
             indices: Vec::new(),
+            dirty: true,
 
             font_size: font.get_size(),
             font_cell_size: font.get_cell_size(),
@@ -99,9 +101,7 @@ impl Text {
     pub fn set_font(&mut self, font: &Font) {
         self.font_id = font.id;
         self.texture_gl_id = font.texture_gl_id;
-
-        // We must regenerate mesh, since the font sizes could change
-        self.set_text(&self.text.clone());
+        self.dirty = true;
     }
 
     pub fn get_text(&self) -> &str {
@@ -109,6 +109,46 @@ impl Text {
     }
 
     pub fn set_text(&mut self, text: &str) {
+        self.text = text.to_string();
+        self.dirty = true;
+    }
+
+    pub fn get_line_height(&self) -> u32 {
+        self.line_height
+    }
+
+    pub fn set_line_height(&mut self, line_height: u32) {
+        self.line_height = line_height;
+        self.dirty = true;
+    }
+
+    pub fn calculate_text_size(&self, text: String) -> Vec2 {
+        let mut text_size = Vec2::new(0.0, self.line_height as f32);
+        let mut line_width = 0.0;
+        let mut color_section = false;
+
+        for char in text.chars() {
+            if char == '\n' {
+                line_width = 0.0;
+                text_size.y += self.line_height as f32;
+                continue;
+            } else if char == '°' {
+                color_section = !color_section;
+                continue;
+            }
+
+            if color_section {
+                continue;
+            }
+
+            line_width += self.font_character_widths[char as usize] as f32;
+            text_size.x = f32::max(text_size.x, line_width);
+        }
+
+        text_size
+    }
+
+    pub fn update(&mut self) {
         unsafe {
             let mut offset: Vec2 = Default::default();
             let mut size: Vec2 = Vec2::new(0.0, self.line_height as f32);
@@ -125,7 +165,7 @@ impl Text {
             self.vertices.clear();
             self.indices.clear();
 
-            for char in text.chars() {
+            for char in self.text.chars() {
                 if char == '\n' {
                     offset.x = 0.0;
                     offset.y -= self.line_height as f32;
@@ -195,45 +235,11 @@ impl Text {
             (self.gl.glBindBuffer)(opengl::GL_ELEMENT_ARRAY_BUFFER, self.ebo_gl_id);
             (self.gl.glBufferData)(opengl::GL_ELEMENT_ARRAY_BUFFER, indices_size, indices_ptr, opengl::GL_STATIC_DRAW);
 
-            self.text = text.to_string();
             self.size = size;
             self.elements_count = self.indices.len() as u32;
+
+            self.dirty = false;
         }
-    }
-
-    pub fn get_line_height(&self) -> u32 {
-        self.line_height
-    }
-
-    pub fn set_line_height(&mut self, line_height: u32) {
-        self.line_height = line_height;
-        self.set_text(&self.text.clone());
-    }
-
-    pub fn calculate_text_size(&self, text: String) -> Vec2 {
-        let mut text_size = Vec2::new(0.0, self.line_height as f32);
-        let mut line_width = 0.0;
-        let mut color_section = false;
-
-        for char in text.chars() {
-            if char == '\n' {
-                line_width = 0.0;
-                text_size.y += self.line_height as f32;
-                continue;
-            } else if char == '°' {
-                color_section = !color_section;
-                continue;
-            }
-
-            if color_section {
-                continue;
-            }
-
-            line_width += self.font_character_widths[char as usize] as f32;
-            text_size.x = f32::max(text_size.x, line_width);
-        }
-
-        text_size
     }
 
     fn get_vertices(&self, width: u32, height: u32, offset: Vec2, uv: Vec2, uv_size: Vec2, color: SolidColor) -> [f32; 36] {
@@ -351,7 +357,11 @@ impl Drawable for Text {
         Batch::new(None, Some(&self.vertices), Some(&self.indices), Some(self.texture_gl_id), Some(&self.color))
     }
 
-    fn draw(&self, shader: &Shader) -> Result<(), String> {
+    fn draw(&mut self, shader: &Shader) -> Result<(), String> {
+        if self.dirty {
+            self.update();
+        }
+
         unsafe {
             let model = self.get_transformation_matrix();
 

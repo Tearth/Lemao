@@ -30,6 +30,7 @@ pub fn main() -> Result<(), String> {
         Ok(renderer) => renderer,
         Err(message) => panic!("{}", message),
     };
+    renderer.set_swap_interval(1);
 
     let font_storage = renderer.get_fonts();
     let mut font_storage = font_storage.write().unwrap();

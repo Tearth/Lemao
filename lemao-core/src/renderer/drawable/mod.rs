@@ -52,7 +52,7 @@ pub trait Drawable {
     fn get_transformation_matrix(&self) -> Mat4x4;
     fn get_batch(&self) -> Batch;
 
-    fn draw(&self, shader: &Shader) -> Result<(), String>;
+    fn draw(&mut self, shader: &Shader) -> Result<(), String>;
 
     fn as_any(&self) -> &dyn Any;
     fn as_any_mut(&mut self) -> &mut dyn Any;

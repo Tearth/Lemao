@@ -27,6 +27,7 @@ pub fn main() -> Result<(), String> {
 
     let mut window = WindowContext::new("Circle", WindowStyle::Window { position: window_position, size: window_size })?;
     let mut renderer = window.create_renderer()?;
+    renderer.set_swap_interval(1);
 
     let font_storage = renderer.get_fonts();
     let mut font_storage = font_storage.write().unwrap();
