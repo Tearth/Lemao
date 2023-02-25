@@ -2,13 +2,13 @@ use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_common_platform::window::WindowStyle;
 use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
-use lemao_core::renderer::drawable::rectangle::Rectangle;
 use lemao_core::renderer::drawable::text::Text;
 use lemao_core::renderer::drawable::Drawable;
 use lemao_core::renderer::fonts::bff;
 use lemao_core::renderer::fonts::Font;
 use lemao_core::renderer::textures::bmp;
 use lemao_core::renderer::textures::Texture;
+use lemao_core::utils::storage::StorageItem;
 use lemao_core::window::context::WindowContext;
 use std::time::Instant;
 
@@ -49,9 +49,8 @@ pub fn main() -> Result<(), String> {
 
     drop(font_storage);
 
-    let fps_text_id = renderer.create_text(font_id)?;
-
-    let fps_text = renderer.get_drawable_and_cast_mut::<Text>(fps_text_id)?;
+    let fps_text = renderer.create_text(font_id)?;
+    let fps_text_id = fps_text.get_id();
     fps_text.set_text("FPS:0");
     fps_text.set_anchor(Vec2::new(0.0, 1.0));
 
@@ -60,8 +59,8 @@ pub fn main() -> Result<(), String> {
     let texture_storage = texture_storage.read().unwrap();
 
     for _ in 0..CELLS_COUNT {
-        let sprite_id = renderer.create_rectangle()?;
-        let sprite = renderer.get_drawable_and_cast_mut::<Rectangle>(sprite_id)?;
+        let sprite = renderer.create_rectangle()?;
+        let sprite_id = sprite.get_id();
         sprite.set_texture(texture_storage.get_and_cast::<Texture>(cell_texture_id)?);
         sprite.set_anchor(Vec2::new(0.5, 0.5));
 

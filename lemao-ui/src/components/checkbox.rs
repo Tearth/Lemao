@@ -99,7 +99,7 @@ impl Checkbox {
             event_mask: None,
 
             // Box properties
-            box_id: renderer.create_rectangle()?,
+            box_id: renderer.create_rectangle()?.get_id(),
             box_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             box_offset: Default::default(),
             box_size: Default::default(),
@@ -107,7 +107,7 @@ impl Checkbox {
             box_unchecked_texture_id,
 
             // Label properties
-            label_id: renderer.create_text(label_font_id)?,
+            label_id: renderer.create_text(label_font_id)?.get_id(),
             label_font_id,
             label_text: Default::default(),
             label_offset: Default::default(),

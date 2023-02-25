@@ -117,19 +117,19 @@ impl Slider {
             event_mask: None,
 
             // Shape properties
-            filling_id: renderer.create_rectangle()?,
+            filling_id: renderer.create_rectangle()?.get_id(),
             color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             corner_rounding: Default::default(),
             texture_id: None,
             texture_original_size: Default::default(),
 
             // Border properties
-            border_id: renderer.create_frame(Default::default())?,
+            border_id: renderer.create_frame()?.get_id(),
             border_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             border_thickness: Default::default(),
 
             // Shadow properties
-            shadow_id: renderer.create_rectangle()?,
+            shadow_id: renderer.create_rectangle()?.get_id(),
             shadow_enabled: false,
             shadow_offset: Default::default(),
             shadow_color: Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 1.0)),
@@ -137,13 +137,13 @@ impl Slider {
             shadow_corner_rounding: Default::default(),
 
             // Bar properties
-            bar_id: renderer.create_rectangle()?,
+            bar_id: renderer.create_rectangle()?.get_id(),
             bar_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
 
             // Selector properties
             selector_id: match selector_shape {
-                ComponentShape::Rectangle => renderer.create_rectangle()?,
-                ComponentShape::Disc => renderer.create_disc(0.0, 512)?,
+                ComponentShape::Rectangle => renderer.create_rectangle()?.get_id(),
+                ComponentShape::Disc => renderer.create_disc()?.get_id(),
             },
             selector_shape,
             selector_position: Default::default(),
@@ -152,8 +152,8 @@ impl Slider {
 
             // Selector border properties
             selector_border_id: match selector_shape {
-                ComponentShape::Rectangle => renderer.create_frame(Default::default())?,
-                ComponentShape::Disc => renderer.create_circle(0.0, 512)?,
+                ComponentShape::Rectangle => renderer.create_frame()?.get_id(),
+                ComponentShape::Disc => renderer.create_circle()?.get_id(),
             },
             selector_border_thickness: Default::default(),
             selector_border_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),

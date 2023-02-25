@@ -13,6 +13,7 @@ use lemao_core::renderer::drawable::text::Text;
 use lemao_core::renderer::drawable::Color;
 use lemao_core::renderer::drawable::Drawable;
 use lemao_core::renderer::fonts::Font;
+use lemao_core::utils::storage::StorageItem;
 use std::any::Any;
 
 pub struct Label {
@@ -76,7 +77,7 @@ impl Label {
             event_mask: None,
 
             // Label properties
-            label_id: renderer.create_text(label_font_id)?,
+            label_id: renderer.create_text(label_font_id)?.get_id(),
             label_font_id,
             label_text: Default::default(),
             label_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),

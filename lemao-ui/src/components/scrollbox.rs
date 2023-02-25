@@ -14,6 +14,7 @@ use lemao_core::renderer::context::RendererContext;
 use lemao_core::renderer::drawable::frame::Frame;
 use lemao_core::renderer::drawable::rectangle::Rectangle;
 use lemao_core::renderer::drawable::Color;
+use lemao_core::utils::storage::StorageItem;
 use lemao_math::color::SolidColor;
 use std::any::Any;
 
@@ -131,42 +132,42 @@ impl Scrollbox {
             event_mask: None,
 
             // Vertical scroll background properties
-            vertical_scroll_background_id: renderer.create_rectangle()?,
+            vertical_scroll_background_id: renderer.create_rectangle()?.get_id(),
             vertical_scroll_background_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             vertical_scroll_background_corner_rounding: Default::default(),
 
             // Horizontal scroll background properties
-            horizontal_scroll_background_id: renderer.create_rectangle()?,
+            horizontal_scroll_background_id: renderer.create_rectangle()?.get_id(),
             horizontal_scroll_background_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             horizontal_scroll_background_corner_rounding: Default::default(),
 
             // Vertical scroll background border properties
-            vertical_scroll_background_border_id: renderer.create_frame(Default::default())?,
+            vertical_scroll_background_border_id: renderer.create_frame()?.get_id(),
             vertical_scroll_background_border_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             vertical_scroll_background_border_thickness: Default::default(),
 
             // Horizontal scroll background border properties
-            horizontal_scroll_background_border_id: renderer.create_frame(Default::default())?,
+            horizontal_scroll_background_border_id: renderer.create_frame()?.get_id(),
             horizontal_scroll_background_border_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             horizontal_scroll_background_border_thickness: Default::default(),
 
             // Vertical scroll properties
-            vertical_scroll_id: renderer.create_rectangle()?,
+            vertical_scroll_id: renderer.create_rectangle()?.get_id(),
             vertical_scroll_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             vertical_scroll_corner_rounding: Default::default(),
 
             // Horizontal scroll properties
-            horizontal_scroll_id: renderer.create_rectangle()?,
+            horizontal_scroll_id: renderer.create_rectangle()?.get_id(),
             horizontal_scroll_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             horizontal_scroll_corner_rounding: Default::default(),
 
             // Vertical scroll border properties
-            vertical_scroll_border_id: renderer.create_frame(Default::default())?,
+            vertical_scroll_border_id: renderer.create_frame()?.get_id(),
             vertical_scroll_border_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             vertical_scroll_border_thickness: Default::default(),
 
             // Horizontal scroll border properties
-            horizontal_scroll_border_id: renderer.create_frame(Default::default())?,
+            horizontal_scroll_border_id: renderer.create_frame()?.get_id(),
             horizontal_scroll_border_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             horizontal_scroll_border_thickness: Default::default(),
 

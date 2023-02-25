@@ -40,7 +40,7 @@ pub struct Circle {
 }
 
 impl Circle {
-    pub fn new(renderer: &RendererContext, texture: &Texture, radius: f32, sides: u32) -> Self {
+    pub fn new(renderer: &RendererContext, texture: &Texture) -> Self {
         let mut circle = Circle {
             id: 0,
             vao_gl_id: 0,
@@ -53,10 +53,10 @@ impl Circle {
             position: Default::default(),
             scale: Vec2::new(1.0, 1.0),
             rotation: 0.0,
-            size: Vec2::new(radius * 2.0, radius * 2.0),
+            size: Vec2::new(100.0, 100.0),
             anchor: Default::default(),
             color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
-            sides,
+            sides: 256,
             start_angle: 0.0,
             end_angle: 2.0 * std::f32::consts::PI,
             thickness: Vec2::new(1.0, 1.0),

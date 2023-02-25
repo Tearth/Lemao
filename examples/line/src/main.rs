@@ -8,10 +8,10 @@ use lemao_core::lemao_common_platform::window::WindowStyle;
 use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::drawable::line::Line;
-use lemao_core::renderer::drawable::text::Text;
 use lemao_core::renderer::drawable::Drawable;
 use lemao_core::renderer::fonts::bff;
 use lemao_core::renderer::fonts::Font;
+use lemao_core::utils::storage::StorageItem;
 use lemao_core::window::context::CoordinationSystem;
 use lemao_core::window::context::WindowContext;
 
@@ -36,10 +36,13 @@ pub fn main() -> Result<(), String> {
 
     drop(font_storage);
 
-    let line_id = renderer.create_line(Vec2::new(200.0, 200.0), Vec2::new(400.0, 400.0)).unwrap();
-    let description_text_id = renderer.create_text(font_id)?;
+    let line = renderer.create_line().unwrap();
+    let line_id = line.get_id();
+    line.set_from(Vec2::new(200.0, 200.0));
+    line.set_to(Vec2::new(400.0, 400.0));
 
-    let description_text = renderer.get_drawable_and_cast_mut::<Text>(description_text_id)?;
+    let description_text = renderer.create_text(font_id)?;
+    let description_text_id = description_text.get_id();
     description_text.set_text(DESCRIPTION);
     description_text.set_anchor(Vec2::new(0.0, 1.0));
     description_text.set_line_height(20);

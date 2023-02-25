@@ -254,62 +254,69 @@ impl RendererContext {
         self.textures.clone()
     }
 
-    pub fn create_circle(&mut self, radius: f32, sides: u32) -> Result<usize, String> {
+    pub fn create_circle(&mut self) -> Result<&mut Circle, String> {
         let texture_storage = self.textures.read().unwrap();
         let texture = texture_storage.get_and_cast::<Texture>(self.default_texture_id)?;
-        let circle = Box::new(Circle::new(self, texture, radius, sides));
+        let circle = Box::new(Circle::new(self, texture));
 
-        Ok(self.drawables.store(circle))
+        let id = self.drawables.store(circle);
+        Ok(self.drawables.get_and_cast_mut::<Circle>(id).unwrap())
     }
 
-    pub fn create_disc(&mut self, radius: f32, sides: u32) -> Result<usize, String> {
+    pub fn create_disc(&mut self) -> Result<&mut Disc, String> {
         let texture_storage = self.textures.read().unwrap();
         let texture = texture_storage.get_and_cast::<Texture>(self.default_texture_id)?;
-        let disc = Box::new(Disc::new(self, texture, radius, sides));
+        let disc = Box::new(Disc::new(self, texture));
 
-        Ok(self.drawables.store(disc))
+        let id = self.drawables.store(disc);
+        Ok(self.drawables.get_and_cast_mut::<Disc>(id).unwrap())
     }
 
-    pub fn create_frame(&mut self, size: Vec2) -> Result<usize, String> {
+    pub fn create_frame(&mut self) -> Result<&mut Frame, String> {
         let texture_storage = self.textures.read().unwrap();
         let texture = texture_storage.get_and_cast::<Texture>(self.default_texture_id)?;
-        let frame = Box::new(Frame::new(self, texture, size));
+        let frame = Box::new(Frame::new(self, texture));
 
-        Ok(self.drawables.store(frame))
+        let id = self.drawables.store(frame);
+        Ok(self.drawables.get_and_cast_mut::<Frame>(id).unwrap())
     }
 
-    pub fn create_line(&mut self, from: Vec2, to: Vec2) -> Result<usize, String> {
+    pub fn create_line(&mut self) -> Result<&mut Line, String> {
         let shape = self.shapes.get_and_cast::<Shape>(self.default_line_shape_id)?;
         let texture_storage = self.textures.read().unwrap();
         let texture = texture_storage.get_and_cast::<Texture>(self.default_texture_id)?;
-        let line = Box::new(Line::new(self, shape, texture, from, to));
+        let line = Box::new(Line::new(self, shape, texture));
 
-        Ok(self.drawables.store(line))
+        let id = self.drawables.store(line);
+        Ok(self.drawables.get_and_cast_mut::<Line>(id).unwrap())
     }
 
-    pub fn create_rectangle(&mut self) -> Result<usize, String> {
+    pub fn create_rectangle(&mut self) -> Result<&mut Rectangle, String> {
         let shape = self.shapes.get_and_cast::<Shape>(self.default_rectangle_shape_id)?;
         let texture_storage = self.textures.read().unwrap();
         let texture = texture_storage.get_and_cast::<Texture>(self.default_texture_id)?;
         let rectangle = Box::new(Rectangle::new(self, shape, texture));
 
-        Ok(self.drawables.store(rectangle))
+        let id = self.drawables.store(rectangle);
+        Ok(self.drawables.get_and_cast_mut::<Rectangle>(id).unwrap())
     }
 
-    pub fn create_text(&mut self, font_id: usize) -> Result<usize, String> {
+    pub fn create_text(&mut self, font_id: usize) -> Result<&mut Text, String> {
         let font_storage = self.fonts.read().unwrap();
         let font = font_storage.get_and_cast::<Font>(font_id)?;
         let text = Box::new(Text::new(self, font));
 
-        Ok(self.drawables.store(text))
+        let id = self.drawables.store(text);
+        Ok(self.drawables.get_and_cast_mut::<Text>(id).unwrap())
     }
 
-    pub fn create_tilemap(&mut self, texture_id: usize, tile_size: Vec2) -> Result<usize, String> {
+    pub fn create_tilemap(&mut self, texture_id: usize) -> Result<&mut Tilemap, String> {
         let texture_storage = self.textures.read().unwrap();
         let texture = texture_storage.get_and_cast::<Texture>(texture_id)?;
-        let tilemap = Box::new(Tilemap::new(self, texture, tile_size));
+        let tilemap = Box::new(Tilemap::new(self, texture));
 
-        Ok(self.drawables.store(tilemap))
+        let id = self.drawables.store(tilemap);
+        Ok(self.drawables.get_and_cast_mut::<Tilemap>(id).unwrap())
     }
 
     pub fn get_drawable(&self, drawable_id: usize) -> Result<&dyn Drawable, String> {

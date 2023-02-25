@@ -7,7 +7,6 @@ use lemao_opengl::bindings::wgl;
 use lemao_opengl::pointers::OpenGLPointers;
 use std::mem;
 use std::ptr;
-use std::rc::Rc;
 
 pub struct WindowsWinAPIRenderer {
     gl_context: winapi::HGLRC,

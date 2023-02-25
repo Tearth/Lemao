@@ -11,6 +11,7 @@ use lemao_core::renderer::context::RendererContext;
 use lemao_core::renderer::drawable::line::Line;
 use lemao_core::renderer::drawable::Color;
 use lemao_core::renderer::drawable::Drawable;
+use lemao_core::utils::storage::StorageItem;
 use std::any::Any;
 
 pub struct Wire {
@@ -56,7 +57,7 @@ pub struct WireChunk {
 }
 
 impl Wire {
-    pub fn new(id: usize, renderer: &mut RendererContext) -> Result<Self, String> {
+    pub fn new(id: usize, _renderer: &mut RendererContext) -> Result<Self, String> {
         Ok(Self {
             id,
 
@@ -366,7 +367,7 @@ impl Component for Wire {
 
 impl WireChunk {
     pub fn new(renderer: &mut RendererContext) -> Result<Self, String> {
-        Ok(Self { line_id: renderer.create_line(Default::default(), Default::default())? })
+        Ok(Self { line_id: renderer.create_line()?.get_id() })
     }
 }
 

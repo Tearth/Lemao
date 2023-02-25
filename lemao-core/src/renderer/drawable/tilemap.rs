@@ -38,7 +38,7 @@ pub struct Tilemap {
 }
 
 impl Tilemap {
-    pub fn new(renderer: &RendererContext, texture: &Texture, tile_size: Vec2) -> Self {
+    pub fn new(renderer: &RendererContext, texture: &Texture) -> Self {
         let texture_size = texture.get_size();
         let mut tilemap = Tilemap {
             id: 0,
@@ -52,12 +52,12 @@ impl Tilemap {
             position: Default::default(),
             scale: Vec2::new(1.0, 1.0),
             rotation: 0.0,
-            size: tile_size,
+            size: Default::default(),
             anchor: Default::default(),
             color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             texture_size,
-            frames_count: Vec2::new(texture_size.x / tile_size.x, texture_size.y / tile_size.y),
-            total_frames_count: ((texture_size.x / tile_size.x) * (texture_size.y / tile_size.y)) as u32,
+            frames_count: Default::default(),
+            total_frames_count: 0,
             frame: 0,
             vertices: Vec::new(),
             indices: Vec::new(),
@@ -91,15 +91,11 @@ impl Tilemap {
         self.texture_id
     }
 
-    pub fn set_texture(&mut self, texture: &Texture, tile_size: Vec2) {
-        let texture_size = texture.get_size();
-
+    pub fn set_texture(&mut self, texture: &Texture) {
         self.texture_id = texture.id;
         self.texture_gl_id = texture.texture_gl_id;
-        self.size = texture.get_size();
-        self.frames_count = Vec2::new(texture_size.x / tile_size.x, texture_size.y / tile_size.y);
-        self.total_frames_count = ((texture_size.x / tile_size.x) * (texture_size.y / tile_size.y)) as u32;
         self.frame = 0;
+        self.dirty = true;
     }
 
     pub fn get_frame(&self) -> u32 {
@@ -108,6 +104,7 @@ impl Tilemap {
 
     pub fn set_frame(&mut self, frame: u32) {
         self.frame = frame;
+        self.dirty = true;
     }
 
     pub fn set_next_frame(&mut self) {
@@ -122,6 +119,8 @@ impl Tilemap {
 
     pub fn update(&mut self) {
         unsafe {
+            self.frames_count = Vec2::new(self.texture_size.x / self.size.x, self.texture_size.y / self.size.y);
+            self.total_frames_count = (self.frames_count.x * self.frames_count.y) as u32;
             self.frame = self.frame.clamp(0, self.total_frames_count - 1);
 
             self.vertices.clear();
@@ -241,6 +240,7 @@ impl Drawable for Tilemap {
 
     fn set_size(&mut self, size: Vec2) {
         self.size = size;
+        self.dirty = true;
     }
 
     fn get_anchor(&self) -> Vec2 {

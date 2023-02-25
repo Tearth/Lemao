@@ -32,7 +32,7 @@ pub struct Line {
 }
 
 impl Line {
-    pub fn new(renderer: &RendererContext, shape: &Shape, texture: &Texture, from: Vec2, to: Vec2) -> Self {
+    pub fn new(renderer: &RendererContext, shape: &Shape, texture: &Texture) -> Self {
         Line {
             id: 0,
             shape_id: shape.id,
@@ -46,8 +46,8 @@ impl Line {
             rotation: 1.0,
             size: Default::default(),
             color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
-            from,
-            to,
+            from: Default::default(),
+            to: Default::default(),
             thickness: 1.0,
             dirty: true,
         }

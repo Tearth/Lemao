@@ -117,8 +117,8 @@ impl Button {
 
             // Shape properties
             filling_id: match shape {
-                ComponentShape::Rectangle => renderer.create_rectangle()?,
-                ComponentShape::Disc => renderer.create_disc(0.0, 512)?,
+                ComponentShape::Rectangle => renderer.create_rectangle()?.get_id(),
+                ComponentShape::Disc => renderer.create_disc()?.get_id(),
             },
             shape,
             color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
@@ -128,14 +128,14 @@ impl Button {
 
             // Border properties
             border_id: match shape {
-                ComponentShape::Rectangle => renderer.create_frame(Default::default())?,
-                ComponentShape::Disc => renderer.create_circle(0.0, 512)?,
+                ComponentShape::Rectangle => renderer.create_frame()?.get_id(),
+                ComponentShape::Disc => renderer.create_circle()?.get_id(),
             },
             border_thickness: Default::default(),
             border_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
 
             // Label properties
-            label_id: renderer.create_text(label_font_id)?,
+            label_id: renderer.create_text(label_font_id)?.get_id(),
             label_font_id,
             label_text: Default::default(),
             label_horizontal_alignment: HorizontalAlignment::Middle,
@@ -145,8 +145,8 @@ impl Button {
 
             // Shadow properties
             shadow_id: match shape {
-                ComponentShape::Rectangle => renderer.create_rectangle()?,
-                ComponentShape::Disc => renderer.create_disc(0.0, 512)?,
+                ComponentShape::Rectangle => renderer.create_rectangle()?.get_id(),
+                ComponentShape::Disc => renderer.create_disc()?.get_id(),
             },
             shadow_enabled: false,
             shadow_offset: Default::default(),

@@ -93,8 +93,8 @@ impl Panel {
 
             // Shape properties
             filling_id: match shape {
-                ComponentShape::Rectangle => renderer.create_rectangle()?,
-                ComponentShape::Disc => renderer.create_disc(0.0, 512)?,
+                ComponentShape::Rectangle => renderer.create_rectangle()?.get_id(),
+                ComponentShape::Disc => renderer.create_disc()?.get_id(),
             },
             shape,
             color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
@@ -106,16 +106,16 @@ impl Panel {
 
             // Border properties
             border_id: match shape {
-                ComponentShape::Rectangle => renderer.create_frame(Default::default())?,
-                ComponentShape::Disc => renderer.create_circle(0.0, 512)?,
+                ComponentShape::Rectangle => renderer.create_frame()?.get_id(),
+                ComponentShape::Disc => renderer.create_circle()?.get_id(),
             },
             border_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             border_thickness: Default::default(),
 
             // Shadow properties
             shadow_id: match shape {
-                ComponentShape::Rectangle => renderer.create_rectangle()?,
-                ComponentShape::Disc => renderer.create_disc(0.0, 512)?,
+                ComponentShape::Rectangle => renderer.create_rectangle()?.get_id(),
+                ComponentShape::Disc => renderer.create_disc()?.get_id(),
             },
             shadow_enabled: false,
             shadow_offset: Default::default(),

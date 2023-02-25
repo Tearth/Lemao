@@ -128,19 +128,19 @@ impl ProgressBar {
             event_mask: None,
 
             // Shape properties
-            filling_id: renderer.create_rectangle()?,
+            filling_id: renderer.create_rectangle()?.get_id(),
             color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             corner_rounding: Default::default(),
             texture_id: None,
             texture_original_size: Default::default(),
 
             // Border properties
-            border_id: renderer.create_frame(Default::default())?,
+            border_id: renderer.create_frame()?.get_id(),
             border_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             border_thickness: Default::default(),
 
             // Label properties
-            label_id: renderer.create_text(label_font_id)?,
+            label_id: renderer.create_text(label_font_id)?.get_id(),
             label_font_id,
             label_text: Default::default(),
             label_horizontal_alignment: HorizontalAlignment::Middle,
@@ -149,7 +149,7 @@ impl ProgressBar {
             label_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
 
             // Shadow properties
-            shadow_id: renderer.create_rectangle()?,
+            shadow_id: renderer.create_rectangle()?.get_id(),
             shadow_enabled: false,
             shadow_offset: Default::default(),
             shadow_color: Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 1.0)),
@@ -810,7 +810,7 @@ impl Bar {
             visible: false,
 
             // Shape properties
-            filling_id: renderer.create_rectangle()?,
+            filling_id: renderer.create_rectangle()?.get_id(),
             color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             from: 0.0,
             to: 1.0,
@@ -818,7 +818,7 @@ impl Bar {
             texture_id: None,
 
             // Border properties
-            border_id: renderer.create_frame(Default::default())?,
+            border_id: renderer.create_frame()?.get_id(),
             border_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             border_thickness: Default::default(),
         })

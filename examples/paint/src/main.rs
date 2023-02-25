@@ -6,13 +6,12 @@ use lemao_core::lemao_common_platform::input::MouseButton;
 use lemao_core::lemao_common_platform::window::WindowStyle;
 use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
-use lemao_core::renderer::drawable::rectangle::Rectangle;
-use lemao_core::renderer::drawable::text::Text;
 use lemao_core::renderer::drawable::Drawable;
 use lemao_core::renderer::fonts::bff;
 use lemao_core::renderer::fonts::Font;
 use lemao_core::renderer::textures::RawTexture;
 use lemao_core::renderer::textures::Texture;
+use lemao_core::utils::storage::StorageItem;
 use lemao_core::window::context::CoordinationSystem;
 use lemao_core::window::context::WindowContext;
 
@@ -43,18 +42,17 @@ pub fn main() -> Result<(), String> {
 
     drop(font_storage);
 
-    let sprite_id = renderer.create_rectangle()?;
-    let description_text_id = renderer.create_text(font_id)?;
-
     let texture_storage = renderer.get_textures();
     let texture_storage = texture_storage.read().unwrap();
 
-    let sprite = renderer.get_drawable_and_cast_mut::<Rectangle>(sprite_id)?;
+    let sprite = renderer.create_rectangle()?;
+    let sprite_id = sprite.get_id();
     sprite.set_texture(texture_storage.get_and_cast::<Texture>(texture_id)?);
 
     drop(texture_storage);
 
-    let description_text = renderer.get_drawable_and_cast_mut::<Text>(description_text_id)?;
+    let description_text = renderer.create_text(font_id)?;
+    let description_text_id = description_text.get_font_id();
     description_text.set_text(DESCRIPTION);
     description_text.set_anchor(Vec2::new(0.0, 1.0));
     description_text.set_line_height(20);

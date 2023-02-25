@@ -7,6 +7,7 @@ use lemao_core::renderer::drawable::text::Text;
 use lemao_core::renderer::drawable::Drawable;
 use lemao_core::renderer::fonts::bff;
 use lemao_core::renderer::fonts::Font;
+use lemao_core::utils::storage::StorageItem;
 use lemao_core::window::context::CoordinationSystem;
 use lemao_core::window::context::WindowContext;
 
@@ -38,14 +39,14 @@ pub fn main() -> Result<(), String> {
 
     drop(font_storage);
 
-    let description_text_id = renderer.create_text(font_id)?;
-    let window_status_text_id = renderer.create_text(font_id)?;
-    let left_top_text_id = renderer.create_text(font_id)?;
-    let right_top_text_id = renderer.create_text(font_id)?;
-    let left_bottom_text_id = renderer.create_text(font_id)?;
-    let right_bottom_text_id = renderer.create_text(font_id)?;
+    let window_status_text_id = renderer.create_text(font_id)?.get_id();
+    let left_top_text_id = renderer.create_text(font_id)?.get_id();
+    let right_top_text_id = renderer.create_text(font_id)?.get_id();
+    let left_bottom_text_id = renderer.create_text(font_id)?.get_id();
+    let right_bottom_text_id = renderer.create_text(font_id)?.get_id();
 
-    let description_text = renderer.get_drawable_and_cast_mut::<Text>(description_text_id)?;
+    let description_text = renderer.create_text(font_id)?;
+    let description_text_id = description_text.get_id();
     description_text.set_text(DESCRIPTION);
     description_text.set_anchor(Vec2::new(0.0, 1.0));
     description_text.set_line_height(20);

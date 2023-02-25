@@ -46,7 +46,7 @@ pub struct FrameThickness {
 }
 
 impl Frame {
-    pub fn new(renderer: &RendererContext, texture: &Texture, size: Vec2) -> Self {
+    pub fn new(renderer: &RendererContext, texture: &Texture) -> Self {
         let mut frame = Frame {
             id: 0,
             vao_gl_id: 0,
@@ -59,7 +59,7 @@ impl Frame {
             position: Default::default(),
             scale: Vec2::new(1.0, 1.0),
             rotation: 0.0,
-            size,
+            size: Vec2::new(100.0, 100.0),
             anchor: Default::default(),
             color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             thickness: FrameThickness::new(1.0, 1.0, 1.0, 1.0),
