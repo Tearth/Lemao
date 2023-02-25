@@ -7,6 +7,7 @@ use super::ComponentShape;
 use super::ComponentSize;
 use super::EventMask;
 use crate::events::UiEvent;
+use crate::utils::storage::UiStorageItem;
 use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_common_platform::input::MouseButton;
 use lemao_core::lemao_common_platform::input::MouseWheelDirection;
@@ -96,9 +97,9 @@ pub struct Slider {
 }
 
 impl Slider {
-    pub fn new(id: usize, renderer: &mut RendererContext, selector_shape: ComponentShape) -> Result<Self, String> {
+    pub fn new(renderer: &mut RendererContext, selector_shape: ComponentShape) -> Result<Self, String> {
         Ok(Self {
-            id,
+            id: 0,
 
             // Common properties
             position: ComponentPosition::AbsoluteToParent(Default::default()),
@@ -839,5 +840,31 @@ impl Component for Slider {
 
     fn as_any_mut(&mut self) -> &mut dyn Any {
         self
+    }
+}
+
+impl UiStorageItem for Slider {
+    fn get_id(&self) -> usize {
+        self.id
+    }
+
+    fn set_id(&mut self, id: usize) {
+        self.id = id;
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+
+    fn as_any_mut(&mut self) -> &mut dyn Any {
+        self
+    }
+
+    fn as_component(&self) -> Option<&dyn Component> {
+        Some(self)
+    }
+
+    fn as_component_mut(&mut self) -> Option<&mut dyn Component> {
+        Some(self)
     }
 }

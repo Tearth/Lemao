@@ -8,6 +8,7 @@ use super::EventMask;
 use super::HorizontalAlignment;
 use super::VerticalAlignment;
 use crate::events::UiEvent;
+use crate::utils::storage::UiStorageItem;
 use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_common_platform::input::MouseButton;
 use lemao_core::lemao_math::color::SolidColor;
@@ -107,9 +108,9 @@ pub struct Bar {
 }
 
 impl ProgressBar {
-    pub fn new(id: usize, renderer: &mut RendererContext, label_font_id: usize) -> Result<Self, String> {
+    pub fn new(renderer: &mut RendererContext, label_font_id: usize) -> Result<Self, String> {
         Ok(Self {
-            id,
+            id: 0,
 
             // Common properties
             position: ComponentPosition::AbsoluteToParent(Default::default()),
@@ -822,5 +823,31 @@ impl Bar {
             border_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             border_thickness: Default::default(),
         })
+    }
+}
+
+impl UiStorageItem for ProgressBar {
+    fn get_id(&self) -> usize {
+        self.id
+    }
+
+    fn set_id(&mut self, id: usize) {
+        self.id = id;
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+
+    fn as_any_mut(&mut self) -> &mut dyn Any {
+        self
+    }
+
+    fn as_component(&self) -> Option<&dyn Component> {
+        Some(self)
+    }
+
+    fn as_component_mut(&mut self) -> Option<&mut dyn Component> {
+        Some(self)
     }
 }

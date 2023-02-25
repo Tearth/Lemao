@@ -14,6 +14,7 @@ use crate::components::ComponentShape;
 use crate::components::ComponentSize;
 use crate::components::EventMask;
 use crate::events::UiEvent;
+use crate::utils::storage::UiStorage;
 use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::context::RendererContext;
@@ -23,7 +24,7 @@ use std::collections::VecDeque;
 pub struct UiContext {
     ui_camera_id: usize,
     main_canvas_id: usize,
-    components: Vec<Option<Box<dyn Component>>>,
+    components: UiStorage,
     events: VecDeque<UiEvent>,
 }
 
@@ -33,7 +34,7 @@ impl UiContext {
         let ui_camera_id = renderer.create_camera(main_camera.get_position(), main_camera.get_size())?;
 
         let mut ui = Self { main_canvas_id: 0, ui_camera_id, components: Default::default(), events: Default::default() };
-        ui.main_canvas_id = ui.create_canvas(renderer)?;
+        ui.main_canvas_id = ui.create_canvas(renderer)?.get_id();
 
         let main_canvas = ui.get_component_mut(ui.main_canvas_id)?;
         main_canvas.set_size(ComponentSize::Absolute(renderer.get_viewport_size()));
@@ -49,7 +50,7 @@ impl UiContext {
             ui_camera.set_size(*size);
             main_canvas.set_size(ComponentSize::Absolute(*size));
 
-            for component in self.components.iter_mut().flatten() {
+            for component in self.components.iter_mut().map(|p| p.as_component_mut().unwrap()) {
                 component.set_dirty_flag(true);
             }
         } else {
@@ -58,11 +59,7 @@ impl UiContext {
                     continue;
                 }
 
-                if component.is_none() {
-                    continue;
-                }
-
-                self.events.extend(component.as_mut().unwrap().process_window_event(event));
+                self.events.extend(component.as_component_mut().unwrap().process_window_event(event));
             }
         }
 
@@ -73,20 +70,16 @@ impl UiContext {
         self.events.pop_front()
     }
 
-    pub fn create_button(&mut self, renderer: &mut RendererContext, shape: ComponentShape, label_font_id: usize) -> Result<usize, String> {
-        let id = self.get_free_component_id();
-        let button = Box::new(Button::new(id, renderer, shape, label_font_id)?);
-        self.components[id] = Some(button);
-
-        Ok(id)
+    pub fn create_button(&mut self, renderer: &mut RendererContext, shape: ComponentShape, label_font_id: usize) -> Result<&mut Button, String> {
+        let button = Box::new(Button::new(renderer, shape, label_font_id)?);
+        let id = self.components.store(button);
+        Ok(self.components.get_and_cast_mut::<Button>(id).unwrap())
     }
 
-    pub fn create_canvas(&mut self, _renderer: &mut RendererContext) -> Result<usize, String> {
-        let id = self.get_free_component_id();
-        let canvas = Box::new(Canvas::new(id)?);
-        self.components[id] = Some(canvas);
-
-        Ok(id)
+    pub fn create_canvas(&mut self, _renderer: &mut RendererContext) -> Result<&mut Canvas, String> {
+        let canvas = Box::new(Canvas::new()?);
+        let id = self.components.store(canvas);
+        Ok(self.components.get_and_cast_mut::<Canvas>(id).unwrap())
     }
 
     pub fn create_checkbox(
@@ -95,94 +88,64 @@ impl UiContext {
         label_font_id: usize,
         tick_on_texture_id: usize,
         tick_off_texture_id: usize,
-    ) -> Result<usize, String> {
-        let id = self.get_free_component_id();
-        let checkbox = Box::new(Checkbox::new(id, renderer, label_font_id, tick_on_texture_id, tick_off_texture_id)?);
-        self.components[id] = Some(checkbox);
-
-        Ok(id)
+    ) -> Result<&mut Checkbox, String> {
+        let checkbox = Box::new(Checkbox::new(renderer, label_font_id, tick_on_texture_id, tick_off_texture_id)?);
+        let id = self.components.store(checkbox);
+        Ok(self.components.get_and_cast_mut::<Checkbox>(id).unwrap())
     }
 
-    pub fn create_label(&mut self, renderer: &mut RendererContext, label_font_id: usize) -> Result<usize, String> {
-        let id = self.get_free_component_id();
-        let label = Box::new(Label::new(id, renderer, label_font_id)?);
-        self.components[id] = Some(label);
-
-        Ok(id)
+    pub fn create_label(&mut self, renderer: &mut RendererContext, label_font_id: usize) -> Result<&mut Label, String> {
+        let label = Box::new(Label::new(renderer, label_font_id)?);
+        let id = self.components.store(label);
+        Ok(self.components.get_and_cast_mut::<Label>(id).unwrap())
     }
 
-    pub fn create_panel(&mut self, renderer: &mut RendererContext, shape: ComponentShape) -> Result<usize, String> {
-        let id = self.get_free_component_id();
-        let panel = Box::new(Panel::new(id, renderer, shape)?);
-        self.components[id] = Some(panel);
-
-        Ok(id)
+    pub fn create_panel(&mut self, renderer: &mut RendererContext, shape: ComponentShape) -> Result<&mut Panel, String> {
+        let panel = Box::new(Panel::new(renderer, shape)?);
+        let id = self.components.store(panel);
+        Ok(self.components.get_and_cast_mut::<Panel>(id).unwrap())
     }
 
-    pub fn create_progressbar(&mut self, renderer: &mut RendererContext, label_font_id: usize) -> Result<usize, String> {
-        let id = self.get_free_component_id();
-        let progressbar = Box::new(ProgressBar::new(id, renderer, label_font_id)?);
-        self.components[id] = Some(progressbar);
-
-        Ok(id)
+    pub fn create_progressbar(&mut self, renderer: &mut RendererContext, label_font_id: usize) -> Result<&mut ProgressBar, String> {
+        let progressbar = Box::new(ProgressBar::new(renderer, label_font_id)?);
+        let id = self.components.store(progressbar);
+        Ok(self.components.get_and_cast_mut::<ProgressBar>(id).unwrap())
     }
 
-    pub fn create_scrollbox(&mut self, renderer: &mut RendererContext) -> Result<usize, String> {
-        let id = self.get_free_component_id();
-        let scrollbox = Box::new(Scrollbox::new(id, renderer)?);
-        self.components[id] = Some(scrollbox);
-
-        Ok(id)
+    pub fn create_scrollbox(&mut self, renderer: &mut RendererContext) -> Result<&mut Scrollbox, String> {
+        let scrollbox = Box::new(Scrollbox::new(renderer)?);
+        let id = self.components.store(scrollbox);
+        Ok(self.components.get_and_cast_mut::<Scrollbox>(id).unwrap())
     }
 
-    pub fn create_slider(&mut self, renderer: &mut RendererContext, selector_shape: ComponentShape) -> Result<usize, String> {
-        let id = self.get_free_component_id();
-        let slider = Box::new(Slider::new(id, renderer, selector_shape)?);
-        self.components[id] = Some(slider);
-
-        Ok(id)
+    pub fn create_slider(&mut self, renderer: &mut RendererContext, selector_shape: ComponentShape) -> Result<&mut Slider, String> {
+        let slider = Box::new(Slider::new(renderer, selector_shape)?);
+        let id = self.components.store(slider);
+        Ok(self.components.get_and_cast_mut::<Slider>(id).unwrap())
     }
 
-    pub fn create_textbox(&mut self, renderer: &mut RendererContext, label_font_id: usize) -> Result<usize, String> {
-        let id = self.get_free_component_id();
-        let textbox = Box::new(TextBox::new(id, renderer, label_font_id)?);
-        self.components[id] = Some(textbox);
-
-        Ok(id)
+    pub fn create_textbox(&mut self, renderer: &mut RendererContext, label_font_id: usize) -> Result<&mut TextBox, String> {
+        let textbox = Box::new(TextBox::new(renderer, label_font_id)?);
+        let id = self.components.store(textbox);
+        Ok(self.components.get_and_cast_mut::<TextBox>(id).unwrap())
     }
 
-    pub fn create_wire(&mut self, renderer: &mut RendererContext) -> Result<usize, String> {
-        let id = self.get_free_component_id();
-        let wire = Box::new(Wire::new(id, renderer)?);
-        self.components[id] = Some(wire);
-
-        Ok(id)
+    pub fn create_wire(&mut self, renderer: &mut RendererContext) -> Result<&mut Wire, String> {
+        let wire = Box::new(Wire::new(renderer)?);
+        let id = self.components.store(wire);
+        Ok(self.components.get_and_cast_mut::<Wire>(id).unwrap())
     }
 
     pub fn get_component(&self, component_id: usize) -> Result<&dyn Component, String> {
-        if component_id >= self.components.len() {
-            return Err(format!("Component {} not found", component_id));
-        }
-
-        match &self.components[component_id] {
-            Some(component) => Ok(component.as_ref()),
-            None => Err(format!("Component {} not found", component_id)),
-        }
+        self.components.get(component_id)?.as_component().ok_or_else(|| format!("Storage item {} is not drawable", component_id))
     }
 
     pub fn get_component_and_cast<T: 'static>(&self, component_id: usize) -> Result<&T, String> {
-        self.get_component(component_id)?.as_any().downcast_ref::<T>().ok_or_else(|| format!("Component {} cannot be downcasted", component_id))
+        self.get_component(component_id)?.as_any().downcast_ref::<T>().ok_or_else(|| format!("Storage item {} cannot be downcasted", component_id))
     }
 
     pub fn get_component_mut(&mut self, component_id: usize) -> Result<&mut dyn Component, String> {
-        if component_id >= self.components.len() {
-            return Err(format!("Component {} not found", component_id));
-        }
-
-        match &mut self.components[component_id] {
-            Some(drawable) => Ok(drawable.as_mut()),
-            None => Err(format!("Component {} not found", component_id)),
-        }
+        self.components.get_mut(component_id)?.as_component_mut().ok_or_else(|| format!("Storage item {} is not drawable", component_id))
     }
 
     pub fn get_component_and_cast_mut<T: 'static>(&mut self, component_id: usize) -> Result<&mut T, String> {
@@ -199,9 +162,7 @@ impl UiContext {
 
     pub fn remove_component(&mut self, component_id: usize, renderer: &mut RendererContext) -> Result<(), String> {
         self.get_component_mut(component_id)?.release_internal_resources(renderer)?;
-        self.components[component_id] = None;
-
-        Ok(())
+        self.components.remove(component_id)
     }
 
     pub fn begin_scrollbox(&self, scrollbox_id: usize, renderer: &RendererContext) -> Result<(), String> {
@@ -310,14 +271,5 @@ impl UiContext {
 
         renderer.set_camera_as_active(active_camera_id)?;
         Ok(())
-    }
-
-    fn get_free_component_id(&mut self) -> usize {
-        if let Some(id) = self.components.iter().position(|p| p.is_none()) {
-            id
-        } else {
-            self.components.push(None);
-            self.components.len() - 1
-        }
     }
 }
