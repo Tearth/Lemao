@@ -26,7 +26,7 @@ pub struct Storage {
 
 impl Storage {
     pub fn store(&mut self, mut item: Box<dyn StorageItem>) -> usize {
-        let id = rand::usize(..);
+        let id = self.get_new_id();
         item.set_id(id);
         self.data.insert(id, item);
 
@@ -69,7 +69,7 @@ impl Storage {
         Ok(())
     }
 
-    pub fn get_new_id(&self) -> usize {
+    fn get_new_id(&self) -> usize {
         loop {
             let id = rand::usize(..);
             if !self.data.contains_key(&id) {
