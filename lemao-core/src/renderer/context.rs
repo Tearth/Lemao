@@ -92,7 +92,7 @@ impl RendererContext {
         self.init_default_camera()?;
         self.init_default_shaders()?;
         self.init_default_shapes();
-        self.init_default_texture();
+        self.init_default_texture()?;
         self.init_batch_renderer();
 
         Ok(())

@@ -92,8 +92,8 @@ pub fn main() -> Result<(), String> {
                 texture_data[index * 4 + 3] = 255;
 
                 let texture_storage = renderer.get_textures();
-                let texture_storage = texture_storage.read().unwrap();
-                let texture = texture_storage.get_and_cast::<Texture>(texture_id).unwrap();
+                let mut texture_storage = texture_storage.write().unwrap();
+                let texture = texture_storage.get_and_cast_mut::<Texture>(texture_id).unwrap();
                 texture.set_data(window_size, &texture_data);
             }
         }

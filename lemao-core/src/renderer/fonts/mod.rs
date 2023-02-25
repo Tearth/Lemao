@@ -155,16 +155,36 @@ impl Font {
         self.size
     }
 
+    pub fn set_size(&mut self, size: Vec2) {
+        self.size = size;
+    }
+
     pub fn get_cell_size(&self) -> Vec2 {
         self.cell_size
+    }
+
+    pub fn set_cell_size(&mut self, cell_size: Vec2) {
+        self.cell_size = cell_size;
     }
 
     pub fn get_base_character_offset(&self) -> u8 {
         self.base_character_offset
     }
 
-    pub fn get_character_widths(&self) -> Vec<u8> {
-        self.character_widths.clone()
+    pub fn set_base_character_offset(&mut self, base_character_offset: u8) {
+        self.base_character_offset = base_character_offset;
+    }
+
+    pub fn get_character_widths(&self) -> &Vec<u8> {
+        &self.character_widths
+    }
+
+    pub fn get_character_widths_mut(&mut self) -> &mut Vec<u8> {
+        &mut self.character_widths
+    }
+
+    pub fn set_character_widths_mut(&mut self, character_widths: Vec<u8>) {
+        self.character_widths = character_widths;
     }
 }
 

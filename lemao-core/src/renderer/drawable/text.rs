@@ -68,7 +68,7 @@ impl Text {
             font_size: font.get_size(),
             font_cell_size: font.get_cell_size(),
             font_base_character_offset: font.get_base_character_offset(),
-            font_character_widths: font.get_character_widths(),
+            font_character_widths: font.get_character_widths().clone(),
         };
 
         unsafe {

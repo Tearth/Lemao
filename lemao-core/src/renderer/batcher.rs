@@ -1,6 +1,5 @@
 use super::context::RendererContext;
 use super::drawable::Color;
-use super::drawable::Drawable;
 use super::shaders::Shader;
 use lemao_math::color::SolidColor;
 use lemao_math::mat4x4::Mat4x4;
@@ -161,14 +160,18 @@ impl BatchRenderer {
             (self.gl.glBindTexture)(opengl::GL_TEXTURE_2D, self.texture_gl_id);
             (self.gl.glDrawElements)(opengl::GL_TRIANGLES, self.indices.len() as i32, opengl::GL_UNSIGNED_INT, ptr::null());
 
-            self.first_batch_added = false;
-            self.vertices.clear();
-            self.indices.clear();
-            self.texture_gl_id = 0;
-            self.max_indice = 0;
+            self.clear();
 
             Ok(())
         }
+    }
+
+    pub fn clear(&mut self) {
+        self.first_batch_added = false;
+        self.vertices.clear();
+        self.indices.clear();
+        self.texture_gl_id = 0;
+        self.max_indice = 0;
     }
 }
 

@@ -26,7 +26,7 @@ impl Camera {
         self.dirty = true;
     }
 
-    pub fn move_toward(&mut self, delta: Vec2) {
+    pub fn move_delta(&mut self, delta: Vec2) {
         self.position += delta;
         self.dirty = true;
     }

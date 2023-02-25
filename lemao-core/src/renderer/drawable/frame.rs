@@ -120,7 +120,7 @@ impl Frame {
         self.dirty = true;
     }
 
-    fn update(&mut self) {
+    pub fn update(&mut self) {
         unsafe {
             self.vertices.clear();
             self.indices.clear();

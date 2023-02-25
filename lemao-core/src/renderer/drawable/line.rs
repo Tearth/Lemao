@@ -33,7 +33,7 @@ pub struct Line {
 
 impl Line {
     pub fn new(renderer: &RendererContext, shape: &Shape, texture: &Texture, from: Vec2, to: Vec2) -> Self {
-        let mut line = Line {
+        Line {
             id: 0,
             shape_id: shape.id,
             shape_vao_gl_id: shape.vao_gl_id,
@@ -50,9 +50,7 @@ impl Line {
             to,
             thickness: 1.0,
             dirty: true,
-        };
-
-        line
+        }
     }
 
     pub fn get_texture_id(&self) -> usize {
@@ -86,7 +84,7 @@ impl Line {
         self.dirty = true;
     }
 
-    fn update(&mut self) {
+    pub fn update(&mut self) {
         self.position = self.from;
         self.rotation = Vec2::new(0.0, 1.0).signed_angle(self.to - self.from);
         self.size = Vec2::new(self.thickness, self.from.distance(self.to) + 1.0);

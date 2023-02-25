@@ -61,7 +61,7 @@ impl Texture {
             (gl.glTexParameteri)(opengl::GL_TEXTURE_2D, opengl::GL_TEXTURE_MIN_FILTER, opengl::GL_LINEAR_MIPMAP_LINEAR as i32);
             (gl.glTexParameteri)(opengl::GL_TEXTURE_2D, opengl::GL_TEXTURE_MAG_FILTER, opengl::GL_LINEAR as i32);
 
-            let texture = Self { id: 0, texture_gl_id, gl, size: raw.size };
+            let mut texture = Self { id: 0, texture_gl_id, gl, size: raw.size };
             texture.set_data(raw.size, &raw.data);
 
             Ok(texture)
@@ -72,7 +72,7 @@ impl Texture {
         self.size
     }
 
-    pub fn set_data(&self, size: Vec2, data: &Vec<u8>) {
+    pub fn set_data(&mut self, size: Vec2, data: &Vec<u8>) {
         unsafe {
             (self.gl.glBindTexture)(opengl::GL_TEXTURE_2D, self.texture_gl_id);
 
@@ -83,6 +83,8 @@ impl Texture {
 
             (self.gl.glTexImage2D)(opengl::GL_TEXTURE_2D, 0, format as i32, texture_width, texture_height, 0, format, opengl::GL_UNSIGNED_BYTE, texture_ptr);
             (self.gl.glGenerateMipmap)(opengl::GL_TEXTURE_2D);
+
+            self.size = size;
         }
     }
 }

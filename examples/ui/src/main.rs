@@ -47,7 +47,7 @@ pub fn main() -> Result<(), String> {
         Ok(renderer) => renderer,
         Err(message) => panic!("{}", message),
     };
-    renderer.set_swap_interval(1);
+    renderer.set_swap_interval(0);
 
     let coin_icon = bmp::load("./assets/coin.bmp")?;
     let hammer_icon = bmp::load("./assets/hammer.bmp")?;
@@ -707,6 +707,8 @@ pub fn main() -> Result<(), String> {
     /* #endregion */
 
     let mut is_running = true;
+    let mut now = std::time::Instant::now();
+    let mut frames = 0;
 
     while is_running {
         while let Some(event) = window.poll_event() {
@@ -824,6 +826,14 @@ pub fn main() -> Result<(), String> {
         ui.draw(&mut renderer, line_chart_id)?;
 
         window.swap_buffers();
+
+        if now.elapsed().as_millis() >= 1000 {
+            println!("{}", frames);
+            now = std::time::Instant::now();
+            frames = 0;
+        }
+
+        frames += 1;
     }
 
     Ok(())

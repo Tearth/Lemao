@@ -133,7 +133,7 @@ impl Disc {
         self.dirty = true;
     }
 
-    fn update(&mut self) {
+    pub fn update(&mut self) {
         unsafe {
             let fixed_start_angle = self.start_angle + std::f32::consts::PI / 2.0;
             let fixed_end_angle = self.end_angle + std::f32::consts::PI / 2.0;

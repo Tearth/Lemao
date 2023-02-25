@@ -120,7 +120,7 @@ impl Tilemap {
         self.dirty = true;
     }
 
-    fn update(&mut self) {
+    pub fn update(&mut self) {
         unsafe {
             self.frame = self.frame.clamp(0, self.total_frames_count - 1);
 

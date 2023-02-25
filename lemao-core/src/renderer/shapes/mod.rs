@@ -80,8 +80,24 @@ impl Shape {
         &self.vertices
     }
 
+    pub fn get_vertices_mut(&mut self) -> &mut Vec<f32> {
+        &mut self.vertices
+    }
+
+    pub fn set_vertices(&mut self, vertices: Vec<f32>) {
+        self.vertices = vertices;
+    }
+
     pub fn get_indices(&self) -> &Vec<u32> {
         &self.indices
+    }
+
+    pub fn get_indices_mut(&mut self) -> &mut Vec<u32> {
+        &mut self.indices
+    }
+
+    pub fn set_indices(&mut self, indices: Vec<u32>) {
+        self.indices = indices;
     }
 }
 

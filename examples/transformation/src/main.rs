@@ -92,16 +92,16 @@ pub fn main() -> Result<(), String> {
 
         let camera = renderer.get_active_camera_mut()?;
         if window.is_key_pressed(Key::ArrowUp) {
-            camera.move_toward(Vec2::new(0.0, 200.0 * delta));
+            camera.move_delta(Vec2::new(0.0, 200.0 * delta));
         }
         if window.is_key_pressed(Key::ArrowDown) {
-            camera.move_toward(Vec2::new(0.0, -200.0 * delta));
+            camera.move_delta(Vec2::new(0.0, -200.0 * delta));
         }
         if window.is_key_pressed(Key::ArrowLeft) {
-            camera.move_toward(Vec2::new(-200.0 * delta, 0.0));
+            camera.move_delta(Vec2::new(-200.0 * delta, 0.0));
         }
         if window.is_key_pressed(Key::ArrowRight) {
-            camera.move_toward(Vec2::new(200.0 * delta, 0.0));
+            camera.move_delta(Vec2::new(200.0 * delta, 0.0));
         }
 
         let sprite = renderer.get_drawable_mut(sprite_id)?;

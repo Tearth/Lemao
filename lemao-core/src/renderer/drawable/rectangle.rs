@@ -41,7 +41,7 @@ pub struct Rectangle {
 
 impl Rectangle {
     pub fn new(renderer: &RendererContext, shape: &Shape, texture: &Texture) -> Self {
-        let mut rectangle = Rectangle {
+        Rectangle {
             id: 0,
             shape_id: shape.id,
             shape_vao_gl_id: shape.vao_gl_id,
@@ -65,9 +65,7 @@ impl Rectangle {
             vertices: Vec::new(),
             indices: Vec::new(),
             dirty: true,
-        };
-
-        rectangle
+        }
     }
 
     pub fn get_texture_id(&self) -> usize {
@@ -91,7 +89,7 @@ impl Rectangle {
         self.dirty = true;
     }
 
-    fn update(&mut self) {
+    pub fn update(&mut self) {
         unsafe {
             if self.custom_shape && !self.custom_shape_initialized {
                 (self.gl.glGenVertexArrays)(1, &mut self.vao_gl_id);
