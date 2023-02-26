@@ -464,8 +464,9 @@ impl Component for Checkbox {
         let font = font_storage.get_and_cast::<Font>(self.label_font_id)?;
         renderer.get_drawable_and_cast_mut::<Text>(self.label_id)?.set_font(font);
         renderer.get_drawable_and_cast_mut::<Text>(self.label_id)?.set_text(&self.label_text);
+        renderer.get_drawable_and_cast_mut::<Text>(self.label_id)?.update();
 
-        self.screen_size = renderer.get_drawable_and_cast_mut::<Text>(self.label_id)?.get_size();
+        self.screen_size = renderer.get_drawable_and_cast_mut::<Text>(self.label_id)?.get_size() + self.label_offset;
         self.size = ComponentSize::Absolute(self.screen_size);
 
         self.screen_position = match self.position {

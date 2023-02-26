@@ -18,12 +18,17 @@ use crate::utils::storage::UiStorage;
 use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::context::RendererContext;
+use lemao_core::renderer::drawable::Color;
 use lemao_core::utils::storage::StorageItem;
+use lemao_math::color::SolidColor;
 use std::collections::VecDeque;
 
 pub struct UiContext {
     ui_camera_id: usize,
     main_canvas_id: usize,
+    debug_frame_id: usize,
+    debug: bool,
+
     components: UiStorage,
     events: VecDeque<UiEvent>,
 }
@@ -33,7 +38,15 @@ impl UiContext {
         let main_camera = renderer.get_active_camera()?;
         let ui_camera_id = renderer.create_camera(main_camera.get_position(), main_camera.get_size())?;
 
-        let mut ui = Self { main_canvas_id: 0, ui_camera_id, components: Default::default(), events: Default::default() };
+        let mut ui = Self {
+            main_canvas_id: 0,
+            ui_camera_id,
+            debug_frame_id: renderer.create_frame()?.get_id(),
+            debug: false,
+
+            components: Default::default(),
+            events: Default::default(),
+        };
         ui.main_canvas_id = ui.create_canvas(renderer)?.get_id();
 
         let main_canvas = ui.get_component_mut(ui.main_canvas_id)?;
@@ -197,7 +210,11 @@ impl UiContext {
             ComponentSize::Absolute(size) => size,
             _ => return Err("Invalid canvas".to_string()),
         };
-        self.update_internal(renderer, self.main_canvas_id, area_position, area_size, None, Default::default(), false)?;
+        let updated_components = self.update_internal(renderer, self.main_canvas_id, area_position, area_size, None, Default::default(), false)?;
+
+        if self.debug && updated_components > 0 {
+            println!("{} components updated", updated_components);
+        }
 
         Ok(())
     }
@@ -211,9 +228,10 @@ impl UiContext {
         event_mask: Option<EventMask>,
         scroll_offset: Option<Vec2>,
         force: bool,
-    ) -> Result<bool, String> {
+    ) -> Result<u32, String> {
         let component = self.get_component_mut(component_id)?;
         let update = force || component.is_dirty();
+        let mut updated_components = 0;
 
         if let Some(scroll_offset) = scroll_offset {
             component.set_scroll_offset(scroll_offset);
@@ -221,6 +239,7 @@ impl UiContext {
 
         if update {
             component.update(renderer, area_position, area_size)?;
+            updated_components += 1;
         }
 
         let component_area_position = component.get_work_area_position();
@@ -233,14 +252,13 @@ impl UiContext {
 
         self.get_component_mut(component_id)?.set_event_mask(event_mask);
 
-        let mut any_component_updated = update;
         for child_id in self.get_component_mut(component_id)?.get_children().clone() {
-            any_component_updated |=
+            updated_components +=
                 self.update_internal(renderer, child_id, component_area_position, component_area_size, event_mask, scroll_offset, force || update)?;
         }
 
         // Scrollbox needs to be updated second time, after all children are refreshed
-        if self.get_component_and_cast::<Scrollbox>(component_id).is_ok() && any_component_updated {
+        if self.get_component_and_cast::<Scrollbox>(component_id).is_ok() && updated_components > 1 {
             let mut left_bottom_corner: Vec2 = Vec2::new(f32::MAX, f32::MAX);
             let mut right_top_corner: Vec2 = Vec2::new(f32::MIN, f32::MIN);
 
@@ -259,7 +277,7 @@ impl UiContext {
             self.get_component_and_cast_mut::<Scrollbox>(component_id)?.update(renderer, area_position, area_size)?;
         }
 
-        Ok(any_component_updated)
+        Ok(updated_components)
     }
 
     pub fn draw(&mut self, renderer: &mut RendererContext, component_id: usize) -> Result<(), String> {
@@ -267,9 +285,31 @@ impl UiContext {
         renderer.set_camera_as_active(self.ui_camera_id)?;
 
         let component = self.get_component_mut(component_id)?;
+        let component_position = component.get_work_area_position();
+        let component_size = component.get_work_area_size();
+        let component_is_active = component.is_active();
         component.draw(renderer)?;
+
+        if self.debug {
+            let debug_frame = renderer.get_drawable_mut(self.debug_frame_id)?;
+            debug_frame.set_position(component_position);
+            debug_frame.set_size(component_size);
+            debug_frame.set_color(Color::SolidColor(match component_is_active {
+                true => SolidColor::new(1.0, 0.0, 0.0, 1.0),
+                false => SolidColor::new(0.2, 0.2, 0.2, 1.0),
+            }));
+            renderer.draw(self.debug_frame_id)?;
+        }
 
         renderer.set_camera_as_active(active_camera_id)?;
         Ok(())
+    }
+
+    pub fn is_debug_enabled(&self) -> bool {
+        self.debug
+    }
+
+    pub fn set_debug_flag(&mut self, debug: bool) {
+        self.debug = debug;
     }
 }

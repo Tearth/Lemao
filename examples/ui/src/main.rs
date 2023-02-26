@@ -75,9 +75,11 @@ pub fn main() -> Result<(), String> {
     let texture_id = texture_storage.store(Box::new(Texture::new(&renderer, &bmp::load("./assets/wheat.bmp")?)?));
     let box_checked_id = texture_storage.store(Box::new(Texture::new(&renderer, &bmp::load("./assets/box_checked.bmp")?)?));
     let box_unchecked_id = texture_storage.store(Box::new(Texture::new(&renderer, &bmp::load("./assets/box_unchecked.bmp")?)?));
-    let mut ui = UiContext::new(&mut renderer)?;
 
     drop(texture_storage);
+
+    let mut ui = UiContext::new(&mut renderer)?;
+    // ui.set_debug_flag(true);
 
     /* #region Progress bar */
     let mut progressbar_background_gradient = Gradient::new(GradientType::Vertical, Vec2::new(0.0, 0.0));
