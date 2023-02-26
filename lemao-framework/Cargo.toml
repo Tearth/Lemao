@@ -1,0 +1,7 @@
+[package]
+name = "lemao-framework"
+version = "1.0.0"
+edition = "2021"
+
+[dependencies]
+lemao-core = { path = "../lemao-core" }

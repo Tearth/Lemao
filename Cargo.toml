@@ -2,6 +2,7 @@
 members = [
     "lemao-bindgen",
     "lemao-core",
+    "lemao-framework",
     "lemao-math",
     "lemao-openal",
     "lemao-opengl",
@@ -16,6 +17,7 @@ members = [
     "examples/circle",
     "examples/disc",
     "examples/frame",
+    "examples/framework",
     "examples/line",
     "examples/paint",
     "examples/rectangle",

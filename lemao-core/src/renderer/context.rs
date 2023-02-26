@@ -43,6 +43,7 @@ pub struct RendererContext {
     default_rectangle_shape_id: usize,
     default_sprite_shape_id: usize,
     default_texture_id: usize,
+    swap_interval: u32,
 
     renderer_platform_specific: Box<dyn RendererPlatformSpecific>,
     textures: Arc<RwLock<Storage>>,
@@ -69,6 +70,7 @@ impl RendererContext {
             default_rectangle_shape_id: 0,
             default_sprite_shape_id: 0,
             default_texture_id: 0,
+            swap_interval: 0,
 
             renderer_platform_specific,
             textures: Default::default(),
@@ -415,8 +417,13 @@ impl RendererContext {
         }
     }
 
-    pub fn set_swap_interval(&self, interval: u32) {
+    pub fn get_swap_interval(&self) -> u32 {
+        self.swap_interval
+    }
+
+    pub fn set_swap_interval(&mut self, interval: u32) {
         self.renderer_platform_specific.set_swap_interval(interval);
+        self.swap_interval = interval;
     }
 
     pub fn close(&self) {
