@@ -132,7 +132,7 @@ where
             scene_storage_lock.get_mut(&self.current_scene)?.on_tick(&mut self)?;
 
             if self.fps_timestamp.elapsed().unwrap().as_secs() >= 1 {
-                self.fps = self.fps_frames;
+                self.fps = self.fps_frames + 1;
                 self.fps_frames = 0;
                 self.fps_timestamp = SystemTime::now();
             } else {
