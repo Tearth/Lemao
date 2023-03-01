@@ -19,7 +19,8 @@ use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::context::RendererContext;
 use lemao_core::renderer::drawable::Color;
-use lemao_core::utils::storage::StorageItem;
+use lemao_core::renderer::drawable::Drawable;
+use lemao_core::renderer::drawable::DrawableEnum;
 use lemao_math::color::SolidColor;
 use std::collections::VecDeque;
 
@@ -41,13 +42,13 @@ impl UiContext {
         let mut ui = Self {
             main_canvas_id: 0,
             ui_camera_id,
-            debug_frame_id: renderer.create_frame()?.get_id(),
+            debug_frame_id: renderer.create_frame()?.id,
             debug: false,
 
             components: Default::default(),
             events: Default::default(),
         };
-        ui.main_canvas_id = ui.create_canvas(renderer)?.get_id();
+        ui.main_canvas_id = ui.create_canvas(renderer)?.id;
 
         let main_canvas = ui.get_component_mut(ui.main_canvas_id)?;
         main_canvas.set_size(ComponentSize::Absolute(renderer.get_viewport_size()));
@@ -57,7 +58,7 @@ impl UiContext {
 
     pub fn process_window_event(&mut self, renderer: &mut RendererContext, event: &InputEvent) -> Result<(), String> {
         if let InputEvent::WindowSizeChanged(size) = event {
-            let ui_camera = renderer.get_camera_mut(self.ui_camera_id)?;
+            let ui_camera = renderer.cameras.get_mut(self.ui_camera_id)?;
             let main_canvas = self.get_component_mut(self.main_canvas_id)?;
 
             ui_camera.set_size(*size);
@@ -281,7 +282,7 @@ impl UiContext {
     }
 
     pub fn draw(&mut self, renderer: &mut RendererContext, component_id: usize) -> Result<(), String> {
-        let active_camera_id = renderer.get_active_camera()?.get_id();
+        let active_camera_id = renderer.get_active_camera()?.id;
         renderer.set_camera_as_active(self.ui_camera_id)?;
 
         let component = self.get_component_mut(component_id)?;
@@ -291,14 +292,14 @@ impl UiContext {
         component.draw(renderer)?;
 
         if self.debug {
-            let debug_frame = renderer.get_drawable_mut(self.debug_frame_id)?;
+            let debug_frame = renderer.frames.get_mut(self.debug_frame_id)?;
             debug_frame.set_position(component_position);
             debug_frame.set_size(component_size);
             debug_frame.set_color(Color::SolidColor(match component_is_active {
                 true => SolidColor::new(1.0, 0.0, 0.0, 1.0),
                 false => SolidColor::new(0.2, 0.2, 0.2, 1.0),
             }));
-            renderer.draw(self.debug_frame_id)?;
+            renderer.draw(DrawableEnum::Frame, self.debug_frame_id)?;
         }
 
         renderer.set_camera_as_active(active_camera_id)?;

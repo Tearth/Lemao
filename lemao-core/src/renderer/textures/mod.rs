@@ -1,9 +1,7 @@
 use super::context::RendererContext;
-use crate::utils::storage::StorageItem;
 use lemao_math::vec2::Vec2;
 use lemao_opengl::bindings::opengl;
 use lemao_opengl::pointers::OpenGLPointers;
-use std::any::Any;
 use std::ffi::c_void;
 use std::rc::Rc;
 
@@ -15,7 +13,7 @@ pub struct RawTexture {
 }
 
 pub struct Texture {
-    pub(crate) id: usize,
+    pub id: usize,
     pub(crate) texture_gl_id: u32,
     gl: Rc<OpenGLPointers>,
 
@@ -86,24 +84,6 @@ impl Texture {
 
             self.size = size;
         }
-    }
-}
-
-impl StorageItem for Texture {
-    fn get_id(&self) -> usize {
-        self.id
-    }
-
-    fn set_id(&mut self, id: usize) {
-        self.id = id;
-    }
-
-    fn as_any(&self) -> &dyn Any {
-        self
-    }
-
-    fn as_any_mut(&mut self) -> &mut dyn Any {
-        self
     }
 }
 

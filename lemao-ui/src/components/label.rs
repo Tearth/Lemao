@@ -10,11 +10,9 @@ use lemao_core::lemao_common_platform::input::MouseButton;
 use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::context::RendererContext;
-use lemao_core::renderer::drawable::text::Text;
 use lemao_core::renderer::drawable::Color;
 use lemao_core::renderer::drawable::Drawable;
-use lemao_core::renderer::fonts::Font;
-use lemao_core::utils::storage::StorageItem;
+use lemao_core::renderer::drawable::DrawableEnum;
 use std::any::Any;
 
 pub struct Label {
@@ -78,7 +76,7 @@ impl Label {
             event_mask: None,
 
             // Label properties
-            label_id: renderer.create_text(label_font_id)?.get_id(),
+            label_id: renderer.create_text(label_font_id)?.id,
             label_font_id,
             label_text: Default::default(),
             label_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
@@ -353,7 +351,7 @@ impl Component for Label {
 
     fn update(&mut self, renderer: &mut RendererContext, area_position: Vec2, area_size: Vec2) -> Result<(), String> {
         // We have to set text first, to get the size used later
-        let label = renderer.get_drawable_and_cast_mut::<Text>(self.label_id)?;
+        let label = renderer.texts.get_mut(self.label_id)?;
         let mut label_text_processed = self.label_text.clone();
         if self.multiline {
             let mut line = String::new();
@@ -372,14 +370,14 @@ impl Component for Label {
             label_text_processed = result + &line;
         }
 
-        let font_storage = renderer.get_fonts();
+        let font_storage = renderer.fonts.clone();
         let font_storage = font_storage.read().unwrap();
-        let font = font_storage.get_and_cast::<Font>(self.label_font_id)?;
-        renderer.get_drawable_and_cast_mut::<Text>(self.label_id)?.set_font(font);
-        renderer.get_drawable_and_cast_mut::<Text>(self.label_id)?.set_text(&label_text_processed);
-        renderer.get_drawable_and_cast_mut::<Text>(self.label_id)?.update();
+        let font = font_storage.get(self.label_font_id)?;
+        renderer.texts.get_mut(self.label_id)?.set_font(font);
+        renderer.texts.get_mut(self.label_id)?.set_text(&label_text_processed);
+        renderer.texts.get_mut(self.label_id)?.update();
 
-        self.screen_size = renderer.get_drawable_and_cast_mut::<Text>(self.label_id)?.get_size();
+        self.screen_size = renderer.texts.get_mut(self.label_id)?.get_size();
         self.size = ComponentSize::Absolute(self.screen_size);
 
         self.screen_position = match self.position {
@@ -396,7 +394,7 @@ impl Component for Label {
         self.screen_size = self.screen_size.floor();
         self.screen_position = self.screen_position.floor();
 
-        let label = renderer.get_drawable_and_cast_mut::<Text>(self.label_id)?;
+        let label = renderer.texts.get_mut(self.label_id)?;
         label.set_position(self.screen_position);
         label.set_color(self.label_color.clone());
 
@@ -407,21 +405,20 @@ impl Component for Label {
 
     fn draw(&mut self, renderer: &mut RendererContext) -> Result<(), String> {
         if self.shadow_enabled {
-            let drawable = renderer.get_drawable_mut(self.label_id)?;
+            let drawable = renderer.texts.get_mut(self.label_id)?;
             let original_position = drawable.get_position();
             let original_color = drawable.get_color().clone();
 
-            let drawable = renderer.get_drawable_mut(self.label_id)?;
             drawable.set_position(original_position + self.shadow_offset);
             drawable.set_color(self.shadow_color.clone());
-            renderer.draw(self.label_id)?;
+            renderer.draw(DrawableEnum::Text, self.label_id)?;
 
-            let drawable = renderer.get_drawable_mut(self.label_id)?;
+            let drawable = renderer.texts.get_mut(self.label_id)?;
             drawable.set_position(original_position);
             drawable.set_color(original_color);
         }
 
-        renderer.draw(self.label_id)?;
+        renderer.draw(DrawableEnum::Text, self.label_id)?;
         Ok(())
     }
 
@@ -434,7 +431,7 @@ impl Component for Label {
     }
 
     fn release_internal_resources(&mut self, renderer: &mut RendererContext) -> Result<(), String> {
-        renderer.remove_drawable(self.label_id)?;
+        renderer.texts.remove(self.label_id);
 
         Ok(())
     }

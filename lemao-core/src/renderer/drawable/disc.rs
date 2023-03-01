@@ -1,7 +1,6 @@
 use super::*;
 use crate::renderer::context::RendererContext;
 use crate::renderer::textures::Texture;
-use crate::utils::storage::StorageItem;
 use lemao_math::mat4x4::Mat4x4;
 use lemao_math::vec2::Vec2;
 use lemao_math::vec3::Vec3;
@@ -14,7 +13,7 @@ use std::ptr;
 use std::rc::Rc;
 
 pub struct Disc {
-    pub(crate) id: usize,
+    pub id: usize,
     pub(crate) vao_gl_id: u32,
     pub(crate) vbo_gl_id: u32,
     pub(crate) ebo_gl_id: u32,
@@ -314,32 +313,6 @@ impl Drawable for Disc {
 
     fn as_any_mut(&mut self) -> &mut dyn Any {
         self
-    }
-}
-
-impl StorageItem for Disc {
-    fn get_id(&self) -> usize {
-        self.id
-    }
-
-    fn set_id(&mut self, id: usize) {
-        self.id = id;
-    }
-
-    fn as_any(&self) -> &dyn Any {
-        self
-    }
-
-    fn as_any_mut(&mut self) -> &mut dyn Any {
-        self
-    }
-
-    fn as_drawable(&self) -> Option<&dyn Drawable> {
-        Some(self)
-    }
-
-    fn as_drawable_mut(&mut self) -> Option<&mut dyn Drawable> {
-        Some(self)
     }
 }
 

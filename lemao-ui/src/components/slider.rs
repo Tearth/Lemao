@@ -14,12 +14,10 @@ use lemao_core::lemao_common_platform::input::MouseWheelDirection;
 use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::context::RendererContext;
-use lemao_core::renderer::drawable::circle::Circle;
-use lemao_core::renderer::drawable::frame::Frame;
-use lemao_core::renderer::drawable::rectangle::Rectangle;
 use lemao_core::renderer::drawable::Color;
+use lemao_core::renderer::drawable::Drawable;
+use lemao_core::renderer::drawable::DrawableEnum;
 use lemao_core::renderer::textures::Texture;
-use lemao_core::utils::storage::StorageItem;
 use std::any::Any;
 
 pub struct Slider {
@@ -118,19 +116,19 @@ impl Slider {
             event_mask: None,
 
             // Shape properties
-            filling_id: renderer.create_rectangle()?.get_id(),
+            filling_id: renderer.create_rectangle()?.id,
             color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             corner_rounding: Default::default(),
             texture_id: None,
             texture_original_size: Default::default(),
 
             // Border properties
-            border_id: renderer.create_frame()?.get_id(),
+            border_id: renderer.create_frame()?.id,
             border_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             border_thickness: Default::default(),
 
             // Shadow properties
-            shadow_id: renderer.create_rectangle()?.get_id(),
+            shadow_id: renderer.create_rectangle()?.id,
             shadow_enabled: false,
             shadow_offset: Default::default(),
             shadow_color: Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 1.0)),
@@ -138,13 +136,13 @@ impl Slider {
             shadow_corner_rounding: Default::default(),
 
             // Bar properties
-            bar_id: renderer.create_rectangle()?.get_id(),
+            bar_id: renderer.create_rectangle()?.id,
             bar_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
 
             // Selector properties
             selector_id: match selector_shape {
-                ComponentShape::Rectangle => renderer.create_rectangle()?.get_id(),
-                ComponentShape::Disc => renderer.create_disc()?.get_id(),
+                ComponentShape::Rectangle => renderer.create_rectangle()?.id,
+                ComponentShape::Disc => renderer.create_disc()?.id,
             },
             selector_shape,
             selector_position: Default::default(),
@@ -153,8 +151,8 @@ impl Slider {
 
             // Selector border properties
             selector_border_id: match selector_shape {
-                ComponentShape::Rectangle => renderer.create_frame()?.get_id(),
-                ComponentShape::Disc => renderer.create_circle()?.get_id(),
+                ComponentShape::Rectangle => renderer.create_frame()?.id,
+                ComponentShape::Disc => renderer.create_circle()?.id,
             },
             selector_border_thickness: Default::default(),
             selector_border_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
@@ -207,7 +205,7 @@ impl Slider {
     }
 
     pub fn set_texture(&mut self, texture: &Texture) {
-        self.texture_id = Some(texture.get_id());
+        self.texture_id = Some(texture.id);
         self.texture_original_size = texture.get_size();
         self.size = ComponentSize::Absolute(texture.get_size());
         self.dirty = true;
@@ -709,12 +707,11 @@ impl Component for Slider {
         self.screen_position = self.screen_position.floor();
 
         if self.border_thickness != Default::default() {
-            let border_rectangle = renderer.get_drawable_mut(self.border_id)?;
+            let border_rectangle = renderer.frames.get_mut(self.border_id)?;
             border_rectangle.set_position(self.screen_position);
             border_rectangle.set_size(self.screen_size);
             border_rectangle.set_color(self.border_color.clone());
-
-            renderer.get_drawable_and_cast_mut::<Frame>(self.border_id)?.set_thickness(self.border_thickness.into());
+            border_rectangle.set_thickness(self.border_thickness.into());
 
             self.screen_position += Vec2::new(self.border_thickness.left, self.border_thickness.bottom);
             self.screen_size -= Vec2::new(self.border_thickness.left + self.border_thickness.right, self.border_thickness.top + self.border_thickness.bottom);
@@ -723,21 +720,19 @@ impl Component for Slider {
             self.screen_position = self.screen_position.floor();
         }
 
-        let filling_rectangle = renderer.get_drawable_mut(self.filling_id)?;
+        let filling_rectangle = renderer.rectangles.get_mut(self.filling_id)?;
         filling_rectangle.set_position(self.screen_position);
         filling_rectangle.set_color(self.color.clone());
 
         if let Some(texture_id) = self.texture_id {
-            let texture_storage = renderer.get_textures();
+            let texture_storage = renderer.textures.clone();
             let texture_storage = texture_storage.read().unwrap();
-            let texture = texture_storage.get_and_cast::<Texture>(texture_id)?;
+            let texture = texture_storage.get(texture_id)?;
 
-            renderer.get_drawable_and_cast_mut::<Rectangle>(self.filling_id)?.set_texture(texture)
+            renderer.rectangles.get_mut(self.filling_id)?.set_texture(texture)
         }
 
-        renderer.get_drawable_mut(self.filling_id)?.set_size(self.screen_size);
-
-        let bar = renderer.get_drawable_mut(self.bar_id)?;
+        let bar = renderer.rectangles.get_mut(self.bar_id)?;
         bar.set_position(self.screen_position);
         bar.set_color(self.bar_color.clone());
         bar.set_size(self.screen_size * Vec2::new(self.phase, 1.0));
@@ -746,20 +741,24 @@ impl Component for Slider {
         let mut selector_size_offset = Default::default();
 
         if self.selector_border_thickness != Default::default() {
-            let border_rectangle = renderer.get_drawable_mut(self.selector_border_id)?;
-            border_rectangle.set_position(self.selector_position);
-            border_rectangle.set_size(self.selector_size);
-            border_rectangle.set_anchor(Vec2::new(0.5, 0.5));
-            border_rectangle.set_color(self.selector_border_color.clone());
-
             match self.selector_shape {
                 ComponentShape::Rectangle => {
-                    renderer.get_drawable_and_cast_mut::<Frame>(self.selector_border_id)?.set_thickness(self.selector_border_thickness.into())
+                    let selector_border = renderer.frames.get_mut(self.selector_border_id)?;
+                    selector_border.set_position(self.selector_position);
+                    selector_border.set_size(self.selector_size);
+                    selector_border.set_color(self.selector_border_color.clone());
+                    selector_border.set_anchor(Vec2::new(0.5, 0.5));
+                    selector_border.set_thickness(self.selector_border_thickness.into());
                 }
-                ComponentShape::Disc => renderer
-                    .get_drawable_and_cast_mut::<Circle>(self.selector_border_id)?
-                    .set_thickness(Vec2::new(self.selector_border_thickness.left, self.selector_border_thickness.top)),
-            }
+                ComponentShape::Disc => {
+                    let selector_border = renderer.circles.get_mut(self.selector_border_id)?;
+                    selector_border.set_position(self.selector_position);
+                    selector_border.set_size(self.selector_size);
+                    selector_border.set_color(self.selector_border_color.clone());
+                    selector_border.set_anchor(Vec2::new(0.5, 0.5));
+                    selector_border.set_thickness(Vec2::new(self.selector_border_thickness.left, self.selector_border_thickness.top));
+                }
+            };
 
             selector_size_offset = Vec2::new(
                 self.selector_border_thickness.left + self.selector_border_thickness.right,
@@ -767,27 +766,47 @@ impl Component for Slider {
             );
         }
 
-        let selector = renderer.get_drawable_mut(self.selector_id)?;
-        selector.set_position(self.selector_position);
-        selector.set_anchor(Vec2::new(0.5, 0.5));
-        selector.set_color(self.selector_color.clone());
-        selector.set_size(self.selector_size - selector_size_offset);
+        match self.selector_shape {
+            ComponentShape::Rectangle => {
+                let selector = renderer.rectangles.get_mut(self.selector_id)?;
+                selector.set_position(self.selector_position);
+                selector.set_anchor(Vec2::new(0.5, 0.5));
+                selector.set_color(self.selector_color.clone());
+                selector.set_size(self.selector_size - selector_size_offset);
+            }
+            ComponentShape::Disc => {
+                let selector = renderer.discs.get_mut(self.selector_id)?;
+                selector.set_position(self.selector_position);
+                selector.set_anchor(Vec2::new(0.5, 0.5));
+                selector.set_color(self.selector_color.clone());
+                selector.set_size(self.selector_size - selector_size_offset);
+            }
+        };
 
-        renderer.get_drawable_and_cast_mut::<Rectangle>(self.filling_id)?.set_corner_rounding(self.corner_rounding.into());
-        renderer.get_drawable_and_cast_mut::<Rectangle>(self.bar_id)?.set_corner_rounding(self.corner_rounding.into());
-        renderer.get_drawable_and_cast_mut::<Frame>(self.border_id)?.set_corner_rounding(self.corner_rounding.into());
+        renderer.rectangles.get_mut(self.filling_id)?.set_corner_rounding(self.corner_rounding.into());
+        renderer.rectangles.get_mut(self.bar_id)?.set_corner_rounding(self.corner_rounding.into());
+        renderer.frames.get_mut(self.border_id)?.set_corner_rounding(self.corner_rounding.into());
 
         if self.shadow_enabled {
-            let shadow = renderer.get_drawable_mut(self.shadow_id)?;
-            shadow.set_position(self.screen_position + self.screen_size / 2.0 + self.shadow_offset);
-            shadow.set_size(self.screen_size);
-            shadow.set_anchor(Vec2::new(0.5, 0.5));
-            shadow.set_color(self.shadow_color.clone());
-            shadow.set_scale(self.shadow_scale);
-
-            if let Ok(rectangle) = renderer.get_drawable_and_cast_mut::<Rectangle>(self.shadow_id) {
-                rectangle.set_corner_rounding(self.shadow_corner_rounding.into());
-            }
+            match self.selector_shape {
+                ComponentShape::Rectangle => {
+                    let shadow = renderer.rectangles.get_mut(self.shadow_id)?;
+                    shadow.set_position(self.screen_position + self.screen_size / 2.0 + self.shadow_offset);
+                    shadow.set_size(self.screen_size);
+                    shadow.set_anchor(Vec2::new(0.5, 0.5));
+                    shadow.set_color(self.shadow_color.clone());
+                    shadow.set_scale(self.shadow_scale);
+                    shadow.set_corner_rounding(self.shadow_corner_rounding.into());
+                }
+                ComponentShape::Disc => {
+                    let shadow = renderer.discs.get_mut(self.shadow_id)?;
+                    shadow.set_position(self.screen_position + self.screen_size / 2.0 + self.shadow_offset);
+                    shadow.set_size(self.screen_size);
+                    shadow.set_anchor(Vec2::new(0.5, 0.5));
+                    shadow.set_color(self.shadow_color.clone());
+                    shadow.set_scale(self.shadow_scale);
+                }
+            };
         }
 
         self.dirty = false;
@@ -795,21 +814,30 @@ impl Component for Slider {
     }
 
     fn draw(&mut self, renderer: &mut RendererContext) -> Result<(), String> {
+        let selector_filling_type = match self.selector_shape {
+            ComponentShape::Rectangle => DrawableEnum::Rectangle,
+            ComponentShape::Disc => DrawableEnum::Disc,
+        };
+        let selector_border_type = match self.selector_shape {
+            ComponentShape::Rectangle => DrawableEnum::Frame,
+            ComponentShape::Disc => DrawableEnum::Circle,
+        };
+
         if self.shadow_enabled {
-            renderer.draw(self.shadow_id)?;
+            renderer.draw(DrawableEnum::Rectangle, self.shadow_id)?;
         }
 
-        renderer.draw(self.filling_id)?;
-        renderer.draw(self.bar_id)?;
+        renderer.draw(DrawableEnum::Rectangle, self.filling_id)?;
+        renderer.draw(DrawableEnum::Rectangle, self.bar_id)?;
 
         if self.border_thickness != Default::default() {
-            renderer.draw(self.border_id)?;
+            renderer.draw(DrawableEnum::Frame, self.border_id)?;
         }
 
-        renderer.draw(self.selector_id)?;
+        renderer.draw(selector_filling_type, self.selector_id)?;
 
         if self.selector_border_thickness != Default::default() {
-            renderer.draw(self.selector_border_id)?;
+            renderer.draw(selector_border_type, self.selector_border_id)?;
         }
 
         Ok(())
@@ -824,12 +852,21 @@ impl Component for Slider {
     }
 
     fn release_internal_resources(&mut self, renderer: &mut RendererContext) -> Result<(), String> {
-        renderer.remove_drawable(self.filling_id)?;
-        renderer.remove_drawable(self.border_id)?;
-        renderer.remove_drawable(self.shadow_id)?;
-        renderer.remove_drawable(self.bar_id)?;
-        renderer.remove_drawable(self.selector_id)?;
-        renderer.remove_drawable(self.selector_border_id)?;
+        match self.selector_shape {
+            ComponentShape::Rectangle => {
+                renderer.rectangles.remove(self.selector_id);
+                renderer.frames.remove(self.selector_border_id);
+            }
+            ComponentShape::Disc => {
+                renderer.discs.remove(self.selector_id);
+                renderer.circles.remove(self.selector_border_id);
+            }
+        };
+
+        renderer.rectangles.remove(self.filling_id);
+        renderer.rectangles.remove(self.border_id);
+        renderer.rectangles.remove(self.shadow_id);
+        renderer.rectangles.remove(self.bar_id);
 
         Ok(())
     }

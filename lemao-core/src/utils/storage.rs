@@ -1,96 +1,54 @@
-use crate::renderer::drawable::Drawable;
-use crate::utils::hasher::StorageHasherBuilder;
-use crate::utils::rand;
-use std::any::Any;
-use std::collections::hash_map::Values;
-use std::collections::hash_map::ValuesMut;
-use std::collections::HashMap;
+use std::collections::VecDeque;
 
-pub trait StorageItem {
-    fn get_id(&self) -> usize;
-    fn set_id(&mut self, id: usize);
-
-    fn as_any(&self) -> &dyn Any;
-    fn as_any_mut(&mut self) -> &mut dyn Any;
-
-    fn as_drawable(&self) -> Option<&dyn Drawable> {
-        None
-    }
-
-    fn as_drawable_mut(&mut self) -> Option<&mut dyn Drawable> {
-        None
-    }
+pub struct Storage<T> {
+    data: Vec<Option<T>>,
+    removed_ids: VecDeque<usize>,
 }
 
-pub struct Storage {
-    data: HashMap<usize, Box<dyn StorageItem>, StorageHasherBuilder>,
-}
-
-impl Storage {
-    pub fn store(&mut self, mut item: Box<dyn StorageItem>) -> usize {
+impl<T> Storage<T> {
+    pub fn store(&mut self, item: T) -> usize {
         let id = self.get_new_id();
-        item.set_id(id);
-        self.data.insert(id, item);
+        self.data.insert(id, Some(item));
 
         id
     }
 
-    pub fn get(&self, id: usize) -> Result<&dyn StorageItem, String> {
-        match self.data.get(&id) {
-            Some(item) => Ok(item.as_ref()),
-            None => Err(format!("Storage item {} not found", id)),
-        }
-    }
-
-    pub fn get_and_cast<C>(&self, id: usize) -> Result<&C, String>
-    where
-        C: 'static,
-    {
-        self.get(id)?.as_any().downcast_ref::<C>().ok_or_else(|| format!("Storage item {} cannot be downcasted", id))
-    }
-
-    pub fn get_mut(&mut self, id: usize) -> Result<&mut dyn StorageItem, String> {
-        match self.data.get_mut(&id) {
-            Some(drawable) => Ok(drawable.as_mut()),
-            None => Err(format!("Storage item {} not found", id)),
-        }
-    }
-
-    pub fn get_and_cast_mut<C>(&mut self, id: usize) -> Result<&mut C, String>
-    where
-        C: 'static,
-    {
-        self.get_mut(id)?.as_any_mut().downcast_mut::<C>().ok_or_else(|| format!("Storage item {} cannot be downcasted", id))
-    }
-
-    pub fn iter(&self) -> Values<usize, Box<dyn StorageItem>> {
-        self.data.values()
-    }
-
-    pub fn iter_mut(&mut self) -> ValuesMut<usize, Box<dyn StorageItem>> {
-        self.data.values_mut()
-    }
-
-    pub fn remove(&mut self, id: usize) -> Result<(), String> {
-        if self.data.remove(&id).is_none() {
-            return Err(format!("Storage item {} not found", id));
-        }
-
-        Ok(())
-    }
-
-    fn get_new_id(&self) -> usize {
-        loop {
-            let id = rand::usize(..);
-            if !self.data.contains_key(&id) {
-                return id;
+    pub fn get(&self, id: usize) -> Result<&T, String> {
+        match self.data.get(id) {
+            Some(item) => Ok(item.as_ref().unwrap()),
+            None => {
+                let x = 10;
+                Err(format!("Storage item {} not found", id))
             }
+        }
+    }
+
+    pub fn get_mut(&mut self, id: usize) -> Result<&mut T, String> {
+        match self.data.get_mut(id) {
+            Some(item) => Ok(item.as_mut().unwrap()),
+            None => {
+                let x = 10;
+                Err(format!("Storage item {} not found", id))
+            }
+        }
+    }
+
+    pub fn remove(&mut self, id: usize) {
+        self.data.remove(id);
+        self.removed_ids.push_back(id);
+    }
+
+    fn get_new_id(&mut self) -> usize {
+        if let Some(id) = self.removed_ids.pop_front() {
+            id
+        } else {
+            self.data.len()
         }
     }
 }
 
-impl Default for Storage {
+impl<T> Default for Storage<T> {
     fn default() -> Self {
-        Self { data: HashMap::with_hasher(StorageHasherBuilder) }
+        Self { data: Default::default(), removed_ids: Default::default() }
     }
 }

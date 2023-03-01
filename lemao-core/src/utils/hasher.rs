@@ -8,9 +8,11 @@ pub struct StorageHasherBuilder;
 
 impl Hasher for StorageHasher {
     fn write(&mut self, bytes: &[u8]) {
-        for &byte in bytes {
-            self.state = self.state.rotate_left(8) ^ (byte as u64);
-        }
+        panic!("Invalid use of NoHashHasher")
+    }
+
+    fn write_usize(&mut self, n: usize) {
+        self.state = n as u64;
     }
 
     fn finish(&self) -> u64 {

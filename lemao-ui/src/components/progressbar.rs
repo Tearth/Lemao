@@ -14,14 +14,10 @@ use lemao_core::lemao_common_platform::input::MouseButton;
 use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::context::RendererContext;
-use lemao_core::renderer::drawable::frame::Frame;
-use lemao_core::renderer::drawable::rectangle::Rectangle;
-use lemao_core::renderer::drawable::text::Text;
 use lemao_core::renderer::drawable::Color;
 use lemao_core::renderer::drawable::Drawable;
-use lemao_core::renderer::fonts::Font;
+use lemao_core::renderer::drawable::DrawableEnum;
 use lemao_core::renderer::textures::Texture;
-use lemao_core::utils::storage::StorageItem;
 use std::any::Any;
 
 const MAX_BARS_COUNT: usize = 8;
@@ -129,19 +125,19 @@ impl ProgressBar {
             event_mask: None,
 
             // Shape properties
-            filling_id: renderer.create_rectangle()?.get_id(),
+            filling_id: renderer.create_rectangle()?.id,
             color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             corner_rounding: Default::default(),
             texture_id: None,
             texture_original_size: Default::default(),
 
             // Border properties
-            border_id: renderer.create_frame()?.get_id(),
+            border_id: renderer.create_frame()?.id,
             border_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             border_thickness: Default::default(),
 
             // Label properties
-            label_id: renderer.create_text(label_font_id)?.get_id(),
+            label_id: renderer.create_text(label_font_id)?.id,
             label_font_id,
             label_text: Default::default(),
             label_horizontal_alignment: HorizontalAlignment::Middle,
@@ -150,7 +146,7 @@ impl ProgressBar {
             label_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
 
             // Shadow properties
-            shadow_id: renderer.create_rectangle()?.get_id(),
+            shadow_id: renderer.create_rectangle()?.id,
             shadow_enabled: false,
             shadow_offset: Default::default(),
             shadow_color: Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 1.0)),
@@ -219,7 +215,7 @@ impl ProgressBar {
     }
 
     pub fn set_bar_texture(&mut self, bar_id: usize, texture: &Texture) {
-        self.bars[bar_id].texture_id = Some(texture.get_id());
+        self.bars[bar_id].texture_id = Some(texture.id);
         self.dirty = true;
     }
     /* #endregion */
@@ -269,7 +265,7 @@ impl ProgressBar {
     }
 
     pub fn set_texture(&mut self, texture: &Texture) {
-        self.texture_id = Some(texture.get_id());
+        self.texture_id = Some(texture.id);
         self.texture_original_size = texture.get_size();
         self.size = ComponentSize::Absolute(texture.get_size());
         self.dirty = true;
@@ -650,12 +646,11 @@ impl Component for ProgressBar {
         self.screen_position = self.screen_position.floor();
 
         if self.border_thickness != Default::default() {
-            let border_rectangle = renderer.get_drawable_mut(self.border_id)?;
+            let border_rectangle = renderer.frames.get_mut(self.border_id)?;
             border_rectangle.set_position(self.screen_position);
             border_rectangle.set_size(self.screen_size);
             border_rectangle.set_color(self.border_color.clone());
-
-            renderer.get_drawable_and_cast_mut::<Frame>(self.border_id)?.set_thickness(self.border_thickness.into());
+            border_rectangle.set_thickness(self.border_thickness.into());
 
             self.screen_position += Vec2::new(self.border_thickness.left, self.border_thickness.bottom);
             self.screen_size -= Vec2::new(self.border_thickness.left + self.border_thickness.right, self.border_thickness.top + self.border_thickness.bottom);
@@ -664,27 +659,26 @@ impl Component for ProgressBar {
             self.screen_position = self.screen_position.floor();
         }
 
-        let filling_rectangle = renderer.get_drawable_mut(self.filling_id)?;
+        let filling_rectangle = renderer.rectangles.get_mut(self.filling_id)?;
         filling_rectangle.set_position(self.screen_position);
         filling_rectangle.set_color(self.color.clone());
+        filling_rectangle.set_size(self.screen_size);
 
         if let Some(texture_id) = self.texture_id {
-            let texture_storage = renderer.get_textures();
+            let texture_storage = renderer.textures.clone();
             let texture_storage = texture_storage.read().unwrap();
-            let texture = texture_storage.get_and_cast::<Texture>(texture_id)?;
+            let texture = texture_storage.get(texture_id)?;
 
-            renderer.get_drawable_and_cast_mut::<Rectangle>(self.filling_id)?.set_texture(texture)
+            renderer.rectangles.get_mut(self.filling_id)?.set_texture(texture)
         }
 
-        renderer.get_drawable_mut(self.filling_id)?.set_size(self.screen_size);
+        renderer.rectangles.get_mut(self.filling_id)?.set_corner_rounding(self.corner_rounding.into());
+        renderer.frames.get_mut(self.border_id)?.set_corner_rounding(self.corner_rounding.into());
 
-        renderer.get_drawable_and_cast_mut::<Rectangle>(self.filling_id)?.set_corner_rounding(self.corner_rounding.into());
-        renderer.get_drawable_and_cast_mut::<Frame>(self.border_id)?.set_corner_rounding(self.corner_rounding.into());
-
-        let font_storage = renderer.get_fonts();
+        let font_storage = renderer.fonts.clone();
         let font_storage = font_storage.read().unwrap();
-        let font = font_storage.get_and_cast::<Font>(self.label_font_id)?;
-        let label = renderer.get_drawable_and_cast_mut::<Text>(self.label_id)?;
+        let font = font_storage.get(self.label_font_id)?;
+        let label = renderer.texts.get_mut(self.label_id)?;
         label.set_font(font);
         label.set_text(&self.label_text);
         label.set_color(self.label_color.clone());
@@ -705,26 +699,22 @@ impl Component for ProgressBar {
         label.set_anchor(horizontal_anchor + vertical_anchor);
 
         if self.shadow_enabled {
-            let shadow = renderer.get_drawable_mut(self.shadow_id)?;
+            let shadow = renderer.rectangles.get_mut(self.shadow_id)?;
             shadow.set_position(self.screen_position + self.screen_size / 2.0 + self.shadow_offset);
             shadow.set_size(self.screen_size);
             shadow.set_anchor(Vec2::new(0.5, 0.5));
             shadow.set_color(self.shadow_color.clone());
             shadow.set_scale(self.shadow_scale);
-
-            if let Ok(rectangle) = renderer.get_drawable_and_cast_mut::<Rectangle>(self.shadow_id) {
-                rectangle.set_corner_rounding(self.shadow_corner_rounding.into());
-            }
+            shadow.set_corner_rounding(self.shadow_corner_rounding.into());
         }
 
         for bar in &mut self.bars {
             if bar.visible {
-                let filling_rectangle = renderer.get_drawable_mut(bar.filling_id)?;
+                let filling_rectangle = renderer.rectangles.get_mut(bar.filling_id)?;
                 filling_rectangle.set_position(Vec2::new(self.screen_position.x + self.screen_size.x * bar.from, self.screen_position.y));
                 filling_rectangle.set_size(Vec2::new((bar.to - bar.from) * self.screen_size.x, self.screen_size.y));
                 filling_rectangle.set_color(bar.color.clone());
-
-                renderer.get_drawable_and_cast_mut::<Rectangle>(bar.filling_id)?.set_corner_rounding(bar.corner_rounding.into());
+                filling_rectangle.set_corner_rounding(bar.corner_rounding.into());
             }
         }
 
@@ -734,40 +724,39 @@ impl Component for ProgressBar {
 
     fn draw(&mut self, renderer: &mut RendererContext) -> Result<(), String> {
         if self.shadow_enabled {
-            renderer.draw(self.shadow_id)?;
+            renderer.draw(DrawableEnum::Rectangle, self.shadow_id)?;
         }
 
-        renderer.draw(self.filling_id)?;
+        renderer.draw(DrawableEnum::Rectangle, self.filling_id)?;
 
         for bar in self.bars.iter().rev() {
             if bar.visible {
-                renderer.draw(bar.filling_id)?;
+                renderer.draw(DrawableEnum::Rectangle, bar.filling_id)?;
 
                 if bar.border_thickness != Default::default() {
-                    renderer.draw(bar.border_id)?;
+                    renderer.draw(DrawableEnum::Frame, bar.border_id)?;
                 }
             }
         }
 
         if self.label_shadow_enabled {
-            let drawable = renderer.get_drawable_mut(self.label_id)?;
+            let drawable = renderer.texts.get_mut(self.label_id)?;
             let original_position = drawable.get_position();
             let original_color = drawable.get_color().clone();
 
-            let drawable = renderer.get_drawable_mut(self.label_id)?;
             drawable.set_position(original_position + self.label_shadow_offset);
             drawable.set_color(self.label_shadow_color.clone());
-            renderer.draw(self.label_id)?;
+            renderer.draw(DrawableEnum::Text, self.label_id)?;
 
-            let drawable = renderer.get_drawable_mut(self.label_id)?;
+            let drawable = renderer.texts.get_mut(self.label_id)?;
             drawable.set_position(original_position);
             drawable.set_color(original_color);
         }
 
-        renderer.draw(self.label_id)?;
+        renderer.draw(DrawableEnum::Text, self.label_id)?;
 
         if self.border_thickness != Default::default() {
-            renderer.draw(self.border_id)?;
+            renderer.draw(DrawableEnum::Frame, self.border_id)?;
         }
 
         Ok(())
@@ -782,14 +771,14 @@ impl Component for ProgressBar {
     }
 
     fn release_internal_resources(&mut self, renderer: &mut RendererContext) -> Result<(), String> {
-        renderer.remove_drawable(self.filling_id)?;
-        renderer.remove_drawable(self.border_id)?;
-        renderer.remove_drawable(self.shadow_id)?;
-        renderer.remove_drawable(self.label_id)?;
+        renderer.rectangles.remove(self.filling_id);
+        renderer.frames.remove(self.border_id);
+        renderer.rectangles.remove(self.shadow_id);
+        renderer.texts.remove(self.label_id);
 
         for bar in &mut self.bars {
-            renderer.remove_drawable(bar.filling_id)?;
-            renderer.remove_drawable(bar.border_id)?;
+            renderer.rectangles.remove(bar.filling_id);
+            renderer.frames.remove(bar.border_id);
         }
 
         Ok(())
@@ -811,7 +800,7 @@ impl Bar {
             visible: false,
 
             // Shape properties
-            filling_id: renderer.create_rectangle()?.get_id(),
+            filling_id: renderer.create_rectangle()?.id,
             color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             from: 0.0,
             to: 1.0,
@@ -819,7 +808,7 @@ impl Bar {
             texture_id: None,
 
             // Border properties
-            border_id: renderer.create_frame()?.get_id(),
+            border_id: renderer.create_frame()?.id,
             border_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             border_thickness: Default::default(),
         })

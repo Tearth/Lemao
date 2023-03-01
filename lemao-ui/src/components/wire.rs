@@ -9,10 +9,9 @@ use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_common_platform::input::MouseButton;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::context::RendererContext;
-use lemao_core::renderer::drawable::line::Line;
 use lemao_core::renderer::drawable::Color;
 use lemao_core::renderer::drawable::Drawable;
-use lemao_core::utils::storage::StorageItem;
+use lemao_core::renderer::drawable::DrawableEnum;
 use std::any::Any;
 
 pub struct Wire {
@@ -316,12 +315,12 @@ impl Component for Wire {
         self.screen_position = self.screen_position.floor();
 
         for chunk in &self.chunks {
-            renderer.remove_drawable(chunk.line_id)?;
+            renderer.lines.remove(chunk.line_id);
         }
 
         for chunk_data in &mut self.data {
             let chunk = WireChunk::new(renderer)?;
-            let line = renderer.get_drawable_and_cast_mut::<Line>(chunk.line_id)?;
+            let line = renderer.lines.get_mut(chunk.line_id)?;
             line.set_from(self.screen_position + chunk_data.from * self.screen_size);
             line.set_to(self.screen_position + chunk_data.to * self.screen_size);
             line.set_color(chunk_data.color.clone());
@@ -335,7 +334,7 @@ impl Component for Wire {
 
     fn draw(&mut self, renderer: &mut RendererContext) -> Result<(), String> {
         for chunk in &self.chunks {
-            renderer.draw(chunk.line_id)?;
+            renderer.draw(DrawableEnum::Line, chunk.line_id)?;
         }
 
         Ok(())
@@ -351,7 +350,7 @@ impl Component for Wire {
 
     fn release_internal_resources(&mut self, renderer: &mut RendererContext) -> Result<(), String> {
         for chunk in &self.chunks {
-            renderer.remove_drawable(chunk.line_id)?;
+            renderer.lines.remove(chunk.line_id);
         }
 
         Ok(())
@@ -368,7 +367,7 @@ impl Component for Wire {
 
 impl WireChunk {
     pub fn new(renderer: &mut RendererContext) -> Result<Self, String> {
-        Ok(Self { line_id: renderer.create_line()?.get_id() })
+        Ok(Self { line_id: renderer.create_line()?.id })
     }
 }
 

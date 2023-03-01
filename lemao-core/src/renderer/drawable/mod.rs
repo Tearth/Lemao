@@ -28,6 +28,17 @@ pub struct CornerRounding {
     pub left_top: f32,
 }
 
+#[derive(Copy, Clone, PartialEq)]
+pub enum DrawableEnum {
+    Circle,
+    Disc,
+    Frame,
+    Line,
+    Rectangle,
+    Text,
+    Tilemap,
+}
+
 pub trait Drawable {
     fn get_position(&self) -> Vec2;
     fn set_position(&mut self, position: Vec2);

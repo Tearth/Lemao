@@ -12,10 +12,9 @@ use lemao_core::lemao_common_platform::input::MouseButton;
 use lemao_core::lemao_common_platform::input::MouseWheelDirection;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::context::RendererContext;
-use lemao_core::renderer::drawable::frame::Frame;
-use lemao_core::renderer::drawable::rectangle::Rectangle;
 use lemao_core::renderer::drawable::Color;
-use lemao_core::utils::storage::StorageItem;
+use lemao_core::renderer::drawable::Drawable;
+use lemao_core::renderer::drawable::DrawableEnum;
 use lemao_math::color::SolidColor;
 use std::any::Any;
 
@@ -133,42 +132,42 @@ impl Scrollbox {
             event_mask: None,
 
             // Vertical scroll background properties
-            vertical_scroll_background_id: renderer.create_rectangle()?.get_id(),
+            vertical_scroll_background_id: renderer.create_rectangle()?.id,
             vertical_scroll_background_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             vertical_scroll_background_corner_rounding: Default::default(),
 
             // Horizontal scroll background properties
-            horizontal_scroll_background_id: renderer.create_rectangle()?.get_id(),
+            horizontal_scroll_background_id: renderer.create_rectangle()?.id,
             horizontal_scroll_background_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             horizontal_scroll_background_corner_rounding: Default::default(),
 
             // Vertical scroll background border properties
-            vertical_scroll_background_border_id: renderer.create_frame()?.get_id(),
+            vertical_scroll_background_border_id: renderer.create_frame()?.id,
             vertical_scroll_background_border_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             vertical_scroll_background_border_thickness: Default::default(),
 
             // Horizontal scroll background border properties
-            horizontal_scroll_background_border_id: renderer.create_frame()?.get_id(),
+            horizontal_scroll_background_border_id: renderer.create_frame()?.id,
             horizontal_scroll_background_border_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             horizontal_scroll_background_border_thickness: Default::default(),
 
             // Vertical scroll properties
-            vertical_scroll_id: renderer.create_rectangle()?.get_id(),
+            vertical_scroll_id: renderer.create_rectangle()?.id,
             vertical_scroll_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             vertical_scroll_corner_rounding: Default::default(),
 
             // Horizontal scroll properties
-            horizontal_scroll_id: renderer.create_rectangle()?.get_id(),
+            horizontal_scroll_id: renderer.create_rectangle()?.id,
             horizontal_scroll_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             horizontal_scroll_corner_rounding: Default::default(),
 
             // Vertical scroll border properties
-            vertical_scroll_border_id: renderer.create_frame()?.get_id(),
+            vertical_scroll_border_id: renderer.create_frame()?.id,
             vertical_scroll_border_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             vertical_scroll_border_thickness: Default::default(),
 
             // Horizontal scroll border properties
-            horizontal_scroll_border_id: renderer.create_frame()?.get_id(),
+            horizontal_scroll_border_id: renderer.create_frame()?.id,
             horizontal_scroll_border_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             horizontal_scroll_border_thickness: Default::default(),
 
@@ -880,15 +879,12 @@ impl Component for Scrollbox {
         let mut vertical_scroll_background_size = Vec2::new(self.scroll_width.x, self.screen_size.y - self.scroll_width.y);
 
         if self.vertical_scroll_background_border_thickness != Default::default() {
-            let border_rectangle = renderer.get_drawable_mut(self.vertical_scroll_background_border_id)?;
+            let border_rectangle = renderer.frames.get_mut(self.vertical_scroll_background_border_id)?;
             border_rectangle.set_position(vertical_scroll_background_position);
             border_rectangle.set_size(vertical_scroll_background_size);
             border_rectangle.set_anchor(Vec2::new(1.0, 1.0));
             border_rectangle.set_color(self.vertical_scroll_background_border_color.clone());
-
-            renderer
-                .get_drawable_and_cast_mut::<Frame>(self.vertical_scroll_background_border_id)?
-                .set_thickness(self.vertical_scroll_background_border_thickness.into());
+            border_rectangle.set_thickness(self.vertical_scroll_background_border_thickness.into());
 
             vertical_scroll_background_position -=
                 Vec2::new(self.vertical_scroll_background_border_thickness.right, self.vertical_scroll_background_border_thickness.top);
@@ -898,7 +894,7 @@ impl Component for Scrollbox {
             );
         }
 
-        let vertical_scroll_background = renderer.get_drawable_mut(self.vertical_scroll_background_id)?;
+        let vertical_scroll_background = renderer.rectangles.get_mut(self.vertical_scroll_background_id)?;
         vertical_scroll_background.set_position(vertical_scroll_background_position);
         vertical_scroll_background.set_size(vertical_scroll_background_size);
         vertical_scroll_background.set_anchor(Vec2::new(1.0, 1.0));
@@ -919,13 +915,12 @@ impl Component for Scrollbox {
         }
 
         if self.vertical_scroll_border_thickness != Default::default() {
-            let border_rectangle = renderer.get_drawable_mut(self.vertical_scroll_border_id)?;
+            let border_rectangle = renderer.frames.get_mut(self.vertical_scroll_border_id)?;
             border_rectangle.set_position(self.vertical_scroll_position);
             border_rectangle.set_size(self.vertical_scroll_size);
             border_rectangle.set_anchor(Vec2::new(1.0, 1.0));
             border_rectangle.set_color(self.vertical_scroll_border_color.clone());
-
-            renderer.get_drawable_and_cast_mut::<Frame>(self.vertical_scroll_border_id)?.set_thickness(self.vertical_scroll_border_thickness.into());
+            border_rectangle.set_thickness(self.vertical_scroll_border_thickness.into());
 
             self.vertical_scroll_position -= Vec2::new(self.vertical_scroll_border_thickness.right, self.vertical_scroll_border_thickness.top);
             self.vertical_scroll_size -= Vec2::new(
@@ -934,20 +929,16 @@ impl Component for Scrollbox {
             );
         }
 
-        let vertical_scroll = renderer.get_drawable_mut(self.vertical_scroll_id)?;
+        let vertical_scroll = renderer.rectangles.get_mut(self.vertical_scroll_id)?;
         vertical_scroll.set_position(self.vertical_scroll_position);
         vertical_scroll.set_size(self.vertical_scroll_size);
         vertical_scroll.set_anchor(Vec2::new(1.0, 1.0));
         vertical_scroll.set_color(self.vertical_scroll_color.clone());
 
-        renderer.get_drawable_and_cast_mut::<Rectangle>(self.vertical_scroll_id)?.set_corner_rounding(self.vertical_scroll_corner_rounding.into());
-        renderer.get_drawable_and_cast_mut::<Frame>(self.vertical_scroll_border_id)?.set_corner_rounding(self.vertical_scroll_corner_rounding.into());
-        renderer
-            .get_drawable_and_cast_mut::<Rectangle>(self.vertical_scroll_background_id)?
-            .set_corner_rounding(self.vertical_scroll_background_corner_rounding.into());
-        renderer
-            .get_drawable_and_cast_mut::<Frame>(self.vertical_scroll_background_border_id)?
-            .set_corner_rounding(self.vertical_scroll_background_corner_rounding.into());
+        renderer.rectangles.get_mut(self.vertical_scroll_id)?.set_corner_rounding(self.vertical_scroll_corner_rounding.into());
+        renderer.frames.get_mut(self.vertical_scroll_border_id)?.set_corner_rounding(self.vertical_scroll_corner_rounding.into());
+        renderer.rectangles.get_mut(self.vertical_scroll_background_id)?.set_corner_rounding(self.vertical_scroll_background_corner_rounding.into());
+        renderer.frames.get_mut(self.vertical_scroll_background_border_id)?.set_corner_rounding(self.vertical_scroll_background_corner_rounding.into());
         /* #endregion */
 
         /* #region Horizontal scroll */
@@ -955,14 +946,11 @@ impl Component for Scrollbox {
         let mut horizontal_scroll_background_size = Vec2::new(self.screen_size.x - self.scroll_width.x, self.scroll_width.y);
 
         if self.horizontal_scroll_background_border_thickness != Default::default() {
-            let border_rectangle = renderer.get_drawable_mut(self.horizontal_scroll_background_border_id)?;
+            let border_rectangle = renderer.frames.get_mut(self.horizontal_scroll_background_border_id)?;
             border_rectangle.set_position(horizontal_scroll_background_position);
             border_rectangle.set_size(horizontal_scroll_background_size);
             border_rectangle.set_color(self.horizontal_scroll_background_border_color.clone());
-
-            renderer
-                .get_drawable_and_cast_mut::<Frame>(self.horizontal_scroll_background_border_id)?
-                .set_thickness(self.horizontal_scroll_background_border_thickness.into());
+            border_rectangle.set_thickness(self.horizontal_scroll_background_border_thickness.into());
 
             horizontal_scroll_background_position +=
                 Vec2::new(self.horizontal_scroll_background_border_thickness.right, self.horizontal_scroll_background_border_thickness.top);
@@ -972,7 +960,7 @@ impl Component for Scrollbox {
             );
         }
 
-        let horizontal_scroll_background = renderer.get_drawable_mut(self.horizontal_scroll_background_id)?;
+        let horizontal_scroll_background = renderer.rectangles.get_mut(self.horizontal_scroll_background_id)?;
         horizontal_scroll_background.set_position(horizontal_scroll_background_position);
         horizontal_scroll_background.set_size(horizontal_scroll_background_size);
         horizontal_scroll_background.set_color(self.horizontal_scroll_background_color.clone());
@@ -992,12 +980,11 @@ impl Component for Scrollbox {
         }
 
         if self.horizontal_scroll_border_thickness != Default::default() {
-            let border_rectangle = renderer.get_drawable_mut(self.horizontal_scroll_border_id)?;
+            let border_rectangle = renderer.frames.get_mut(self.horizontal_scroll_border_id)?;
             border_rectangle.set_position(self.horizontal_scroll_position);
             border_rectangle.set_size(self.horizontal_scroll_size);
             border_rectangle.set_color(self.horizontal_scroll_border_color.clone());
-
-            renderer.get_drawable_and_cast_mut::<Frame>(self.horizontal_scroll_border_id)?.set_thickness(self.horizontal_scroll_border_thickness.into());
+            border_rectangle.set_thickness(self.horizontal_scroll_border_thickness.into());
 
             self.horizontal_scroll_position += Vec2::new(self.horizontal_scroll_border_thickness.right, self.horizontal_scroll_border_thickness.top);
             self.horizontal_scroll_size -= Vec2::new(
@@ -1006,19 +993,15 @@ impl Component for Scrollbox {
             );
         }
 
-        let horizontal_scroll = renderer.get_drawable_mut(self.horizontal_scroll_id)?;
+        let horizontal_scroll = renderer.rectangles.get_mut(self.horizontal_scroll_id)?;
         horizontal_scroll.set_position(self.horizontal_scroll_position);
         horizontal_scroll.set_size(self.horizontal_scroll_size);
         horizontal_scroll.set_color(self.horizontal_scroll_color.clone());
 
-        renderer.get_drawable_and_cast_mut::<Rectangle>(self.horizontal_scroll_id)?.set_corner_rounding(self.horizontal_scroll_corner_rounding.into());
-        renderer.get_drawable_and_cast_mut::<Frame>(self.horizontal_scroll_border_id)?.set_corner_rounding(self.horizontal_scroll_corner_rounding.into());
-        renderer
-            .get_drawable_and_cast_mut::<Rectangle>(self.horizontal_scroll_background_id)?
-            .set_corner_rounding(self.horizontal_scroll_background_corner_rounding.into());
-        renderer
-            .get_drawable_and_cast_mut::<Frame>(self.horizontal_scroll_background_border_id)?
-            .set_corner_rounding(self.horizontal_scroll_background_corner_rounding.into());
+        renderer.rectangles.get_mut(self.horizontal_scroll_id)?.set_corner_rounding(self.horizontal_scroll_corner_rounding.into());
+        renderer.frames.get_mut(self.horizontal_scroll_border_id)?.set_corner_rounding(self.horizontal_scroll_corner_rounding.into());
+        renderer.rectangles.get_mut(self.horizontal_scroll_background_id)?.set_corner_rounding(self.horizontal_scroll_background_corner_rounding.into());
+        renderer.frames.get_mut(self.horizontal_scroll_background_border_id)?.set_corner_rounding(self.horizontal_scroll_background_corner_rounding.into());
         /* #endregion */
 
         self.dirty = false;
@@ -1028,28 +1011,28 @@ impl Component for Scrollbox {
 
     fn draw(&mut self, renderer: &mut RendererContext) -> Result<(), String> {
         if self.scroll_width.x > 0.0 {
-            renderer.draw(self.vertical_scroll_background_id)?;
-            renderer.draw(self.vertical_scroll_id)?;
+            renderer.draw(DrawableEnum::Rectangle, self.vertical_scroll_background_id)?;
+            renderer.draw(DrawableEnum::Rectangle, self.vertical_scroll_id)?;
 
             if self.vertical_scroll_background_border_thickness != Default::default() {
-                renderer.draw(self.vertical_scroll_background_border_id)?;
+                renderer.draw(DrawableEnum::Frame, self.vertical_scroll_background_border_id)?;
             }
 
             if self.vertical_scroll_border_thickness != Default::default() {
-                renderer.draw(self.vertical_scroll_border_id)?;
+                renderer.draw(DrawableEnum::Frame, self.vertical_scroll_border_id)?;
             }
         }
 
         if self.scroll_width.y > 0.0 {
-            renderer.draw(self.horizontal_scroll_background_id)?;
-            renderer.draw(self.horizontal_scroll_id)?;
+            renderer.draw(DrawableEnum::Rectangle, self.horizontal_scroll_background_id)?;
+            renderer.draw(DrawableEnum::Rectangle, self.horizontal_scroll_id)?;
 
             if self.horizontal_scroll_background_border_thickness != Default::default() {
-                renderer.draw(self.horizontal_scroll_background_border_id)?;
+                renderer.draw(DrawableEnum::Frame, self.horizontal_scroll_background_border_id)?;
             }
 
             if self.horizontal_scroll_border_thickness != Default::default() {
-                renderer.draw(self.horizontal_scroll_border_id)?;
+                renderer.draw(DrawableEnum::Frame, self.horizontal_scroll_border_id)?;
             }
         }
 
@@ -1065,14 +1048,14 @@ impl Component for Scrollbox {
     }
 
     fn release_internal_resources(&mut self, renderer: &mut RendererContext) -> Result<(), String> {
-        renderer.remove_drawable(self.vertical_scroll_id)?;
-        renderer.remove_drawable(self.vertical_scroll_border_id)?;
-        renderer.remove_drawable(self.vertical_scroll_background_id)?;
-        renderer.remove_drawable(self.vertical_scroll_background_border_id)?;
-        renderer.remove_drawable(self.horizontal_scroll_id)?;
-        renderer.remove_drawable(self.horizontal_scroll_border_id)?;
-        renderer.remove_drawable(self.horizontal_scroll_background_id)?;
-        renderer.remove_drawable(self.horizontal_scroll_background_border_id)?;
+        renderer.rectangles.remove(self.vertical_scroll_id);
+        renderer.frames.remove(self.vertical_scroll_border_id);
+        renderer.rectangles.remove(self.vertical_scroll_background_id);
+        renderer.frames.remove(self.vertical_scroll_background_border_id);
+        renderer.rectangles.remove(self.horizontal_scroll_id);
+        renderer.frames.remove(self.horizontal_scroll_border_id);
+        renderer.rectangles.remove(self.horizontal_scroll_background_id);
+        renderer.frames.remove(self.horizontal_scroll_background_border_id);
 
         Ok(())
     }

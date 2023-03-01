@@ -9,8 +9,9 @@ use std::sync::RwLock;
 pub struct AudioContext {
     device: *mut openal::ALCdevice_struct,
     context: *mut openal::ALCcontext_struct,
-    samples: Arc<RwLock<Storage>>,
-    sounds: Storage,
+
+    pub samples: Arc<RwLock<Storage<Sample>>>,
+    pub sounds: Storage<Sound>,
 }
 
 impl AudioContext {
@@ -41,23 +42,17 @@ impl AudioContext {
         }
     }
 
-    pub fn get_samples(&self) -> Arc<RwLock<Storage>> {
+    pub fn get_samples(&self) -> Arc<RwLock<Storage<Sample>>> {
         self.samples.clone()
     }
 
     pub fn create_sound(&mut self, sample_id: usize) -> Result<usize, String> {
         let sample_storage = self.samples.read().unwrap();
-        let sample = sample_storage.get_and_cast::<Sample>(sample_id)?;
+        let sample = sample_storage.get(sample_id)?;
+        let id = self.sounds.store(Sound::new(sample)?);
+        self.sounds.get_mut(id)?.id = id;
 
-        Ok(self.sounds.store(Box::new(Sound::new(sample)?)))
-    }
-
-    pub fn get_sound(&self, sound_id: usize) -> Result<&Sound, String> {
-        self.sounds.get_and_cast::<Sound>(sound_id)
-    }
-
-    pub fn get_sound_mut(&mut self, sound_id: usize) -> Result<&mut Sound, String> {
-        self.sounds.get_and_cast_mut::<Sound>(sound_id)
+        Ok(id)
     }
 }
 
