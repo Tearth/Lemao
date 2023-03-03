@@ -292,12 +292,12 @@ impl UiContext {
 
         if self.debug {
             let debug_frame = renderer.frames.get_mut(self.debug_frame_id)?;
-            debug_frame.set_position(component_position);
-            debug_frame.set_size(component_size);
-            debug_frame.set_color(Color::SolidColor(match component_is_active {
+            debug_frame.position = component_position;
+            debug_frame.size = component_size;
+            debug_frame.color = Color::SolidColor(match component_is_active {
                 true => SolidColor::new(1.0, 0.0, 0.0, 1.0),
                 false => SolidColor::new(0.2, 0.2, 0.2, 1.0),
-            }));
+            });
             renderer.draw(DrawableEnum::Frame, self.debug_frame_id)?;
         }
 

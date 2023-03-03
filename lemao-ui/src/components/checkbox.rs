@@ -457,10 +457,10 @@ impl Component for Checkbox {
         // We have to set text first, to get the size used later
         let font = renderer.fonts.get(self.label_font_id)?;
         renderer.texts.get_mut(self.label_id)?.set_font(font);
-        renderer.texts.get_mut(self.label_id)?.set_text(&self.label_text);
+        renderer.texts.get_mut(self.label_id)?.text = self.label_text.clone();
         renderer.texts.get_mut(self.label_id)?.update();
 
-        self.screen_size = renderer.texts.get_mut(self.label_id)?.get_size() + self.label_offset;
+        self.screen_size = renderer.texts.get_mut(self.label_id)?.size + self.label_offset;
         self.size = ComponentSize::Absolute(self.screen_size);
 
         self.screen_position = match self.position {
@@ -478,8 +478,8 @@ impl Component for Checkbox {
         self.screen_position = self.screen_position.floor();
 
         let r#box = renderer.rectangles.get_mut(self.box_id)?;
-        r#box.set_position(self.screen_position + self.box_offset);
-        r#box.set_color(self.box_color.clone());
+        r#box.position = self.screen_position + self.box_offset;
+        r#box.color = self.box_color.clone();
 
         if self.checked {
             let texture = renderer.textures.get(self.box_checked_texture_id)?;
@@ -491,12 +491,12 @@ impl Component for Checkbox {
             r#box.set_texture(texture);
         }
 
-        r#box.set_size(self.box_size);
+        r#box.size = self.box_size;
         r#box.update();
 
         let label = renderer.texts.get_mut(self.label_id)?;
-        label.set_position(self.screen_position + self.label_offset);
-        label.set_color(self.label_color.clone());
+        label.position = self.screen_position + self.label_offset;
+        label.color = self.label_color.clone();
         label.update();
 
         self.dirty = false;
@@ -507,16 +507,16 @@ impl Component for Checkbox {
     fn draw(&mut self, renderer: &mut RendererContext) -> Result<(), String> {
         if self.label_shadow_enabled {
             let drawable = renderer.texts.get_mut(self.label_id)?;
-            let original_position = drawable.get_position();
-            let original_color = drawable.get_color().clone();
+            let original_position = drawable.position;
+            let original_color = drawable.color.clone();
 
-            drawable.set_position(original_position + self.label_shadow_offset);
-            drawable.set_color(self.label_shadow_color.clone());
+            drawable.position = original_position + self.label_shadow_offset;
+            drawable.color = self.label_shadow_color.clone();
             renderer.draw(DrawableEnum::Text, self.label_id)?;
 
             let drawable = renderer.texts.get_mut(self.label_id)?;
-            drawable.set_position(original_position);
-            drawable.set_color(original_color);
+            drawable.position = original_position;
+            drawable.color = original_color;
         }
 
         renderer.draw(DrawableEnum::Rectangle, self.box_id)?;

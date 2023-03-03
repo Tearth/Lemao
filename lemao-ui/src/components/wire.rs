@@ -320,10 +320,10 @@ impl Component for Wire {
         for chunk_data in &mut self.data {
             let chunk = WireChunk::new(renderer)?;
             let line = renderer.lines.get_mut(chunk.line_id)?;
-            line.set_from(self.screen_position + chunk_data.from * self.screen_size);
-            line.set_to(self.screen_position + chunk_data.to * self.screen_size);
-            line.set_color(chunk_data.color.clone());
-            line.set_thickness(chunk_data.thickness);
+            line.from = self.screen_position + chunk_data.from * self.screen_size;
+            line.to = self.screen_position + chunk_data.to * self.screen_size;
+            line.color = chunk_data.color.clone();
+            line.thickness = chunk_data.thickness;
             line.update();
             self.chunks.push(chunk);
         }

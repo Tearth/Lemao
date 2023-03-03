@@ -372,10 +372,10 @@ impl Component for Label {
 
         let font = renderer.fonts.get(self.label_font_id)?;
         label.set_font(font);
-        label.set_text(&label_text_processed);
+        label.text = label_text_processed;
         label.update();
 
-        self.screen_size = label.get_size();
+        self.screen_size = label.size;
         self.size = ComponentSize::Absolute(self.screen_size);
 
         self.screen_position = match self.position {
@@ -393,8 +393,8 @@ impl Component for Label {
         self.screen_position = self.screen_position.floor();
 
         let label = renderer.texts.get_mut(self.label_id)?;
-        label.set_position(self.screen_position);
-        label.set_color(self.label_color.clone());
+        label.position = self.screen_position;
+        label.color = self.label_color.clone();
         label.update();
 
         self.dirty = false;
@@ -405,16 +405,16 @@ impl Component for Label {
     fn draw(&mut self, renderer: &mut RendererContext) -> Result<(), String> {
         if self.shadow_enabled {
             let drawable = renderer.texts.get_mut(self.label_id)?;
-            let original_position = drawable.get_position();
-            let original_color = drawable.get_color().clone();
+            let original_position = drawable.position;
+            let original_color = drawable.color.clone();
 
-            drawable.set_position(original_position + self.shadow_offset);
-            drawable.set_color(self.shadow_color.clone());
+            drawable.position = original_position + self.shadow_offset;
+            drawable.color = self.shadow_color.clone();
             renderer.draw(DrawableEnum::Text, self.label_id)?;
 
             let drawable = renderer.texts.get_mut(self.label_id)?;
-            drawable.set_position(original_position);
-            drawable.set_color(original_color);
+            drawable.position = original_position;
+            drawable.color = original_color;
         }
 
         renderer.draw(DrawableEnum::Text, self.label_id)?;

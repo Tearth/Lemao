@@ -415,13 +415,13 @@ impl RendererContext {
 
     pub fn draw(&mut self, r#type: DrawableEnum, drawable_id: usize) -> Result<(), String> {
         let color = match r#type {
-            DrawableEnum::Circle => self.circles.get(drawable_id)?.get_color(),
-            DrawableEnum::Disc => self.discs.get(drawable_id)?.get_color(),
-            DrawableEnum::Frame => self.frames.get(drawable_id)?.get_color(),
-            DrawableEnum::Line => self.lines.get(drawable_id)?.get_color(),
-            DrawableEnum::Rectangle => self.rectangles.get(drawable_id)?.get_color(),
-            DrawableEnum::Text => self.texts.get(drawable_id)?.get_color(),
-            DrawableEnum::Tilemap => self.tilemaps.get(drawable_id)?.get_color(),
+            DrawableEnum::Circle => &self.circles.get(drawable_id)?.color,
+            DrawableEnum::Disc => &self.discs.get(drawable_id)?.color,
+            DrawableEnum::Frame => &self.frames.get(drawable_id)?.color,
+            DrawableEnum::Line => &self.lines.get(drawable_id)?.color,
+            DrawableEnum::Rectangle => &self.rectangles.get(drawable_id)?.color,
+            DrawableEnum::Text => &self.texts.get(drawable_id)?.color,
+            DrawableEnum::Tilemap => &self.tilemaps.get(drawable_id)?.color,
         };
 
         let shader_id = match color {

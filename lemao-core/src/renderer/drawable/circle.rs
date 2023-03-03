@@ -20,17 +20,17 @@ pub struct Circle {
     pub(crate) texture_gl_id: u32,
     gl: Rc<OpenGLPointers>,
 
-    position: Vec2,
-    scale: Vec2,
-    rotation: f32,
-    size: Vec2,
-    anchor: Vec2,
-    color: Color,
-    sides: u32,
-    start_angle: f32,
-    end_angle: f32,
-    thickness: Vec2,
-    squircle_factor: f32,
+    pub position: Vec2,
+    pub scale: Vec2,
+    pub rotation: f32,
+    pub size: Vec2,
+    pub anchor: Vec2,
+    pub color: Color,
+    pub sides: u32,
+    pub start_angle: f32,
+    pub end_angle: f32,
+    pub thickness: Vec2,
+    pub squircle_factor: f32,
     elements_count: u32,
     vertices: Vec<f32>,
     indices: Vec<u32>,
@@ -86,53 +86,21 @@ impl Circle {
         circle
     }
 
-    pub fn get_texture_id(&self) -> usize {
-        self.texture_id
-    }
-
     pub fn set_texture(&mut self, texture: &Texture) {
         self.texture_id = texture.id;
         self.texture_gl_id = texture.texture_gl_id;
     }
 
-    pub fn get_sides(&self) -> u32 {
-        self.sides
+    pub fn get_transformation_matrix(&self) -> Mat4x4 {
+        let translation = Mat4x4::translate(Vec3::from(self.position));
+        let anchor_offset = Mat4x4::translate(-Vec3::from(self.anchor * self.size).floor());
+        let scale = Mat4x4::scale(Vec3::from(self.scale));
+        let rotation = Mat4x4::rotate(self.rotation);
+        translation * rotation * scale * anchor_offset
     }
 
-    pub fn set_sides(&mut self, sides: u32) {
-        self.sides = sides;
-    }
-
-    pub fn get_start_angle(&self) -> f32 {
-        self.start_angle
-    }
-
-    pub fn set_start_angle(&mut self, angle: f32) {
-        self.start_angle = angle;
-    }
-
-    pub fn get_end_angle(&self) -> f32 {
-        self.end_angle
-    }
-
-    pub fn set_end_angle(&mut self, angle: f32) {
-        self.end_angle = angle;
-    }
-
-    pub fn get_thickness(&self) -> Vec2 {
-        self.thickness
-    }
-
-    pub fn set_thickness(&mut self, thickness: Vec2) {
-        self.thickness = thickness;
-    }
-
-    pub fn get_squircle_factor(&self) -> f32 {
-        self.squircle_factor
-    }
-
-    pub fn set_squircle_factor(&mut self, squircle_factor: f32) {
-        self.squircle_factor = squircle_factor;
+    pub fn get_batch(&self) -> Batch {
+        Batch::new(None, Some(&self.vertices), Some(&self.indices), Some(self.texture_gl_id), Some(&self.color))
     }
 
     pub fn update(&mut self) {
@@ -205,6 +173,21 @@ impl Circle {
         }
     }
 
+    pub fn draw(&mut self, shader: &Shader) -> Result<(), String> {
+        unsafe {
+            let model = self.get_transformation_matrix();
+
+            shader.set_parameter("model", model.as_ptr())?;
+            shader.set_color(&self.color)?;
+
+            (self.gl.glBindVertexArray)(self.vao_gl_id);
+            (self.gl.glBindTexture)(opengl::GL_TEXTURE_2D, self.texture_gl_id);
+            (self.gl.glDrawElements)(opengl::GL_TRIANGLES, self.elements_count as i32, opengl::GL_UNSIGNED_INT, ptr::null());
+
+            Ok(())
+        }
+    }
+
     #[rustfmt::skip]
     fn get_vertices(&self, outer_position: Vec2, inner_position: Vec2, outer_uv: Vec2, inner_uv: Vec2, color: SolidColor) -> [f32; 18] {
         [
@@ -228,89 +211,6 @@ impl Circle {
             /* t.u */ inner_uv.x,
             /* t.v */ inner_uv.y,
         ]
-    }
-
-    pub fn get_position(&self) -> Vec2 {
-        self.position
-    }
-
-    pub fn set_position(&mut self, position: Vec2) {
-        self.position = position;
-    }
-
-    pub fn move_delta(&mut self, delta: Vec2) {
-        self.position += delta;
-    }
-
-    pub fn get_scale(&self) -> Vec2 {
-        self.scale
-    }
-
-    pub fn set_scale(&mut self, scale: Vec2) {
-        self.scale = scale;
-    }
-
-    pub fn get_rotation(&self) -> f32 {
-        self.rotation
-    }
-
-    pub fn set_rotation(&mut self, rotation: f32) {
-        self.rotation = rotation;
-    }
-
-    pub fn rotate(&mut self, delta: f32) {
-        self.rotation += delta;
-    }
-
-    pub fn get_size(&self) -> Vec2 {
-        self.size
-    }
-
-    pub fn set_size(&mut self, size: Vec2) {
-        self.size = size;
-    }
-
-    pub fn get_anchor(&self) -> Vec2 {
-        self.anchor
-    }
-
-    pub fn set_anchor(&mut self, anchor: Vec2) {
-        self.anchor = anchor;
-    }
-
-    pub fn get_color(&self) -> &Color {
-        &self.color
-    }
-
-    pub fn set_color(&mut self, color: Color) {
-        self.color = color;
-    }
-
-    pub fn get_transformation_matrix(&self) -> Mat4x4 {
-        let translation = Mat4x4::translate(Vec3::from(self.position));
-        let anchor_offset = Mat4x4::translate(-Vec3::from(self.anchor * self.size).floor());
-        let scale = Mat4x4::scale(Vec3::from(self.scale));
-        let rotation = Mat4x4::rotate(self.rotation);
-        translation * rotation * scale * anchor_offset
-    }
-
-    pub fn get_batch(&self) -> Batch {
-        Batch::new(None, Some(&self.vertices), Some(&self.indices), Some(self.texture_gl_id), Some(&self.color))
-    }
-
-    pub fn draw(&mut self, shader: &Shader) -> Result<(), String> {
-        unsafe {
-            let model = self.get_transformation_matrix();
-
-            shader.set_parameter("model", model.as_ptr())?;
-            shader.set_color(&self.color)?;
-
-            (self.gl.glBindVertexArray)(self.vao_gl_id);
-            (self.gl.glBindTexture)(opengl::GL_TEXTURE_2D, self.texture_gl_id);
-            (self.gl.glDrawElements)(opengl::GL_TRIANGLES, self.elements_count as i32, opengl::GL_UNSIGNED_INT, ptr::null());
-
-            Ok(())
-        }
     }
 }
 

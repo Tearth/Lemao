@@ -488,22 +488,22 @@ impl Component for Panel {
             match self.shape {
                 ComponentShape::Rectangle => {
                     let border = renderer.frames.get_mut(self.border_id)?;
-                    border.set_position(self.screen_position);
-                    border.set_size(self.screen_size);
-                    border.set_color(self.border_color.clone());
-                    border.set_thickness(self.border_thickness.into());
-                    border.set_corner_rounding(self.corner_rounding.into());
+                    border.position = self.screen_position;
+                    border.size = self.screen_size;
+                    border.color = self.border_color.clone();
+                    border.thickness = self.border_thickness.into();
+                    border.corner_rounding = self.corner_rounding.into();
 
                     border.update();
                 }
                 ComponentShape::Disc => {
                     let border = renderer.circles.get_mut(self.border_id)?;
-                    border.set_position(self.screen_position);
-                    border.set_size(self.screen_size);
-                    border.set_color(self.border_color.clone());
-                    border.set_thickness(Vec2::new(self.border_thickness.left, self.border_thickness.top));
-                    border.set_start_angle(self.start_angle);
-                    border.set_end_angle(self.end_angle);
+                    border.position = self.screen_position;
+                    border.size = self.screen_size;
+                    border.color = self.border_color.clone();
+                    border.thickness = Vec2::new(self.border_thickness.left, self.border_thickness.top);
+                    border.start_angle = self.start_angle;
+                    border.end_angle = self.end_angle;
 
                     border.update();
                 }
@@ -519,10 +519,10 @@ impl Component for Panel {
         match self.shape {
             ComponentShape::Rectangle => {
                 let filling = renderer.rectangles.get_mut(self.filling_id)?;
-                filling.set_position(self.screen_position);
-                filling.set_color(self.color.clone());
-                filling.set_size(self.screen_size);
-                filling.set_corner_rounding(self.corner_rounding.into());
+                filling.position = self.screen_position;
+                filling.color = self.color.clone();
+                filling.size = self.screen_size;
+                filling.corner_rounding = self.corner_rounding.into();
 
                 if let Some(texture_id) = self.texture_id {
                     filling.set_texture(renderer.textures.get(texture_id)?);
@@ -532,11 +532,11 @@ impl Component for Panel {
             }
             ComponentShape::Disc => {
                 let filling = renderer.discs.get_mut(self.filling_id)?;
-                filling.set_position(self.screen_position);
-                filling.set_color(self.color.clone());
-                filling.set_size(self.screen_size);
-                filling.set_start_angle(self.start_angle);
-                filling.set_end_angle(self.end_angle);
+                filling.position = self.screen_position;
+                filling.color = self.color.clone();
+                filling.size = self.screen_size;
+                filling.start_angle = self.start_angle;
+                filling.end_angle = self.end_angle;
 
                 if let Some(texture_id) = self.texture_id {
                     filling.set_texture(renderer.textures.get(texture_id)?);
@@ -550,22 +550,24 @@ impl Component for Panel {
             match self.shape {
                 ComponentShape::Rectangle => {
                     let shadow = renderer.rectangles.get_mut(self.shadow_id)?;
-                    shadow.set_position(self.screen_position + self.screen_size / 2.0 + self.shadow_offset);
-                    shadow.set_size(self.screen_size);
-                    shadow.set_anchor(Vec2::new(0.5, 0.5));
-                    shadow.set_color(self.shadow_color.clone());
-                    shadow.set_scale(self.shadow_scale);
-                    shadow.set_corner_rounding(self.shadow_corner_rounding.into());
+                    shadow.position = self.screen_position + self.screen_size / 2.0 + self.shadow_offset;
+                    shadow.size = self.screen_size;
+                    shadow.anchor = Vec2::new(0.5, 0.5);
+                    shadow.color = self.shadow_color.clone();
+                    shadow.scale = self.shadow_scale;
+                    shadow.corner_rounding = self.shadow_corner_rounding.into();
+                    shadow.update();
                 }
                 ComponentShape::Disc => {
                     let shadow = renderer.discs.get_mut(self.shadow_id)?;
-                    shadow.set_position(self.screen_position + self.screen_size / 2.0 + self.shadow_offset);
-                    shadow.set_size(self.screen_size);
-                    shadow.set_anchor(Vec2::new(0.5, 0.5));
-                    shadow.set_color(self.shadow_color.clone());
-                    shadow.set_scale(self.shadow_scale);
-                    shadow.set_start_angle(self.start_angle);
-                    shadow.set_end_angle(self.end_angle);
+                    shadow.position = self.screen_position + self.screen_size / 2.0 + self.shadow_offset;
+                    shadow.size = self.screen_size;
+                    shadow.anchor = Vec2::new(0.5, 0.5);
+                    shadow.color = self.shadow_color.clone();
+                    shadow.scale = self.shadow_scale;
+                    shadow.start_angle = self.start_angle;
+                    shadow.end_angle = self.end_angle;
+                    shadow.update()
                 }
             };
         }

@@ -22,16 +22,16 @@ pub struct Rectangle {
     pub(crate) texture_gl_id: u32,
     gl: Rc<OpenGLPointers>,
 
-    position: Vec2,
-    scale: Vec2,
-    rotation: f32,
-    size: Vec2,
-    anchor: Vec2,
-    color: Color,
-    corner_rounding: CornerRounding,
-    elements_count: u32,
-    custom_shape: bool,
+    pub position: Vec2,
+    pub scale: Vec2,
+    pub rotation: f32,
+    pub size: Vec2,
+    pub anchor: Vec2,
+    pub color: Color,
+    pub corner_rounding: CornerRounding,
+    pub custom_shape: bool,
     custom_shape_initialized: bool,
+    elements_count: u32,
     vertices: Vec<f32>,
     indices: Vec<u32>,
 }
@@ -56,16 +56,12 @@ impl Rectangle {
             anchor: Default::default(),
             color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             corner_rounding: Default::default(),
-            elements_count: 0,
             custom_shape: false,
             custom_shape_initialized: false,
+            elements_count: 0,
             vertices: Vec::new(),
             indices: Vec::new(),
         }
-    }
-
-    pub fn get_texture_id(&self) -> usize {
-        self.texture_id
     }
 
     pub fn set_texture(&mut self, texture: &Texture) {
@@ -73,17 +69,33 @@ impl Rectangle {
         self.texture_gl_id = texture.texture_gl_id;
     }
 
-    pub fn get_corner_rounding(&self) -> CornerRounding {
-        self.corner_rounding
+    pub fn get_transformation_matrix(&self) -> Mat4x4 {
+        let translation = Mat4x4::translate(Vec3::from(self.position));
+        let rotation = Mat4x4::rotate(self.rotation);
+
+        if self.custom_shape {
+            let anchor_offset = Mat4x4::translate(-Vec3::from(self.anchor * self.size));
+            let scale = Mat4x4::scale(Vec3::from(self.scale).floor());
+            translation * rotation * scale * anchor_offset
+        } else {
+            let anchor_offset = Mat4x4::translate(-Vec3::from(self.anchor));
+            let scale = Mat4x4::scale(Vec3::from(self.scale * self.size).floor());
+            translation * rotation * scale * anchor_offset
+        }
     }
 
-    pub fn set_corner_rounding(&mut self, corner_rounding: CornerRounding) {
-        self.corner_rounding = corner_rounding;
-        self.custom_shape = true;
+    pub fn get_batch(&self) -> Batch {
+        if self.custom_shape {
+            Batch::new(None, Some(&self.vertices), Some(&self.indices), Some(self.texture_gl_id), Some(&self.color))
+        } else {
+            Batch::new(Some(self.shape_id), None, None, Some(self.texture_gl_id), Some(&self.color))
+        }
     }
 
     pub fn update(&mut self) {
         unsafe {
+            self.custom_shape = self.corner_rounding != Default::default();
+
             if self.custom_shape && !self.custom_shape_initialized {
                 (self.gl.glGenVertexArrays)(1, &mut self.vao_gl_id);
                 (self.gl.glBindVertexArray)(self.vao_gl_id);
@@ -225,6 +237,27 @@ impl Rectangle {
         }
     }
 
+    pub fn draw(&mut self, shader: &Shader) -> Result<(), String> {
+        unsafe {
+            let model = self.get_transformation_matrix();
+
+            shader.set_parameter("model", model.as_ptr())?;
+            shader.set_color(&self.color)?;
+
+            if self.custom_shape {
+                (self.gl.glBindVertexArray)(self.vao_gl_id);
+                (self.gl.glBindTexture)(opengl::GL_TEXTURE_2D, self.texture_gl_id);
+                (self.gl.glDrawElements)(opengl::GL_TRIANGLES, self.elements_count as i32, opengl::GL_UNSIGNED_INT, ptr::null());
+            } else {
+                (self.gl.glBindVertexArray)(self.shape_vao_gl_id);
+                (self.gl.glBindTexture)(opengl::GL_TEXTURE_2D, self.texture_gl_id);
+                (self.gl.glDrawElements)(opengl::GL_TRIANGLES, 6, opengl::GL_UNSIGNED_INT, ptr::null());
+            }
+
+            Ok(())
+        }
+    }
+
     #[rustfmt::skip]
     fn get_vertices(&self, position: Vec2, uv: Vec2, color: SolidColor) -> [f32; 9] {
         [
@@ -263,106 +296,6 @@ impl Rectangle {
             if angle > to_angle + step / 2.0 {
                 break;
             }
-        }
-    }
-
-    pub fn get_position(&self) -> Vec2 {
-        self.position
-    }
-
-    pub fn set_position(&mut self, position: Vec2) {
-        self.position = position;
-    }
-
-    pub fn move_delta(&mut self, delta: Vec2) {
-        self.position += delta;
-    }
-
-    pub fn get_scale(&self) -> Vec2 {
-        self.scale
-    }
-
-    pub fn set_scale(&mut self, scale: Vec2) {
-        self.scale = scale;
-    }
-
-    pub fn get_rotation(&self) -> f32 {
-        self.rotation
-    }
-
-    pub fn set_rotation(&mut self, rotation: f32) {
-        self.rotation = rotation;
-    }
-
-    pub fn rotate(&mut self, delta: f32) {
-        self.rotation += delta;
-    }
-
-    pub fn get_size(&self) -> Vec2 {
-        self.size
-    }
-
-    pub fn set_size(&mut self, size: Vec2) {
-        self.size = size;
-    }
-
-    pub fn get_anchor(&self) -> Vec2 {
-        self.anchor
-    }
-
-    pub fn set_anchor(&mut self, anchor: Vec2) {
-        self.anchor = anchor;
-    }
-
-    pub fn get_color(&self) -> &Color {
-        &self.color
-    }
-
-    pub fn set_color(&mut self, color: Color) {
-        self.color = color;
-    }
-
-    pub fn get_transformation_matrix(&self) -> Mat4x4 {
-        let translation = Mat4x4::translate(Vec3::from(self.position));
-        let rotation = Mat4x4::rotate(self.rotation);
-
-        if self.custom_shape {
-            let anchor_offset = Mat4x4::translate(-Vec3::from(self.anchor * self.size));
-            let scale = Mat4x4::scale(Vec3::from(self.scale).floor());
-            translation * rotation * scale * anchor_offset
-        } else {
-            let anchor_offset = Mat4x4::translate(-Vec3::from(self.anchor));
-            let scale = Mat4x4::scale(Vec3::from(self.scale * self.size).floor());
-            translation * rotation * scale * anchor_offset
-        }
-    }
-
-    pub fn get_batch(&self) -> Batch {
-        if self.custom_shape {
-            Batch::new(None, Some(&self.vertices), Some(&self.indices), Some(self.texture_gl_id), Some(&self.color))
-        } else {
-            Batch::new(Some(self.shape_id), None, None, Some(self.texture_gl_id), Some(&self.color))
-        }
-    }
-
-    pub fn draw(&mut self, shader: &Shader) -> Result<(), String> {
-        unsafe {
-            let model = self.get_transformation_matrix();
-
-            shader.set_parameter("model", model.as_ptr())?;
-            shader.set_color(&self.color)?;
-
-            if self.custom_shape {
-                (self.gl.glBindVertexArray)(self.vao_gl_id);
-                (self.gl.glBindTexture)(opengl::GL_TEXTURE_2D, self.texture_gl_id);
-                (self.gl.glDrawElements)(opengl::GL_TRIANGLES, self.elements_count as i32, opengl::GL_UNSIGNED_INT, ptr::null());
-            } else {
-                (self.gl.glBindVertexArray)(self.shape_vao_gl_id);
-                (self.gl.glBindTexture)(opengl::GL_TEXTURE_2D, self.texture_gl_id);
-                (self.gl.glDrawElements)(opengl::GL_TRIANGLES, 6, opengl::GL_UNSIGNED_INT, ptr::null());
-            }
-
-            Ok(())
         }
     }
 }

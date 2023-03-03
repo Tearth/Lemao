@@ -20,14 +20,14 @@ pub struct Text {
     pub(crate) texture_gl_id: u32,
     gl: Rc<OpenGLPointers>,
 
-    position: Vec2,
-    scale: Vec2,
-    rotation: f32,
-    size: Vec2,
-    anchor: Vec2,
-    color: Color,
-    text: String,
-    line_height: u32,
+    pub position: Vec2,
+    pub scale: Vec2,
+    pub rotation: f32,
+    pub size: Vec2,
+    pub anchor: Vec2,
+    pub color: Color,
+    pub text: String,
+    pub line_height: u32,
     elements_count: u32,
     vertices: Vec<f32>,
     indices: Vec<u32>,
@@ -90,29 +90,21 @@ impl Text {
         text
     }
 
-    pub fn get_font_id(&self) -> usize {
-        self.font_id
-    }
-
     pub fn set_font(&mut self, font: &Font) {
         self.font_id = font.id;
         self.texture_gl_id = font.texture_gl_id;
     }
 
-    pub fn get_text(&self) -> &str {
-        &self.text
+    pub fn get_transformation_matrix(&self) -> Mat4x4 {
+        let translation = Mat4x4::translate(Vec3::from(self.position));
+        let anchor_offset = Mat4x4::translate(-Vec3::from(self.anchor * self.size).floor());
+        let scale = Mat4x4::scale(Vec3::from(self.scale));
+        let rotation = Mat4x4::rotate(self.rotation);
+        translation * rotation * scale * anchor_offset
     }
 
-    pub fn set_text(&mut self, text: &str) {
-        self.text = text.to_string();
-    }
-
-    pub fn get_line_height(&self) -> u32 {
-        self.line_height
-    }
-
-    pub fn set_line_height(&mut self, line_height: u32) {
-        self.line_height = line_height;
+    pub fn get_batch(&self) -> Batch {
+        Batch::new(None, Some(&self.vertices), Some(&self.indices), Some(self.texture_gl_id), Some(&self.color))
     }
 
     pub fn calculate_text_size(&self, text: String) -> Vec2 {
@@ -233,6 +225,21 @@ impl Text {
         }
     }
 
+    pub fn draw(&mut self, shader: &Shader) -> Result<(), String> {
+        unsafe {
+            let model = self.get_transformation_matrix();
+
+            shader.set_parameter("model", model.as_ptr())?;
+            shader.set_color(&self.color)?;
+
+            (self.gl.glBindVertexArray)(self.vao_gl_id);
+            (self.gl.glBindTexture)(opengl::GL_TEXTURE_2D, self.texture_gl_id);
+            (self.gl.glDrawElements)(opengl::GL_TRIANGLES, self.elements_count as i32, opengl::GL_UNSIGNED_INT, ptr::null());
+
+            Ok(())
+        }
+    }
+
     fn get_vertices(&self, width: u32, height: u32, offset: Vec2, uv: Vec2, uv_size: Vec2, color: SolidColor) -> [f32; 36] {
         [
             // Left-bottom
@@ -276,89 +283,6 @@ impl Text {
             /* t.u */ uv.x,
             /* t.v */ uv.y + uv_size.y,
         ]
-    }
-
-    pub fn get_position(&self) -> Vec2 {
-        self.position
-    }
-
-    pub fn set_position(&mut self, position: Vec2) {
-        self.position = position;
-    }
-
-    pub fn move_delta(&mut self, delta: Vec2) {
-        self.position += delta;
-    }
-
-    pub fn get_scale(&self) -> Vec2 {
-        self.scale
-    }
-
-    pub fn set_scale(&mut self, scale: Vec2) {
-        self.scale = scale;
-    }
-
-    pub fn get_rotation(&self) -> f32 {
-        self.rotation
-    }
-
-    pub fn set_rotation(&mut self, rotation: f32) {
-        self.rotation = rotation;
-    }
-
-    pub fn rotate(&mut self, delta: f32) {
-        self.rotation += delta;
-    }
-
-    pub fn get_size(&self) -> Vec2 {
-        self.size
-    }
-
-    pub fn set_size(&mut self, size: Vec2) {
-        self.size = size;
-    }
-
-    pub fn get_anchor(&self) -> Vec2 {
-        self.anchor
-    }
-
-    pub fn set_anchor(&mut self, anchor: Vec2) {
-        self.anchor = anchor;
-    }
-
-    pub fn get_color(&self) -> &Color {
-        &self.color
-    }
-
-    pub fn set_color(&mut self, color: Color) {
-        self.color = color;
-    }
-
-    pub fn get_transformation_matrix(&self) -> Mat4x4 {
-        let translation = Mat4x4::translate(Vec3::from(self.position));
-        let anchor_offset = Mat4x4::translate(-Vec3::from(self.anchor * self.size).floor());
-        let scale = Mat4x4::scale(Vec3::from(self.scale));
-        let rotation = Mat4x4::rotate(self.rotation);
-        translation * rotation * scale * anchor_offset
-    }
-
-    pub fn get_batch(&self) -> Batch {
-        Batch::new(None, Some(&self.vertices), Some(&self.indices), Some(self.texture_gl_id), Some(&self.color))
-    }
-
-    pub fn draw(&mut self, shader: &Shader) -> Result<(), String> {
-        unsafe {
-            let model = self.get_transformation_matrix();
-
-            shader.set_parameter("model", model.as_ptr())?;
-            shader.set_color(&self.color)?;
-
-            (self.gl.glBindVertexArray)(self.vao_gl_id);
-            (self.gl.glBindTexture)(opengl::GL_TEXTURE_2D, self.texture_gl_id);
-            (self.gl.glDrawElements)(opengl::GL_TRIANGLES, self.elements_count as i32, opengl::GL_UNSIGNED_INT, ptr::null());
-
-            Ok(())
-        }
     }
 }
 

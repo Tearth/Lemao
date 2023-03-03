@@ -879,12 +879,12 @@ impl Component for Scrollbox {
 
         if self.vertical_scroll_background_border_thickness != Default::default() {
             let border = renderer.frames.get_mut(self.vertical_scroll_background_border_id)?;
-            border.set_position(vertical_scroll_background_position);
-            border.set_size(vertical_scroll_background_size);
-            border.set_anchor(Vec2::new(1.0, 1.0));
-            border.set_color(self.vertical_scroll_background_border_color.clone());
-            border.set_thickness(self.vertical_scroll_background_border_thickness.into());
-            border.set_corner_rounding(self.vertical_scroll_background_corner_rounding.into());
+            border.position = vertical_scroll_background_position;
+            border.size = vertical_scroll_background_size;
+            border.anchor = Vec2::new(1.0, 1.0);
+            border.color = self.vertical_scroll_background_border_color.clone();
+            border.thickness = self.vertical_scroll_background_border_thickness.into();
+            border.corner_rounding = self.vertical_scroll_background_corner_rounding.into();
             border.update();
 
             vertical_scroll_background_position -=
@@ -896,11 +896,11 @@ impl Component for Scrollbox {
         }
 
         let vertical_scroll_background = renderer.rectangles.get_mut(self.vertical_scroll_background_id)?;
-        vertical_scroll_background.set_position(vertical_scroll_background_position);
-        vertical_scroll_background.set_size(vertical_scroll_background_size);
-        vertical_scroll_background.set_anchor(Vec2::new(1.0, 1.0));
-        vertical_scroll_background.set_color(self.vertical_scroll_background_color.clone());
-        vertical_scroll_background.set_corner_rounding(self.vertical_scroll_background_corner_rounding.into());
+        vertical_scroll_background.position = vertical_scroll_background_position;
+        vertical_scroll_background.size = vertical_scroll_background_size;
+        vertical_scroll_background.anchor = Vec2::new(1.0, 1.0);
+        vertical_scroll_background.color = self.vertical_scroll_background_color.clone();
+        vertical_scroll_background.corner_rounding = self.vertical_scroll_background_corner_rounding.into();
         vertical_scroll_background.update();
 
         self.scroll_difference.y = (self.total_size.y + self.scroll_width.y - self.screen_size.y).clamp(0.0, f32::MAX);
@@ -919,12 +919,12 @@ impl Component for Scrollbox {
 
         if self.vertical_scroll_border_thickness != Default::default() {
             let border = renderer.frames.get_mut(self.vertical_scroll_border_id)?;
-            border.set_position(self.vertical_scroll_position);
-            border.set_size(self.vertical_scroll_size);
-            border.set_anchor(Vec2::new(1.0, 1.0));
-            border.set_color(self.vertical_scroll_border_color.clone());
-            border.set_thickness(self.vertical_scroll_border_thickness.into());
-            border.set_corner_rounding(self.vertical_scroll_corner_rounding.into());
+            border.position = self.vertical_scroll_position;
+            border.size = self.vertical_scroll_size;
+            border.anchor = Vec2::new(1.0, 1.0);
+            border.color = self.vertical_scroll_border_color.clone();
+            border.thickness = self.vertical_scroll_border_thickness.into();
+            border.corner_rounding = self.vertical_scroll_corner_rounding.into();
             border.update();
 
             self.vertical_scroll_position -= Vec2::new(self.vertical_scroll_border_thickness.right, self.vertical_scroll_border_thickness.top);
@@ -935,11 +935,11 @@ impl Component for Scrollbox {
         }
 
         let vertical_scroll = renderer.rectangles.get_mut(self.vertical_scroll_id)?;
-        vertical_scroll.set_position(self.vertical_scroll_position);
-        vertical_scroll.set_size(self.vertical_scroll_size);
-        vertical_scroll.set_anchor(Vec2::new(1.0, 1.0));
-        vertical_scroll.set_color(self.vertical_scroll_color.clone());
-        vertical_scroll.set_corner_rounding(self.vertical_scroll_corner_rounding.into());
+        vertical_scroll.position = self.vertical_scroll_position;
+        vertical_scroll.size = self.vertical_scroll_size;
+        vertical_scroll.anchor = Vec2::new(1.0, 1.0);
+        vertical_scroll.color = self.vertical_scroll_color.clone();
+        vertical_scroll.corner_rounding = self.vertical_scroll_corner_rounding.into();
         vertical_scroll.update();
         /* #endregion */
 
@@ -949,11 +949,11 @@ impl Component for Scrollbox {
 
         if self.horizontal_scroll_background_border_thickness != Default::default() {
             let border = renderer.frames.get_mut(self.horizontal_scroll_background_border_id)?;
-            border.set_position(horizontal_scroll_background_position);
-            border.set_size(horizontal_scroll_background_size);
-            border.set_color(self.horizontal_scroll_background_border_color.clone());
-            border.set_thickness(self.horizontal_scroll_background_border_thickness.into());
-            border.set_corner_rounding(self.horizontal_scroll_background_corner_rounding.into());
+            border.position = horizontal_scroll_background_position;
+            border.size = horizontal_scroll_background_size;
+            border.color = self.horizontal_scroll_background_border_color.clone();
+            border.thickness = self.horizontal_scroll_background_border_thickness.into();
+            border.corner_rounding = self.horizontal_scroll_background_corner_rounding.into();
             border.update();
 
             horizontal_scroll_background_position +=
@@ -965,10 +965,10 @@ impl Component for Scrollbox {
         }
 
         let horizontal_scroll_background = renderer.rectangles.get_mut(self.horizontal_scroll_background_id)?;
-        horizontal_scroll_background.set_position(horizontal_scroll_background_position);
-        horizontal_scroll_background.set_size(horizontal_scroll_background_size);
-        horizontal_scroll_background.set_color(self.horizontal_scroll_background_color.clone());
-        horizontal_scroll_background.set_corner_rounding(self.horizontal_scroll_background_corner_rounding.into());
+        horizontal_scroll_background.position = horizontal_scroll_background_position;
+        horizontal_scroll_background.size = horizontal_scroll_background_size;
+        horizontal_scroll_background.color = self.horizontal_scroll_background_color.clone();
+        horizontal_scroll_background.corner_rounding = self.horizontal_scroll_background_corner_rounding.into();
         horizontal_scroll_background.update();
 
         self.scroll_difference.x = (self.total_size.x + self.scroll_width.x - self.screen_size.x).clamp(0.0, f32::MAX);
@@ -987,11 +987,11 @@ impl Component for Scrollbox {
 
         if self.horizontal_scroll_border_thickness != Default::default() {
             let border = renderer.frames.get_mut(self.horizontal_scroll_border_id)?;
-            border.set_position(self.horizontal_scroll_position);
-            border.set_size(self.horizontal_scroll_size);
-            border.set_color(self.horizontal_scroll_border_color.clone());
-            border.set_thickness(self.horizontal_scroll_border_thickness.into());
-            border.set_corner_rounding(self.horizontal_scroll_corner_rounding.into());
+            border.position = self.horizontal_scroll_position;
+            border.size = self.horizontal_scroll_size;
+            border.color = self.horizontal_scroll_border_color.clone();
+            border.thickness = self.horizontal_scroll_border_thickness.into();
+            border.corner_rounding = self.horizontal_scroll_corner_rounding.into();
             border.update();
 
             self.horizontal_scroll_position += Vec2::new(self.horizontal_scroll_border_thickness.right, self.horizontal_scroll_border_thickness.top);
@@ -1002,10 +1002,10 @@ impl Component for Scrollbox {
         }
 
         let horizontal_scroll = renderer.rectangles.get_mut(self.horizontal_scroll_id)?;
-        horizontal_scroll.set_position(self.horizontal_scroll_position);
-        horizontal_scroll.set_size(self.horizontal_scroll_size);
-        horizontal_scroll.set_color(self.horizontal_scroll_color.clone());
-        horizontal_scroll.set_corner_rounding(self.horizontal_scroll_corner_rounding.into());
+        horizontal_scroll.position = self.horizontal_scroll_position;
+        horizontal_scroll.size = self.horizontal_scroll_size;
+        horizontal_scroll.color = self.horizontal_scroll_color.clone();
+        horizontal_scroll.corner_rounding = self.horizontal_scroll_corner_rounding.into();
         horizontal_scroll.update();
         /* #endregion */
 

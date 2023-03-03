@@ -36,8 +36,8 @@ pub fn main() -> Result<(), String> {
 
     let fps_text_id = renderer.create_text(font_id)?;
     let fps_text = renderer.texts.get_mut(fps_text_id)?;
-    fps_text.set_text("FPS:0");
-    fps_text.set_anchor(Vec2::new(0.0, 1.0));
+    fps_text.text = "FPS:0".to_string();
+    fps_text.anchor = Vec2::new(0.0, 1.0);
     fps_text.update();
 
     let mut cells = Vec::new();
@@ -47,8 +47,8 @@ pub fn main() -> Result<(), String> {
         let sprite = renderer.rectangles.get_mut(sprite_id)?;
         let cell_texture = renderer.textures.get(cell_texture_id)?;
 
-        sprite.set_anchor(Vec2::new(0.5, 0.5));
-        sprite.set_size(cell_texture.get_size());
+        sprite.anchor = Vec2::new(0.5, 0.5);
+        sprite.size = cell_texture.get_size();
         sprite.set_texture(cell_texture);
 
         cells.push(CellData {
@@ -70,7 +70,7 @@ pub fn main() -> Result<(), String> {
 
                     renderer.set_viewport_size(size);
                     renderer.get_active_camera_mut()?.set_size(size);
-                    renderer.texts.get_mut(fps_text_id)?.set_position(Vec2::new(5.0, window_size.y - 0.0));
+                    renderer.texts.get_mut(fps_text_id)?.position = Vec2::new(5.0, window_size.y - 0.0);
                 }
                 InputEvent::WindowClosed => {
                     is_running = false;
@@ -97,7 +97,7 @@ pub fn main() -> Result<(), String> {
             }
 
             cell.position += cell.velocity;
-            sprite.set_position(cell.position);
+            sprite.position = cell.position;
             sprite.update();
 
             renderer.batcher_add_drawable(DrawableEnum::Rectangle, cell.sprite_id)?;
@@ -105,7 +105,7 @@ pub fn main() -> Result<(), String> {
 
         if now.elapsed().as_millis() >= 1000 {
             let fps_text = renderer.texts.get_mut(fps_text_id)?;
-            fps_text.set_text(&format!("FPS:{frames}"));
+            fps_text.text = format!("FPS:{frames}");
             fps_text.update();
 
             now = Instant::now();

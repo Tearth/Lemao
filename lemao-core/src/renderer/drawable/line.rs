@@ -14,18 +14,17 @@ pub struct Line {
     pub id: usize,
     pub(crate) shape_id: usize,
     pub(crate) shape_vao_gl_id: u32,
-    pub(crate) texture_id: usize,
     pub(crate) texture_gl_id: u32,
     gl: Rc<OpenGLPointers>,
 
-    position: Vec2,
-    scale: Vec2,
-    rotation: f32,
-    size: Vec2,
-    color: Color,
-    from: Vec2,
-    to: Vec2,
-    thickness: f32,
+    pub position: Vec2,
+    pub scale: Vec2,
+    pub rotation: f32,
+    pub size: Vec2,
+    pub color: Color,
+    pub from: Vec2,
+    pub to: Vec2,
+    pub thickness: f32,
 }
 
 impl Line {
@@ -34,7 +33,6 @@ impl Line {
             id: 0,
             shape_id: shape.id,
             shape_vao_gl_id: shape.vao_gl_id,
-            texture_id: texture.id,
             texture_gl_id: texture.texture_gl_id,
             gl: renderer.gl.clone(),
 
@@ -49,96 +47,6 @@ impl Line {
         }
     }
 
-    pub fn get_texture_id(&self) -> usize {
-        self.texture_id
-    }
-
-    pub fn get_from(&self) -> Vec2 {
-        self.from
-    }
-
-    pub fn set_from(&mut self, from: Vec2) {
-        self.from = from;
-    }
-
-    pub fn get_to(&self) -> Vec2 {
-        self.to
-    }
-
-    pub fn set_to(&mut self, to: Vec2) {
-        self.to = to;
-    }
-
-    pub fn get_thickness(&self) -> f32 {
-        self.thickness
-    }
-
-    pub fn set_thickness(&mut self, thickness: f32) {
-        self.thickness = thickness;
-    }
-
-    pub fn update(&mut self) {
-        self.position = self.from;
-        self.rotation = Vec2::new(0.0, 1.0).signed_angle(self.to - self.from);
-        self.size = Vec2::new(self.thickness, self.from.distance(self.to) + 1.0);
-    }
-
-    pub fn get_position(&self) -> Vec2 {
-        self.position
-    }
-
-    pub fn set_position(&mut self, position: Vec2) {
-        self.position = position;
-    }
-
-    pub fn move_delta(&mut self, delta: Vec2) {
-        self.position += delta;
-    }
-
-    pub fn get_scale(&self) -> Vec2 {
-        self.scale
-    }
-
-    pub fn set_scale(&mut self, scale: Vec2) {
-        self.scale = scale;
-    }
-
-    pub fn get_rotation(&self) -> f32 {
-        self.rotation
-    }
-
-    pub fn set_rotation(&mut self, rotation: f32) {
-        self.rotation = rotation;
-    }
-
-    pub fn rotate(&mut self, delta: f32) {
-        self.rotation += delta;
-    }
-
-    pub fn get_size(&self) -> Vec2 {
-        self.size
-    }
-
-    pub fn set_size(&mut self, size: Vec2) {
-        self.size = size;
-    }
-
-    pub fn get_anchor(&self) -> Vec2 {
-        panic!("")
-    }
-
-    pub fn set_anchor(&mut self, _anchor: Vec2) {
-        panic!("")
-    }
-
-    pub fn get_color(&self) -> &Color {
-        &self.color
-    }
-
-    pub fn set_color(&mut self, color: Color) {
-        self.color = color;
-    }
-
     pub fn get_transformation_matrix(&self) -> Mat4x4 {
         let translation = Mat4x4::translate(Vec3::from(self.position + Vec2::new(0.5, 0.5)));
         let anchor_offset = Mat4x4::translate(Vec3::new(0.0, -0.5, 0.0));
@@ -149,6 +57,12 @@ impl Line {
 
     pub fn get_batch(&self) -> Batch {
         Batch::new(Some(self.shape_id), None, None, Some(self.texture_gl_id), Some(&self.color))
+    }
+
+    pub fn update(&mut self) {
+        self.position = self.from;
+        self.rotation = Vec2::new(0.0, 1.0).signed_angle(self.to - self.from);
+        self.size = Vec2::new(self.thickness, self.from.distance(self.to) + 1.0);
     }
 
     pub fn draw(&mut self, shader: &Shader) -> Result<(), String> {

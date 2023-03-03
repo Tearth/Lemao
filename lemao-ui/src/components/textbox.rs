@@ -619,11 +619,11 @@ impl Component for TextBox {
 
         if self.border_thickness != Default::default() {
             let border = renderer.frames.get_mut(self.border_id)?;
-            border.set_position(self.screen_position);
-            border.set_size(self.screen_size);
-            border.set_color(self.border_color.clone());
-            border.set_thickness(self.border_thickness.into());
-            border.set_corner_rounding(self.corner_rounding.into());
+            border.position = self.screen_position;
+            border.size = self.screen_size;
+            border.color = self.border_color.clone();
+            border.thickness = self.border_thickness.into();
+            border.corner_rounding = self.corner_rounding.into();
             border.update();
 
             self.screen_position += Vec2::new(self.border_thickness.left, self.border_thickness.bottom);
@@ -634,10 +634,10 @@ impl Component for TextBox {
         }
 
         let filling = renderer.rectangles.get_mut(self.filling_id)?;
-        filling.set_position(self.screen_position);
-        filling.set_color(self.color.clone());
-        filling.set_size(self.screen_size);
-        filling.set_corner_rounding(self.corner_rounding.into());
+        filling.position = self.screen_position;
+        filling.color = self.color.clone();
+        filling.size = self.screen_size;
+        filling.corner_rounding = self.corner_rounding.into();
 
         if let Some(texture_id) = self.texture_id {
             filling.set_texture(renderer.textures.get(texture_id)?)
@@ -660,20 +660,20 @@ impl Component for TextBox {
         let font = renderer.fonts.get(self.label_font_id)?;
         let label = renderer.texts.get_mut(self.label_id)?;
         label.set_font(font);
-        label.set_text(&self.label_text);
-        label.set_color(self.label_color.clone());
-        label.set_position((horizontal_position + vertical_position + self.label_offset).floor());
-        label.set_anchor(horizontal_anchor + vertical_anchor);
+        label.text = self.label_text.clone();
+        label.color = self.label_color.clone();
+        label.position = (horizontal_position + vertical_position + self.label_offset).floor();
+        label.anchor = horizontal_anchor + vertical_anchor;
         label.update();
 
         if self.shadow_enabled {
             let shadow = renderer.rectangles.get_mut(self.shadow_id)?;
-            shadow.set_position(self.screen_position + self.screen_size / 2.0 + self.shadow_offset);
-            shadow.set_size(self.screen_size);
-            shadow.set_anchor(Vec2::new(0.5, 0.5));
-            shadow.set_color(self.shadow_color.clone());
-            shadow.set_scale(self.shadow_scale);
-            shadow.set_corner_rounding(self.shadow_corner_rounding.into());
+            shadow.position = self.screen_position + self.screen_size / 2.0 + self.shadow_offset;
+            shadow.size = self.screen_size;
+            shadow.anchor = Vec2::new(0.5, 0.5);
+            shadow.color = self.shadow_color.clone();
+            shadow.scale = self.shadow_scale;
+            shadow.corner_rounding = self.shadow_corner_rounding.into();
             shadow.update();
         }
 
@@ -690,16 +690,16 @@ impl Component for TextBox {
 
         if self.label_shadow_enabled {
             let drawable = renderer.texts.get_mut(self.label_id)?;
-            let original_position = drawable.get_position();
-            let original_color = drawable.get_color().clone();
+            let original_position = drawable.position;
+            let original_color = drawable.color.clone();
 
-            drawable.set_position(original_position + self.label_shadow_offset);
-            drawable.set_color(self.label_shadow_color.clone());
+            drawable.position = original_position + self.label_shadow_offset;
+            drawable.color = self.label_shadow_color.clone();
             renderer.draw(DrawableEnum::Text, self.label_id)?;
 
             let drawable = renderer.texts.get_mut(self.label_id)?;
-            drawable.set_position(original_position);
-            drawable.set_color(original_color);
+            drawable.position = original_position;
+            drawable.color = original_color;
         }
 
         renderer.draw(DrawableEnum::Text, self.label_id)?;
