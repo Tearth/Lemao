@@ -10,7 +10,6 @@ use lemao_core::lemao_common_platform::input::MouseButton;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::context::RendererContext;
 use lemao_core::renderer::drawable::Color;
-use lemao_core::renderer::drawable::Drawable;
 use lemao_core::renderer::drawable::DrawableEnum;
 use std::any::Any;
 
@@ -325,6 +324,7 @@ impl Component for Wire {
             line.set_to(self.screen_position + chunk_data.to * self.screen_size);
             line.set_color(chunk_data.color.clone());
             line.set_thickness(chunk_data.thickness);
+            line.update();
             self.chunks.push(chunk);
         }
 
@@ -367,7 +367,7 @@ impl Component for Wire {
 
 impl WireChunk {
     pub fn new(renderer: &mut RendererContext) -> Result<Self, String> {
-        Ok(Self { line_id: renderer.create_line()?.id })
+        Ok(Self { line_id: renderer.create_line()? })
     }
 }
 

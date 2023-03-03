@@ -11,7 +11,6 @@ use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::context::RendererContext;
 use lemao_core::renderer::drawable::Color;
-use lemao_core::renderer::drawable::Drawable;
 use lemao_core::renderer::drawable::DrawableEnum;
 use std::any::Any;
 
@@ -76,7 +75,7 @@ impl Label {
             event_mask: None,
 
             // Label properties
-            label_id: renderer.create_text(label_font_id)?.id,
+            label_id: renderer.create_text(label_font_id)?,
             label_font_id,
             label_text: Default::default(),
             label_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
@@ -353,6 +352,7 @@ impl Component for Label {
         // We have to set text first, to get the size used later
         let label = renderer.texts.get_mut(self.label_id)?;
         let mut label_text_processed = self.label_text.clone();
+
         if self.multiline {
             let mut line = String::new();
             let mut result = String::new();
@@ -370,14 +370,12 @@ impl Component for Label {
             label_text_processed = result + &line;
         }
 
-        let font_storage = renderer.fonts.clone();
-        let font_storage = font_storage.read().unwrap();
-        let font = font_storage.get(self.label_font_id)?;
-        renderer.texts.get_mut(self.label_id)?.set_font(font);
-        renderer.texts.get_mut(self.label_id)?.set_text(&label_text_processed);
-        renderer.texts.get_mut(self.label_id)?.update();
+        let font = renderer.fonts.get(self.label_font_id)?;
+        label.set_font(font);
+        label.set_text(&label_text_processed);
+        label.update();
 
-        self.screen_size = renderer.texts.get_mut(self.label_id)?.get_size();
+        self.screen_size = label.get_size();
         self.size = ComponentSize::Absolute(self.screen_size);
 
         self.screen_position = match self.position {
@@ -397,6 +395,7 @@ impl Component for Label {
         let label = renderer.texts.get_mut(self.label_id)?;
         label.set_position(self.screen_position);
         label.set_color(self.label_color.clone());
+        label.update();
 
         self.dirty = false;
 

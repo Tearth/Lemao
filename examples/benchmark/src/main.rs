@@ -2,12 +2,7 @@ use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_common_platform::window::WindowStyle;
 use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
-use lemao_core::renderer::drawable::Drawable;
 use lemao_core::renderer::drawable::DrawableEnum;
-use lemao_core::renderer::fonts::bff;
-use lemao_core::renderer::fonts::Font;
-use lemao_core::renderer::textures::bmp;
-use lemao_core::renderer::textures::Texture;
 use lemao_core::window::context::WindowContext;
 use std::time::Instant;
 
@@ -36,32 +31,25 @@ pub fn main() -> Result<(), String> {
     let mut renderer = window.create_renderer()?;
     renderer.set_swap_interval(0);
 
-    let texture_storage = renderer.textures.clone();
-    let mut texture_storage = texture_storage.write().unwrap();
-    let cell_texture_id = texture_storage.store(Texture::new(&renderer, &bmp::load("./assets/cell.bmp")?)?);
+    let cell_texture_id = renderer.create_texture("./assets/cell.bmp")?;
+    let font_id = renderer.create_font("./assets/inconsolata.bff")?;
 
-    drop(texture_storage);
-
-    let font_storage = renderer.fonts.clone();
-    let mut font_storage = font_storage.write().unwrap();
-    let font_id = font_storage.store(Font::new(&renderer, &bff::load("./assets/inconsolata.bff")?)?);
-
-    drop(font_storage);
-
-    let fps_text = renderer.create_text(font_id)?;
-    let fps_text_id = fps_text.id;
+    let fps_text_id = renderer.create_text(font_id)?;
+    let fps_text = renderer.texts.get_mut(fps_text_id)?;
     fps_text.set_text("FPS:0");
     fps_text.set_anchor(Vec2::new(0.0, 1.0));
+    fps_text.update();
 
     let mut cells = Vec::new();
-    let texture_storage = renderer.textures.clone();
-    let texture_storage = texture_storage.read().unwrap();
 
     for _ in 0..CELLS_COUNT {
-        let sprite = renderer.create_rectangle()?;
-        let sprite_id = sprite.id;
-        sprite.set_texture(texture_storage.get(cell_texture_id)?);
+        let sprite_id = renderer.create_rectangle()?;
+        let sprite = renderer.rectangles.get_mut(sprite_id)?;
+        let cell_texture = renderer.textures.get(cell_texture_id)?;
+
         sprite.set_anchor(Vec2::new(0.5, 0.5));
+        sprite.set_size(cell_texture.get_size());
+        sprite.set_texture(cell_texture);
 
         cells.push(CellData {
             sprite_id,
@@ -69,8 +57,6 @@ pub fn main() -> Result<(), String> {
             velocity: Vec2 { x: MAX_SPEED * (fastrand::f32() * 2.0 - 1.0), y: MAX_SPEED * (fastrand::f32() * 2.0 - 1.0) },
         });
     }
-
-    drop(texture_storage);
 
     let mut now = Instant::now();
     let mut frames = 0;
@@ -112,11 +98,16 @@ pub fn main() -> Result<(), String> {
 
             cell.position += cell.velocity;
             sprite.set_position(cell.position);
+            sprite.update();
+
             renderer.batcher_add_drawable(DrawableEnum::Rectangle, cell.sprite_id)?;
         }
 
         if now.elapsed().as_millis() >= 1000 {
-            renderer.texts.get_mut(fps_text_id)?.set_text(&format!("FPS:{frames}"));
+            let fps_text = renderer.texts.get_mut(fps_text_id)?;
+            fps_text.set_text(&format!("FPS:{frames}"));
+            fps_text.update();
+
             now = Instant::now();
             frames = 0;
         }

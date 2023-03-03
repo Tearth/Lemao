@@ -8,14 +8,15 @@ use super::drawable::rectangle::Rectangle;
 use super::drawable::text::Text;
 use super::drawable::tilemap::Tilemap;
 use super::drawable::Color;
-use super::drawable::Drawable;
 use super::drawable::DrawableEnum;
+use super::fonts::bff;
 use super::fonts::Font;
 use super::shaders::Shader;
 use super::shaders::DEFAULT_VERTEX_SHADER;
 use super::shaders::GRADIENT_FRAGMENT_SHADER;
 use super::shaders::SOLID_FRAGMENT_SHADER;
 use super::shapes::Shape;
+use super::textures::bmp;
 use super::textures::RawTexture;
 use super::textures::Texture;
 use crate::utils::storage::Storage;
@@ -28,8 +29,6 @@ use lemao_opengl::pointers::OpenGLPointers;
 use std::ffi::c_void;
 use std::fs;
 use std::rc::Rc;
-use std::sync::Arc;
-use std::sync::RwLock;
 
 pub struct RendererContext {
     pub(crate) gl: Rc<OpenGLPointers>,
@@ -47,8 +46,9 @@ pub struct RendererContext {
     swap_interval: u32,
 
     renderer_platform_specific: Box<dyn RendererPlatformSpecific>,
-    pub textures: Arc<RwLock<Storage<Texture>>>,
-    pub fonts: Arc<RwLock<Storage<Font>>>,
+
+    pub textures: Storage<Texture>,
+    pub fonts: Storage<Font>,
     pub cameras: Storage<Camera>,
     pub shaders: Storage<Shader>,
 
@@ -82,6 +82,7 @@ impl RendererContext {
             swap_interval: 0,
 
             renderer_platform_specific,
+
             textures: Default::default(),
             fonts: Default::default(),
             shaders: Default::default(),
@@ -189,8 +190,8 @@ impl RendererContext {
 
     pub fn init_default_texture(&mut self) -> Result<(), String> {
         let texture = Texture::new(self, &RawTexture::new(Vec2::new(1.0, 1.0), vec![255, 255, 255, 255]))?;
-        self.default_texture_id = self.textures.write().unwrap().store(texture);
-        self.textures.write().unwrap().get_mut(self.default_texture_id)?.id = self.default_texture_id;
+        self.default_texture_id = self.textures.store(texture);
+        self.textures.get_mut(self.default_texture_id)?.id = self.default_texture_id;
 
         Ok(())
     }
@@ -207,6 +208,22 @@ impl RendererContext {
         unsafe {
             (self.gl.glViewport)(0, 0, size.x as i32, size.y as i32);
         }
+    }
+
+    pub fn create_texture(&mut self, path: &str) -> Result<usize, String> {
+        let texture = Texture::new(self, &bmp::load(path)?)?;
+        let id = self.textures.store(texture);
+        self.textures.get_mut(id)?.id = id;
+
+        Ok(id)
+    }
+
+    pub fn create_font(&mut self, path: &str) -> Result<usize, String> {
+        let font = Font::new(self, &bff::load(path)?)?;
+        let id = self.fonts.store(font);
+        self.fonts.get_mut(id)?.id = id;
+
+        Ok(id)
     }
 
     pub fn create_shader(&mut self, vertex_shader_path: &str, fragment_shader_path: &str) -> Result<usize, String> {
@@ -264,90 +281,83 @@ impl RendererContext {
         self.set_camera_as_active(self.default_camera_id)
     }
 
-    pub fn create_circle(&mut self) -> Result<&mut Circle, String> {
-        let texture_storage = self.textures.read().unwrap();
-        let texture = texture_storage.get(self.default_texture_id)?;
+    pub fn create_circle(&mut self) -> Result<usize, String> {
+        let texture = self.textures.get(self.default_texture_id)?;
         let circle = Circle::new(self, texture);
 
         let id = self.circles.store(circle);
         let circle = self.circles.get_mut(id)?;
         circle.id = id;
 
-        Ok(circle)
+        Ok(id)
     }
 
-    pub fn create_disc(&mut self) -> Result<&mut Disc, String> {
-        let texture_storage = self.textures.read().unwrap();
-        let texture = texture_storage.get(self.default_texture_id)?;
+    pub fn create_disc(&mut self) -> Result<usize, String> {
+        let texture = self.textures.get(self.default_texture_id)?;
         let disc = Disc::new(self, texture);
 
         let id = self.discs.store(disc);
         let disc = self.discs.get_mut(id)?;
         disc.id = id;
 
-        Ok(disc)
+        Ok(id)
     }
 
-    pub fn create_frame(&mut self) -> Result<&mut Frame, String> {
-        let texture_storage = self.textures.read().unwrap();
-        let texture = texture_storage.get(self.default_texture_id)?;
+    pub fn create_frame(&mut self) -> Result<usize, String> {
+        let texture = self.textures.get(self.default_texture_id)?;
         let frame = Frame::new(self, texture);
 
         let id = self.frames.store(frame);
         let frame = self.frames.get_mut(id)?;
         frame.id = id;
 
-        Ok(frame)
+        Ok(id)
     }
 
-    pub fn create_line(&mut self) -> Result<&mut Line, String> {
+    pub fn create_line(&mut self) -> Result<usize, String> {
         let shape = self.shapes.get(self.default_line_shape_id)?;
-        let texture_storage = self.textures.read().unwrap();
-        let texture = texture_storage.get(self.default_texture_id)?;
+        let texture = self.textures.get(self.default_texture_id)?;
         let line = Line::new(self, shape, texture);
 
         let id = self.lines.store(line);
         let line = self.lines.get_mut(id)?;
         line.id = id;
 
-        Ok(line)
+        Ok(id)
     }
 
-    pub fn create_rectangle(&mut self) -> Result<&mut Rectangle, String> {
+    pub fn create_rectangle(&mut self) -> Result<usize, String> {
         let shape = self.shapes.get(self.default_rectangle_shape_id)?;
-        let texture_storage = self.textures.read().unwrap();
-        let texture = texture_storage.get(self.default_texture_id)?;
+        let texture = self.textures.get(self.default_texture_id)?;
         let rectangle = Rectangle::new(self, shape, texture);
 
         let id = self.rectangles.store(rectangle);
         let rectangle = self.rectangles.get_mut(id)?;
         rectangle.id = id;
 
-        Ok(rectangle)
+        Ok(id)
     }
 
-    pub fn create_text(&mut self, font_id: usize) -> Result<&mut Text, String> {
-        let font_storage = self.fonts.read().unwrap();
-        let font = font_storage.get(font_id)?;
+    pub fn create_text(&mut self, font_id: usize) -> Result<usize, String> {
+        let font = self.fonts.get(font_id)?;
         let text = Text::new(self, font);
 
         let id = self.texts.store(text);
         let text = self.texts.get_mut(id)?;
         text.id = id;
 
-        Ok(text)
+        Ok(id)
     }
 
-    pub fn create_tilemap(&mut self, texture_id: usize) -> Result<&mut Tilemap, String> {
-        let texture_storage = self.textures.read().unwrap();
-        let texture = texture_storage.get(texture_id)?;
+    pub fn create_tilemap(&mut self, texture_id: usize) -> Result<usize, String> {
+        let texture = self.textures.get(texture_id)?;
         let tilemap = Tilemap::new(self, texture);
 
         let id = self.tilemaps.store(tilemap);
         let tilemap = self.tilemaps.get_mut(id)?;
         tilemap.id = id;
 
-        Ok(tilemap)
+        Ok(id)
     }
 
     pub fn enable_scissor(&self, position: Vec2, size: Vec2) {

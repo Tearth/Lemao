@@ -6,7 +6,6 @@ use lemao_math::vec2::Vec2;
 use lemao_math::vec3::Vec3;
 use lemao_opengl::bindings::opengl;
 use lemao_opengl::pointers::OpenGLPointers;
-use std::any::Any;
 use std::ffi::c_void;
 use std::mem;
 use std::ptr;
@@ -34,7 +33,6 @@ pub struct Disc {
     elements_count: u32,
     vertices: Vec<f32>,
     indices: Vec<u32>,
-    dirty: bool,
 }
 
 impl Disc {
@@ -61,7 +59,6 @@ impl Disc {
             elements_count: 0,
             vertices: Vec::new(),
             indices: Vec::new(),
-            dirty: true,
         };
 
         unsafe {
@@ -102,7 +99,6 @@ impl Disc {
 
     pub fn set_sides(&mut self, sides: u32) {
         self.sides = sides;
-        self.dirty = true;
     }
 
     pub fn get_start_angle(&self) -> f32 {
@@ -111,7 +107,6 @@ impl Disc {
 
     pub fn set_start_angle(&mut self, angle: f32) {
         self.start_angle = angle;
-        self.dirty = true;
     }
 
     pub fn get_end_angle(&self) -> f32 {
@@ -120,7 +115,6 @@ impl Disc {
 
     pub fn set_end_angle(&mut self, angle: f32) {
         self.end_angle = angle;
-        self.dirty = true;
     }
 
     pub fn get_squircle_factor(&self) -> f32 {
@@ -129,7 +123,6 @@ impl Disc {
 
     pub fn set_squircle_factor(&mut self, squircle_factor: f32) {
         self.squircle_factor = squircle_factor;
-        self.dirty = true;
     }
 
     pub fn update(&mut self) {
@@ -197,8 +190,6 @@ impl Disc {
 
             (self.gl.glBindBuffer)(opengl::GL_ELEMENT_ARRAY_BUFFER, self.ebo_gl_id);
             (self.gl.glBufferData)(opengl::GL_ELEMENT_ARRAY_BUFFER, indices_size, indices_ptr, opengl::GL_STATIC_DRAW);
-
-            self.dirty = false;
         }
     }
 
@@ -216,67 +207,64 @@ impl Disc {
             /* t.v */ uv.y,
         ]
     }
-}
 
-impl Drawable for Disc {
-    fn get_position(&self) -> Vec2 {
+    pub fn get_position(&self) -> Vec2 {
         self.position
     }
 
-    fn set_position(&mut self, position: Vec2) {
+    pub fn set_position(&mut self, position: Vec2) {
         self.position = position;
     }
 
-    fn move_delta(&mut self, delta: Vec2) {
+    pub fn move_delta(&mut self, delta: Vec2) {
         self.position += delta;
     }
 
-    fn get_scale(&self) -> Vec2 {
+    pub fn get_scale(&self) -> Vec2 {
         self.scale
     }
 
-    fn set_scale(&mut self, scale: Vec2) {
+    pub fn set_scale(&mut self, scale: Vec2) {
         self.scale = scale;
     }
 
-    fn get_rotation(&self) -> f32 {
+    pub fn get_rotation(&self) -> f32 {
         self.rotation
     }
 
-    fn set_rotation(&mut self, rotation: f32) {
+    pub fn set_rotation(&mut self, rotation: f32) {
         self.rotation = rotation;
     }
 
-    fn rotate(&mut self, delta: f32) {
+    pub fn rotate(&mut self, delta: f32) {
         self.rotation += delta;
     }
 
-    fn get_size(&self) -> Vec2 {
+    pub fn get_size(&self) -> Vec2 {
         self.size
     }
 
-    fn set_size(&mut self, size: Vec2) {
+    pub fn set_size(&mut self, size: Vec2) {
         self.size = size;
-        self.dirty = true;
     }
 
-    fn get_anchor(&self) -> Vec2 {
+    pub fn get_anchor(&self) -> Vec2 {
         self.anchor
     }
 
-    fn set_anchor(&mut self, anchor: Vec2) {
+    pub fn set_anchor(&mut self, anchor: Vec2) {
         self.anchor = anchor;
     }
 
-    fn get_color(&self) -> &Color {
+    pub fn get_color(&self) -> &Color {
         &self.color
     }
 
-    fn set_color(&mut self, color: Color) {
+    pub fn set_color(&mut self, color: Color) {
         self.color = color;
     }
 
-    fn get_transformation_matrix(&self) -> Mat4x4 {
+    pub fn get_transformation_matrix(&self) -> Mat4x4 {
         let translation = Mat4x4::translate(Vec3::from(self.position));
         let anchor_offset = Mat4x4::translate(-Vec3::from(self.anchor * self.size).floor());
         let scale = Mat4x4::scale(Vec3::from(self.scale));
@@ -284,15 +272,11 @@ impl Drawable for Disc {
         translation * rotation * scale * anchor_offset
     }
 
-    fn get_batch(&self) -> Batch {
+    pub fn get_batch(&self) -> Batch {
         Batch::new(None, Some(&self.vertices), Some(&self.indices), Some(self.texture_gl_id), Some(&self.color))
     }
 
-    fn draw(&mut self, shader: &Shader) -> Result<(), String> {
-        if self.dirty {
-            self.update();
-        }
-
+    pub fn draw(&mut self, shader: &Shader) -> Result<(), String> {
         unsafe {
             let model = self.get_transformation_matrix();
 
@@ -305,14 +289,6 @@ impl Drawable for Disc {
 
             Ok(())
         }
-    }
-
-    fn as_any(&self) -> &dyn Any {
-        self
-    }
-
-    fn as_any_mut(&mut self) -> &mut dyn Any {
-        self
     }
 }
 

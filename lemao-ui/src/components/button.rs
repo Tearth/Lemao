@@ -16,7 +16,6 @@ use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::context::RendererContext;
 use lemao_core::renderer::drawable::Color;
-use lemao_core::renderer::drawable::Drawable;
 use lemao_core::renderer::drawable::DrawableEnum;
 use lemao_core::renderer::textures::Texture;
 use std::any::Any;
@@ -112,8 +111,8 @@ impl Button {
 
             // Shape properties
             filling_id: match shape {
-                ComponentShape::Rectangle => renderer.create_rectangle()?.id,
-                ComponentShape::Disc => renderer.create_disc()?.id,
+                ComponentShape::Rectangle => renderer.create_rectangle()?,
+                ComponentShape::Disc => renderer.create_disc()?,
             },
             shape,
             color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
@@ -123,14 +122,14 @@ impl Button {
 
             // Border properties
             border_id: match shape {
-                ComponentShape::Rectangle => renderer.create_frame()?.id,
-                ComponentShape::Disc => renderer.create_circle()?.id,
+                ComponentShape::Rectangle => renderer.create_frame()?,
+                ComponentShape::Disc => renderer.create_circle()?,
             },
             border_thickness: Default::default(),
             border_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
 
             // Label properties
-            label_id: renderer.create_text(label_font_id)?.id,
+            label_id: renderer.create_text(label_font_id)?,
             label_font_id,
             label_text: Default::default(),
             label_horizontal_alignment: HorizontalAlignment::Middle,
@@ -140,8 +139,8 @@ impl Button {
 
             // Shadow properties
             shadow_id: match shape {
-                ComponentShape::Rectangle => renderer.create_rectangle()?.id,
-                ComponentShape::Disc => renderer.create_disc()?.id,
+                ComponentShape::Rectangle => renderer.create_rectangle()?,
+                ComponentShape::Disc => renderer.create_disc()?,
             },
             shadow_enabled: false,
             shadow_offset: Default::default(),
@@ -642,18 +641,23 @@ impl Component for Button {
         if self.border_thickness != Default::default() {
             match self.shape {
                 ComponentShape::Rectangle => {
-                    let border_rectangle = renderer.frames.get_mut(self.border_id)?;
-                    border_rectangle.set_position(self.screen_position);
-                    border_rectangle.set_size(self.screen_size);
-                    border_rectangle.set_color(self.border_color.clone());
-                    border_rectangle.set_thickness(self.border_thickness.into());
+                    let border = renderer.frames.get_mut(self.border_id)?;
+                    border.set_position(self.screen_position);
+                    border.set_size(self.screen_size);
+                    border.set_color(self.border_color.clone());
+                    border.set_thickness(self.border_thickness.into());
+                    border.set_corner_rounding(self.corner_rounding.into());
+
+                    border.update();
                 }
                 ComponentShape::Disc => {
-                    let border_rectangle = renderer.circles.get_mut(self.border_id)?;
-                    border_rectangle.set_position(self.screen_position);
-                    border_rectangle.set_size(self.screen_size);
-                    border_rectangle.set_color(self.border_color.clone());
-                    border_rectangle.set_thickness(Vec2::new(self.border_thickness.left, self.border_thickness.top));
+                    let border = renderer.circles.get_mut(self.border_id)?;
+                    border.set_position(self.screen_position);
+                    border.set_size(self.screen_size);
+                    border.set_color(self.border_color.clone());
+                    border.set_thickness(Vec2::new(self.border_thickness.left, self.border_thickness.top));
+
+                    border.update();
                 }
             }
 
@@ -670,38 +674,53 @@ impl Component for Button {
                 filling.set_position(self.screen_position);
                 filling.set_color(self.color.clone());
                 filling.set_size(self.screen_size);
+                filling.set_corner_rounding(self.corner_rounding.into());
+
+                if let Some(texture_id) = self.texture_id {
+                    filling.set_texture(renderer.textures.get(texture_id)?)
+                }
+
+                filling.update();
             }
             ComponentShape::Disc => {
                 let filling = renderer.discs.get_mut(self.filling_id)?;
                 filling.set_position(self.screen_position);
                 filling.set_color(self.color.clone());
                 filling.set_size(self.screen_size);
+
+                if let Some(texture_id) = self.texture_id {
+                    filling.set_texture(renderer.textures.get(texture_id)?)
+                }
+
+                filling.update();
             }
         };
 
-        if let Some(texture_id) = self.texture_id {
-            let texture_storage = renderer.textures.clone();
-            let texture_storage = texture_storage.read().unwrap();
-            let texture = texture_storage.get(texture_id)?;
-
+        if self.shadow_enabled {
             match self.shape {
-                ComponentShape::Rectangle => renderer.rectangles.get_mut(self.filling_id)?.set_texture(texture),
-                ComponentShape::Disc => renderer.discs.get_mut(self.filling_id)?.set_texture(texture),
+                ComponentShape::Rectangle => {
+                    let shadow = renderer.rectangles.get_mut(self.shadow_id)?;
+                    shadow.set_position(self.screen_position + self.screen_size / 2.0 + self.shadow_offset);
+                    shadow.set_size(self.screen_size);
+                    shadow.set_anchor(Vec2::new(0.5, 0.5));
+                    shadow.set_color(self.shadow_color.clone());
+                    shadow.set_scale(self.shadow_scale);
+                    shadow.set_corner_rounding(self.shadow_corner_rounding.into());
+
+                    shadow.update();
+                }
+                ComponentShape::Disc => {
+                    let shadow = renderer.discs.get_mut(self.shadow_id)?;
+                    shadow.set_position(self.screen_position + self.screen_size / 2.0 + self.shadow_offset);
+                    shadow.set_size(self.screen_size);
+                    shadow.set_anchor(Vec2::new(0.5, 0.5));
+                    shadow.set_color(self.shadow_color.clone());
+                    shadow.set_scale(self.shadow_scale);
+
+                    shadow.update();
+                }
             };
         }
-
-        if self.shape == ComponentShape::Rectangle {
-            renderer.rectangles.get_mut(self.filling_id)?.set_corner_rounding(self.corner_rounding.into());
-            renderer.frames.get_mut(self.border_id)?.set_corner_rounding(self.corner_rounding.into());
-        }
-
-        let font_storage = renderer.fonts.clone();
-        let font_storage = font_storage.read().unwrap();
-        let font = font_storage.get(self.label_font_id)?;
-        let label = renderer.texts.get_mut(self.label_id)?;
-        label.set_font(font);
-        label.set_text(&self.label_text);
-        label.set_color(self.label_color.clone());
 
         let (horizontal_position, horizontal_anchor) = match self.label_horizontal_alignment {
             HorizontalAlignment::Left => (Vec2::new(self.screen_position.x, 0.0), Vec2::new(0.0, 0.0)),
@@ -715,30 +734,14 @@ impl Component for Button {
             VerticalAlignment::Bottom => (Vec2::new(0.0, self.screen_position.y + self.screen_size.y), Vec2::new(0.0, 1.0)),
         };
 
+        let font = renderer.fonts.get(self.label_font_id)?;
+        let label = renderer.texts.get_mut(self.label_id)?;
+        label.set_font(font);
+        label.set_text(&self.label_text);
+        label.set_color(self.label_color.clone());
         label.set_position(horizontal_position + vertical_position + self.label_offset);
         label.set_anchor(horizontal_anchor + vertical_anchor);
-
-        if self.shadow_enabled {
-            match self.shape {
-                ComponentShape::Rectangle => {
-                    let shadow = renderer.rectangles.get_mut(self.shadow_id)?;
-                    shadow.set_position(self.screen_position + self.screen_size / 2.0 + self.shadow_offset);
-                    shadow.set_size(self.screen_size);
-                    shadow.set_anchor(Vec2::new(0.5, 0.5));
-                    shadow.set_color(self.shadow_color.clone());
-                    shadow.set_scale(self.shadow_scale);
-                    shadow.set_corner_rounding(self.shadow_corner_rounding.into());
-                }
-                ComponentShape::Disc => {
-                    let shadow = renderer.discs.get_mut(self.shadow_id)?;
-                    shadow.set_position(self.screen_position + self.screen_size / 2.0 + self.shadow_offset);
-                    shadow.set_size(self.screen_size);
-                    shadow.set_anchor(Vec2::new(0.5, 0.5));
-                    shadow.set_color(self.shadow_color.clone());
-                    shadow.set_scale(self.shadow_scale);
-                }
-            };
-        }
+        label.update();
 
         self.dirty = false;
 

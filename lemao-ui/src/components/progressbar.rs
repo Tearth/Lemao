@@ -15,7 +15,6 @@ use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::context::RendererContext;
 use lemao_core::renderer::drawable::Color;
-use lemao_core::renderer::drawable::Drawable;
 use lemao_core::renderer::drawable::DrawableEnum;
 use lemao_core::renderer::textures::Texture;
 use std::any::Any;
@@ -125,19 +124,19 @@ impl ProgressBar {
             event_mask: None,
 
             // Shape properties
-            filling_id: renderer.create_rectangle()?.id,
+            filling_id: renderer.create_rectangle()?,
             color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             corner_rounding: Default::default(),
             texture_id: None,
             texture_original_size: Default::default(),
 
             // Border properties
-            border_id: renderer.create_frame()?.id,
+            border_id: renderer.create_frame()?,
             border_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             border_thickness: Default::default(),
 
             // Label properties
-            label_id: renderer.create_text(label_font_id)?.id,
+            label_id: renderer.create_text(label_font_id)?,
             label_font_id,
             label_text: Default::default(),
             label_horizontal_alignment: HorizontalAlignment::Middle,
@@ -146,7 +145,7 @@ impl ProgressBar {
             label_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
 
             // Shadow properties
-            shadow_id: renderer.create_rectangle()?.id,
+            shadow_id: renderer.create_rectangle()?,
             shadow_enabled: false,
             shadow_offset: Default::default(),
             shadow_color: Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 1.0)),
@@ -646,11 +645,13 @@ impl Component for ProgressBar {
         self.screen_position = self.screen_position.floor();
 
         if self.border_thickness != Default::default() {
-            let border_rectangle = renderer.frames.get_mut(self.border_id)?;
-            border_rectangle.set_position(self.screen_position);
-            border_rectangle.set_size(self.screen_size);
-            border_rectangle.set_color(self.border_color.clone());
-            border_rectangle.set_thickness(self.border_thickness.into());
+            let border = renderer.frames.get_mut(self.border_id)?;
+            border.set_position(self.screen_position);
+            border.set_size(self.screen_size);
+            border.set_color(self.border_color.clone());
+            border.set_thickness(self.border_thickness.into());
+            border.set_corner_rounding(self.corner_rounding.into());
+            border.update();
 
             self.screen_position += Vec2::new(self.border_thickness.left, self.border_thickness.bottom);
             self.screen_size -= Vec2::new(self.border_thickness.left + self.border_thickness.right, self.border_thickness.top + self.border_thickness.bottom);
@@ -659,29 +660,17 @@ impl Component for ProgressBar {
             self.screen_position = self.screen_position.floor();
         }
 
-        let filling_rectangle = renderer.rectangles.get_mut(self.filling_id)?;
-        filling_rectangle.set_position(self.screen_position);
-        filling_rectangle.set_color(self.color.clone());
-        filling_rectangle.set_size(self.screen_size);
+        let filling = renderer.rectangles.get_mut(self.filling_id)?;
+        filling.set_position(self.screen_position);
+        filling.set_color(self.color.clone());
+        filling.set_size(self.screen_size);
+        filling.set_corner_rounding(self.corner_rounding.into());
 
         if let Some(texture_id) = self.texture_id {
-            let texture_storage = renderer.textures.clone();
-            let texture_storage = texture_storage.read().unwrap();
-            let texture = texture_storage.get(texture_id)?;
-
-            renderer.rectangles.get_mut(self.filling_id)?.set_texture(texture)
+            filling.set_texture(renderer.textures.get(texture_id)?)
         }
 
-        renderer.rectangles.get_mut(self.filling_id)?.set_corner_rounding(self.corner_rounding.into());
-        renderer.frames.get_mut(self.border_id)?.set_corner_rounding(self.corner_rounding.into());
-
-        let font_storage = renderer.fonts.clone();
-        let font_storage = font_storage.read().unwrap();
-        let font = font_storage.get(self.label_font_id)?;
-        let label = renderer.texts.get_mut(self.label_id)?;
-        label.set_font(font);
-        label.set_text(&self.label_text);
-        label.set_color(self.label_color.clone());
+        filling.update();
 
         let (horizontal_position, horizontal_anchor) = match self.label_horizontal_alignment {
             HorizontalAlignment::Left => (Vec2::new(self.screen_position.x, 0.0), Vec2::new(0.0, 0.0)),
@@ -695,8 +684,14 @@ impl Component for ProgressBar {
             VerticalAlignment::Bottom => (Vec2::new(0.0, self.screen_position.y + self.screen_size.y), Vec2::new(0.0, 1.0)),
         };
 
+        let font = renderer.fonts.get(self.label_font_id)?;
+        let label = renderer.texts.get_mut(self.label_id)?;
+        label.set_font(font);
+        label.set_text(&self.label_text);
+        label.set_color(self.label_color.clone());
         label.set_position((horizontal_position + vertical_position + self.label_offset).floor());
         label.set_anchor(horizontal_anchor + vertical_anchor);
+        label.update();
 
         if self.shadow_enabled {
             let shadow = renderer.rectangles.get_mut(self.shadow_id)?;
@@ -706,15 +701,17 @@ impl Component for ProgressBar {
             shadow.set_color(self.shadow_color.clone());
             shadow.set_scale(self.shadow_scale);
             shadow.set_corner_rounding(self.shadow_corner_rounding.into());
+            shadow.update();
         }
 
         for bar in &mut self.bars {
             if bar.visible {
-                let filling_rectangle = renderer.rectangles.get_mut(bar.filling_id)?;
-                filling_rectangle.set_position(Vec2::new(self.screen_position.x + self.screen_size.x * bar.from, self.screen_position.y));
-                filling_rectangle.set_size(Vec2::new((bar.to - bar.from) * self.screen_size.x, self.screen_size.y));
-                filling_rectangle.set_color(bar.color.clone());
-                filling_rectangle.set_corner_rounding(bar.corner_rounding.into());
+                let filling = renderer.rectangles.get_mut(bar.filling_id)?;
+                filling.set_position(Vec2::new(self.screen_position.x + self.screen_size.x * bar.from, self.screen_position.y));
+                filling.set_size(Vec2::new((bar.to - bar.from) * self.screen_size.x, self.screen_size.y));
+                filling.set_color(bar.color.clone());
+                filling.set_corner_rounding(bar.corner_rounding.into());
+                filling.update();
             }
         }
 
@@ -800,7 +797,7 @@ impl Bar {
             visible: false,
 
             // Shape properties
-            filling_id: renderer.create_rectangle()?.id,
+            filling_id: renderer.create_rectangle()?,
             color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             from: 0.0,
             to: 1.0,
@@ -808,7 +805,7 @@ impl Bar {
             texture_id: None,
 
             // Border properties
-            border_id: renderer.create_frame()?.id,
+            border_id: renderer.create_frame()?,
             border_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             border_thickness: Default::default(),
         })

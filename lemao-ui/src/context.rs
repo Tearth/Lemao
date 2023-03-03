@@ -19,7 +19,6 @@ use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::context::RendererContext;
 use lemao_core::renderer::drawable::Color;
-use lemao_core::renderer::drawable::Drawable;
 use lemao_core::renderer::drawable::DrawableEnum;
 use lemao_math::color::SolidColor;
 use std::collections::VecDeque;
@@ -42,7 +41,7 @@ impl UiContext {
         let mut ui = Self {
             main_canvas_id: 0,
             ui_camera_id,
-            debug_frame_id: renderer.create_frame()?.id,
+            debug_frame_id: renderer.create_frame()?,
             debug: false,
 
             components: Default::default(),

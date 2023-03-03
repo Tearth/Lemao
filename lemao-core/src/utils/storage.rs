@@ -16,20 +16,14 @@ impl<T> Storage<T> {
     pub fn get(&self, id: usize) -> Result<&T, String> {
         match self.data.get(id) {
             Some(item) => Ok(item.as_ref().unwrap()),
-            None => {
-                let x = 10;
-                Err(format!("Storage item {} not found", id))
-            }
+            None => Err(format!("Storage item {} not found", id)),
         }
     }
 
     pub fn get_mut(&mut self, id: usize) -> Result<&mut T, String> {
         match self.data.get_mut(id) {
             Some(item) => Ok(item.as_mut().unwrap()),
-            None => {
-                let x = 10;
-                Err(format!("Storage item {} not found", id))
-            }
+            None => Err(format!("Storage item {} not found", id)),
         }
     }
 

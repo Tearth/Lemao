@@ -6,7 +6,6 @@ use lemao_math::vec2::Vec2;
 use lemao_math::vec3::Vec3;
 use lemao_opengl::bindings::opengl;
 use lemao_opengl::pointers::OpenGLPointers;
-use std::any::Any;
 use std::ffi::c_void;
 use std::mem;
 use std::ptr;
@@ -32,7 +31,6 @@ pub struct Text {
     elements_count: u32,
     vertices: Vec<f32>,
     indices: Vec<u32>,
-    dirty: bool,
 
     font_size: Vec2,
     font_cell_size: Vec2,
@@ -62,7 +60,6 @@ impl Text {
             elements_count: 0,
             vertices: Vec::new(),
             indices: Vec::new(),
-            dirty: true,
 
             font_size: font.get_size(),
             font_cell_size: font.get_cell_size(),
@@ -100,7 +97,6 @@ impl Text {
     pub fn set_font(&mut self, font: &Font) {
         self.font_id = font.id;
         self.texture_gl_id = font.texture_gl_id;
-        self.dirty = true;
     }
 
     pub fn get_text(&self) -> &str {
@@ -109,7 +105,6 @@ impl Text {
 
     pub fn set_text(&mut self, text: &str) {
         self.text = text.to_string();
-        self.dirty = true;
     }
 
     pub fn get_line_height(&self) -> u32 {
@@ -118,7 +113,6 @@ impl Text {
 
     pub fn set_line_height(&mut self, line_height: u32) {
         self.line_height = line_height;
-        self.dirty = true;
     }
 
     pub fn calculate_text_size(&self, text: String) -> Vec2 {
@@ -236,8 +230,6 @@ impl Text {
 
             self.size = size;
             self.elements_count = self.indices.len() as u32;
-
-            self.dirty = false;
         }
     }
 
@@ -285,66 +277,64 @@ impl Text {
             /* t.v */ uv.y + uv_size.y,
         ]
     }
-}
 
-impl Drawable for Text {
-    fn get_position(&self) -> Vec2 {
+    pub fn get_position(&self) -> Vec2 {
         self.position
     }
 
-    fn set_position(&mut self, position: Vec2) {
+    pub fn set_position(&mut self, position: Vec2) {
         self.position = position;
     }
 
-    fn move_delta(&mut self, delta: Vec2) {
+    pub fn move_delta(&mut self, delta: Vec2) {
         self.position += delta;
     }
 
-    fn get_scale(&self) -> Vec2 {
+    pub fn get_scale(&self) -> Vec2 {
         self.scale
     }
 
-    fn set_scale(&mut self, scale: Vec2) {
+    pub fn set_scale(&mut self, scale: Vec2) {
         self.scale = scale;
     }
 
-    fn get_rotation(&self) -> f32 {
+    pub fn get_rotation(&self) -> f32 {
         self.rotation
     }
 
-    fn set_rotation(&mut self, rotation: f32) {
+    pub fn set_rotation(&mut self, rotation: f32) {
         self.rotation = rotation;
     }
 
-    fn rotate(&mut self, delta: f32) {
+    pub fn rotate(&mut self, delta: f32) {
         self.rotation += delta;
     }
 
-    fn get_size(&self) -> Vec2 {
+    pub fn get_size(&self) -> Vec2 {
         self.size
     }
 
-    fn set_size(&mut self, size: Vec2) {
+    pub fn set_size(&mut self, size: Vec2) {
         self.size = size;
     }
 
-    fn get_anchor(&self) -> Vec2 {
+    pub fn get_anchor(&self) -> Vec2 {
         self.anchor
     }
 
-    fn set_anchor(&mut self, anchor: Vec2) {
+    pub fn set_anchor(&mut self, anchor: Vec2) {
         self.anchor = anchor;
     }
 
-    fn get_color(&self) -> &Color {
+    pub fn get_color(&self) -> &Color {
         &self.color
     }
 
-    fn set_color(&mut self, color: Color) {
+    pub fn set_color(&mut self, color: Color) {
         self.color = color;
     }
 
-    fn get_transformation_matrix(&self) -> Mat4x4 {
+    pub fn get_transformation_matrix(&self) -> Mat4x4 {
         let translation = Mat4x4::translate(Vec3::from(self.position));
         let anchor_offset = Mat4x4::translate(-Vec3::from(self.anchor * self.size).floor());
         let scale = Mat4x4::scale(Vec3::from(self.scale));
@@ -352,15 +342,11 @@ impl Drawable for Text {
         translation * rotation * scale * anchor_offset
     }
 
-    fn get_batch(&self) -> Batch {
+    pub fn get_batch(&self) -> Batch {
         Batch::new(None, Some(&self.vertices), Some(&self.indices), Some(self.texture_gl_id), Some(&self.color))
     }
 
-    fn draw(&mut self, shader: &Shader) -> Result<(), String> {
-        if self.dirty {
-            self.update();
-        }
-
+    pub fn draw(&mut self, shader: &Shader) -> Result<(), String> {
         unsafe {
             let model = self.get_transformation_matrix();
 
@@ -373,14 +359,6 @@ impl Drawable for Text {
 
             Ok(())
         }
-    }
-
-    fn as_any(&self) -> &dyn Any {
-        self
-    }
-
-    fn as_any_mut(&mut self) -> &mut dyn Any {
-        self
     }
 }
 

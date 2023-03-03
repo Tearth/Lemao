@@ -11,7 +11,6 @@ use lemao_core::renderer::drawable::Color;
 use lemao_core::renderer::fonts::bff;
 use lemao_core::renderer::fonts::Font;
 use lemao_core::renderer::textures::bmp;
-use lemao_core::renderer::textures::Texture;
 use lemao_core::window::context::WindowContext;
 use lemao_ui::components::label::Label;
 use lemao_ui::components::slider::Slider;
@@ -60,23 +59,13 @@ pub fn main() -> Result<(), String> {
     bold_font.set_character(201, Vec2::new(0.0, 3.0), &hammer_icon);
     bold_font.set_character(202, Vec2::new(0.0, 3.0), &happiness_icon);
 
-    let font_storage = renderer.fonts.clone();
-    let mut font_storage = font_storage.write().unwrap();
+    let regular_font_id = renderer.fonts.store(Font::new(&renderer, &regular_font)?);
+    let bold_font_id = renderer.fonts.store(Font::new(&renderer, &bold_font)?);
+    let header_font_id = renderer.fonts.store(Font::new(&renderer, &header_font)?);
 
-    let regular_font_id = font_storage.store(Font::new(&renderer, &regular_font)?);
-    let bold_font_id = font_storage.store(Font::new(&renderer, &bold_font)?);
-    let header_font_id = font_storage.store(Font::new(&renderer, &header_font)?);
-
-    drop(font_storage);
-
-    let texture_storage = renderer.textures.clone();
-    let mut texture_storage = texture_storage.write().unwrap();
-
-    let texture_id = texture_storage.store(Texture::new(&renderer, &bmp::load("./assets/wheat.bmp")?)?);
-    let box_checked_id = texture_storage.store(Texture::new(&renderer, &bmp::load("./assets/box_checked.bmp")?)?);
-    let box_unchecked_id = texture_storage.store(Texture::new(&renderer, &bmp::load("./assets/box_unchecked.bmp")?)?);
-
-    drop(texture_storage);
+    let texture_id = renderer.create_texture("./assets/wheat.bmp")?;
+    let box_checked_id = renderer.create_texture("./assets/box_checked.bmp")?;
+    let box_unchecked_id = renderer.create_texture("./assets/box_unchecked.bmp")?;
 
     let mut ui = UiContext::new(&mut renderer)?;
     // ui.set_debug_flag(true);
@@ -171,12 +160,9 @@ pub fn main() -> Result<(), String> {
     window_title.set_shadow_color(Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 1.0)));
     ui.get_component_mut(main_window_id)?.add_child(window_title_id);
 
-    let texture_storage = renderer.textures.clone();
-    let texture_storage = texture_storage.read().unwrap();
-
     let image = ui.create_panel(&mut renderer, ComponentShape::Rectangle)?;
     let image_id = image.get_id();
-    image.set_texture(texture_storage.get(texture_id)?);
+    image.set_texture(renderer.textures.get(texture_id)?);
     image.set_size(ComponentSize::Absolute(Vec2::new(300.0, 150.0)));
     image.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0)));
     image.set_anchor(Vec2::new(0.0, 1.0));
@@ -186,8 +172,6 @@ pub fn main() -> Result<(), String> {
     image.set_border_thickness(ComponentBorderThickness::new(1.0, 1.0, 1.0, 1.0))?;
     image.set_corner_rounding(ComponentCornerRounding::new(4.0, 4.0, 4.0, 4.0));
     ui.get_component_mut(main_window_id)?.add_child(image_id);
-
-    drop(texture_storage);
 
     let mut quote_panel_gradient = Gradient::new(GradientType::Vertical, Vec2::new(0.0, 0.0));
     quote_panel_gradient.steps.push(GradientStep::new(SolidColor::new_rgb(96, 97, 115, 0), 0.0));

@@ -7,7 +7,6 @@ use lemao_math::vec2::Vec2;
 use lemao_math::vec3::Vec3;
 use lemao_opengl::bindings::opengl;
 use lemao_opengl::pointers::OpenGLPointers;
-use std::any::Any;
 use std::ptr;
 use std::rc::Rc;
 
@@ -27,7 +26,6 @@ pub struct Line {
     from: Vec2,
     to: Vec2,
     thickness: f32,
-    dirty: bool,
 }
 
 impl Line {
@@ -48,7 +46,6 @@ impl Line {
             from: Default::default(),
             to: Default::default(),
             thickness: 1.0,
-            dirty: true,
         }
     }
 
@@ -62,7 +59,6 @@ impl Line {
 
     pub fn set_from(&mut self, from: Vec2) {
         self.from = from;
-        self.dirty = true;
     }
 
     pub fn get_to(&self) -> Vec2 {
@@ -71,7 +67,6 @@ impl Line {
 
     pub fn set_to(&mut self, to: Vec2) {
         self.to = to;
-        self.dirty = true;
     }
 
     pub fn get_thickness(&self) -> f32 {
@@ -80,76 +75,71 @@ impl Line {
 
     pub fn set_thickness(&mut self, thickness: f32) {
         self.thickness = thickness;
-        self.dirty = true;
     }
 
     pub fn update(&mut self) {
         self.position = self.from;
         self.rotation = Vec2::new(0.0, 1.0).signed_angle(self.to - self.from);
         self.size = Vec2::new(self.thickness, self.from.distance(self.to) + 1.0);
-
-        self.dirty = false;
     }
-}
 
-impl Drawable for Line {
-    fn get_position(&self) -> Vec2 {
+    pub fn get_position(&self) -> Vec2 {
         self.position
     }
 
-    fn set_position(&mut self, position: Vec2) {
+    pub fn set_position(&mut self, position: Vec2) {
         self.position = position;
     }
 
-    fn move_delta(&mut self, delta: Vec2) {
+    pub fn move_delta(&mut self, delta: Vec2) {
         self.position += delta;
     }
 
-    fn get_scale(&self) -> Vec2 {
+    pub fn get_scale(&self) -> Vec2 {
         self.scale
     }
 
-    fn set_scale(&mut self, scale: Vec2) {
+    pub fn set_scale(&mut self, scale: Vec2) {
         self.scale = scale;
     }
 
-    fn get_rotation(&self) -> f32 {
+    pub fn get_rotation(&self) -> f32 {
         self.rotation
     }
 
-    fn set_rotation(&mut self, rotation: f32) {
+    pub fn set_rotation(&mut self, rotation: f32) {
         self.rotation = rotation;
     }
 
-    fn rotate(&mut self, delta: f32) {
+    pub fn rotate(&mut self, delta: f32) {
         self.rotation += delta;
     }
 
-    fn get_size(&self) -> Vec2 {
+    pub fn get_size(&self) -> Vec2 {
         self.size
     }
 
-    fn set_size(&mut self, size: Vec2) {
+    pub fn set_size(&mut self, size: Vec2) {
         self.size = size;
     }
 
-    fn get_anchor(&self) -> Vec2 {
-        panic!("Line doesn't support anchor property");
+    pub fn get_anchor(&self) -> Vec2 {
+        panic!("")
     }
 
-    fn set_anchor(&mut self, _anchor: Vec2) {
-        panic!("Line doesn't support anchor property");
+    pub fn set_anchor(&mut self, _anchor: Vec2) {
+        panic!("")
     }
 
-    fn get_color(&self) -> &Color {
+    pub fn get_color(&self) -> &Color {
         &self.color
     }
 
-    fn set_color(&mut self, color: Color) {
+    pub fn set_color(&mut self, color: Color) {
         self.color = color;
     }
 
-    fn get_transformation_matrix(&self) -> Mat4x4 {
+    pub fn get_transformation_matrix(&self) -> Mat4x4 {
         let translation = Mat4x4::translate(Vec3::from(self.position + Vec2::new(0.5, 0.5)));
         let anchor_offset = Mat4x4::translate(Vec3::new(0.0, -0.5, 0.0));
         let scale = Mat4x4::scale(Vec3::from(self.scale * self.size).floor());
@@ -157,15 +147,11 @@ impl Drawable for Line {
         translation * rotation * anchor_offset * scale
     }
 
-    fn get_batch(&self) -> Batch {
+    pub fn get_batch(&self) -> Batch {
         Batch::new(Some(self.shape_id), None, None, Some(self.texture_gl_id), Some(&self.color))
     }
 
-    fn draw(&mut self, shader: &Shader) -> Result<(), String> {
-        if self.dirty {
-            self.update();
-        }
-
+    pub fn draw(&mut self, shader: &Shader) -> Result<(), String> {
         unsafe {
             let model = self.get_transformation_matrix();
 
@@ -178,13 +164,5 @@ impl Drawable for Line {
 
             Ok(())
         }
-    }
-
-    fn as_any(&self) -> &dyn Any {
-        self
-    }
-
-    fn as_any_mut(&mut self) -> &mut dyn Any {
-        self
     }
 }

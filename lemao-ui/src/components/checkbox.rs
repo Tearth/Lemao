@@ -11,7 +11,6 @@ use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::context::RendererContext;
 use lemao_core::renderer::drawable::Color;
-use lemao_core::renderer::drawable::Drawable;
 use lemao_core::renderer::drawable::DrawableEnum;
 use lemao_core::renderer::textures::Texture;
 use std::any::Any;
@@ -91,7 +90,7 @@ impl Checkbox {
             event_mask: None,
 
             // Box properties
-            box_id: renderer.create_rectangle()?.id,
+            box_id: renderer.create_rectangle()?,
             box_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             box_offset: Default::default(),
             box_size: Default::default(),
@@ -99,7 +98,7 @@ impl Checkbox {
             box_unchecked_texture_id,
 
             // Label properties
-            label_id: renderer.create_text(label_font_id)?.id,
+            label_id: renderer.create_text(label_font_id)?,
             label_font_id,
             label_text: Default::default(),
             label_offset: Default::default(),
@@ -456,9 +455,7 @@ impl Component for Checkbox {
 
     fn update(&mut self, renderer: &mut RendererContext, area_position: Vec2, area_size: Vec2) -> Result<(), String> {
         // We have to set text first, to get the size used later
-        let font_storage = renderer.fonts.clone();
-        let font_storage = font_storage.read().unwrap();
-        let font = font_storage.get(self.label_font_id)?;
+        let font = renderer.fonts.get(self.label_font_id)?;
         renderer.texts.get_mut(self.label_id)?.set_font(font);
         renderer.texts.get_mut(self.label_id)?.set_text(&self.label_text);
         renderer.texts.get_mut(self.label_id)?.update();
@@ -484,24 +481,23 @@ impl Component for Checkbox {
         r#box.set_position(self.screen_position + self.box_offset);
         r#box.set_color(self.box_color.clone());
 
-        let texture_storage = renderer.textures.clone();
-        let texture_storage = texture_storage.read().unwrap();
-
         if self.checked {
-            let texture = texture_storage.get(self.box_checked_texture_id)?;
+            let texture = renderer.textures.get(self.box_checked_texture_id)?;
             self.box_size = texture.get_size();
-            renderer.rectangles.get_mut(self.box_id)?.set_texture(texture);
+            r#box.set_texture(texture);
         } else {
-            let texture = texture_storage.get(self.box_unchecked_texture_id)?;
+            let texture = renderer.textures.get(self.box_unchecked_texture_id)?;
             self.box_size = texture.get_size();
-            renderer.rectangles.get_mut(self.box_id)?.set_texture(texture);
+            r#box.set_texture(texture);
         }
 
-        renderer.rectangles.get_mut(self.box_id)?.set_size(self.box_size);
+        r#box.set_size(self.box_size);
+        r#box.update();
 
         let label = renderer.texts.get_mut(self.label_id)?;
         label.set_position(self.screen_position + self.label_offset);
         label.set_color(self.label_color.clone());
+        label.update();
 
         self.dirty = false;
 
