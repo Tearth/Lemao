@@ -5,12 +5,9 @@ use lemao_core::lemao_common_platform::input::Key;
 use lemao_core::lemao_common_platform::window::WindowStyle;
 use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
-use lemao_core::renderer::drawable::Drawable;
-use lemao_core::renderer::fonts::bff;
-use lemao_core::renderer::fonts::Font;
+use lemao_core::renderer::drawable::DrawableEnum;
 use lemao_core::renderer::textures::bmp;
 use lemao_core::renderer::textures::Texture;
-use lemao_core::utils::storage::StorageItem;
 use lemao_core::window::context::WindowContext;
 use std::time::Instant;
 
@@ -31,36 +28,24 @@ pub fn main() -> Result<(), String> {
     let mut renderer = window.create_renderer()?;
     renderer.set_swap_interval(1);
 
-    let texture_storage = renderer.get_textures();
-    let mut texture_storage = texture_storage.write().unwrap();
-    let kaela_rgb = texture_storage.store(Box::new(Texture::new(&renderer, &bmp::load("./assets/disc.bmp")?)?));
-
-    drop(texture_storage);
-
-    let font_storage = renderer.get_fonts();
-    let mut font_storage = font_storage.write().unwrap();
-    let font_id = font_storage.store(Box::new(Font::new(&renderer, &bff::load("./assets/inconsolata.bff")?)?));
-
-    drop(font_storage);
+    let texture_id = renderer.create_texture("./assets/disc.bmp")?;
+    let font_id = renderer.create_font("./assets/inconsolata.bff")?;
 
     let gui_camera_id = renderer.create_camera(Default::default(), window_size)?;
 
-    let texture_storage = renderer.get_textures();
-    let texture_storage = texture_storage.read().unwrap();
+    let sprite_id = renderer.create_rectangle()?;
+    let sprite = renderer.rectangles.get_mut(sprite_id)?;
+    sprite.set_texture(renderer.textures.get(texture_id)?);
+    sprite.anchor = (Vec2::new(0.5, 0.5));
+    sprite.position = (Vec2::new(400.0, 300.0));
+    sprite.size = renderer.textures.get(texture_id)?.size;
 
-    let sprite = renderer.create_rectangle()?;
-    let sprite_id = sprite.get_id();
-    sprite.set_texture(texture_storage.get_and_cast::<Texture>(kaela_rgb)?);
-    sprite.set_anchor(Vec2::new(0.5, 0.5));
-    sprite.set_position(Vec2::new(400.0, 300.0));
-
-    drop(texture_storage);
-
-    let description_text = renderer.create_text(font_id)?;
-    let description_text_id = description_text.get_id();
-    description_text.set_text(DESCRIPTION);
-    description_text.set_anchor(Vec2::new(0.0, 1.0));
-    description_text.set_line_height(20);
+    let description_text_id = renderer.create_text(font_id)?;
+    let description_text = renderer.texts.get_mut(description_text_id)?;
+    description_text.text = (DESCRIPTION.to_string());
+    description_text.anchor = (Vec2::new(0.0, 1.0));
+    description_text.line_height = (20);
+    description_text.update();
 
     let mut last_update = Instant::now();
     let mut is_running = true;
@@ -77,10 +62,15 @@ pub fn main() -> Result<(), String> {
                     }
                 }
                 InputEvent::WindowSizeChanged(size) => {
-                    renderer.set_viewport_size(size);
-                    renderer.get_active_camera_mut()?.set_size(size);
-                    renderer.get_camera_mut(gui_camera_id)?.set_size(size);
-                    renderer.get_drawable_mut(description_text_id)?.set_position(Vec2::new(5.0, size.y - 0.0));
+                    renderer.set_viewport_size(size)?;
+
+                    renderer.cameras.get_mut(renderer.active_camera_id)?.size = size;
+                    renderer.cameras.get_mut(renderer.active_camera_id)?.dirty = true;
+
+                    renderer.cameras.get_mut(gui_camera_id)?.size = size;
+                    renderer.cameras.get_mut(gui_camera_id)?.dirty = true;
+
+                    renderer.texts.get_mut(description_text_id)?.position = (Vec2::new(5.0, size.y - 0.0));
                 }
                 InputEvent::WindowClosed => {
                     is_running = false;
@@ -89,48 +79,54 @@ pub fn main() -> Result<(), String> {
             }
         }
 
-        let camera = renderer.get_active_camera_mut()?;
+        let camera = renderer.cameras.get_mut(renderer.active_camera_id)?;
         if window.is_key_pressed(Key::ArrowUp) {
-            camera.move_delta(Vec2::new(0.0, 200.0 * delta));
+            camera.position += (Vec2::new(0.0, 200.0 * delta));
+            camera.dirty = true;
         }
         if window.is_key_pressed(Key::ArrowDown) {
-            camera.move_delta(Vec2::new(0.0, -200.0 * delta));
+            camera.position += (Vec2::new(0.0, -200.0 * delta));
+            camera.dirty = true;
         }
         if window.is_key_pressed(Key::ArrowLeft) {
-            camera.move_delta(Vec2::new(-200.0 * delta, 0.0));
+            camera.position += (Vec2::new(-200.0 * delta, 0.0));
+            camera.dirty = true;
         }
         if window.is_key_pressed(Key::ArrowRight) {
-            camera.move_delta(Vec2::new(200.0 * delta, 0.0));
+            camera.position += (Vec2::new(200.0 * delta, 0.0));
+            camera.dirty = true;
         }
 
-        let sprite = renderer.get_drawable_mut(sprite_id)?;
+        let sprite = renderer.rectangles.get_mut(sprite_id)?;
         if window.is_key_pressed(Key::KeyW) {
-            sprite.move_delta(Vec2::new(0.0, 200.0 * delta));
+            sprite.position += (Vec2::new(0.0, 200.0 * delta));
         }
         if window.is_key_pressed(Key::KeyS) {
-            sprite.move_delta(Vec2::new(0.0, -200.0 * delta));
+            sprite.position += (Vec2::new(0.0, -200.0 * delta));
         }
         if window.is_key_pressed(Key::KeyA) {
-            sprite.move_delta(Vec2::new(-200.0 * delta, 0.0));
+            sprite.position += (Vec2::new(-200.0 * delta, 0.0));
         }
         if window.is_key_pressed(Key::KeyD) {
-            sprite.move_delta(Vec2::new(200.0 * delta, 0.0));
+            sprite.position += (Vec2::new(200.0 * delta, 0.0));
         }
         if window.is_key_pressed(Key::KeyE) {
-            sprite.rotate(-2.0 * delta);
+            sprite.rotation += (-2.0 * delta);
         }
         if window.is_key_pressed(Key::KeyQ) {
-            sprite.rotate(2.0 * delta);
+            sprite.rotation += (2.0 * delta);
         }
         if window.is_key_pressed(Key::Space) {
-            sprite.move_delta(Vec2::new_from_angle(sprite.get_rotation()) * 200.0 * Vec2::new(delta, delta));
+            sprite.position += (Vec2::new_from_angle(sprite.rotation) * 200.0 * Vec2::new(delta, delta));
         }
 
+        sprite.update();
+
         renderer.clear(SolidColor::new(0.5, 0.5, 0.5, 1.0));
-        renderer.draw(sprite_id)?;
+        renderer.draw(DrawableEnum::Rectangle, sprite_id)?;
         renderer.set_camera_as_active(gui_camera_id)?;
-        renderer.draw(description_text_id)?;
-        renderer.set_default_camera()?;
+        renderer.draw(DrawableEnum::Text, description_text_id)?;
+        renderer.set_camera_as_active(renderer.default_camera_id)?;
         window.swap_buffers();
     }
 

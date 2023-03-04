@@ -7,11 +7,7 @@ use lemao_core::lemao_common_platform::input::MouseWheelDirection;
 use lemao_core::lemao_common_platform::window::WindowStyle;
 use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
-use lemao_core::renderer::drawable::disc::Disc;
-use lemao_core::renderer::drawable::Drawable;
-use lemao_core::renderer::fonts::bff;
-use lemao_core::renderer::fonts::Font;
-use lemao_core::utils::storage::StorageItem;
+use lemao_core::renderer::drawable::DrawableEnum;
 use lemao_core::window::context::CoordinationSystem;
 use lemao_core::window::context::WindowContext;
 
@@ -29,24 +25,22 @@ pub fn main() -> Result<(), String> {
     let mut renderer = window.create_renderer()?;
     renderer.set_swap_interval(1);
 
-    let font_storage = renderer.get_fonts();
-    let mut font_storage = font_storage.write().unwrap();
-    let font_id = font_storage.store(Box::new(Font::new(&renderer, &bff::load("./assets/inconsolata.bff")?)?));
+    let font_id = renderer.create_font("./assets/inconsolata.bff")?;
 
-    drop(font_storage);
+    let disc_id = renderer.create_disc()?;
+    let disc = renderer.discs.get_mut(disc_id)?;
+    disc.size = (Vec2::new(100.0, 100.0));
+    disc.sides = (32);
+    disc.anchor = (Vec2::new(0.5, 0.5));
+    disc.position = (Vec2::new(400.0, 300.0));
+    disc.update();
 
-    let disc = renderer.create_disc()?;
-    let disc_id = disc.get_id();
-    disc.set_size(Vec2::new(100.0, 100.0));
-    disc.set_sides(32);
-    disc.set_anchor(Vec2::new(0.5, 0.5));
-    disc.set_position(Vec2::new(400.0, 300.0));
-
-    let description_text = renderer.create_text(font_id)?;
-    let description_text_id = description_text.get_id();
-    description_text.set_text(DESCRIPTION);
-    description_text.set_anchor(Vec2::new(0.0, 1.0));
-    description_text.set_line_height(20);
+    let description_text_id = renderer.create_text(font_id)?;
+    let description_text = renderer.texts.get_mut(description_text_id)?;
+    description_text.text = (DESCRIPTION.to_string());
+    description_text.anchor = (Vec2::new(0.0, 1.0));
+    description_text.line_height = (20);
+    description_text.update();
 
     let mut is_running = true;
     while is_running {
@@ -58,19 +52,20 @@ pub fn main() -> Result<(), String> {
                     }
                 }
                 InputEvent::MouseWheelRotated(direction, _) => {
-                    let disc = renderer.get_drawable_and_cast_mut::<Disc>(disc_id)?;
+                    let disc = renderer.discs.get_mut(disc_id)?;
                     if direction == MouseWheelDirection::Up {
-                        disc.set_sides(disc.get_sides() + 1);
+                        disc.sides += 1;
                     } else {
-                        if disc.get_sides() > 3 {
-                            disc.set_sides(disc.get_sides() - 1);
+                        if disc.sides > 3 {
+                            disc.sides -= 1;
                         }
                     }
+
+                    disc.update();
                 }
                 InputEvent::WindowSizeChanged(size) => {
-                    renderer.set_viewport_size(size);
-                    renderer.get_active_camera_mut()?.set_size(size);
-                    renderer.get_drawable_mut(description_text_id)?.set_position(Vec2::new(5.0, size.y - 0.0));
+                    renderer.set_viewport_size(size)?;
+                    renderer.texts.get_mut(description_text_id)?.position = (Vec2::new(5.0, size.y - 0.0));
                 }
                 InputEvent::WindowClosed => {
                     is_running = false;
@@ -81,12 +76,13 @@ pub fn main() -> Result<(), String> {
 
         if window.is_mouse_button_pressed(MouseButton::Left) {
             let position = window.get_cursor_position(CoordinationSystem::Window);
-            renderer.get_drawable_and_cast_mut::<Disc>(disc_id)?.set_position(position);
+            renderer.discs.get_mut(disc_id)?.position = position;
+            renderer.discs.get_mut(disc_id)?.update()
         }
 
         renderer.clear(SolidColor::new(0.5, 0.5, 0.5, 1.0));
-        renderer.draw(disc_id)?;
-        renderer.draw(description_text_id)?;
+        renderer.draw(DrawableEnum::Disc, disc_id)?;
+        renderer.draw(DrawableEnum::Text, description_text_id)?;
         window.swap_buffers();
     }
 

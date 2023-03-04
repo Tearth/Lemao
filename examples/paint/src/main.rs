@@ -6,12 +6,9 @@ use lemao_core::lemao_common_platform::input::MouseButton;
 use lemao_core::lemao_common_platform::window::WindowStyle;
 use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
-use lemao_core::renderer::drawable::Drawable;
-use lemao_core::renderer::fonts::bff;
-use lemao_core::renderer::fonts::Font;
+use lemao_core::renderer::drawable::DrawableEnum;
 use lemao_core::renderer::textures::RawTexture;
 use lemao_core::renderer::textures::Texture;
-use lemao_core::utils::storage::StorageItem;
 use lemao_core::window::context::CoordinationSystem;
 use lemao_core::window::context::WindowContext;
 
@@ -30,32 +27,22 @@ pub fn main() -> Result<(), String> {
 
     let mut texture_data = vec![0; (window_size.x * window_size.y * 4.0) as usize];
 
-    let texture_storage = renderer.get_textures();
-    let mut texture_storage = texture_storage.write().unwrap();
-    let texture_id = texture_storage.store(Box::new(Texture::new(&renderer, &RawTexture::new(window_size, texture_data.clone()))?));
+    let texture_id = renderer.textures.store(Texture::new(&renderer, &RawTexture::new(window_size, texture_data.clone()))?);
+    renderer.textures.get_mut(texture_id)?.id = texture_id;
 
-    drop(texture_storage);
+    let font_id = renderer.create_font("./assets/inconsolata.bff")?;
 
-    let font_storage = renderer.get_fonts();
-    let mut font_storage = font_storage.write().unwrap();
-    let font_id = font_storage.store(Box::new(Font::new(&renderer, &bff::load("./assets/inconsolata.bff")?)?));
+    let sprite_id = renderer.create_rectangle()?;
+    let sprite = renderer.rectangles.get_mut(sprite_id)?;
+    sprite.set_texture(renderer.textures.get(texture_id)?);
+    sprite.size = window_size;
 
-    drop(font_storage);
-
-    let texture_storage = renderer.get_textures();
-    let texture_storage = texture_storage.read().unwrap();
-
-    let sprite = renderer.create_rectangle()?;
-    let sprite_id = sprite.get_id();
-    sprite.set_texture(texture_storage.get_and_cast::<Texture>(texture_id)?);
-
-    drop(texture_storage);
-
-    let description_text = renderer.create_text(font_id)?;
-    let description_text_id = description_text.get_font_id();
-    description_text.set_text(DESCRIPTION);
-    description_text.set_anchor(Vec2::new(0.0, 1.0));
-    description_text.set_line_height(20);
+    let description_text_id = renderer.create_text(font_id)?;
+    let description_text = renderer.texts.get_mut(description_text_id)?;
+    description_text.text = (DESCRIPTION.to_string());
+    description_text.anchor = (Vec2::new(0.0, 1.0));
+    description_text.line_height = (20);
+    description_text.update();
 
     let mut is_running = true;
 
@@ -68,9 +55,8 @@ pub fn main() -> Result<(), String> {
                     }
                 }
                 InputEvent::WindowSizeChanged(size) => {
-                    renderer.set_viewport_size(size);
-                    renderer.get_active_camera_mut()?.set_size(size);
-                    renderer.get_drawable_mut(description_text_id)?.set_position(Vec2::new(5.0, size.y - 0.0));
+                    renderer.set_viewport_size(size)?;
+                    renderer.texts.get_mut(description_text_id)?.position = (Vec2::new(5.0, size.y - 0.0));
                 }
                 InputEvent::WindowClosed => {
                     is_running = false;
@@ -89,16 +75,14 @@ pub fn main() -> Result<(), String> {
                 texture_data[index * 4 + 2] = 255;
                 texture_data[index * 4 + 3] = 255;
 
-                let texture_storage = renderer.get_textures();
-                let mut texture_storage = texture_storage.write().unwrap();
-                let texture = texture_storage.get_and_cast_mut::<Texture>(texture_id).unwrap();
+                let texture = renderer.textures.get_mut(texture_id).unwrap();
                 texture.set_data(window_size, &texture_data);
             }
         }
 
         renderer.clear(SolidColor::new(0.0, 0.0, 0.0, 1.0));
-        renderer.draw(sprite_id)?;
-        renderer.draw(description_text_id)?;
+        renderer.draw(DrawableEnum::Rectangle, sprite_id)?;
+        renderer.draw(DrawableEnum::Text, description_text_id)?;
         window.swap_buffers();
     }
 

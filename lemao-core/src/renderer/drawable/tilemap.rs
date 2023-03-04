@@ -96,6 +96,14 @@ impl Tilemap {
         translation * rotation * scale * anchor_offset
     }
 
+    pub fn set_next_frame(&mut self) {
+        self.frame = if self.frame + 1 >= self.total_frames_count { 0 } else { self.frame + 1 };
+    }
+
+    pub fn set_previous_frame(&mut self) {
+        self.frame = if self.frame == 0 { self.total_frames_count - 1 } else { self.frame - 1 };
+    }
+
     pub fn get_batch(&self) -> Batch {
         Batch::new(None, Some(&self.vertices), Some(&self.indices), Some(self.texture_gl_id), Some(&self.color))
     }
