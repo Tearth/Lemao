@@ -39,9 +39,9 @@ pub fn main() -> Result<(), String> {
 
     let description_text_id = renderer.create_text(font_id)?;
     let description_text = renderer.texts.get_mut(description_text_id)?;
-    description_text.text = (DESCRIPTION.to_string());
-    description_text.anchor = (Vec2::new(0.0, 1.0));
-    description_text.line_height = (20);
+    description_text.text = DESCRIPTION.to_string();
+    description_text.anchor = Vec2::new(0.0, 1.0);
+    description_text.line_height = 20;
     description_text.update();
 
     let mut is_running = true;
@@ -56,7 +56,7 @@ pub fn main() -> Result<(), String> {
                 }
                 InputEvent::WindowSizeChanged(size) => {
                     renderer.set_viewport_size(size)?;
-                    renderer.texts.get_mut(description_text_id)?.position = (Vec2::new(5.0, size.y - 0.0));
+                    renderer.texts.get_mut(description_text_id)?.position = Vec2::new(5.0, size.y - 0.0);
                 }
                 InputEvent::WindowClosed => {
                     is_running = false;

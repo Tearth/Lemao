@@ -37,9 +37,9 @@ pub fn main() -> Result<(), String> {
 
     let description_text_id = renderer.create_text(font_id)?;
     let description_text = renderer.texts.get_mut(description_text_id)?;
-    description_text.text = (DESCRIPTION.to_string());
-    description_text.anchor = (Vec2::new(0.0, 1.0));
-    description_text.line_height = (20);
+    description_text.text = DESCRIPTION.to_string();
+    description_text.anchor = Vec2::new(0.0, 1.0);
+    description_text.line_height = 20;
     description_text.update();
 
     let mut sleep_duration = 10;

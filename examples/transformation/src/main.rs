@@ -6,8 +6,8 @@ use lemao_core::lemao_common_platform::window::WindowStyle;
 use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::drawable::DrawableEnum;
-use lemao_core::renderer::textures::bmp;
-use lemao_core::renderer::textures::Texture;
+
+
 use lemao_core::window::context::WindowContext;
 use std::time::Instant;
 
@@ -36,15 +36,15 @@ pub fn main() -> Result<(), String> {
     let sprite_id = renderer.create_rectangle()?;
     let sprite = renderer.rectangles.get_mut(sprite_id)?;
     sprite.set_texture(renderer.textures.get(texture_id)?);
-    sprite.anchor = (Vec2::new(0.5, 0.5));
-    sprite.position = (Vec2::new(400.0, 300.0));
+    sprite.anchor = Vec2::new(0.5, 0.5);
+    sprite.position = Vec2::new(400.0, 300.0);
     sprite.size = renderer.textures.get(texture_id)?.size;
 
     let description_text_id = renderer.create_text(font_id)?;
     let description_text = renderer.texts.get_mut(description_text_id)?;
-    description_text.text = (DESCRIPTION.to_string());
-    description_text.anchor = (Vec2::new(0.0, 1.0));
-    description_text.line_height = (20);
+    description_text.text = DESCRIPTION.to_string();
+    description_text.anchor = Vec2::new(0.0, 1.0);
+    description_text.line_height = 20;
     description_text.update();
 
     let mut last_update = Instant::now();
@@ -70,7 +70,7 @@ pub fn main() -> Result<(), String> {
                     renderer.cameras.get_mut(gui_camera_id)?.size = size;
                     renderer.cameras.get_mut(gui_camera_id)?.dirty = true;
 
-                    renderer.texts.get_mut(description_text_id)?.position = (Vec2::new(5.0, size.y - 0.0));
+                    renderer.texts.get_mut(description_text_id)?.position = Vec2::new(5.0, size.y - 0.0);
                 }
                 InputEvent::WindowClosed => {
                     is_running = false;
@@ -81,43 +81,43 @@ pub fn main() -> Result<(), String> {
 
         let camera = renderer.cameras.get_mut(renderer.active_camera_id)?;
         if window.is_key_pressed(Key::ArrowUp) {
-            camera.position += (Vec2::new(0.0, 200.0 * delta));
+            camera.position += Vec2::new(0.0, 200.0 * delta);
             camera.dirty = true;
         }
         if window.is_key_pressed(Key::ArrowDown) {
-            camera.position += (Vec2::new(0.0, -200.0 * delta));
+            camera.position += Vec2::new(0.0, -200.0 * delta);
             camera.dirty = true;
         }
         if window.is_key_pressed(Key::ArrowLeft) {
-            camera.position += (Vec2::new(-200.0 * delta, 0.0));
+            camera.position += Vec2::new(-200.0 * delta, 0.0);
             camera.dirty = true;
         }
         if window.is_key_pressed(Key::ArrowRight) {
-            camera.position += (Vec2::new(200.0 * delta, 0.0));
+            camera.position += Vec2::new(200.0 * delta, 0.0);
             camera.dirty = true;
         }
 
         let sprite = renderer.rectangles.get_mut(sprite_id)?;
         if window.is_key_pressed(Key::KeyW) {
-            sprite.position += (Vec2::new(0.0, 200.0 * delta));
+            sprite.position += Vec2::new(0.0, 200.0 * delta);
         }
         if window.is_key_pressed(Key::KeyS) {
-            sprite.position += (Vec2::new(0.0, -200.0 * delta));
+            sprite.position += Vec2::new(0.0, -200.0 * delta);
         }
         if window.is_key_pressed(Key::KeyA) {
-            sprite.position += (Vec2::new(-200.0 * delta, 0.0));
+            sprite.position += Vec2::new(-200.0 * delta, 0.0);
         }
         if window.is_key_pressed(Key::KeyD) {
-            sprite.position += (Vec2::new(200.0 * delta, 0.0));
+            sprite.position += Vec2::new(200.0 * delta, 0.0);
         }
         if window.is_key_pressed(Key::KeyE) {
-            sprite.rotation += (-2.0 * delta);
+            sprite.rotation += -2.0 * delta;
         }
         if window.is_key_pressed(Key::KeyQ) {
-            sprite.rotation += (2.0 * delta);
+            sprite.rotation += 2.0 * delta;
         }
         if window.is_key_pressed(Key::Space) {
-            sprite.position += (Vec2::new_from_angle(sprite.rotation) * 200.0 * Vec2::new(delta, delta));
+            sprite.position += Vec2::new_from_angle(sprite.rotation) * 200.0 * Vec2::new(delta, delta);
         }
 
         sprite.update();

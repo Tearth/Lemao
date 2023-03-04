@@ -30,16 +30,16 @@ pub fn main() -> Result<(), String> {
 
     let frame_id = renderer.create_frame()?;
     let frame = renderer.frames.get_mut(frame_id)?;
-    frame.size = (Vec2::new(100.0, 100.0));
-    frame.anchor = (Vec2::new(0.5, 0.5));
-    frame.position = (Vec2::new(400.0, 300.0));
+    frame.size = Vec2::new(100.0, 100.0);
+    frame.anchor = Vec2::new(0.5, 0.5);
+    frame.position = Vec2::new(400.0, 300.0);
     frame.update();
 
     let description_text_id = renderer.create_text(font_id)?;
     let description_text = renderer.texts.get_mut(description_text_id)?;
-    description_text.text = (DESCRIPTION.to_string());
-    description_text.anchor = (Vec2::new(0.0, 1.0));
-    description_text.line_height = (20);
+    description_text.text = DESCRIPTION.to_string();
+    description_text.anchor = Vec2::new(0.0, 1.0);
+    description_text.line_height = 20;
     description_text.update();
 
     let mut is_running = true;
@@ -54,16 +54,16 @@ pub fn main() -> Result<(), String> {
                 InputEvent::MouseWheelRotated(direction, _) => {
                     let frame = renderer.frames.get_mut(frame_id)?;
                     if direction == MouseWheelDirection::Up {
-                        frame.thickness = (frame.thickness + FrameThickness::new(1.0, 1.0, 1.0, 1.0));
+                        frame.thickness = frame.thickness + FrameThickness::new(1.0, 1.0, 1.0, 1.0);
                     } else {
-                        frame.thickness = (frame.thickness - FrameThickness::new(1.0, 1.0, 1.0, 1.0));
+                        frame.thickness = frame.thickness - FrameThickness::new(1.0, 1.0, 1.0, 1.0);
                     }
 
                     frame.update();
                 }
                 InputEvent::WindowSizeChanged(size) => {
                     renderer.set_viewport_size(size)?;
-                    renderer.texts.get_mut(description_text_id)?.position = (Vec2::new(5.0, size.y - 0.0));
+                    renderer.texts.get_mut(description_text_id)?.position = Vec2::new(5.0, size.y - 0.0);
                 }
                 InputEvent::WindowClosed => {
                     is_running = false;

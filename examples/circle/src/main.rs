@@ -29,17 +29,17 @@ pub fn main() -> Result<(), String> {
 
     let circle_id = renderer.create_circle()?;
     let circle = renderer.circles.get_mut(circle_id)?;
-    circle.size = (Vec2::new(100.0, 100.0));
-    circle.sides = (64);
-    circle.anchor = (Vec2::new(0.5, 0.5));
-    circle.position = (Vec2::new(400.0, 300.0));
+    circle.size = Vec2::new(100.0, 100.0);
+    circle.sides = 64;
+    circle.anchor = Vec2::new(0.5, 0.5);
+    circle.position = Vec2::new(400.0, 300.0);
     circle.update();
 
     let description_text_id = renderer.create_text(font_id)?;
     let description_text = renderer.texts.get_mut(description_text_id)?;
-    description_text.text = (DESCRIPTION.to_string());
-    description_text.anchor = (Vec2::new(0.0, 1.0));
-    description_text.line_height = (20);
+    description_text.text = DESCRIPTION.to_string();
+    description_text.anchor = Vec2::new(0.0, 1.0);
+    description_text.line_height = 20;
     description_text.update();
 
     let mut is_running = true;
@@ -63,7 +63,7 @@ pub fn main() -> Result<(), String> {
                 }
                 InputEvent::WindowSizeChanged(size) => {
                     renderer.set_viewport_size(size)?;
-                    renderer.texts.get_mut(description_text_id)?.position = (Vec2::new(5.0, size.y - 0.0));
+                    renderer.texts.get_mut(description_text_id)?.position = Vec2::new(5.0, size.y - 0.0);
                 }
                 InputEvent::WindowClosed => {
                     is_running = false;
@@ -74,7 +74,7 @@ pub fn main() -> Result<(), String> {
 
         if window.is_mouse_button_pressed(MouseButton::Left) {
             let position = window.get_cursor_position(CoordinationSystem::Window);
-            renderer.circles.get_mut(circle_id)?.position = (position);
+            renderer.circles.get_mut(circle_id)?.position = position;
             renderer.circles.get_mut(circle_id)?.update();
         }
 

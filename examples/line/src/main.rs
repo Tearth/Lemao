@@ -7,10 +7,10 @@ use lemao_core::lemao_common_platform::input::MouseWheelDirection;
 use lemao_core::lemao_common_platform::window::WindowStyle;
 use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
-use lemao_core::renderer::drawable::line::Line;
+
 use lemao_core::renderer::drawable::DrawableEnum;
-use lemao_core::renderer::fonts::bff;
-use lemao_core::renderer::fonts::Font;
+
+
 use lemao_core::window::context::CoordinationSystem;
 use lemao_core::window::context::WindowContext;
 
@@ -33,14 +33,14 @@ pub fn main() -> Result<(), String> {
 
     let line_id = renderer.create_line().unwrap();
     let line = renderer.lines.get_mut(line_id)?;
-    line.from = (Vec2::new(200.0, 200.0));
-    line.to = (Vec2::new(400.0, 400.0));
+    line.from = Vec2::new(200.0, 200.0);
+    line.to = Vec2::new(400.0, 400.0);
 
     let description_text_id = renderer.create_text(font_id)?;
     let description_text = renderer.texts.get_mut(description_text_id)?;
-    description_text.text = (DESCRIPTION.to_string());
-    description_text.anchor = (Vec2::new(0.0, 1.0));
-    description_text.line_height = (20);
+    description_text.text = DESCRIPTION.to_string();
+    description_text.anchor = Vec2::new(0.0, 1.0);
+    description_text.line_height = 20;
     description_text.update();
 
     let mut is_running = true;
@@ -55,16 +55,16 @@ pub fn main() -> Result<(), String> {
                 InputEvent::MouseWheelRotated(direction, _) => {
                     let line = renderer.lines.get_mut(line_id)?;
                     if direction == MouseWheelDirection::Up {
-                        line.thickness = (line.thickness + 1.0);
+                        line.thickness = line.thickness + 1.0;
                     } else {
-                        line.thickness = ((line.thickness - 1.0).max(1.0));
+                        line.thickness = (line.thickness - 1.0).max(1.0);
                     }
 
                     line.update();
                 }
                 InputEvent::WindowSizeChanged(size) => {
                     renderer.set_viewport_size(size)?;
-                    renderer.texts.get_mut(description_text_id)?.position = (Vec2::new(5.0, size.y - 0.0));
+                    renderer.texts.get_mut(description_text_id)?.position = Vec2::new(5.0, size.y - 0.0);
                 }
                 InputEvent::WindowClosed => {
                     is_running = false;
@@ -81,7 +81,7 @@ pub fn main() -> Result<(), String> {
 
         if window.is_mouse_button_pressed(MouseButton::Right) {
             let position = window.get_cursor_position(CoordinationSystem::Window);
-            renderer.lines.get_mut(line_id)?.to = (position);
+            renderer.lines.get_mut(line_id)?.to = position;
             renderer.lines.get_mut(line_id)?.update();
         }
 
