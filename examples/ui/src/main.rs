@@ -15,7 +15,6 @@ use lemao_core::window::context::WindowContext;
 use lemao_ui::components::label::Label;
 use lemao_ui::components::slider::Slider;
 use lemao_ui::components::wire::WireChunkData;
-use lemao_ui::components::Component;
 use lemao_ui::components::ComponentBorderThickness;
 use lemao_ui::components::ComponentCornerRounding;
 use lemao_ui::components::ComponentMargin;
@@ -23,6 +22,7 @@ use lemao_ui::components::ComponentPosition;
 use lemao_ui::components::ComponentShape;
 use lemao_ui::components::ComponentSize;
 use lemao_ui::components::HorizontalAlignment;
+use lemao_ui::components::VerticalAlignment;
 use lemao_ui::context::UiContext;
 use lemao_ui::events::UiEvent;
 use lemao_ui::utils::storage::UiStorageItem;
@@ -90,32 +90,32 @@ pub fn main() -> Result<(), String> {
 
     let progressbar = ui.create_progressbar(&mut renderer, regular_font_id)?;
     let progressbar_id = progressbar.get_id();
-    progressbar.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.5, 1.0)));
-    progressbar.set_size(ComponentSize::Relative(Vec2::new(0.6, 1.0)));
-    progressbar.set_max_size(Vec2::new(f32::MAX, 20.0));
-    progressbar.set_anchor(Vec2::new(0.5, 1.0));
-    progressbar.set_offset(Vec2::new(0.0, -10.0));
-    progressbar.set_color(Color::Gradient(progressbar_background_gradient));
-    progressbar.set_border_color(Color::SolidColor(SolidColor::new_rgb(72, 79, 92, 255)));
-    progressbar.set_border_thickness(ComponentBorderThickness::new(1.0, 1.0, 1.0, 1.0))?;
-    progressbar.set_corner_rounding(ComponentCornerRounding::new(3.0, 3.0, 3.0, 3.0));
-    progressbar.set_bar_visibility(0, true);
-    progressbar.set_bar_from(0, 0.0);
-    progressbar.set_bar_to(0, 0.45);
-    progressbar.set_bar_color(0, Color::Gradient(bar_1_gradient.clone()));
-    progressbar.set_bar_corner_rounding(0, ComponentCornerRounding::new(3.0, 3.0, 3.0, 3.0));
-    progressbar.set_bar_visibility(1, true);
-    progressbar.set_bar_from(1, 0.0);
-    progressbar.set_bar_to(1, 0.55);
-    progressbar.set_bar_color(1, Color::Gradient(bar_2_gradient.clone()));
-    progressbar.set_bar_corner_rounding(1, ComponentCornerRounding::new(3.0, 3.0, 3.0, 3.0));
-    progressbar.set_label_text("Research: Iron Working (3)".to_string());
-    progressbar.set_label_horizontal_alignment(lemao_ui::components::HorizontalAlignment::Middle);
-    progressbar.set_label_vertical_alignment(lemao_ui::components::VerticalAlignment::Middle);
-    progressbar.set_label_offset(Vec2::new(0.0, -1.0));
-    progressbar.set_label_shadow_enabled_flag(true);
-    progressbar.set_label_shadow_offset(Vec2::new(1.0, -1.0));
-    progressbar.set_label_shadow_color(Color::SolidColor(SolidColor::new_rgb(0, 0, 0, 120)));
+    progressbar.position = ComponentPosition::RelativeToParent(Vec2::new(0.5, 1.0));
+    progressbar.size = ComponentSize::Relative(Vec2::new(0.6, 1.0));
+    progressbar.max_size = Vec2::new(f32::MAX, 20.0);
+    progressbar.anchor = Vec2::new(0.5, 1.0);
+    progressbar.offset = Vec2::new(0.0, -10.0);
+    progressbar.color = Color::Gradient(progressbar_background_gradient);
+    progressbar.border_color = Color::SolidColor(SolidColor::new_rgb(72, 79, 92, 255));
+    progressbar.border_thickness = ComponentBorderThickness::new(1.0, 1.0, 1.0, 1.0);
+    progressbar.corner_rounding = ComponentCornerRounding::new(3.0, 3.0, 3.0, 3.0);
+    progressbar.bars[0].visible = true;
+    progressbar.bars[0].from = 0.0;
+    progressbar.bars[0].to = 0.45;
+    progressbar.bars[0].color = Color::Gradient(bar_1_gradient.clone());
+    progressbar.bars[0].corner_rounding = ComponentCornerRounding::new(3.0, 3.0, 3.0, 3.0);
+    progressbar.bars[1].visible = true;
+    progressbar.bars[1].from = 0.0;
+    progressbar.bars[1].to = 0.55;
+    progressbar.bars[1].color = Color::Gradient(bar_2_gradient.clone());
+    progressbar.bars[1].corner_rounding = ComponentCornerRounding::new(3.0, 3.0, 3.0, 3.0);
+    progressbar.label_text = "Research: Iron Working (3)".to_string();
+    progressbar.label_horizontal_alignment = lemao_ui::components::HorizontalAlignment::Middle;
+    progressbar.label_vertical_alignment = lemao_ui::components::VerticalAlignment::Middle;
+    progressbar.label_offset = Vec2::new(0.0, -1.0);
+    progressbar.label_shadow_enabled = true;
+    progressbar.label_shadow_offset = Vec2::new(1.0, -1.0);
+    progressbar.label_shadow_color = Color::SolidColor(SolidColor::new_rgb(0, 0, 0, 120));
     ui.get_main_canvas_mut()?.add_child(progressbar_id);
     /* #endregion */
 
@@ -135,42 +135,42 @@ pub fn main() -> Result<(), String> {
 
     let main_window = ui.create_panel(&mut renderer, ComponentShape::Rectangle)?;
     let main_window_id = main_window.get_id();
-    main_window.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.5, 0.5)));
-    main_window.set_size(ComponentSize::Absolute(Vec2::new(690.0, 620.0)));
-    main_window.set_anchor(Vec2::new(0.5, 0.5));
-    main_window.set_color(Color::Gradient(window_filling_gradient.clone()));
-    main_window.set_border_color(Color::Gradient(window_border_gradient.clone()));
-    main_window.set_border_thickness(ComponentBorderThickness::new(1.0, 1.0, 1.0, 1.0))?;
-    main_window.set_corner_rounding(ComponentCornerRounding::new(10.0, 10.0, 10.0, 10.0));
-    main_window.set_shadow_enabled_flag(true);
-    main_window.set_shadow_offset(Vec2::new(5.0, -5.0));
-    main_window.set_shadow_color(Color::Gradient(window_shadow_gradient.clone()));
-    main_window.set_shadow_corner_rounding(ComponentCornerRounding::new(20.0, 20.0, 20.0, 20.0))?;
-    main_window.set_shadow_scale(Vec2::new(1.03, 1.03));
+    main_window.position = ComponentPosition::RelativeToParent(Vec2::new(0.5, 0.5));
+    main_window.size = ComponentSize::Absolute(Vec2::new(690.0, 620.0));
+    main_window.anchor = Vec2::new(0.5, 0.5);
+    main_window.color = Color::Gradient(window_filling_gradient.clone());
+    main_window.border_color = Color::Gradient(window_border_gradient.clone());
+    main_window.border_thickness = ComponentBorderThickness::new(1.0, 1.0, 1.0, 1.0);
+    main_window.corner_rounding = ComponentCornerRounding::new(10.0, 10.0, 10.0, 10.0);
+    main_window.shadow_enabled = true;
+    main_window.shadow_offset = Vec2::new(5.0, -5.0);
+    main_window.shadow_color = Color::Gradient(window_shadow_gradient.clone());
+    main_window.shadow_corner_rounding = ComponentCornerRounding::new(20.0, 20.0, 20.0, 20.0);
+    main_window.shadow_scale = Vec2::new(1.03, 1.03);
     ui.get_main_canvas_mut()?.add_child(main_window_id);
 
     let window_title = ui.create_label(&mut renderer, header_font_id)?;
     let window_title_id = window_title.get_id();
-    window_title.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.5, 1.0)));
-    window_title.set_anchor(Vec2::new(0.5, 0.5));
-    window_title.set_offset(Vec2::new(0.0, -27.0));
-    window_title.set_text("You have founded agriculture!".to_string());
-    window_title.set_shadow_enabled_flag(true);
-    window_title.set_shadow_offset(Vec2::new(1.0, -1.0));
-    window_title.set_shadow_color(Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 1.0)));
+    window_title.position = ComponentPosition::RelativeToParent(Vec2::new(0.5, 1.0));
+    window_title.anchor = Vec2::new(0.5, 0.5);
+    window_title.offset = Vec2::new(0.0, -27.0);
+    window_title.label_text = "You have founded agriculture!".to_string();
+    window_title.shadow_enabled = true;
+    window_title.shadow_offset = Vec2::new(1.0, -1.0);
+    window_title.shadow_color = Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 1.0));
     ui.get_component_mut(main_window_id)?.add_child(window_title_id);
 
     let image = ui.create_panel(&mut renderer, ComponentShape::Rectangle)?;
     let image_id = image.get_id();
     image.set_texture(renderer.textures.get(texture_id)?);
-    image.set_size(ComponentSize::Absolute(Vec2::new(300.0, 150.0)));
-    image.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0)));
-    image.set_anchor(Vec2::new(0.0, 1.0));
-    image.set_offset(Vec2::new(0.0, -50.0));
-    image.set_margin(ComponentMargin::new(0.0, 0.0, 10.0, 10.0));
-    image.set_border_color(Color::SolidColor(SolidColor::new_rgb(72, 45, 6, 255)));
-    image.set_border_thickness(ComponentBorderThickness::new(1.0, 1.0, 1.0, 1.0))?;
-    image.set_corner_rounding(ComponentCornerRounding::new(4.0, 4.0, 4.0, 4.0));
+    image.size = ComponentSize::Absolute(Vec2::new(300.0, 150.0));
+    image.position = ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0));
+    image.anchor = Vec2::new(0.0, 1.0);
+    image.offset = Vec2::new(0.0, -50.0);
+    image.margin = ComponentMargin::new(0.0, 0.0, 10.0, 10.0);
+    image.border_color = Color::SolidColor(SolidColor::new_rgb(72, 45, 6, 255));
+    image.border_thickness = ComponentBorderThickness::new(1.0, 1.0, 1.0, 1.0);
+    image.corner_rounding = ComponentCornerRounding::new(4.0, 4.0, 4.0, 4.0);
     ui.get_component_mut(main_window_id)?.add_child(image_id);
 
     let mut quote_panel_gradient = Gradient::new(GradientType::Vertical, Vec2::new(0.0, 0.0));
@@ -179,45 +179,45 @@ pub fn main() -> Result<(), String> {
 
     let quote_panel = ui.create_panel(&mut renderer, ComponentShape::Rectangle)?;
     let quote_panel_id = quote_panel.get_id();
-    quote_panel.set_position(ComponentPosition::RelativeToParent(Vec2::new(1.0, 1.0)));
-    quote_panel.set_size(ComponentSize::Absolute(Vec2::new(400.0, 150.0)));
-    quote_panel.set_anchor(Vec2::new(1.0, 1.0));
-    quote_panel.set_color(Color::SolidColor(SolidColor::new_rgb(60, 60, 60, 0)));
-    quote_panel.set_max_size(Vec2::new(f32::MAX, 150.0));
-    quote_panel.set_margin(ComponentMargin::new(0.0, 0.0, 10.0, 10.0));
-    quote_panel.set_offset(Vec2::new(0.0, -50.0));
-    quote_panel.set_corner_rounding(ComponentCornerRounding::new(5.0, 5.0, 5.0, 5.0));
-    quote_panel.set_border_thickness(ComponentBorderThickness::new(1.0, 1.0, 1.0, 1.0))?;
-    quote_panel.set_border_color(Color::SolidColor(SolidColor::new_rgb(86, 92, 107, 255)));
+    quote_panel.position = ComponentPosition::RelativeToParent(Vec2::new(1.0, 1.0));
+    quote_panel.size = ComponentSize::Absolute(Vec2::new(400.0, 150.0));
+    quote_panel.anchor = Vec2::new(1.0, 1.0);
+    quote_panel.color = Color::SolidColor(SolidColor::new_rgb(60, 60, 60, 0));
+    quote_panel.max_size = Vec2::new(f32::MAX, 150.0);
+    quote_panel.margin = ComponentMargin::new(0.0, 0.0, 10.0, 10.0);
+    quote_panel.offset = Vec2::new(0.0, -50.0);
+    quote_panel.corner_rounding = ComponentCornerRounding::new(5.0, 5.0, 5.0, 5.0);
+    quote_panel.border_thickness = ComponentBorderThickness::new(1.0, 1.0, 1.0, 1.0);
+    quote_panel.border_color = Color::SolidColor(SolidColor::new_rgb(86, 92, 107, 255));
     ui.get_component_mut(main_window_id)?.add_child(quote_panel_id);
 
     let quote = ui.create_label(&mut renderer, regular_font_id)?;
     let quote_id = quote.get_id();
-    quote.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0)));
-    quote.set_anchor(Vec2::new(0.0, 1.0));
-    quote.set_margin(ComponentMargin::new(10.0, 10.0, 10.0, 10.0));
+    quote.position = ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0));
+    quote.anchor = Vec2::new(0.0, 1.0);
+    quote.margin = ComponentMargin::new(10.0, 10.0, 10.0, 10.0);
     quote.set_multiline_text(
         "\"To forget how to dig the earth and to tend the soil is to forget ourselves.\" - °200,255,200,255°Mahatma Gandhi°255,255,255,255°\n\n".to_string() + 
         "\"Agriculture is our wisest pursuit, because it will in the end contribute most to real wealth, good morals, and happiness.\" - °200,255,200,255°Thomas Jefferson°255,255,255,255°",
         360.0,
     );
-    quote.set_shadow_enabled_flag(true);
-    quote.set_shadow_offset(Vec2::new(1.0, -1.0));
-    quote.set_shadow_color(Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 0.5)));
+    quote.shadow_enabled = true;
+    quote.shadow_offset = Vec2::new(1.0, -1.0);
+    quote.shadow_color = Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 0.5));
     ui.get_component_mut(quote_panel_id)?.add_child(quote_id);
 
     let description_panel = ui.create_panel(&mut renderer, ComponentShape::Rectangle)?;
     let description_panel_id = description_panel.get_id();
-    description_panel.set_position(ComponentPosition::RelativeToParent(Vec2::new(1.0, 1.0)));
-    description_panel.set_size(ComponentSize::Relative(Vec2::new(1.0, 150.0)));
-    description_panel.set_anchor(Vec2::new(1.0, 1.0));
-    description_panel.set_color(Color::SolidColor(SolidColor::new_rgb(60, 60, 60, 0)));
-    description_panel.set_max_size(Vec2::new(f32::MAX, 220.0));
-    description_panel.set_margin(ComponentMargin::new(0.0, 0.0, 10.0, 10.0));
-    description_panel.set_offset(Vec2::new(0.0, -210.0));
-    description_panel.set_corner_rounding(ComponentCornerRounding::new(5.0, 8.0, 8.0, 5.0));
-    description_panel.set_border_thickness(ComponentBorderThickness::new(1.0, 1.0, 1.0, 1.0))?;
-    description_panel.set_border_color(Color::SolidColor(SolidColor::new_rgb(86, 92, 107, 255)));
+    description_panel.position = ComponentPosition::RelativeToParent(Vec2::new(1.0, 1.0));
+    description_panel.size = ComponentSize::Relative(Vec2::new(1.0, 150.0));
+    description_panel.anchor = Vec2::new(1.0, 1.0);
+    description_panel.color = Color::SolidColor(SolidColor::new_rgb(60, 60, 60, 0));
+    description_panel.max_size = Vec2::new(f32::MAX, 220.0);
+    description_panel.margin = ComponentMargin::new(0.0, 0.0, 10.0, 10.0);
+    description_panel.offset = Vec2::new(0.0, -210.0);
+    description_panel.corner_rounding = ComponentCornerRounding::new(5.0, 8.0, 8.0, 5.0);
+    description_panel.border_thickness = ComponentBorderThickness::new(1.0, 1.0, 1.0, 1.0);
+    description_panel.border_color = Color::SolidColor(SolidColor::new_rgb(86, 92, 107, 255));
     ui.get_component_mut(main_window_id)?.add_child(description_panel_id);
 
     let mut scroll_gradient = Gradient::new(GradientType::Horizontal, Vec2::new(0.0, 0.0));
@@ -226,33 +226,33 @@ pub fn main() -> Result<(), String> {
 
     let description_scrollbox = ui.create_scrollbox(&mut renderer)?;
     let description_scrollbox_id = description_scrollbox.get_id();
-    description_scrollbox.set_size(ComponentSize::Relative(Vec2::new(1.0, 1.0)));
-    description_scrollbox.set_vertical_scroll_background_color(Color::SolidColor(SolidColor::new_rgb(0, 0, 0, 120)));
-    description_scrollbox.set_vertical_scroll_color(Color::Gradient(scroll_gradient.clone()));
-    description_scrollbox.set_vertical_scroll_corner_rounding(ComponentCornerRounding::new(8.0, 8.0, 8.0, 8.0))?;
-    description_scrollbox.set_vertical_scroll_background_corner_rounding(ComponentCornerRounding::new(8.0, 8.0, 8.0, 8.0))?;
-    description_scrollbox.set_vertical_scroll_border_thickness(ComponentBorderThickness::new(1.0, 1.0, 1.0, 1.0));
-    description_scrollbox.set_vertical_scroll_border_color(Color::SolidColor(SolidColor::new_rgb(199, 178, 153, 255)));
-    description_scrollbox.set_vertical_scroll_background_border_color(Color::SolidColor(SolidColor::new_rgb(199, 178, 153, 255)));
-    description_scrollbox.set_vertical_scroll_background_border_thickness(ComponentBorderThickness::new(1.0, 1.0, 1.0, 1.0));
+    description_scrollbox.size = ComponentSize::Relative(Vec2::new(1.0, 1.0));
+    description_scrollbox.vertical_scroll_background_color = Color::SolidColor(SolidColor::new_rgb(0, 0, 0, 120));
+    description_scrollbox.vertical_scroll_color = Color::Gradient(scroll_gradient.clone());
+    description_scrollbox.vertical_scroll_corner_rounding = ComponentCornerRounding::new(8.0, 8.0, 8.0, 8.0);
+    description_scrollbox.vertical_scroll_background_corner_rounding = ComponentCornerRounding::new(8.0, 8.0, 8.0, 8.0);
+    description_scrollbox.vertical_scroll_border_thickness = ComponentBorderThickness::new(1.0, 1.0, 1.0, 1.0);
+    description_scrollbox.vertical_scroll_border_color = Color::SolidColor(SolidColor::new_rgb(199, 178, 153, 255));
+    description_scrollbox.vertical_scroll_background_border_color = Color::SolidColor(SolidColor::new_rgb(199, 178, 153, 255));
+    description_scrollbox.vertical_scroll_background_border_thickness = ComponentBorderThickness::new(1.0, 1.0, 1.0, 1.0);
 
-    description_scrollbox.set_horizontal_scroll_background_color(Color::SolidColor(SolidColor::new_rgb(0, 0, 0, 120)));
-    description_scrollbox.set_horizontal_scroll_color(Color::Gradient(scroll_gradient.clone()));
-    description_scrollbox.set_horizontal_scroll_corner_rounding(ComponentCornerRounding::new(8.0, 8.0, 8.0, 8.0))?;
-    description_scrollbox.set_horizontal_scroll_background_corner_rounding(ComponentCornerRounding::new(8.0, 8.0, 8.0, 8.0))?;
-    description_scrollbox.set_horizontal_scroll_border_thickness(ComponentBorderThickness::new(1.0, 1.0, 1.0, 1.0));
-    description_scrollbox.set_horizontal_scroll_border_color(Color::SolidColor(SolidColor::new_rgb(199, 178, 153, 255)));
-    description_scrollbox.set_horizontal_scroll_background_border_color(Color::SolidColor(SolidColor::new_rgb(199, 178, 153, 255)));
-    description_scrollbox.set_horizontal_scroll_background_border_thickness(ComponentBorderThickness::new(1.0, 1.0, 1.0, 1.0));
-    description_scrollbox.set_padding(Vec2::new(20.0, 20.0));
-    description_scrollbox.set_scroll_width(Vec2::new(20.0, 0.0));
+    description_scrollbox.horizontal_scroll_background_color = Color::SolidColor(SolidColor::new_rgb(0, 0, 0, 120));
+    description_scrollbox.horizontal_scroll_color = Color::Gradient(scroll_gradient.clone());
+    description_scrollbox.horizontal_scroll_corner_rounding = ComponentCornerRounding::new(8.0, 8.0, 8.0, 8.0);
+    description_scrollbox.horizontal_scroll_background_corner_rounding = ComponentCornerRounding::new(8.0, 8.0, 8.0, 8.0);
+    description_scrollbox.horizontal_scroll_border_thickness = ComponentBorderThickness::new(1.0, 1.0, 1.0, 1.0);
+    description_scrollbox.horizontal_scroll_border_color = Color::SolidColor(SolidColor::new_rgb(199, 178, 153, 255));
+    description_scrollbox.horizontal_scroll_background_border_color = Color::SolidColor(SolidColor::new_rgb(199, 178, 153, 255));
+    description_scrollbox.horizontal_scroll_background_border_thickness = ComponentBorderThickness::new(1.0, 1.0, 1.0, 1.0);
+    description_scrollbox.padding = Vec2::new(20.0, 20.0);
+    description_scrollbox.scroll_width = Vec2::new(20.0, 0.0);
     ui.get_component_mut(description_panel_id)?.add_child(description_scrollbox_id);
 
     let description = ui.create_label(&mut renderer, regular_font_id)?;
     let description_id = description.get_id();
-    description.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0)));
-    description.set_anchor(Vec2::new(0.0, 1.0));
-    description.set_margin(ComponentMargin::new(10.0, 10.0, 10.0, 10.0));
+    description.position = ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0));
+    description.anchor = Vec2::new(0.0, 1.0);
+    description.margin = ComponentMargin::new(10.0, 10.0, 10.0, 10.0);
     description.set_multiline_text(
         "Agriculture began independently in different parts of the globe, and included a diverse range of taxa. At least eleven separate regions of the Old and New World were involved as independent centers of origin. The development of agriculture about 12,000 years ago changed the way humans lived. They switched from nomadic hunter-gatherer lifestyles to permanent settlements and farming.\n\n".to_string() + 
         "Wild grains were collected and eaten from at least 105,000 years ago. However, domestication did not occur until much later. The earliest evidence of small-scale cultivation of edible grasses is from around 21,000 BC with the Ohalo II people on the shores of the Sea of Galilee. By around 9500 BC, the eight Neolithic founder crops - emmer wheat, einkorn wheat, hulled barley, peas, lentils, bitter vetch, chickpeas, and flax - were cultivated in the Levant. Rye may have been cultivated earlier, but this claim remains controversial. Rice was domesticated in China by 6200 BC with earliest known cultivation from 5700 BC, followed by mung, soy and azuki beans. Rice was also independently domesticated in West Africa and cultivated by 1000 BC. Pigs were domesticated in Mesopotamia around 11,000 years ago, followed by sheep. Cattle were domesticated from the wild aurochs in the areas of modern Turkey and India around 8500 BC. Camels were domesticated late, perhaps around 3000 BC.\n\n" +
@@ -260,9 +260,9 @@ pub fn main() -> Result<(), String> {
         "In South America, agriculture began as early as 9000 BC, starting with the cultivation of several species of plants that later became only minor crops. In the Andes of South America, the potato was domesticated between 8000 BC and 5000 BC, along with beans, squash, tomatoes, peanuts, coca, llamas, alpacas, and guinea pigs. Cassava was domesticated in the Amazon Basin no later than 7000 BC. Maize (Zea mays) found its way to South America from Mesoamerica, where wild teosinte was domesticated about 7000 BC and selectively bred to become domestic maize. Cotton was domesticated in Peru by 4200 BC; another species of cotton was domesticated in Mesoamerica and became by far the most important species of cotton in the textile industry in modern times. Evidence of agriculture in the Eastern United States dates to about 3000 BCE. Several plants were cultivated, later to be replaced by the Three Sisters cultivation of maize, squash, and beans.",
         630.0,
     );
-    description.set_shadow_enabled_flag(true);
-    description.set_shadow_offset(Vec2::new(1.0, -1.0));
-    description.set_shadow_color(Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 0.5)));
+    description.shadow_enabled = true;
+    description.shadow_offset = Vec2::new(1.0, -1.0);
+    description.shadow_color = Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 0.5));
     ui.get_component_mut(description_scrollbox_id)?.add_child(description_id);
 
     let mut effect_panel_1_gradient = Gradient::new(GradientType::Vertical, Vec2::new(0.0, 0.0));
@@ -271,42 +271,40 @@ pub fn main() -> Result<(), String> {
 
     let effect_panel_1 = ui.create_panel(&mut renderer, ComponentShape::Rectangle)?;
     let effect_panel_1_id = effect_panel_1.get_id();
-    effect_panel_1.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.5, 0.0)));
-    effect_panel_1.set_size(ComponentSize::Relative(Vec2::new(1.0, 1.0)));
-    effect_panel_1.set_anchor(Vec2::new(0.5, 0.0));
-    effect_panel_1.set_color(Color::Gradient(effect_panel_1_gradient));
-    effect_panel_1.set_max_size(Vec2::new(f32::MAX, 120.0));
-    effect_panel_1.set_margin(ComponentMargin::new(0.0, 0.0, 10.0, 10.0));
-    effect_panel_1.set_offset(Vec2::new(0.0, 60.0));
-    effect_panel_1.set_corner_rounding(ComponentCornerRounding::new(5.0, 5.0, 5.0, 5.0));
+    effect_panel_1.position = ComponentPosition::RelativeToParent(Vec2::new(0.5, 0.0));
+    effect_panel_1.size = ComponentSize::Relative(Vec2::new(1.0, 1.0));
+    effect_panel_1.anchor = Vec2::new(0.5, 0.0);
+    effect_panel_1.color = Color::Gradient(effect_panel_1_gradient);
+    effect_panel_1.max_size = Vec2::new(f32::MAX, 120.0);
+    effect_panel_1.margin = ComponentMargin::new(0.0, 0.0, 10.0, 10.0);
+    effect_panel_1.offset = Vec2::new(0.0, 60.0);
+    effect_panel_1.corner_rounding = ComponentCornerRounding::new(5.0, 5.0, 5.0, 5.0);
     ui.get_component_mut(main_window_id)?.add_child(effect_panel_1_id);
 
     let effect_panel_2 = ui.create_panel(&mut renderer, ComponentShape::Rectangle)?;
     let effect_panel_2_id = effect_panel_2.get_id();
-    effect_panel_2.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.5, 0.0)));
-    effect_panel_2.set_size(ComponentSize::Relative(Vec2::new(1.0, 1.0)));
-    effect_panel_2.set_anchor(Vec2::new(0.5, 0.0));
-    effect_panel_2.set_color(Color::SolidColor(SolidColor::new_rgb(0, 0, 0, 60)));
-    effect_panel_2.set_max_size(Vec2::new(f32::MAX, 120.0));
-    effect_panel_2.set_margin(ComponentMargin::new(10.0, 0.0, 20.0, 20.0));
-    effect_panel_2.set_offset(Vec2::new(0.0, 60.0));
-    effect_panel_2.set_corner_rounding(ComponentCornerRounding::new(5.0, 5.0, 5.0, 5.0));
+    effect_panel_2.position = ComponentPosition::RelativeToParent(Vec2::new(0.5, 0.0));
+    effect_panel_2.size = ComponentSize::Relative(Vec2::new(1.0, 1.0));
+    effect_panel_2.anchor = Vec2::new(0.5, 0.0);
+    effect_panel_2.color = Color::SolidColor(SolidColor::new_rgb(0, 0, 0, 60));
+    effect_panel_2.max_size = Vec2::new(f32::MAX, 120.0);
+    effect_panel_2.margin = ComponentMargin::new(10.0, 0.0, 20.0, 20.0);
+    effect_panel_2.offset = Vec2::new(0.0, 60.0);
+    effect_panel_2.corner_rounding = ComponentCornerRounding::new(5.0, 5.0, 5.0, 5.0);
     ui.get_component_mut(main_window_id)?.add_child(effect_panel_2_id);
 
     let effect = ui.create_label(&mut renderer, regular_font_id)?;
     let effect_id = effect.get_id();
-    effect.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0)));
-    effect.set_anchor(Vec2::new(0.0, 1.0));
-    effect.set_margin(ComponentMargin::new(3.0, 3.0, 3.0, 3.0));
-    effect.set_text(
-        "+1 \u{CA} and +1 \u{C9} per military unit stationed in the city\n".to_string()
-            + "+10% \u{CA} for every farm belonging to capital (but not more than 50%)\n"
-            + "+20% \u{C8} for every specialist\n"
-            + "+1 \u{C8} worker mainteance",
-    );
-    effect.set_shadow_enabled_flag(true);
-    effect.set_shadow_offset(Vec2::new(1.0, -1.0));
-    effect.set_shadow_color(Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 0.5)));
+    effect.position = ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0));
+    effect.anchor = Vec2::new(0.0, 1.0);
+    effect.margin = ComponentMargin::new(3.0, 3.0, 3.0, 3.0);
+    effect.label_text = "+1 \u{CA} and +1 \u{C9} per military unit stationed in the city\n".to_string()
+        + "+10% \u{CA} for every farm belonging to capital (but not more than 50%)\n"
+        + "+20% \u{C8} for every specialist\n"
+        + "+1 \u{C8} worker mainteance";
+    effect.shadow_enabled = true;
+    effect.shadow_offset = Vec2::new(1.0, -1.0);
+    effect.shadow_color = Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 0.5));
     ui.get_component_mut(effect_panel_2_id)?.add_child(effect_id);
 
     let mut button_filling_gradient = Gradient::new(GradientType::Vertical, Vec2::new(0.0, 0.0));
@@ -315,34 +313,34 @@ pub fn main() -> Result<(), String> {
 
     let ok_button = ui.create_button(&mut renderer, ComponentShape::Rectangle, bold_font_id)?;
     let ok_button_id = ok_button.get_id();
-    ok_button.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.5, 0.0)));
-    ok_button.set_size(ComponentSize::Absolute(Vec2::new(100.0, 25.0)));
-    ok_button.set_anchor(Vec2::new(0.5, 0.5));
-    ok_button.set_color(Color::Gradient(button_filling_gradient.clone()));
-    ok_button.set_border_thickness(ComponentBorderThickness::new(1.0, 1.0, 1.0, 1.0))?;
-    ok_button.set_border_color(Color::SolidColor(SolidColor::new(0.5, 0.5, 0.5, 1.0)));
-    ok_button.set_label_text("Ok".to_string());
-    ok_button.set_margin(ComponentMargin::new(0.0, 0.0, 0.0, 0.0));
-    ok_button.set_label_horizontal_alignment(lemao_ui::components::HorizontalAlignment::Middle);
-    ok_button.set_label_vertical_alignment(lemao_ui::components::VerticalAlignment::Middle);
-    ok_button.set_label_offset(Vec2::new(0.0, 0.0));
-    ok_button.set_label_color(Color::SolidColor(SolidColor::new_rgb(117, 95, 72, 255)));
-    ok_button.set_offset(Vec2::new(0.0, 30.0));
-    ok_button.set_corner_rounding(ComponentCornerRounding::new(5.0, 5.0, 5.0, 5.0));
-    ok_button.set_shadow_enabled_flag(true);
-    ok_button.set_shadow_offset(Vec2::new(2.0, -2.0));
-    ok_button.set_shadow_color(Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 1.0)));
-    ok_button.set_shadow_corner_rounding(ComponentCornerRounding::new(5.0, 5.0, 5.0, 5.0))?;
-    ok_button.set_shadow_scale(Vec2::new(1.01, 1.01));
+    ok_button.position = ComponentPosition::RelativeToParent(Vec2::new(0.5, 0.0));
+    ok_button.size = ComponentSize::Absolute(Vec2::new(100.0, 25.0));
+    ok_button.anchor = Vec2::new(0.5, 0.5);
+    ok_button.color = Color::Gradient(button_filling_gradient.clone());
+    ok_button.border_thickness = ComponentBorderThickness::new(1.0, 1.0, 1.0, 1.0);
+    ok_button.border_color = Color::SolidColor(SolidColor::new(0.5, 0.5, 0.5, 1.0));
+    ok_button.label_text = "Ok".to_string();
+    ok_button.margin = ComponentMargin::new(0.0, 0.0, 0.0, 0.0);
+    ok_button.label_horizontal_alignment = HorizontalAlignment::Middle;
+    ok_button.label_vertical_alignment = VerticalAlignment::Middle;
+    ok_button.label_offset = Vec2::new(0.0, 0.0);
+    ok_button.label_color = Color::SolidColor(SolidColor::new_rgb(117, 95, 72, 255));
+    ok_button.offset = Vec2::new(0.0, 30.0);
+    ok_button.corner_rounding = ComponentCornerRounding::new(5.0, 5.0, 5.0, 5.0);
+    ok_button.shadow_enabled = true;
+    ok_button.shadow_offset = Vec2::new(2.0, -2.0);
+    ok_button.shadow_color = Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 1.0));
+    ok_button.shadow_corner_rounding = ComponentCornerRounding::new(5.0, 5.0, 5.0, 5.0);
+    ok_button.shadow_scale = Vec2::new(1.01, 1.01);
     ok_button.on_button_pressed = Some(|button, _, _| {
-        button.set_color(button.get_color().clone().set_alpha(0.8));
-        button.set_border_color(button.get_border_color().clone().set_alpha(0.8));
-        button.set_shadow_color(button.get_shadow_color().clone().set_alpha(0.4));
+        button.color = button.color.clone().set_alpha(0.8);
+        button.border_color = button.border_color.clone().set_alpha(0.8);
+        button.shadow_color = button.shadow_color.clone().set_alpha(0.4);
     });
     ok_button.on_button_released = Some(|button, _, _| {
-        button.set_color(button.get_color().clone().set_alpha(1.0));
-        button.set_border_color(button.get_border_color().clone().set_alpha(1.0));
-        button.set_shadow_color(button.get_shadow_color().clone().set_alpha(1.0));
+        button.color = button.color.clone().set_alpha(1.0);
+        button.border_color = button.border_color.clone().set_alpha(1.0);
+        button.shadow_color = button.shadow_color.clone().set_alpha(1.0);
     });
     ui.get_component_mut(main_window_id)?.add_child(ok_button_id);
     /* #endregion */
@@ -350,30 +348,30 @@ pub fn main() -> Result<(), String> {
     /* #region Right side window */
     let right_window = ui.create_panel(&mut renderer, ComponentShape::Rectangle)?;
     let right_window_id = right_window.get_id();
-    right_window.set_position(ComponentPosition::RelativeToParent(Vec2::new(1.0, 0.5)));
-    right_window.set_offset(Vec2::new(-15.0, 0.0));
-    right_window.set_size(ComponentSize::Absolute(Vec2::new(300.0, 620.0)));
-    right_window.set_anchor(Vec2::new(1.0, 0.5));
-    right_window.set_color(Color::Gradient(window_filling_gradient.clone()));
-    right_window.set_border_color(Color::Gradient(window_border_gradient.clone()));
-    right_window.set_border_thickness(ComponentBorderThickness::new(1.0, 1.0, 1.0, 1.0))?;
-    right_window.set_corner_rounding(ComponentCornerRounding::new(10.0, 10.0, 10.0, 10.0));
-    right_window.set_shadow_enabled_flag(true);
-    right_window.set_shadow_offset(Vec2::new(5.0, -5.0));
-    right_window.set_shadow_color(Color::Gradient(window_shadow_gradient.clone()));
-    right_window.set_shadow_corner_rounding(ComponentCornerRounding::new(20.0, 20.0, 20.0, 20.0))?;
-    right_window.set_shadow_scale(Vec2::new(1.03, 1.03));
+    right_window.position = ComponentPosition::RelativeToParent(Vec2::new(1.0, 0.5));
+    right_window.offset = Vec2::new(-15.0, 0.0);
+    right_window.size = ComponentSize::Absolute(Vec2::new(300.0, 620.0));
+    right_window.anchor = Vec2::new(1.0, 0.5);
+    right_window.color = Color::Gradient(window_filling_gradient.clone());
+    right_window.border_color = Color::Gradient(window_border_gradient.clone());
+    right_window.border_thickness = ComponentBorderThickness::new(1.0, 1.0, 1.0, 1.0);
+    right_window.corner_rounding = ComponentCornerRounding::new(10.0, 10.0, 10.0, 10.0);
+    right_window.shadow_enabled = true;
+    right_window.shadow_offset = Vec2::new(5.0, -5.0);
+    right_window.shadow_color = Color::Gradient(window_shadow_gradient.clone());
+    right_window.shadow_corner_rounding = ComponentCornerRounding::new(20.0, 20.0, 20.0, 20.0);
+    right_window.shadow_scale = Vec2::new(1.03, 1.03);
     ui.get_main_canvas_mut()?.add_child(right_window_id);
 
     let right_window_title = ui.create_label(&mut renderer, header_font_id)?;
     let right_window_title_id = right_window_title.get_id();
-    right_window_title.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.5, 1.0)));
-    right_window_title.set_anchor(Vec2::new(0.5, 0.5));
-    right_window_title.set_offset(Vec2::new(0.0, -27.0));
-    right_window_title.set_text("Settings".to_string());
-    right_window_title.set_shadow_enabled_flag(true);
-    right_window_title.set_shadow_offset(Vec2::new(1.0, -1.0));
-    right_window_title.set_shadow_color(Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 1.0)));
+    right_window_title.position = ComponentPosition::RelativeToParent(Vec2::new(0.5, 1.0));
+    right_window_title.anchor = Vec2::new(0.5, 0.5);
+    right_window_title.offset = Vec2::new(0.0, -27.0);
+    right_window_title.label_text = "Settings".to_string();
+    right_window_title.shadow_enabled = true;
+    right_window_title.shadow_offset = Vec2::new(1.0, -1.0);
+    right_window_title.shadow_color = Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 1.0));
     ui.get_component_mut(right_window_id)?.add_child(right_window_title_id);
 
     let mut checkbox_ids = Vec::new();
@@ -392,17 +390,17 @@ pub fn main() -> Result<(), String> {
     for checkbox_label in checkbox_labels {
         let checkbox = ui.create_checkbox(&mut renderer, regular_font_id, box_checked_id, box_unchecked_id)?;
         let checkbox_id = checkbox.get_id();
-        checkbox.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0)));
-        checkbox.set_offset(Vec2::new(0.0, -75.0 - 30.0 * checkbox_ids.len() as f32));
-        checkbox.set_margin(ComponentMargin::new(3.0, 3.0, 3.0, 10.0));
-        checkbox.set_label_offset(Vec2::new(25.0, 1.0));
-        checkbox.set_box_offset(Vec2::new(0.0, 4.0));
-        checkbox.set_label_text(checkbox_label.to_string());
-        checkbox.set_label_shadow_enabled_flag(true);
-        checkbox.set_label_shadow_offset(Vec2::new(1.0, -1.0));
-        checkbox.set_label_shadow_color(Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 1.0)));
-        checkbox.on_cursor_enter = Some(|checkbox, _| checkbox.set_box_color(checkbox.get_box_color().clone().set_alpha(0.8)));
-        checkbox.on_cursor_leave = Some(|checkbox, _| checkbox.set_box_color(checkbox.get_box_color().clone().set_alpha(1.0)));
+        checkbox.position = ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0));
+        checkbox.offset = Vec2::new(0.0, -75.0 - 30.0 * checkbox_ids.len() as f32);
+        checkbox.margin = ComponentMargin::new(3.0, 3.0, 3.0, 10.0);
+        checkbox.label_offset = Vec2::new(25.0, 1.0);
+        checkbox.box_offset = Vec2::new(0.0, 4.0);
+        checkbox.label_text = checkbox_label.to_string();
+        checkbox.label_shadow_enabled = true;
+        checkbox.label_shadow_offset = Vec2::new(1.0, -1.0);
+        checkbox.label_shadow_color = Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 1.0));
+        checkbox.on_cursor_enter = Some(|checkbox, _| checkbox.box_color = checkbox.box_color.clone().set_alpha(0.8));
+        checkbox.on_cursor_leave = Some(|checkbox, _| checkbox.box_color = checkbox.box_color.clone().set_alpha(1.0));
         ui.get_component_mut(right_window_id)?.add_child(checkbox_id);
 
         checkbox_ids.push(checkbox_id);
@@ -415,42 +413,42 @@ pub fn main() -> Result<(), String> {
     for textbox_label in textbox_labels {
         let label = ui.create_label(&mut renderer, regular_font_id)?;
         let label_id = label.get_id();
-        label.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0)));
-        label.set_offset(Vec2::new(0.0, -348.0 - 30.0 * textbox_label_ids.len() as f32));
-        label.set_margin(ComponentMargin::new(3.0, 3.0, 3.0, 10.0));
-        label.set_text(textbox_label.to_string());
-        label.set_shadow_enabled_flag(true);
-        label.set_shadow_offset(Vec2::new(1.0, -1.0));
-        label.set_shadow_color(Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 1.0)));
+        label.position = ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0));
+        label.offset = Vec2::new(0.0, -348.0 - 30.0 * textbox_label_ids.len() as f32);
+        label.margin = ComponentMargin::new(3.0, 3.0, 3.0, 10.0);
+        label.label_text = textbox_label.to_string();
+        label.shadow_enabled = true;
+        label.shadow_offset = Vec2::new(1.0, -1.0);
+        label.shadow_color = Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 1.0));
         ui.get_component_mut(right_window_id)?.add_child(label_id);
 
         textbox_label_ids.push(label_id);
 
         let textbox = ui.create_textbox(&mut renderer, regular_font_id)?;
         let textbox_id = textbox.get_id();
-        textbox.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0)));
-        textbox.set_size(ComponentSize::Absolute(Vec2::new(180.0, 30.0)));
-        textbox.set_offset(Vec2::new(110.0, -350.0 - 30.0 * textbox_ids.len() as f32));
-        textbox.set_margin(ComponentMargin::new(3.0, 3.0, 3.0, 10.0));
-        textbox.set_label_horizontal_alignment(HorizontalAlignment::Left);
-        textbox.set_label_offset(Vec2::new(3.0, -1.0));
-        textbox.set_color(Color::SolidColor(SolidColor::new_rgb(38, 41, 52, 255)));
-        textbox.set_border_color(Color::SolidColor(SolidColor::new_rgb(199, 178, 153, 255)));
-        textbox.set_border_thickness(ComponentBorderThickness::new(1.0, 1.0, 1.0, 1.0))?;
-        textbox.set_corner_rounding(ComponentCornerRounding::new(3.0, 3.0, 3.0, 3.0));
-        textbox.set_label_max_length(15);
+        textbox.position = ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0));
+        textbox.size = ComponentSize::Absolute(Vec2::new(180.0, 30.0));
+        textbox.offset = Vec2::new(110.0, -350.0 - 30.0 * textbox_ids.len() as f32);
+        textbox.margin = ComponentMargin::new(3.0, 3.0, 3.0, 10.0);
+        textbox.label_horizontal_alignment = HorizontalAlignment::Left;
+        textbox.label_offset = Vec2::new(3.0, -1.0);
+        textbox.color = Color::SolidColor(SolidColor::new_rgb(38, 41, 52, 255));
+        textbox.border_color = Color::SolidColor(SolidColor::new_rgb(199, 178, 153, 255));
+        textbox.border_thickness = ComponentBorderThickness::new(1.0, 1.0, 1.0, 1.0);
+        textbox.corner_rounding = ComponentCornerRounding::new(3.0, 3.0, 3.0, 3.0);
+        textbox.label_max_length = 15;
         textbox.on_cursor_enter = Some(|textbox, _| {
-            if !textbox.is_active() {
-                textbox.set_color(textbox.get_color().clone().set_alpha(0.8));
+            if !textbox.active {
+                textbox.color = textbox.color.clone().set_alpha(0.8);
             }
         });
         textbox.on_cursor_leave = Some(|textbox, _| {
-            if !textbox.is_active() {
-                textbox.set_color(textbox.get_color().clone().set_alpha(1.0));
+            if !textbox.active {
+                textbox.color = textbox.color.clone().set_alpha(1.0);
             }
         });
-        textbox.on_activation = Some(|textbox, _| textbox.set_color(textbox.get_color().clone().set_alpha(0.5)));
-        textbox.on_deactivation = Some(|textbox, _| textbox.set_color(textbox.get_color().clone().set_alpha(1.0)));
+        textbox.on_activation = Some(|textbox, _| textbox.color = textbox.color.clone().set_alpha(0.5));
+        textbox.on_deactivation = Some(|textbox, _| textbox.color = textbox.color.clone().set_alpha(1.0));
         ui.get_component_mut(right_window_id)?.add_child(textbox_id);
 
         textbox_ids.push(textbox_id);
@@ -458,13 +456,13 @@ pub fn main() -> Result<(), String> {
 
     let right_window_focuses_title = ui.create_label(&mut renderer, header_font_id)?;
     let right_window_focuses_title_id = right_window_focuses_title.get_id();
-    right_window_focuses_title.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.5, 1.0)));
-    right_window_focuses_title.set_anchor(Vec2::new(0.5, 0.5));
-    right_window_focuses_title.set_offset(Vec2::new(0.0, -445.0));
-    right_window_focuses_title.set_text("City focuses".to_string());
-    right_window_focuses_title.set_shadow_enabled_flag(true);
-    right_window_focuses_title.set_shadow_offset(Vec2::new(1.0, -1.0));
-    right_window_focuses_title.set_shadow_color(Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 1.0)));
+    right_window_focuses_title.position = ComponentPosition::RelativeToParent(Vec2::new(0.5, 1.0));
+    right_window_focuses_title.anchor = Vec2::new(0.5, 0.5);
+    right_window_focuses_title.offset = Vec2::new(0.0, -445.0);
+    right_window_focuses_title.label_text = "City focuses".to_string();
+    right_window_focuses_title.shadow_enabled = true;
+    right_window_focuses_title.shadow_offset = Vec2::new(1.0, -1.0);
+    right_window_focuses_title.shadow_color = Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 1.0));
     ui.get_component_mut(right_window_id)?.add_child(right_window_focuses_title_id);
 
     let mut toggle_button_ids = Vec::new();
@@ -473,36 +471,36 @@ pub fn main() -> Result<(), String> {
     for toggle_button_label in toggle_button_labels {
         let button = ui.create_button(&mut renderer, ComponentShape::Rectangle, regular_font_id)?;
         let button_id = button.get_id();
-        button.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0)));
-        button.set_size(ComponentSize::Absolute(Vec2::new(40.0, 30.0)));
-        button.set_offset(Vec2::new(100.0 + 50.0 * toggle_button_ids.len() as f32, -480.0));
-        button.set_anchor(Vec2::new(0.5, 0.5));
-        button.set_color(Color::Gradient(button_filling_gradient.clone()));
-        button.set_border_thickness(ComponentBorderThickness::new(1.0, 1.0, 1.0, 1.0))?;
-        button.set_border_color(Color::SolidColor(SolidColor::new(0.5, 0.5, 0.5, 1.0)));
-        button.set_label_text(toggle_button_label.to_string());
-        button.set_margin(ComponentMargin::new(0.0, 0.0, 0.0, 0.0));
-        button.set_label_horizontal_alignment(lemao_ui::components::HorizontalAlignment::Middle);
-        button.set_label_vertical_alignment(lemao_ui::components::VerticalAlignment::Middle);
-        button.set_label_offset(Vec2::new(0.0, -2.0));
-        button.set_corner_rounding(ComponentCornerRounding::new(5.0, 5.0, 5.0, 5.0));
-        button.set_shadow_enabled_flag(true);
-        button.set_shadow_offset(Vec2::new(2.0, -2.0));
-        button.set_shadow_color(Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 1.0)));
-        button.set_shadow_corner_rounding(ComponentCornerRounding::new(5.0, 5.0, 5.0, 5.0))?;
-        button.set_shadow_scale(Vec2::new(1.01, 1.01));
-        button.set_toggleable_flag(true);
+        button.position = ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0));
+        button.size = ComponentSize::Absolute(Vec2::new(40.0, 30.0));
+        button.offset = Vec2::new(100.0 + 50.0 * toggle_button_ids.len() as f32, -480.0);
+        button.anchor = Vec2::new(0.5, 0.5);
+        button.color = Color::Gradient(button_filling_gradient.clone());
+        button.border_thickness = ComponentBorderThickness::new(1.0, 1.0, 1.0, 1.0);
+        button.border_color = Color::SolidColor(SolidColor::new(0.5, 0.5, 0.5, 1.0));
+        button.label_text = toggle_button_label.to_string();
+        button.margin = ComponentMargin::new(0.0, 0.0, 0.0, 0.0);
+        button.label_horizontal_alignment = lemao_ui::components::HorizontalAlignment::Middle;
+        button.label_vertical_alignment = lemao_ui::components::VerticalAlignment::Middle;
+        button.label_offset = Vec2::new(0.0, -2.0);
+        button.corner_rounding = ComponentCornerRounding::new(5.0, 5.0, 5.0, 5.0);
+        button.shadow_enabled = true;
+        button.shadow_offset = Vec2::new(2.0, -2.0);
+        button.shadow_color = Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 1.0));
+        button.shadow_corner_rounding = ComponentCornerRounding::new(5.0, 5.0, 5.0, 5.0);
+        button.shadow_scale = Vec2::new(1.01, 1.01);
+        button.toggleable = true;
         button.on_button_pressed = Some(|button, _, _| {
-            button.set_color(button.get_color().clone().set_alpha(0.4));
-            button.set_border_color(button.get_border_color().clone().set_alpha(0.4));
-            button.set_shadow_color(button.get_shadow_color().clone().set_alpha(0.0));
-            button.set_label_color(button.get_label_color().clone().set_alpha(0.2));
+            button.color = button.color.clone().set_alpha(0.4);
+            button.border_color = button.border_color.clone().set_alpha(0.4);
+            button.shadow_color = button.shadow_color.clone().set_alpha(0.0);
+            button.label_color = button.label_color.clone().set_alpha(0.2);
         });
         button.on_button_released = Some(|button, _, _| {
-            button.set_color(button.get_color().clone().set_alpha(1.0));
-            button.set_border_color(button.get_border_color().clone().set_alpha(1.0));
-            button.set_shadow_color(button.get_shadow_color().clone().set_alpha(1.0));
-            button.set_label_color(button.get_label_color().clone().set_alpha(1.0));
+            button.color = button.color.clone().set_alpha(1.0);
+            button.border_color = button.border_color.clone().set_alpha(1.0);
+            button.shadow_color = button.shadow_color.clone().set_alpha(1.0);
+            button.label_color = button.label_color.clone().set_alpha(1.0);
         });
         ui.get_component_mut(right_window_id)?.add_child(button_id);
 
@@ -521,36 +519,36 @@ pub fn main() -> Result<(), String> {
     for slider_label in slider_labels {
         let label = ui.create_label(&mut renderer, regular_font_id)?;
         let label_id = label.get_id();
-        label.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0)));
-        label.set_anchor(Vec2::new(0.0, 0.5));
-        label.set_offset(Vec2::new(0.0, -530.0 - 30.0 * slider_label_ids.len() as f32));
-        label.set_margin(ComponentMargin::new(3.0, 3.0, 3.0, 10.0));
-        label.set_text(slider_label.to_string());
-        label.set_shadow_enabled_flag(true);
-        label.set_shadow_offset(Vec2::new(1.0, -1.0));
-        label.set_shadow_color(Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 1.0)));
+        label.position = ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0));
+        label.anchor = Vec2::new(0.0, 0.5);
+        label.offset = Vec2::new(0.0, -530.0 - 30.0 * slider_label_ids.len() as f32);
+        label.margin = ComponentMargin::new(3.0, 3.0, 3.0, 10.0);
+        label.label_text = slider_label.to_string();
+        label.shadow_enabled = true;
+        label.shadow_offset = Vec2::new(1.0, -1.0);
+        label.shadow_color = Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 1.0));
         ui.get_component_mut(right_window_id)?.add_child(label_id);
 
         slider_label_ids.push(label_id);
 
         let slider = ui.create_slider(&mut renderer, ComponentShape::Disc)?;
         let slider_id = slider.get_id();
-        slider.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.5, 1.0)));
-        slider.set_size(ComponentSize::Absolute(Vec2::new(210.0, 10.0)));
-        slider.set_anchor(Vec2::new(0.5, 0.5));
-        slider.set_offset(Vec2::new(35.0, -530.0 - 30.0 * slider_ids.len() as f32));
-        slider.set_margin(ComponentMargin::new(3.0, 3.0, 3.0, 10.0));
-        slider.set_color(Color::SolidColor(SolidColor::new_rgb(38, 41, 52, 255)));
-        slider.set_bar_color(Color::SolidColor(SolidColor::new_rgb(219, 198, 173, 255)));
+        slider.position = ComponentPosition::RelativeToParent(Vec2::new(0.5, 1.0));
+        slider.size = ComponentSize::Absolute(Vec2::new(210.0, 10.0));
+        slider.anchor = Vec2::new(0.5, 0.5);
+        slider.offset = Vec2::new(35.0, -530.0 - 30.0 * slider_ids.len() as f32);
+        slider.margin = ComponentMargin::new(3.0, 3.0, 3.0, 10.0);
+        slider.color = Color::SolidColor(SolidColor::new_rgb(38, 41, 52, 255));
+        slider.bar_color = Color::SolidColor(SolidColor::new_rgb(219, 198, 173, 255));
         slider.set_phase(0.5);
-        slider.set_border_thickness(ComponentBorderThickness::new(1.0, 1.0, 1.0, 1.0))?;
-        slider.set_border_color(Color::SolidColor(SolidColor::new_rgb(199, 178, 153, 255)));
-        slider.set_corner_rounding(ComponentCornerRounding::new(1.0, 1.0, 1.0, 1.0));
-        slider.set_selector_size(Vec2::new(15.0, 15.0));
-        slider.set_selector_color(Color::Gradient(selector_filling_gradient.clone()));
-        slider.set_steps_count(slider_steps_count[slider_ids.len()]);
-        slider.set_selector_border_thickness(ComponentBorderThickness::new(1.0, 1.0, 1.0, 1.0));
-        slider.set_selector_border_color(Color::SolidColor(SolidColor::new_rgb(199, 178, 153, 255)));
+        slider.border_thickness = ComponentBorderThickness::new(1.0, 1.0, 1.0, 1.0);
+        slider.border_color = Color::SolidColor(SolidColor::new_rgb(199, 178, 153, 255));
+        slider.corner_rounding = ComponentCornerRounding::new(1.0, 1.0, 1.0, 1.0);
+        slider.selector_size = Vec2::new(15.0, 15.0);
+        slider.selector_color = Color::Gradient(selector_filling_gradient.clone());
+        slider.steps_count = slider_steps_count[slider_ids.len()];
+        slider.selector_border_thickness = ComponentBorderThickness::new(1.0, 1.0, 1.0, 1.0);
+        slider.selector_border_color = Color::SolidColor(SolidColor::new_rgb(199, 178, 153, 255));
         ui.get_component_mut(right_window_id)?.add_child(slider_id);
 
         slider_ids.push(slider_id);
@@ -560,30 +558,30 @@ pub fn main() -> Result<(), String> {
     /* #region Left side window */
     let left_window = ui.create_panel(&mut renderer, ComponentShape::Rectangle)?;
     let left_window_id = left_window.get_id();
-    left_window.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.0, 0.5)));
-    left_window.set_offset(Vec2::new(15.0, 0.0));
-    left_window.set_size(ComponentSize::Absolute(Vec2::new(300.0, 620.0)));
-    left_window.set_anchor(Vec2::new(0.0, 0.5));
-    left_window.set_color(Color::Gradient(window_filling_gradient.clone()));
-    left_window.set_border_color(Color::Gradient(window_border_gradient.clone()));
-    left_window.set_border_thickness(ComponentBorderThickness::new(1.0, 1.0, 1.0, 1.0))?;
-    left_window.set_corner_rounding(ComponentCornerRounding::new(10.0, 10.0, 10.0, 10.0));
-    left_window.set_shadow_enabled_flag(true);
-    left_window.set_shadow_offset(Vec2::new(5.0, -5.0));
-    left_window.set_shadow_color(Color::Gradient(window_shadow_gradient.clone()));
-    left_window.set_shadow_corner_rounding(ComponentCornerRounding::new(20.0, 20.0, 20.0, 20.0))?;
-    left_window.set_shadow_scale(Vec2::new(1.03, 1.03));
+    left_window.position = ComponentPosition::RelativeToParent(Vec2::new(0.0, 0.5));
+    left_window.offset = Vec2::new(15.0, 0.0);
+    left_window.size = ComponentSize::Absolute(Vec2::new(300.0, 620.0));
+    left_window.anchor = Vec2::new(0.0, 0.5);
+    left_window.color = Color::Gradient(window_filling_gradient.clone());
+    left_window.border_color = Color::Gradient(window_border_gradient.clone());
+    left_window.border_thickness = ComponentBorderThickness::new(1.0, 1.0, 1.0, 1.0);
+    left_window.corner_rounding = ComponentCornerRounding::new(10.0, 10.0, 10.0, 10.0);
+    left_window.shadow_enabled = true;
+    left_window.shadow_offset = Vec2::new(5.0, -5.0);
+    left_window.shadow_color = Color::Gradient(window_shadow_gradient.clone());
+    left_window.shadow_corner_rounding = ComponentCornerRounding::new(20.0, 20.0, 20.0, 20.0);
+    left_window.shadow_scale = Vec2::new(1.03, 1.03);
     ui.get_main_canvas_mut()?.add_child(left_window_id);
 
     let left_window_title = ui.create_label(&mut renderer, header_font_id)?;
     let left_window_title_id = left_window_title.get_id();
-    left_window_title.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.5, 1.0)));
-    left_window_title.set_anchor(Vec2::new(0.5, 0.5));
-    left_window_title.set_offset(Vec2::new(0.0, -27.0));
-    left_window_title.set_text("Statistics".to_string());
-    left_window_title.set_shadow_enabled_flag(true);
-    left_window_title.set_shadow_offset(Vec2::new(1.0, -1.0));
-    left_window_title.set_shadow_color(Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 1.0)));
+    left_window_title.position = ComponentPosition::RelativeToParent(Vec2::new(0.5, 1.0));
+    left_window_title.anchor = Vec2::new(0.5, 0.5);
+    left_window_title.offset = Vec2::new(0.0, -27.0);
+    left_window_title.label_text = "Statistics".to_string();
+    left_window_title.shadow_enabled = true;
+    left_window_title.shadow_offset = Vec2::new(1.0, -1.0);
+    left_window_title.shadow_color = Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 1.0));
     ui.get_component_mut(left_window_id)?.add_child(left_window_title_id);
 
     let mut pie_chart_1_filling_gradient = Gradient::new(GradientType::Radial, Vec2::new(0.0, 0.0));
@@ -592,17 +590,17 @@ pub fn main() -> Result<(), String> {
 
     let pie_chart_1 = ui.create_panel(&mut renderer, ComponentShape::Disc)?;
     let pie_chart_1_id = pie_chart_1.get_id();
-    pie_chart_1.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.5, 1.0)));
-    pie_chart_1.set_offset(Vec2::new(0.0, -180.0));
-    pie_chart_1.set_size(ComponentSize::Absolute(Vec2::new(250.0, 250.0)));
-    pie_chart_1.set_anchor(Vec2::new(0.5, 0.5));
-    pie_chart_1.set_color(Color::Gradient(pie_chart_1_filling_gradient));
-    pie_chart_1.set_border_color(Color::SolidColor(SolidColor::new_rgb(0, 0, 0, 255)));
-    pie_chart_1.set_border_thickness(ComponentBorderThickness::new(1.0, 1.0, 1.0, 1.0))?;
-    pie_chart_1.set_start_angle(0.0);
-    pie_chart_1.set_end_angle(std::f32::consts::PI * 0.7);
-    pie_chart_1.on_cursor_enter = Some(|panel, _| panel.set_color(panel.get_color().clone().set_alpha(0.5)));
-    pie_chart_1.on_cursor_leave = Some(|panel, _| panel.set_color(panel.get_color().clone().set_alpha(1.0)));
+    pie_chart_1.position = ComponentPosition::RelativeToParent(Vec2::new(0.5, 1.0));
+    pie_chart_1.offset = Vec2::new(0.0, -180.0);
+    pie_chart_1.size = ComponentSize::Absolute(Vec2::new(250.0, 250.0));
+    pie_chart_1.anchor = Vec2::new(0.5, 0.5);
+    pie_chart_1.color = Color::Gradient(pie_chart_1_filling_gradient);
+    pie_chart_1.border_color = Color::SolidColor(SolidColor::new_rgb(0, 0, 0, 255));
+    pie_chart_1.border_thickness = ComponentBorderThickness::new(1.0, 1.0, 1.0, 1.0);
+    pie_chart_1.start_angle = 0.0;
+    pie_chart_1.end_angle = std::f32::consts::PI * 0.7;
+    pie_chart_1.on_cursor_enter = Some(|panel, _| panel.color = panel.color.clone().set_alpha(0.5));
+    pie_chart_1.on_cursor_leave = Some(|panel, _| panel.color = panel.color.clone().set_alpha(1.0));
     ui.get_component_mut(left_window_id)?.add_child(pie_chart_1_id);
 
     let mut pie_chart_2_filling_gradient = Gradient::new(GradientType::Radial, Vec2::new(0.0, 0.0));
@@ -611,17 +609,17 @@ pub fn main() -> Result<(), String> {
 
     let pie_chart_2 = ui.create_panel(&mut renderer, ComponentShape::Disc)?;
     let pie_chart_2_id = pie_chart_2.get_id();
-    pie_chart_2.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.5, 1.0)));
-    pie_chart_2.set_offset(Vec2::new(0.0, -180.0));
-    pie_chart_2.set_size(ComponentSize::Absolute(Vec2::new(250.0, 250.0)));
-    pie_chart_2.set_anchor(Vec2::new(0.5, 0.5));
-    pie_chart_2.set_color(Color::Gradient(pie_chart_2_filling_gradient));
-    pie_chart_2.set_border_color(Color::SolidColor(SolidColor::new_rgb(0, 0, 0, 255)));
-    pie_chart_2.set_border_thickness(ComponentBorderThickness::new(1.0, 1.0, 1.0, 1.0))?;
-    pie_chart_2.set_start_angle(std::f32::consts::PI * 0.7);
-    pie_chart_2.set_end_angle(std::f32::consts::PI * 1.3);
-    pie_chart_2.on_cursor_enter = Some(|panel, _| panel.set_color(panel.get_color().clone().set_alpha(0.5)));
-    pie_chart_2.on_cursor_leave = Some(|panel, _| panel.set_color(panel.get_color().clone().set_alpha(1.0)));
+    pie_chart_2.position = ComponentPosition::RelativeToParent(Vec2::new(0.5, 1.0));
+    pie_chart_2.offset = Vec2::new(0.0, -180.0);
+    pie_chart_2.size = ComponentSize::Absolute(Vec2::new(250.0, 250.0));
+    pie_chart_2.anchor = Vec2::new(0.5, 0.5);
+    pie_chart_2.color = Color::Gradient(pie_chart_2_filling_gradient);
+    pie_chart_2.border_color = Color::SolidColor(SolidColor::new_rgb(0, 0, 0, 255));
+    pie_chart_2.border_thickness = ComponentBorderThickness::new(1.0, 1.0, 1.0, 1.0);
+    pie_chart_2.start_angle = std::f32::consts::PI * 0.7;
+    pie_chart_2.end_angle = std::f32::consts::PI * 1.3;
+    pie_chart_2.on_cursor_enter = Some(|panel, _| panel.color = panel.color.clone().set_alpha(0.5));
+    pie_chart_2.on_cursor_leave = Some(|panel, _| panel.color = panel.color.clone().set_alpha(1.0));
     ui.get_component_mut(left_window_id)?.add_child(pie_chart_2_id);
 
     let mut pie_chart_3_filling_gradient = Gradient::new(GradientType::Radial, Vec2::new(0.0, 0.0));
@@ -630,41 +628,39 @@ pub fn main() -> Result<(), String> {
 
     let pie_chart_3 = ui.create_panel(&mut renderer, ComponentShape::Disc)?;
     let pie_chart_3_id = pie_chart_3.get_id();
-    pie_chart_3.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.5, 1.0)));
-    pie_chart_3.set_offset(Vec2::new(0.0, -180.0));
-    pie_chart_3.set_size(ComponentSize::Absolute(Vec2::new(250.0, 250.0)));
-    pie_chart_3.set_anchor(Vec2::new(0.5, 0.5));
-    pie_chart_3.set_color(Color::Gradient(pie_chart_3_filling_gradient));
-    pie_chart_3.set_border_color(Color::SolidColor(SolidColor::new_rgb(0, 0, 0, 255)));
-    pie_chart_3.set_border_thickness(ComponentBorderThickness::new(1.0, 1.0, 1.0, 1.0))?;
-    pie_chart_3.set_start_angle(std::f32::consts::PI * 1.3);
-    pie_chart_3.set_end_angle(std::f32::consts::PI * 2.0);
-    pie_chart_3.on_cursor_enter = Some(|panel, _| panel.set_color(panel.get_color().clone().set_alpha(0.5)));
-    pie_chart_3.on_cursor_leave = Some(|panel, _| panel.set_color(panel.get_color().clone().set_alpha(1.0)));
+    pie_chart_3.position = ComponentPosition::RelativeToParent(Vec2::new(0.5, 1.0));
+    pie_chart_3.offset = Vec2::new(0.0, -180.0);
+    pie_chart_3.size = ComponentSize::Absolute(Vec2::new(250.0, 250.0));
+    pie_chart_3.anchor = Vec2::new(0.5, 0.5);
+    pie_chart_3.color = Color::Gradient(pie_chart_3_filling_gradient);
+    pie_chart_3.border_color = Color::SolidColor(SolidColor::new_rgb(0, 0, 0, 255));
+    pie_chart_3.border_thickness = ComponentBorderThickness::new(1.0, 1.0, 1.0, 1.0);
+    pie_chart_3.start_angle = std::f32::consts::PI * 1.3;
+    pie_chart_3.end_angle = std::f32::consts::PI * 2.0;
+    pie_chart_3.on_cursor_enter = Some(|panel, _| panel.color = panel.color.clone().set_alpha(0.5));
+    pie_chart_3.on_cursor_leave = Some(|panel, _| panel.color = panel.color.clone().set_alpha(1.0));
     ui.get_component_mut(left_window_id)?.add_child(pie_chart_3_id);
 
     let pie_chart_legend = ui.create_label(&mut renderer, regular_font_id)?;
     let pie_chart_legend_id = pie_chart_legend.get_id();
-    pie_chart_legend.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.5, 1.0)));
-    pie_chart_legend.set_anchor(Vec2::new(0.5, 1.0));
-    pie_chart_legend.set_offset(Vec2::new(0.0, -320.0));
-    pie_chart_legend.set_text(
-        "°254,135,177,255°\u{CB}°255,255,255,255° - import ".to_string()
-            + "°175,69,166,255°\u{CB}°255,255,255,255° - export "
-            + "°147,82,186,255°\u{CB}°255,255,255,255° - domestic",
-    );
-    pie_chart_legend.set_shadow_enabled_flag(true);
-    pie_chart_legend.set_shadow_offset(Vec2::new(1.0, -1.0));
-    pie_chart_legend.set_shadow_color(Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 0.5)));
+    pie_chart_legend.position = ComponentPosition::RelativeToParent(Vec2::new(0.5, 1.0));
+    pie_chart_legend.anchor = Vec2::new(0.5, 1.0);
+    pie_chart_legend.offset = Vec2::new(0.0, -320.0);
+    pie_chart_legend.label_text = "°254,135,177,255°\u{CB}°255,255,255,255° - import ".to_string()
+        + "°175,69,166,255°\u{CB}°255,255,255,255° - export "
+        + "°147,82,186,255°\u{CB}°255,255,255,255° - domestic";
+    pie_chart_legend.shadow_enabled = true;
+    pie_chart_legend.shadow_offset = Vec2::new(1.0, -1.0);
+    pie_chart_legend.shadow_color = Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 0.5));
     ui.get_component_mut(left_window_id)?.add_child(pie_chart_legend_id);
 
     let line_chart = ui.create_wire(&mut renderer)?;
     let line_chart_id = line_chart.get_id();
-    line_chart.set_position(ComponentPosition::RelativeToParent(Vec2::new(0.5, 1.0)));
-    line_chart.set_offset(Vec2::new(0.0, -480.0));
-    line_chart.set_size(ComponentSize::Absolute(Vec2::new(250.0, 250.0)));
-    line_chart.set_anchor(Vec2::new(0.5, 0.5));
-    line_chart.set_data(vec![
+    line_chart.position = ComponentPosition::RelativeToParent(Vec2::new(0.5, 1.0));
+    line_chart.offset = Vec2::new(0.0, -480.0);
+    line_chart.size = ComponentSize::Absolute(Vec2::new(250.0, 250.0));
+    line_chart.anchor = Vec2::new(0.5, 0.5);
+    line_chart.data = vec![
         // Helper lines
         WireChunkData::new(Color::SolidColor(SolidColor::new_rgb(255, 255, 255, 50)), Vec2::new(0.0, 0.2), Vec2::new(1.0, 0.2), 1.0),
         WireChunkData::new(Color::SolidColor(SolidColor::new_rgb(255, 255, 255, 50)), Vec2::new(0.0, 0.4), Vec2::new(1.0, 0.4), 1.0),
@@ -682,7 +678,7 @@ pub fn main() -> Result<(), String> {
         // Axis
         WireChunkData::new(Color::SolidColor(SolidColor::new_rgb(255, 255, 255, 255)), Vec2::new(0.0, 1.0), Vec2::new(0.0, 0.0), 1.0),
         WireChunkData::new(Color::SolidColor(SolidColor::new_rgb(255, 255, 255, 255)), Vec2::new(0.0, 0.0), Vec2::new(1.0, 0.0), 1.0),
-    ]);
+    ];
     ui.get_component_mut(left_window_id)?.add_child(line_chart_id);
     /* #endregion */
 
@@ -733,11 +729,13 @@ pub fn main() -> Result<(), String> {
                 UiEvent::SelectorMoved(component_id, direction) => {
                     println!("SELECTOR {} {:?}", component_id, direction);
 
-                    let phase = ui.get_component_and_cast_mut::<Slider>(component_id)?.get_phase();
+                    let phase = ui.get_component_and_cast_mut::<Slider>(component_id)?.phase;
                     let label_index = slider_ids.iter().position(|&p| p == component_id).unwrap();
                     let label_content = slider_labels[label_index].replace("50%", &format!("{:.0}%", phase * 100.0));
 
-                    ui.get_component_and_cast_mut::<Label>(slider_label_ids[label_index])?.set_text(label_content);
+                    let slider_label = ui.get_component_and_cast_mut::<Label>(slider_label_ids[label_index])?;
+                    slider_label.label_text = label_content;
+                    slider_label.dirty = true;
                 }
                 UiEvent::TextBoxActivated(component_id, button) => println!("TEXTBOX ACTIVATED {} {:?}", component_id, button),
                 UiEvent::TextBoxDeactivated(component_id, button) => println!("TEXTBOX DEACTIVATED {} {:?}", component_id, button),

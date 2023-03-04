@@ -17,7 +17,7 @@ pub struct RawFont {
 }
 
 pub struct Font {
-    pub(crate) id: usize,
+    pub id: usize,
     pub(crate) texture_gl_id: u32,
     gl: Rc<OpenGLPointers>,
 

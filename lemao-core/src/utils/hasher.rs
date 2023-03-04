@@ -7,7 +7,7 @@ pub struct StorageHasher {
 pub struct StorageHasherBuilder;
 
 impl Hasher for StorageHasher {
-    fn write(&mut self, bytes: &[u8]) {
+    fn write(&mut self, _bytes: &[u8]) {
         panic!("Invalid use of NoHashHasher")
     }
 

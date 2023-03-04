@@ -22,43 +22,43 @@ pub struct Panel {
     pub(crate) id: usize,
 
     // Common properties
-    position: ComponentPosition,
-    screen_position: Vec2,
-    size: ComponentSize,
-    screen_size: Vec2,
-    min_size: Vec2,
-    max_size: Vec2,
-    anchor: Vec2,
-    margin: ComponentMargin,
-    offset: Vec2,
-    scroll_offset: Vec2,
-    active: bool,
-    dirty: bool,
-    children: Vec<usize>,
-    event_mask: Option<EventMask>,
+    pub position: ComponentPosition,
+    pub screen_position: Vec2,
+    pub size: ComponentSize,
+    pub screen_size: Vec2,
+    pub min_size: Vec2,
+    pub max_size: Vec2,
+    pub anchor: Vec2,
+    pub margin: ComponentMargin,
+    pub offset: Vec2,
+    pub scroll_offset: Vec2,
+    pub active: bool,
+    pub dirty: bool,
+    pub children: Vec<usize>,
+    pub event_mask: Option<EventMask>,
 
     // Shape properties
-    filling_id: usize,
-    shape: ComponentShape,
-    color: Color,
-    corner_rounding: ComponentCornerRounding,
-    start_angle: f32,
-    end_angle: f32,
-    texture_id: Option<usize>,
-    texture_original_size: Vec2,
+    pub filling_id: usize,
+    pub shape: ComponentShape,
+    pub color: Color,
+    pub corner_rounding: ComponentCornerRounding,
+    pub start_angle: f32,
+    pub end_angle: f32,
+    pub texture_id: Option<usize>,
+    pub texture_original_size: Vec2,
 
     // Border properties
-    border_id: usize,
-    border_color: Color,
-    border_thickness: ComponentBorderThickness,
+    pub border_id: usize,
+    pub border_color: Color,
+    pub border_thickness: ComponentBorderThickness,
 
     // Shadow properties
-    shadow_id: usize,
-    shadow_enabled: bool,
-    shadow_offset: Vec2,
-    shadow_color: Color,
-    shadow_scale: Vec2,
-    shadow_corner_rounding: ComponentCornerRounding,
+    pub shadow_id: usize,
+    pub shadow_enabled: bool,
+    pub shadow_offset: Vec2,
+    pub shadow_color: Color,
+    pub shadow_scale: Vec2,
+    pub shadow_corner_rounding: ComponentCornerRounding,
 
     // Event handlers
     pub on_cursor_enter: Option<fn(component: &mut Self, cursor_position: Vec2)>,
@@ -128,131 +128,12 @@ impl Panel {
         })
     }
 
-    /* #region Shape properties */
-    pub fn get_id(&self) -> usize {
-        self.id
-    }
-
-    pub fn get_shape(&self) -> ComponentShape {
-        self.shape
-    }
-
-    pub fn get_color(&self) -> &Color {
-        &self.color
-    }
-
-    pub fn set_color(&mut self, color: Color) {
-        self.color = color;
-        self.dirty = true;
-    }
-
-    pub fn get_corner_rounding(&self) -> ComponentCornerRounding {
-        self.corner_rounding
-    }
-
-    pub fn set_corner_rounding(&mut self, corner_rounding: ComponentCornerRounding) {
-        self.corner_rounding = corner_rounding;
-        self.dirty = true;
-    }
-
-    pub fn get_start_angle(&self) -> f32 {
-        self.start_angle
-    }
-
-    pub fn set_start_angle(&mut self, start_angle: f32) {
-        self.start_angle = start_angle;
-        self.dirty = true;
-    }
-
-    pub fn get_end_angle(&self) -> f32 {
-        self.end_angle
-    }
-
-    pub fn set_end_angle(&mut self, end_angle: f32) {
-        self.end_angle = end_angle;
-        self.dirty = true;
-    }
-
-    pub fn get_texture_id(&self) -> Option<usize> {
-        self.texture_id
-    }
-
     pub fn set_texture(&mut self, texture: &Texture) {
         self.texture_id = Some(texture.id);
         self.texture_original_size = texture.get_size();
         self.size = ComponentSize::Absolute(texture.get_size());
         self.dirty = true;
     }
-    /* #endregion */
-
-    /* #region Border properties */
-    pub fn get_border_thickness(&self) -> ComponentBorderThickness {
-        self.border_thickness
-    }
-
-    pub fn set_border_thickness(&mut self, border_thickness: ComponentBorderThickness) -> Result<(), String> {
-        if self.shape == ComponentShape::Rectangle && !self.border_thickness.is_axially_uniform() {
-            return Err("Not supported".to_string());
-        }
-
-        self.border_thickness = border_thickness;
-        self.dirty = true;
-        Ok(())
-    }
-
-    pub fn get_border_color(&self) -> &Color {
-        &self.border_color
-    }
-
-    pub fn set_border_color(&mut self, border_color: Color) {
-        self.border_color = border_color;
-        self.dirty = true;
-    }
-    /* #endregion */
-
-    /* #region Shadow properties */
-    pub fn is_shadow_enabled(&self) -> bool {
-        self.shadow_enabled
-    }
-
-    pub fn set_shadow_enabled_flag(&mut self, shadow_enabled: bool) {
-        self.shadow_enabled = shadow_enabled;
-    }
-
-    pub fn get_shadow_offset(&self) -> Vec2 {
-        self.shadow_offset
-    }
-
-    pub fn set_shadow_offset(&mut self, shadow_offset: Vec2) {
-        self.shadow_offset = shadow_offset;
-    }
-
-    pub fn get_shadow_color(&self) -> &Color {
-        &self.shadow_color
-    }
-
-    pub fn set_shadow_color(&mut self, get_shadow_color: Color) {
-        self.shadow_color = get_shadow_color;
-    }
-
-    pub fn get_shadow_scale(&self) -> Vec2 {
-        self.shadow_scale
-    }
-
-    pub fn set_shadow_scale(&mut self, shadow_scale: Vec2) {
-        self.shadow_scale = shadow_scale;
-    }
-
-    pub fn get_shadow_corner_rounding(&self) -> ComponentCornerRounding {
-        self.shadow_corner_rounding
-    }
-
-    pub fn set_shadow_corner_rounding(&mut self, shadow_corner_rounding: ComponentCornerRounding) -> Result<(), String> {
-        self.shadow_corner_rounding = shadow_corner_rounding;
-        self.dirty = true;
-        Ok(())
-    }
-    /* #endregion */
 
     fn is_point_inside(&self, point: Vec2) -> bool {
         if !self.active {

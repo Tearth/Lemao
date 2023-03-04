@@ -12,39 +12,40 @@ use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::context::RendererContext;
 use lemao_core::renderer::drawable::Color;
 use lemao_core::renderer::drawable::DrawableEnum;
+use lemao_core::renderer::fonts::Font;
 use std::any::Any;
 
 pub struct Label {
     pub(crate) id: usize,
 
     // Common properties
-    position: ComponentPosition,
-    screen_position: Vec2,
-    size: ComponentSize,
-    screen_size: Vec2,
-    min_size: Vec2,
-    max_size: Vec2,
-    anchor: Vec2,
-    margin: ComponentMargin,
-    offset: Vec2,
-    scroll_offset: Vec2,
-    active: bool,
-    dirty: bool,
-    children: Vec<usize>,
-    event_mask: Option<EventMask>,
+    pub position: ComponentPosition,
+    pub screen_position: Vec2,
+    pub size: ComponentSize,
+    pub screen_size: Vec2,
+    pub min_size: Vec2,
+    pub max_size: Vec2,
+    pub anchor: Vec2,
+    pub margin: ComponentMargin,
+    pub offset: Vec2,
+    pub scroll_offset: Vec2,
+    pub active: bool,
+    pub dirty: bool,
+    pub children: Vec<usize>,
+    pub event_mask: Option<EventMask>,
 
     // Label properties
-    label_id: usize,
-    label_font_id: usize,
-    label_text: String,
-    label_color: Color,
-    multiline: bool,
-    max_multiline_width: f32,
+    pub label_id: usize,
+    pub label_font_id: usize,
+    pub label_text: String,
+    pub label_color: Color,
+    pub multiline: bool,
+    pub max_multiline_width: f32,
 
     // Shadow properties
-    shadow_enabled: bool,
-    shadow_offset: Vec2,
-    shadow_color: Color,
+    pub shadow_enabled: bool,
+    pub shadow_offset: Vec2,
+    pub shadow_color: Color,
 
     // Event handlers
     pub on_cursor_enter: Option<fn(component: &mut Self, cursor_position: Vec2)>,
@@ -95,27 +96,8 @@ impl Label {
         })
     }
 
-    pub fn get_id(&self) -> usize {
-        self.id
-    }
-
-    /* #region Label properties */
-    pub fn get_font_id(&self) -> usize {
-        self.label_font_id
-    }
-
-    pub fn set_font_id(&mut self, font_id: usize) {
-        self.label_font_id = font_id;
-        self.dirty = true;
-    }
-
-    pub fn get_text(&self) -> &str {
-        &self.label_text
-    }
-
-    pub fn set_text(&mut self, text: String) {
-        self.label_text = text;
-        self.multiline = false;
+    pub fn set_label_font(&mut self, font: &Font) {
+        self.label_font_id = font.id;
         self.dirty = true;
     }
 
@@ -125,42 +107,6 @@ impl Label {
         self.multiline = true;
         self.dirty = true;
     }
-
-    pub fn get_color(&self) -> &Color {
-        &self.label_color
-    }
-
-    pub fn set_color(&mut self, color: Color) {
-        self.label_color = color;
-        self.dirty = true;
-    }
-    /* #endregion */
-
-    /* #region Shadow properties */
-    pub fn is_shadow_enabled(&self) -> bool {
-        self.shadow_enabled
-    }
-
-    pub fn set_shadow_enabled_flag(&mut self, shadow_enabled: bool) {
-        self.shadow_enabled = shadow_enabled;
-    }
-
-    pub fn get_shadow_offset(&self) -> Vec2 {
-        self.shadow_offset
-    }
-
-    pub fn set_shadow_offset(&mut self, shadow_offset: Vec2) {
-        self.shadow_offset = shadow_offset;
-    }
-
-    pub fn get_shadow_color(&self) -> &Color {
-        &self.shadow_color
-    }
-
-    pub fn set_shadow_color(&mut self, get_shadow_color: Color) {
-        self.shadow_color = get_shadow_color;
-    }
-    /* #endregion */
 
     fn is_point_inside(&self, point: Vec2) -> bool {
         if !self.active {

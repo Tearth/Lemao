@@ -17,24 +17,24 @@ pub struct Wire {
     pub(crate) id: usize,
 
     // Common properties
-    position: ComponentPosition,
-    screen_position: Vec2,
-    size: ComponentSize,
-    screen_size: Vec2,
-    min_size: Vec2,
-    max_size: Vec2,
-    anchor: Vec2,
-    margin: ComponentMargin,
-    offset: Vec2,
-    scroll_offset: Vec2,
-    active: bool,
-    dirty: bool,
-    children: Vec<usize>,
-    event_mask: Option<EventMask>,
+    pub position: ComponentPosition,
+    pub screen_position: Vec2,
+    pub size: ComponentSize,
+    pub screen_size: Vec2,
+    pub min_size: Vec2,
+    pub max_size: Vec2,
+    pub anchor: Vec2,
+    pub margin: ComponentMargin,
+    pub offset: Vec2,
+    pub scroll_offset: Vec2,
+    pub active: bool,
+    pub dirty: bool,
+    pub children: Vec<usize>,
+    pub event_mask: Option<EventMask>,
 
     // Line properties
-    chunks: Vec<WireChunk>,
-    data: Vec<WireChunkData>,
+    pub chunks: Vec<WireChunk>,
+    pub data: Vec<WireChunkData>,
 
     // Event handlers
     pub on_cursor_enter: Option<fn(component: &mut Self, cursor_position: Vec2)>,
@@ -87,22 +87,6 @@ impl Wire {
             on_mouse_button_released: None,
         })
     }
-
-    pub fn get_id(&self) -> usize {
-        self.id
-    }
-
-    /* #region Line properties */
-    pub fn set_data(&mut self, data: Vec<WireChunkData>) {
-        self.data = data;
-        self.dirty = true;
-    }
-
-    pub fn clear_data(&mut self) {
-        self.data.clear();
-        self.dirty = true;
-    }
-    /* #endregion */
 
     fn is_point_inside(&self, point: Vec2) -> bool {
         if !self.active {

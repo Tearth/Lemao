@@ -16,6 +16,7 @@ use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::context::RendererContext;
 use lemao_core::renderer::drawable::Color;
 use lemao_core::renderer::drawable::DrawableEnum;
+use lemao_core::renderer::fonts::Font;
 use lemao_core::renderer::textures::Texture;
 use std::any::Any;
 
@@ -25,57 +26,57 @@ pub struct ProgressBar {
     pub(crate) id: usize,
 
     // Common properties
-    position: ComponentPosition,
-    screen_position: Vec2,
-    size: ComponentSize,
-    screen_size: Vec2,
-    min_size: Vec2,
-    max_size: Vec2,
-    anchor: Vec2,
-    margin: ComponentMargin,
-    offset: Vec2,
-    scroll_offset: Vec2,
-    active: bool,
-    dirty: bool,
-    children: Vec<usize>,
-    event_mask: Option<EventMask>,
+    pub position: ComponentPosition,
+    pub screen_position: Vec2,
+    pub size: ComponentSize,
+    pub screen_size: Vec2,
+    pub min_size: Vec2,
+    pub max_size: Vec2,
+    pub anchor: Vec2,
+    pub margin: ComponentMargin,
+    pub offset: Vec2,
+    pub scroll_offset: Vec2,
+    pub active: bool,
+    pub dirty: bool,
+    pub children: Vec<usize>,
+    pub event_mask: Option<EventMask>,
 
     // Shape properties
-    filling_id: usize,
-    color: Color,
-    corner_rounding: ComponentCornerRounding,
-    texture_id: Option<usize>,
-    texture_original_size: Vec2,
+    pub filling_id: usize,
+    pub color: Color,
+    pub corner_rounding: ComponentCornerRounding,
+    pub texture_id: Option<usize>,
+    pub texture_original_size: Vec2,
 
     // Border properties
-    border_id: usize,
-    border_color: Color,
-    border_thickness: ComponentBorderThickness,
+    pub border_id: usize,
+    pub border_color: Color,
+    pub border_thickness: ComponentBorderThickness,
 
     // Label properties
-    label_id: usize,
-    label_font_id: usize,
-    label_text: String,
-    label_horizontal_alignment: HorizontalAlignment,
-    label_vertical_alignment: VerticalAlignment,
-    label_offset: Vec2,
-    label_color: Color,
+    pub label_id: usize,
+    pub label_font_id: usize,
+    pub label_text: String,
+    pub label_horizontal_alignment: HorizontalAlignment,
+    pub label_vertical_alignment: VerticalAlignment,
+    pub label_offset: Vec2,
+    pub label_color: Color,
 
     // Shadow properties
-    shadow_id: usize,
-    shadow_enabled: bool,
-    shadow_offset: Vec2,
-    shadow_color: Color,
-    shadow_scale: Vec2,
-    shadow_corner_rounding: ComponentCornerRounding,
+    pub shadow_id: usize,
+    pub shadow_enabled: bool,
+    pub shadow_offset: Vec2,
+    pub shadow_color: Color,
+    pub shadow_scale: Vec2,
+    pub shadow_corner_rounding: ComponentCornerRounding,
 
     // Label shadow properties
-    label_shadow_enabled: bool,
-    label_shadow_offset: Vec2,
-    label_shadow_color: Color,
+    pub label_shadow_enabled: bool,
+    pub label_shadow_offset: Vec2,
+    pub label_shadow_color: Color,
 
     // Bar properties
-    bars: Vec<Bar>,
+    pub bars: Vec<Bar>,
 
     // Event handlers
     pub on_cursor_enter: Option<fn(component: &mut Self, cursor_position: Vec2)>,
@@ -86,20 +87,20 @@ pub struct ProgressBar {
 
 pub struct Bar {
     // Common properties
-    visible: bool,
+    pub visible: bool,
 
     // Shape properties
-    filling_id: usize,
-    color: Color,
-    from: f32,
-    to: f32,
-    corner_rounding: ComponentCornerRounding,
-    texture_id: Option<usize>,
+    pub filling_id: usize,
+    pub color: Color,
+    pub from: f32,
+    pub to: f32,
+    pub corner_rounding: ComponentCornerRounding,
+    pub texture_id: Option<usize>,
 
     // Border properties
-    border_id: usize,
-    border_color: Color,
-    border_thickness: ComponentBorderThickness,
+    pub border_id: usize,
+    pub border_color: Color,
+    pub border_thickness: ComponentBorderThickness,
 }
 
 impl ProgressBar {
@@ -172,95 +173,9 @@ impl ProgressBar {
         self.id
     }
 
-    /* #region Bar shape properties */
-    pub fn get_bar_color(&self, bar_id: usize) -> &Color {
-        &self.bars[bar_id].color
-    }
-
-    pub fn set_bar_color(&mut self, bar_id: usize, color: Color) {
-        self.bars[bar_id].color = color;
-        self.dirty = true;
-    }
-
-    pub fn get_bar_from(&self, bar_id: usize) -> f32 {
-        self.bars[bar_id].from
-    }
-
-    pub fn set_bar_from(&mut self, bar_id: usize, from: f32) {
-        self.bars[bar_id].from = from;
-        self.dirty = true;
-    }
-
-    pub fn get_bar_to(&self, bar_id: usize) -> f32 {
-        self.bars[bar_id].to
-    }
-
-    pub fn set_bar_to(&mut self, bar_id: usize, to: f32) {
-        self.bars[bar_id].to = to;
-        self.dirty = true;
-    }
-
-    pub fn get_bar_corner_rounding(&self, bar_id: usize) -> ComponentCornerRounding {
-        self.bars[bar_id].corner_rounding
-    }
-
-    pub fn set_bar_corner_rounding(&mut self, bar_id: usize, corner_rounding: ComponentCornerRounding) {
-        self.bars[bar_id].corner_rounding = corner_rounding;
-        self.dirty = true;
-    }
-
-    pub fn get_bar_texture_id(&self, bar_id: usize) -> Option<usize> {
-        self.bars[bar_id].texture_id
-    }
-
     pub fn set_bar_texture(&mut self, bar_id: usize, texture: &Texture) {
         self.bars[bar_id].texture_id = Some(texture.id);
         self.dirty = true;
-    }
-    /* #endregion */
-
-    /* #region Bar border properties */
-    pub fn get_bar_border_thickness(&self, bar_id: usize) -> ComponentBorderThickness {
-        self.bars[bar_id].border_thickness
-    }
-
-    pub fn set_bar_border_thickness(&mut self, bar_id: usize, border_thickness: ComponentBorderThickness) -> Result<(), String> {
-        self.bars[bar_id].border_thickness = border_thickness;
-        self.dirty = true;
-        Ok(())
-    }
-
-    pub fn get_bar_border_color(&self, bar_id: usize) -> &Color {
-        &self.bars[bar_id].border_color
-    }
-
-    pub fn set_bar_border_color(&mut self, bar_id: usize, border_color: Color) {
-        self.bars[bar_id].border_color = border_color;
-        self.dirty = true;
-    }
-    /* #endregion */
-
-    /* #region Shape properties */
-    pub fn get_color(&self) -> &Color {
-        &self.color
-    }
-
-    pub fn set_color(&mut self, color: Color) {
-        self.color = color;
-        self.dirty = true;
-    }
-
-    pub fn get_corner_rounding(&self) -> ComponentCornerRounding {
-        self.corner_rounding
-    }
-
-    pub fn set_corner_rounding(&mut self, corner_rounding: ComponentCornerRounding) {
-        self.corner_rounding = corner_rounding;
-        self.dirty = true;
-    }
-
-    pub fn get_texture_id(&self) -> Option<usize> {
-        self.texture_id
     }
 
     pub fn set_texture(&mut self, texture: &Texture) {
@@ -269,165 +184,11 @@ impl ProgressBar {
         self.size = ComponentSize::Absolute(texture.get_size());
         self.dirty = true;
     }
-    /* #endregion */
 
-    /* #region Border properties */
-    pub fn get_border_thickness(&self) -> ComponentBorderThickness {
-        self.border_thickness
-    }
-
-    pub fn set_border_thickness(&mut self, border_thickness: ComponentBorderThickness) -> Result<(), String> {
-        self.border_thickness = border_thickness;
-        self.dirty = true;
-        Ok(())
-    }
-
-    pub fn get_border_color(&self) -> &Color {
-        &self.border_color
-    }
-
-    pub fn set_border_color(&mut self, border_color: Color) {
-        self.border_color = border_color;
+    pub fn set_label_font(&mut self, label_font: &Font) {
+        self.label_font_id = label_font.id;
         self.dirty = true;
     }
-    /* #endregion */
-
-    /* #region Label properties */
-    pub fn get_label_font_id(&self) -> usize {
-        self.label_font_id
-    }
-
-    pub fn set_label_font_id(&mut self, label_font_id: usize) {
-        self.label_font_id = label_font_id;
-        self.dirty = true;
-    }
-
-    pub fn get_label_text(&self) -> &str {
-        &self.label_text
-    }
-
-    pub fn set_label_text(&mut self, text: String) {
-        self.label_text = text;
-        self.dirty = true;
-    }
-
-    pub fn get_label_horizontal_alignment(&self) -> HorizontalAlignment {
-        self.label_horizontal_alignment
-    }
-
-    pub fn set_label_horizontal_alignment(&mut self, label_horizontal_alignment: HorizontalAlignment) {
-        self.label_horizontal_alignment = label_horizontal_alignment;
-        self.dirty = true;
-    }
-
-    pub fn get_label_vertical_alignment(&self) -> VerticalAlignment {
-        self.label_vertical_alignment
-    }
-
-    pub fn set_label_vertical_alignment(&mut self, label_vertical_alignment: VerticalAlignment) {
-        self.label_vertical_alignment = label_vertical_alignment;
-        self.dirty = true;
-    }
-
-    pub fn get_label_offset(&self) -> Vec2 {
-        self.label_offset
-    }
-
-    pub fn set_label_offset(&mut self, label_offset: Vec2) {
-        self.label_offset = label_offset;
-        self.dirty = true;
-    }
-
-    pub fn get_label_color(&self) -> &Color {
-        &self.label_color
-    }
-
-    pub fn set_label_color(&mut self, label_color: Color) {
-        self.label_color = label_color;
-        self.dirty = true;
-    }
-    /* #endregion */
-
-    /* #region Shadow properties */
-    pub fn is_shadow_enabled(&self) -> bool {
-        self.shadow_enabled
-    }
-
-    pub fn set_shadow_enabled_flag(&mut self, shadow_enabled: bool) {
-        self.shadow_enabled = shadow_enabled;
-    }
-
-    pub fn get_shadow_offset(&self) -> Vec2 {
-        self.shadow_offset
-    }
-
-    pub fn set_shadow_offset(&mut self, shadow_offset: Vec2) {
-        self.shadow_offset = shadow_offset;
-    }
-
-    pub fn get_shadow_color(&self) -> &Color {
-        &self.shadow_color
-    }
-
-    pub fn set_shadow_color(&mut self, get_shadow_color: Color) {
-        self.shadow_color = get_shadow_color;
-    }
-
-    pub fn get_shadow_scale(&self) -> Vec2 {
-        self.shadow_scale
-    }
-
-    pub fn set_shadow_scale(&mut self, shadow_scale: Vec2) {
-        self.shadow_scale = shadow_scale;
-    }
-
-    pub fn get_shadow_corner_rounding(&self) -> ComponentCornerRounding {
-        self.shadow_corner_rounding
-    }
-
-    pub fn set_shadow_corner_rounding(&mut self, shadow_corner_rounding: ComponentCornerRounding) -> Result<(), String> {
-        self.shadow_corner_rounding = shadow_corner_rounding;
-        self.dirty = true;
-        Ok(())
-    }
-    /* #endregion */
-
-    /* #region Label shadow properties */
-    pub fn is_label_shadow_enabled(&self) -> bool {
-        self.label_shadow_enabled
-    }
-
-    pub fn set_label_shadow_enabled_flag(&mut self, label_shadow_enabled: bool) {
-        self.label_shadow_enabled = label_shadow_enabled;
-    }
-
-    pub fn get_label_shadow_offset(&self) -> Vec2 {
-        self.label_shadow_offset
-    }
-
-    pub fn set_label_shadow_offset(&mut self, label_shadow_offset: Vec2) {
-        self.label_shadow_offset = label_shadow_offset;
-    }
-
-    pub fn get_label_shadow_color(&self) -> &Color {
-        &self.label_shadow_color
-    }
-
-    pub fn set_label_shadow_color(&mut self, get_label_shadow_color: Color) {
-        self.label_shadow_color = get_label_shadow_color;
-    }
-    /* #endregion */
-
-    /* #region Bar properties */
-    pub fn get_bar_visibility(&self, bar_id: usize) -> bool {
-        self.bars[bar_id].visible
-    }
-
-    pub fn set_bar_visibility(&mut self, bar_id: usize, visible: bool) {
-        self.bars[bar_id].visible = visible;
-        self.dirty = true;
-    }
-    /* #endregion */
 
     fn is_point_inside(&self, point: Vec2) -> bool {
         if !self.active {

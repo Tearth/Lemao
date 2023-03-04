@@ -12,6 +12,7 @@ use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::context::RendererContext;
 use lemao_core::renderer::drawable::Color;
 use lemao_core::renderer::drawable::DrawableEnum;
+use lemao_core::renderer::fonts::Font;
 use lemao_core::renderer::textures::Texture;
 use std::any::Any;
 
@@ -19,44 +20,44 @@ pub struct Checkbox {
     pub(crate) id: usize,
 
     // Common properties
-    position: ComponentPosition,
-    screen_position: Vec2,
-    size: ComponentSize,
-    screen_size: Vec2,
-    min_size: Vec2,
-    max_size: Vec2,
-    anchor: Vec2,
-    margin: ComponentMargin,
-    offset: Vec2,
-    scroll_offset: Vec2,
-    active: bool,
-    dirty: bool,
-    children: Vec<usize>,
-    event_mask: Option<EventMask>,
+    pub position: ComponentPosition,
+    pub screen_position: Vec2,
+    pub size: ComponentSize,
+    pub screen_size: Vec2,
+    pub min_size: Vec2,
+    pub max_size: Vec2,
+    pub anchor: Vec2,
+    pub margin: ComponentMargin,
+    pub offset: Vec2,
+    pub scroll_offset: Vec2,
+    pub active: bool,
+    pub dirty: bool,
+    pub children: Vec<usize>,
+    pub event_mask: Option<EventMask>,
 
     // Box properties
-    box_id: usize,
-    box_color: Color,
-    box_offset: Vec2,
-    box_size: Vec2,
-    box_checked_texture_id: usize,
-    box_unchecked_texture_id: usize,
+    pub box_id: usize,
+    pub box_color: Color,
+    pub box_offset: Vec2,
+    pub box_size: Vec2,
+    pub box_checked_texture_id: usize,
+    pub box_unchecked_texture_id: usize,
 
     // Label properties
-    label_id: usize,
-    label_font_id: usize,
-    label_text: String,
-    label_offset: Vec2,
-    label_color: Color,
+    pub label_id: usize,
+    pub label_font_id: usize,
+    pub label_text: String,
+    pub label_offset: Vec2,
+    pub label_color: Color,
 
     // Label shadow properties
-    label_shadow_enabled: bool,
-    label_shadow_offset: Vec2,
-    label_shadow_color: Color,
+    pub label_shadow_enabled: bool,
+    pub label_shadow_offset: Vec2,
+    pub label_shadow_color: Color,
 
     // Component-specific properties
-    pressed: bool,
-    checked: bool,
+    pub pressed: bool,
+    pub checked: bool,
 
     // Event handlers
     pub on_cursor_enter: Option<fn(component: &mut Self, cursor_position: Vec2)>,
@@ -124,13 +125,9 @@ impl Checkbox {
         })
     }
 
-    pub fn get_id(&self) -> usize {
-        self.id
-    }
-
-    /* #region Box properties */
-    pub fn get_box_checked_texture_id(&self) -> usize {
-        self.box_checked_texture_id
+    pub fn set_label_font(&mut self, font: &Font) {
+        self.label_font_id = font.id;
+        self.dirty = true;
     }
 
     pub fn set_box_checked_texture(&mut self, box_checked_texture: &Texture) {
@@ -139,109 +136,11 @@ impl Checkbox {
         self.dirty = true;
     }
 
-    pub fn get_box_unchecked_texture_id(&self) -> usize {
-        self.box_unchecked_texture_id
-    }
-
     pub fn set_box_unchecked_texture(&mut self, box_unchecked_texture: &Texture) {
         self.box_unchecked_texture_id = box_unchecked_texture.id;
         self.box_size = box_unchecked_texture.get_size();
         self.dirty = true;
     }
-
-    pub fn get_box_color(&self) -> &Color {
-        &self.box_color
-    }
-
-    pub fn set_box_color(&mut self, box_color: Color) {
-        self.box_color = box_color;
-        self.dirty = true;
-    }
-
-    pub fn get_box_offset(&self) -> &Vec2 {
-        &self.box_offset
-    }
-
-    pub fn set_box_offset(&mut self, box_offset: Vec2) {
-        self.box_offset = box_offset;
-        self.dirty = true;
-    }
-    /* #endregion */
-
-    /* #region Label properties */
-    pub fn get_label_font_id(&self) -> usize {
-        self.label_font_id
-    }
-
-    pub fn set_label_font_id(&mut self, label_font_id: usize) {
-        self.label_font_id = label_font_id;
-        self.dirty = true;
-    }
-
-    pub fn get_label_text(&self) -> &str {
-        &self.label_text
-    }
-
-    pub fn set_label_text(&mut self, text: String) {
-        self.label_text = text;
-        self.dirty = true;
-    }
-
-    pub fn get_label_offset(&self) -> Vec2 {
-        self.label_offset
-    }
-
-    pub fn set_label_offset(&mut self, label_offset: Vec2) {
-        self.label_offset = label_offset;
-        self.dirty = true;
-    }
-
-    pub fn get_label_color(&self) -> &Color {
-        &self.label_color
-    }
-
-    pub fn set_label_color(&mut self, color: Color) {
-        self.label_color = color;
-        self.dirty = true;
-    }
-    /* #endregion */
-
-    /* #region Label shadow properties */
-    pub fn is_label_shadow_enabled(&self) -> bool {
-        self.label_shadow_enabled
-    }
-
-    pub fn set_label_shadow_enabled_flag(&mut self, label_shadow_enabled: bool) {
-        self.label_shadow_enabled = label_shadow_enabled;
-    }
-
-    pub fn get_label_shadow_offset(&self) -> Vec2 {
-        self.label_shadow_offset
-    }
-
-    pub fn set_label_shadow_offset(&mut self, label_shadow_offset: Vec2) {
-        self.label_shadow_offset = label_shadow_offset;
-    }
-
-    pub fn get_label_shadow_color(&self) -> &Color {
-        &self.label_shadow_color
-    }
-
-    pub fn set_label_shadow_color(&mut self, get_label_shadow_color: Color) {
-        self.label_shadow_color = get_label_shadow_color;
-    }
-    /* #endregion */
-
-    /* #region Component-specific properties */
-    pub fn is_checked(&self) -> bool {
-        self.checked
-    }
-
-    pub fn set_checked(&mut self, checked: bool) {
-        self.checked = checked;
-        self.dirty = true;
-    }
-    /* #endregion */
 
     fn is_point_inside(&self, point: Vec2) -> bool {
         if !self.active {
