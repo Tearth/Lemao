@@ -35,8 +35,8 @@ pub struct UiContext {
 
 impl UiContext {
     pub fn new(renderer: &mut RendererContext) -> Result<Self, String> {
-        let main_camera = renderer.get_active_camera()?;
-        let ui_camera_id = renderer.create_camera(main_camera.get_position(), main_camera.get_size())?;
+        let main_camera = renderer.cameras.get(renderer.active_camera_id)?;
+        let ui_camera_id = renderer.create_camera(main_camera.position, main_camera.size)?;
 
         let mut ui = Self {
             main_canvas_id: 0,
@@ -50,7 +50,7 @@ impl UiContext {
         ui.main_canvas_id = ui.create_canvas(renderer)?.id;
 
         let main_canvas = ui.get_component_mut(ui.main_canvas_id)?;
-        main_canvas.set_size(ComponentSize::Absolute(renderer.get_viewport_size()));
+        main_canvas.set_size(ComponentSize::Absolute(renderer.viewport_size));
 
         Ok(ui)
     }
@@ -60,7 +60,8 @@ impl UiContext {
             let ui_camera = renderer.cameras.get_mut(self.ui_camera_id)?;
             let main_canvas = self.get_component_mut(self.main_canvas_id)?;
 
-            ui_camera.set_size(*size);
+            ui_camera.size = *size;
+            ui_camera.dirty = true;
             main_canvas.set_size(ComponentSize::Absolute(*size));
 
             for component in self.components.iter_mut().map(|p| p.as_component_mut().unwrap()) {
@@ -281,7 +282,7 @@ impl UiContext {
     }
 
     pub fn draw(&mut self, renderer: &mut RendererContext, component_id: usize) -> Result<(), String> {
-        let active_camera_id = renderer.get_active_camera()?.id;
+        let active_camera_id = renderer.active_camera_id;
         renderer.set_camera_as_active(self.ui_camera_id)?;
 
         let component = self.get_component_mut(component_id)?;

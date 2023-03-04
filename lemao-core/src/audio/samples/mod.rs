@@ -5,10 +5,10 @@ use std::ffi::c_void;
 pub mod wav;
 
 pub struct RawSample {
-    channels_count: u32,
-    frequency: u32,
-    bits_per_sample: u32,
-    data: Vec<u8>,
+    pub channels_count: u32,
+    pub frequency: u32,
+    pub bits_per_sample: u32,
+    pub data: Vec<u8>,
 }
 
 pub struct Sample {
@@ -19,42 +19,6 @@ pub struct Sample {
 impl RawSample {
     pub fn new(channels_count: u32, frequency: u32, bits_per_sample: u32, data: Vec<u8>) -> Self {
         Self { channels_count, frequency, bits_per_sample, data }
-    }
-
-    pub fn get_channels_count(&self) -> u32 {
-        self.channels_count
-    }
-
-    pub fn set_channels_count(&mut self, channels_count: u32) {
-        self.channels_count = channels_count;
-    }
-
-    pub fn get_frequency(&self) -> u32 {
-        self.frequency
-    }
-
-    pub fn set_frequency(&mut self, frequency: u32) {
-        self.frequency = frequency;
-    }
-
-    pub fn get_bits_per_sample(&self) -> u32 {
-        self.bits_per_sample
-    }
-
-    pub fn set_bits_per_sample(&mut self, bits_per_sample: u32) {
-        self.bits_per_sample = bits_per_sample;
-    }
-
-    pub fn get_data(&self) -> &Vec<u8> {
-        &self.data
-    }
-
-    pub fn get_data_mut(&mut self) -> &mut Vec<u8> {
-        &mut self.data
-    }
-
-    pub fn set_data(&mut self, data: Vec<u8>) {
-        self.data = data;
     }
 }
 

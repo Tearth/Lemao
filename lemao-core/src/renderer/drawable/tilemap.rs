@@ -36,7 +36,7 @@ pub struct Tilemap {
 
 impl Tilemap {
     pub fn new(renderer: &RendererContext, texture: &Texture) -> Self {
-        let texture_size = texture.get_size();
+        let texture_size = texture.size;
         let mut tilemap = Tilemap {
             id: 0,
             vao_gl_id: 0,

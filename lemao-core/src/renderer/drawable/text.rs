@@ -56,15 +56,15 @@ impl Text {
             anchor: Default::default(),
             color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             text: Default::default(),
-            line_height: font.get_cell_size().y as u32,
+            line_height: font.cell_size.y as u32,
             elements_count: 0,
             vertices: Vec::new(),
             indices: Vec::new(),
 
-            font_size: font.get_size(),
-            font_cell_size: font.get_cell_size(),
-            font_base_character_offset: font.get_base_character_offset(),
-            font_character_widths: font.get_character_widths().clone(),
+            font_size: font.size,
+            font_cell_size: font.cell_size,
+            font_base_character_offset: font.base_character_offset,
+            font_character_widths: font.character_widths.clone(),
         };
 
         unsafe {

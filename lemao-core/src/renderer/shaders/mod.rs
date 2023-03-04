@@ -18,7 +18,7 @@ pub struct Shader {
     pub(crate) program_id: u32,
     gl: Rc<OpenGLPointers>,
 
-    uniforms: HashMap<String, ShaderParameter>,
+    pub uniforms: HashMap<String, ShaderParameter>,
 }
 
 pub struct ShaderParameter {

@@ -15,10 +15,6 @@ impl Sound {
         Ok(sound)
     }
 
-    pub fn get_sample_id(&self) -> usize {
-        self.sample_id
-    }
-
     pub fn set_sample(&mut self, sample: &Sample) -> Result<(), String> {
         unsafe {
             if self.source_id == 0 {

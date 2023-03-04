@@ -77,7 +77,7 @@ impl WindowContext {
 
         match coordination_system {
             CoordinationSystem::Window => Vec2::new(cursor_position.x, cursor_position.y),
-            CoordinationSystem::Camera(camera) => Vec2::new(cursor_position.x, cursor_position.y) + camera.get_position(),
+            CoordinationSystem::Camera(camera) => Vec2::new(cursor_position.x, cursor_position.y) + camera.position,
         }
     }
 

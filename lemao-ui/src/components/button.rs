@@ -171,8 +171,8 @@ impl Button {
 
     pub fn set_texture(&mut self, texture: &Texture) {
         self.texture_id = Some(texture.id);
-        self.texture_original_size = texture.get_size();
-        self.size = ComponentSize::Absolute(texture.get_size());
+        self.texture_original_size = texture.size;
+        self.size = ComponentSize::Absolute(texture.size);
         self.dirty = true;
     }
 

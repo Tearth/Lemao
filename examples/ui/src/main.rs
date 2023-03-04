@@ -688,8 +688,7 @@ pub fn main() -> Result<(), String> {
         while let Some(event) = window.poll_event() {
             match event {
                 InputEvent::WindowSizeChanged(size) => {
-                    renderer.set_viewport_size(size);
-                    renderer.get_active_camera_mut()?.set_size(size);
+                    renderer.set_viewport_size(size)?;
                 }
 
                 InputEvent::WindowClosed => {

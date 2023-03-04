@@ -5,45 +5,14 @@ use lemao_math::vec3::Vec3;
 pub struct Camera {
     pub id: usize,
 
-    position: Vec2,
-    size: Vec2,
-    dirty: bool,
+    pub position: Vec2,
+    pub size: Vec2,
+    pub dirty: bool,
 }
 
 impl Camera {
     pub fn new(position: Vec2, size: Vec2) -> Self {
         Self { id: 0, position, size, dirty: false }
-    }
-
-    pub fn get_position(&self) -> Vec2 {
-        self.position
-    }
-
-    pub fn set_position(&mut self, position: Vec2) {
-        self.position = position;
-        self.dirty = true;
-    }
-
-    pub fn move_delta(&mut self, delta: Vec2) {
-        self.position += delta;
-        self.dirty = true;
-    }
-
-    pub fn get_size(&self) -> Vec2 {
-        self.size
-    }
-
-    pub fn set_size(&mut self, size: Vec2) {
-        self.size = size;
-        self.dirty = true;
-    }
-
-    pub(crate) fn is_dirty(&self) -> bool {
-        self.dirty
-    }
-
-    pub(crate) fn set_dirty_flag(&mut self, value: bool) {
-        self.dirty = value;
     }
 
     pub(crate) fn get_projection_matrix(&self) -> Mat4x4 {

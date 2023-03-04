@@ -8,16 +8,16 @@ use std::sync::RwLock;
 use std::time::SystemTime;
 
 pub struct Application<G> {
-    window: WindowContext,
-    renderer: RendererContext,
-    global_data: G,
+    pub window: WindowContext,
+    pub renderer: RendererContext,
+    pub global_data: G,
 
-    running: bool,
-    default_scene: String,
-    current_scene: String,
-    pending_scene: String,
-    delta_time: f32,
-    fps: u32,
+    pub running: bool,
+    pub default_scene: String,
+    pub current_scene: String,
+    pub pending_scene: String,
+    pub delta_time: f32,
+    pub fps: u32,
     fps_frames: u32,
     fps_timestamp: SystemTime,
 
@@ -59,38 +59,6 @@ where
 
             scenes: Default::default(),
         })
-    }
-
-    pub fn get_renderer(&self) -> &RendererContext {
-        &self.renderer
-    }
-
-    pub fn get_renderer_mut(&mut self) -> &mut RendererContext {
-        &mut self.renderer
-    }
-
-    pub fn get_window(&self) -> &WindowContext {
-        &self.window
-    }
-
-    pub fn get_window_mut(&mut self) -> &mut WindowContext {
-        &mut self.window
-    }
-
-    pub fn get_global_data(&self) -> &G {
-        &self.global_data
-    }
-
-    pub fn get_global_data_mut(&mut self) -> &mut G {
-        &mut self.global_data
-    }
-
-    pub fn get_fps(&self) -> u32 {
-        self.fps
-    }
-
-    pub fn get_delta_time(&self) -> f32 {
-        self.delta_time
     }
 
     pub fn register_scene(mut self, name: &str, mut scene: Box<dyn Scene<G>>, default: bool) -> Result<Self, String> {

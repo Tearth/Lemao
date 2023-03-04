@@ -48,7 +48,7 @@ pub fn main() -> Result<(), String> {
         let cell_texture = renderer.textures.get(cell_texture_id)?;
 
         sprite.anchor = Vec2::new(0.5, 0.5);
-        sprite.size = cell_texture.get_size();
+        sprite.size = cell_texture.size;
         sprite.set_texture(cell_texture);
 
         cells.push(CellData {
@@ -68,8 +68,7 @@ pub fn main() -> Result<(), String> {
                 InputEvent::WindowSizeChanged(size) => {
                     window_size = size;
 
-                    renderer.set_viewport_size(size);
-                    renderer.get_active_camera_mut()?.set_size(size);
+                    renderer.set_viewport_size(size)?;
                     renderer.texts.get_mut(fps_text_id)?.position = Vec2::new(5.0, window_size.y - 0.0);
                 }
                 InputEvent::WindowClosed => {

@@ -8,8 +8,8 @@ use std::rc::Rc;
 pub mod bmp;
 
 pub struct RawTexture {
-    size: Vec2,
-    data: Vec<u8>,
+    pub size: Vec2,
+    pub data: Vec<u8>,
 }
 
 pub struct Texture {
@@ -17,32 +17,12 @@ pub struct Texture {
     pub(crate) texture_gl_id: u32,
     gl: Rc<OpenGLPointers>,
 
-    size: Vec2,
+    pub size: Vec2,
 }
 
 impl RawTexture {
     pub fn new(size: Vec2, data: Vec<u8>) -> Self {
         Self { size, data }
-    }
-
-    pub fn get_size(&self) -> Vec2 {
-        self.size
-    }
-
-    pub fn set_size(&mut self, size: Vec2) {
-        self.size = size;
-    }
-
-    pub fn get_data(&self) -> &Vec<u8> {
-        &self.data
-    }
-
-    pub fn get_data_mut(&mut self) -> &mut Vec<u8> {
-        &mut self.data
-    }
-
-    pub fn set_data(&mut self, data: Vec<u8>) {
-        self.data = data;
     }
 }
 
@@ -64,10 +44,6 @@ impl Texture {
 
             Ok(texture)
         }
-    }
-
-    pub fn get_size(&self) -> Vec2 {
-        self.size
     }
 
     pub fn set_data(&mut self, size: Vec2, data: &Vec<u8>) {

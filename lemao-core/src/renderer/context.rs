@@ -33,17 +33,17 @@ use std::rc::Rc;
 pub struct RendererContext {
     pub(crate) gl: Rc<OpenGLPointers>,
 
-    viewport_size: Vec2,
-    default_camera_id: usize,
-    active_camera_id: usize,
-    default_solid_shader_id: usize,
-    default_gradient_shader_id: usize,
-    active_shader_id: usize,
-    default_line_shape_id: usize,
-    default_rectangle_shape_id: usize,
-    default_sprite_shape_id: usize,
-    default_texture_id: usize,
-    swap_interval: u32,
+    pub viewport_size: Vec2,
+    pub default_camera_id: usize,
+    pub active_camera_id: usize,
+    pub default_solid_shader_id: usize,
+    pub default_gradient_shader_id: usize,
+    pub active_shader_id: usize,
+    pub default_line_shape_id: usize,
+    pub default_rectangle_shape_id: usize,
+    pub default_sprite_shape_id: usize,
+    pub default_texture_id: usize,
+    pub swap_interval: u32,
 
     renderer_platform_specific: Box<dyn RendererPlatformSpecific>,
 
@@ -60,8 +60,8 @@ pub struct RendererContext {
     pub texts: Storage<Text>,
     pub tilemaps: Storage<Tilemap>,
 
-    shapes: Storage<Shape>,
-    batch_renderer: Option<BatchRenderer>,
+    pub shapes: Storage<Shape>,
+    pub batch_renderer: Option<BatchRenderer>,
 }
 
 impl RendererContext {
@@ -108,8 +108,8 @@ impl RendererContext {
         //     (self.gl.glDebugMessageCallback)(gl_error, std::ptr::null_mut());
         // }
 
-        self.set_viewport_size(self.viewport_size);
         self.init_default_camera()?;
+        self.set_viewport_size(self.viewport_size)?;
         self.init_default_shaders()?;
         self.init_default_shapes()?;
         self.init_default_texture()?;
@@ -122,7 +122,7 @@ impl RendererContext {
         let camera = Camera::new(Default::default(), Default::default());
         self.default_camera_id = self.cameras.store(camera);
         self.cameras.get_mut(self.default_camera_id)?.id = self.default_camera_id;
-        self.set_default_camera()?;
+        self.set_camera_as_active(self.default_camera_id)?;
 
         Ok(())
     }
@@ -200,13 +200,13 @@ impl RendererContext {
         self.batch_renderer = Some(BatchRenderer::new(self, 1024 * 1024, 1024 * 1024));
     }
 
-    pub fn get_viewport_size(&self) -> Vec2 {
-        self.viewport_size
-    }
-
-    pub fn set_viewport_size(&mut self, size: Vec2) {
+    pub fn set_viewport_size(&mut self, size: Vec2) -> Result<(), String> {
         unsafe {
             (self.gl.glViewport)(0, 0, size.x as i32, size.y as i32);
+            self.cameras.get_mut(self.active_camera_id)?.size = size;
+            self.cameras.get_mut(self.active_camera_id)?.dirty = true;
+
+            Ok(())
         }
     }
 
@@ -260,25 +260,13 @@ impl RendererContext {
         Ok(id)
     }
 
-    pub fn get_active_camera(&self) -> Result<&Camera, String> {
-        self.cameras.get(self.active_camera_id)
-    }
-
-    pub fn get_active_camera_mut(&mut self) -> Result<&mut Camera, String> {
-        self.cameras.get_mut(self.active_camera_id)
-    }
-
     pub fn set_camera_as_active(&mut self, camera_id: usize) -> Result<(), String> {
         let camera = self.cameras.get_mut(camera_id)?;
 
         self.active_camera_id = camera_id;
-        camera.set_dirty_flag(true);
+        camera.dirty = true;
 
         Ok(())
-    }
-
-    pub fn set_default_camera(&mut self) -> Result<(), String> {
-        self.set_camera_as_active(self.default_camera_id)
     }
 
     pub fn create_circle(&mut self) -> Result<usize, String> {
@@ -386,8 +374,8 @@ impl RendererContext {
 
         if let Some(shape_id) = batch.shape_id {
             let shape = self.shapes.get(shape_id)?;
-            batch.vertices = Some(shape.get_vertices());
-            batch.indices = Some(shape.get_indices());
+            batch.vertices = Some(&shape.vertices);
+            batch.indices = Some(&shape.indices);
         }
 
         self.batch_renderer.as_mut().unwrap().add(transformation_matrix, &batch)?;
@@ -400,14 +388,14 @@ impl RendererContext {
             Color::Gradient(_) => self.default_gradient_shader_id,
         };
 
-        if shader_id != self.active_shader_id || self.cameras.get(self.active_camera_id)?.is_dirty() {
+        if shader_id != self.active_shader_id || self.cameras.get(self.active_camera_id)?.dirty {
             self.set_shader_as_active(shader_id)?;
 
             let camera = self.cameras.get_mut(self.active_camera_id)?;
             let shader = self.shaders.get(shader_id)?;
             shader.set_parameter("proj", camera.get_projection_matrix().as_ptr())?;
             shader.set_parameter("view", camera.get_view_matrix().as_ptr())?;
-            camera.set_dirty_flag(false);
+            camera.dirty = false;
         }
 
         self.batch_renderer.as_mut().unwrap().draw(self.shaders.get(shader_id)?)
@@ -429,14 +417,14 @@ impl RendererContext {
             Color::Gradient(_) => self.default_gradient_shader_id,
         };
 
-        if shader_id != self.active_shader_id || self.cameras.get(self.active_camera_id)?.is_dirty() {
+        if shader_id != self.active_shader_id || self.cameras.get(self.active_camera_id)?.dirty {
             self.set_shader_as_active(shader_id)?;
 
             let camera = self.cameras.get_mut(self.active_camera_id)?;
             let shader = self.shaders.get(shader_id)?;
             shader.set_parameter("proj", camera.get_projection_matrix().as_ptr())?;
             shader.set_parameter("view", camera.get_view_matrix().as_ptr())?;
-            camera.set_dirty_flag(false);
+            camera.dirty = false;
         }
 
         let shader = self.shaders.get(shader_id)?;
@@ -458,10 +446,6 @@ impl RendererContext {
             (self.gl.glClearColor)(color.r, color.g, color.b, color.a);
             (self.gl.glClear)(opengl::GL_COLOR_BUFFER_BIT);
         }
-    }
-
-    pub fn get_swap_interval(&self) -> u32 {
-        self.swap_interval
     }
 
     pub fn set_swap_interval(&mut self, interval: u32) {

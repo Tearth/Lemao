@@ -132,13 +132,13 @@ impl Checkbox {
 
     pub fn set_box_checked_texture(&mut self, box_checked_texture: &Texture) {
         self.box_checked_texture_id = box_checked_texture.id;
-        self.box_size = box_checked_texture.get_size();
+        self.box_size = box_checked_texture.size;
         self.dirty = true;
     }
 
     pub fn set_box_unchecked_texture(&mut self, box_unchecked_texture: &Texture) {
         self.box_unchecked_texture_id = box_unchecked_texture.id;
-        self.box_size = box_unchecked_texture.get_size();
+        self.box_size = box_unchecked_texture.size;
         self.dirty = true;
     }
 
@@ -382,11 +382,11 @@ impl Component for Checkbox {
 
         if self.checked {
             let texture = renderer.textures.get(self.box_checked_texture_id)?;
-            self.box_size = texture.get_size();
+            self.box_size = texture.size;
             r#box.set_texture(texture);
         } else {
             let texture = renderer.textures.get(self.box_unchecked_texture_id)?;
-            self.box_size = texture.get_size();
+            self.box_size = texture.size;
             r#box.set_texture(texture);
         }
 
