@@ -61,12 +61,13 @@ where
         })
     }
 
-    pub fn register_scene(mut self, name: &str, mut scene: Box<dyn Scene<G>>, default: bool) -> Result<Self, String> {
+    pub fn register_scene(mut self, name: &str, scene_factory: fn(&mut Self) -> Box<dyn Scene<G>>, default: bool) -> Result<Self, String> {
         if default {
             self.default_scene = name.to_string();
             self.pending_scene = name.to_string();
         }
 
+        let mut scene = scene_factory(&mut self);
         scene.on_init(&mut self)?;
 
         let scene_storage = self.scenes.clone();

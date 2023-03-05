@@ -7,8 +7,10 @@ use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::drawable::DrawableEnum;
 
-
 use lemao_core::window::context::WindowContext;
+use lemao_ui::components::label::Label;
+use lemao_ui::components::ComponentPosition;
+use lemao_ui::context::UiContext;
 use std::time::Instant;
 
 #[rustfmt::skip]
@@ -26,12 +28,11 @@ pub fn main() -> Result<(), String> {
 
     let mut window = WindowContext::new("Transformation", WindowStyle::Window { position: window_position, size: window_size })?;
     let mut renderer = window.create_renderer()?;
+    let mut ui = UiContext::new(&mut renderer)?;
     renderer.set_swap_interval(1);
 
     let texture_id = renderer.create_texture("./assets/disc.bmp")?;
     let font_id = renderer.create_font("./assets/inconsolata.bff")?;
-
-    let gui_camera_id = renderer.create_camera(Default::default(), window_size)?;
 
     let sprite_id = renderer.create_rectangle()?;
     let sprite = renderer.rectangles.get_mut(sprite_id)?;
@@ -40,12 +41,14 @@ pub fn main() -> Result<(), String> {
     sprite.position = Vec2::new(400.0, 300.0);
     sprite.size = renderer.textures.get(texture_id)?.size;
 
-    let description_text_id = renderer.create_text(font_id)?;
-    let description_text = renderer.texts.get_mut(description_text_id)?;
-    description_text.text = DESCRIPTION.to_string();
+    let description_text_id = ui.create_label(&mut renderer, font_id)?;
+    let description_text = ui.get_component_and_cast_mut::<Label>(description_text_id)?;
+    description_text.label_text = DESCRIPTION.to_string();
+    description_text.position = ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0));
+    description_text.offset = Vec2::new(5.0, 0.0);
     description_text.anchor = Vec2::new(0.0, 1.0);
-    description_text.line_height = 20;
-    description_text.update();
+    description_text.label_line_height = 20;
+    ui.get_component_mut(ui.main_canvas_id)?.add_child(description_text_id);
 
     let mut last_update = Instant::now();
     let mut is_running = true;
@@ -56,27 +59,21 @@ pub fn main() -> Result<(), String> {
 
         while let Some(event) = window.poll_event() {
             match event {
-                InputEvent::KeyPressed(k) => {
-                    if let Key::Escape = k {
+                InputEvent::KeyPressed(key) => {
+                    if let Key::Escape = key {
                         window.close()
                     }
                 }
                 InputEvent::WindowSizeChanged(size) => {
                     renderer.set_viewport_size(size)?;
-
-                    renderer.cameras.get_mut(renderer.active_camera_id)?.size = size;
-                    renderer.cameras.get_mut(renderer.active_camera_id)?.dirty = true;
-
-                    renderer.cameras.get_mut(gui_camera_id)?.size = size;
-                    renderer.cameras.get_mut(gui_camera_id)?.dirty = true;
-
-                    renderer.texts.get_mut(description_text_id)?.position = Vec2::new(5.0, size.y - 0.0);
                 }
                 InputEvent::WindowClosed => {
                     is_running = false;
                 }
                 _ => {}
             }
+
+            ui.process_window_event(&mut renderer, &event)?;
         }
 
         let camera = renderer.cameras.get_mut(renderer.active_camera_id)?;
@@ -120,13 +117,11 @@ pub fn main() -> Result<(), String> {
             sprite.position += Vec2::new_from_angle(sprite.rotation) * 200.0 * Vec2::new(delta, delta);
         }
 
-        sprite.update();
+        ui.update(&mut renderer)?;
 
         renderer.clear(SolidColor::new(0.5, 0.5, 0.5, 1.0));
         renderer.draw(DrawableEnum::Rectangle, sprite_id)?;
-        renderer.set_camera_as_active(gui_camera_id)?;
-        renderer.draw(DrawableEnum::Text, description_text_id)?;
-        renderer.set_camera_as_active(renderer.default_camera_id)?;
+        ui.draw(&mut renderer, description_text_id)?;
         window.swap_buffers();
     }
 

@@ -11,6 +11,9 @@ use lemao_core::renderer::textures::RawTexture;
 use lemao_core::renderer::textures::Texture;
 use lemao_core::window::context::CoordinationSystem;
 use lemao_core::window::context::WindowContext;
+use lemao_ui::components::label::Label;
+use lemao_ui::components::ComponentPosition;
+use lemao_ui::context::UiContext;
 
 #[rustfmt::skip]
 const DESCRIPTION: &str = 
@@ -23,6 +26,7 @@ pub fn main() -> Result<(), String> {
 
     let mut window = WindowContext::new("Paint", WindowStyle::Window { position: window_position, size: window_size })?;
     let mut renderer = window.create_renderer()?;
+    let mut ui = UiContext::new(&mut renderer)?;
     renderer.set_swap_interval(1);
 
     let mut texture_data = vec![0; (window_size.x * window_size.y * 4.0) as usize];
@@ -37,32 +41,35 @@ pub fn main() -> Result<(), String> {
     sprite.set_texture(renderer.textures.get(texture_id)?);
     sprite.size = window_size;
 
-    let description_text_id = renderer.create_text(font_id)?;
-    let description_text = renderer.texts.get_mut(description_text_id)?;
-    description_text.text = DESCRIPTION.to_string();
+    let description_text_id = ui.create_label(&mut renderer, font_id)?;
+    let description_text = ui.get_component_and_cast_mut::<Label>(description_text_id)?;
+    description_text.label_text = DESCRIPTION.to_string();
+    description_text.position = ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0));
+    description_text.offset = Vec2::new(5.0, 0.0);
     description_text.anchor = Vec2::new(0.0, 1.0);
-    description_text.line_height = 20;
-    description_text.update();
+    description_text.label_line_height = 20;
+    ui.get_component_mut(ui.main_canvas_id)?.add_child(description_text_id);
 
     let mut is_running = true;
 
     while is_running {
         while let Some(event) = window.poll_event() {
             match event {
-                InputEvent::KeyPressed(k) => {
-                    if let Key::Escape = k {
+                InputEvent::KeyPressed(key) => {
+                    if let Key::Escape = key {
                         window.close()
                     }
                 }
                 InputEvent::WindowSizeChanged(size) => {
                     renderer.set_viewport_size(size)?;
-                    renderer.texts.get_mut(description_text_id)?.position = Vec2::new(5.0, size.y - 0.0);
                 }
                 InputEvent::WindowClosed => {
                     is_running = false;
                 }
                 _ => {}
             }
+
+            ui.process_window_event(&mut renderer, &event)?;
         }
 
         if window.is_mouse_button_pressed(MouseButton::Left) {
@@ -80,9 +87,11 @@ pub fn main() -> Result<(), String> {
             }
         }
 
+        ui.update(&mut renderer)?;
+
         renderer.clear(SolidColor::new(0.0, 0.0, 0.0, 1.0));
         renderer.draw(DrawableEnum::Rectangle, sprite_id)?;
-        renderer.draw(DrawableEnum::Text, description_text_id)?;
+        ui.draw(&mut renderer, description_text_id)?;
         window.swap_buffers();
     }
 

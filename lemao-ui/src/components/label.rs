@@ -39,6 +39,7 @@ pub struct Label {
     pub label_font_id: usize,
     pub label_text: String,
     pub label_color: Color,
+    pub label_line_height: u32,
     pub multiline: bool,
     pub max_multiline_width: f32,
 
@@ -80,6 +81,7 @@ impl Label {
             label_font_id,
             label_text: Default::default(),
             label_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
+            label_line_height: renderer.fonts.get(label_font_id)?.cell_size.y as u32,
             multiline: false,
             max_multiline_width: 0.0,
 
@@ -319,6 +321,7 @@ impl Component for Label {
         let font = renderer.fonts.get(self.label_font_id)?;
         label.set_font(font);
         label.text = label_text_processed;
+        label.line_height = self.label_line_height;
         label.update();
 
         self.screen_size = label.size;

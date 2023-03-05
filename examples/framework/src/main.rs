@@ -9,7 +9,7 @@ pub mod scenes;
 
 pub fn main() -> Result<(), String> {
     Application::new("Framework", WindowStyle::Window { position: Default::default(), size: Vec2::new(1366.0, 768.0) })?
-        .register_scene("Scene 1", Box::new(FirstScene::new()), true)?
-        .register_scene("Scene 2", Box::new(SecondScene::new()), false)?
+        .register_scene("Scene 1", |app| Box::new(FirstScene::new(app)), true)?
+        .register_scene("Scene 2", |app| Box::new(SecondScene::new(app)), false)?
         .run()
 }

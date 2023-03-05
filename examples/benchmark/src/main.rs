@@ -4,6 +4,9 @@ use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::drawable::DrawableEnum;
 use lemao_core::window::context::WindowContext;
+use lemao_ui::components::label::Label;
+use lemao_ui::components::ComponentPosition;
+use lemao_ui::context::UiContext;
 use std::time::Instant;
 
 #[no_mangle]
@@ -29,16 +32,19 @@ pub fn main() -> Result<(), String> {
 
     let mut window = WindowContext::new("Audio", WindowStyle::Window { position: window_position, size: window_size })?;
     let mut renderer = window.create_renderer()?;
+    let mut ui = UiContext::new(&mut renderer)?;
     renderer.set_swap_interval(0);
 
     let cell_texture_id = renderer.create_texture("./assets/cell.bmp")?;
     let font_id = renderer.create_font("./assets/inconsolata.bff")?;
 
-    let fps_text_id = renderer.create_text(font_id)?;
-    let fps_text = renderer.texts.get_mut(fps_text_id)?;
-    fps_text.text = "FPS:0".to_string();
+    let fps_text_id = ui.create_label(&mut renderer, font_id)?;
+    let fps_text = ui.get_component_and_cast_mut::<Label>(fps_text_id)?;
+    fps_text.label_text = "FPS:0".to_string();
+    fps_text.position = ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0));
+    fps_text.offset = Vec2::new(5.0, 0.0);
     fps_text.anchor = Vec2::new(0.0, 1.0);
-    fps_text.update();
+    ui.get_component_mut(ui.main_canvas_id)?.add_child(fps_text_id);
 
     let mut cells = Vec::new();
 
@@ -67,15 +73,15 @@ pub fn main() -> Result<(), String> {
             match event {
                 InputEvent::WindowSizeChanged(size) => {
                     window_size = size;
-
                     renderer.set_viewport_size(size)?;
-                    renderer.texts.get_mut(fps_text_id)?.position = Vec2::new(5.0, window_size.y - 0.0);
                 }
                 InputEvent::WindowClosed => {
                     is_running = false;
                 }
                 _ => {}
             }
+
+            ui.process_window_event(&mut renderer, &event)?;
         }
 
         renderer.clear(SolidColor::new(0.5, 0.5, 0.5, 1.0));
@@ -103,17 +109,19 @@ pub fn main() -> Result<(), String> {
         }
 
         if now.elapsed().as_millis() >= 1000 {
-            let fps_text = renderer.texts.get_mut(fps_text_id)?;
-            fps_text.text = format!("FPS:{frames}");
-            fps_text.update();
+            let fps_text = ui.get_component_and_cast_mut::<Label>(fps_text_id)?;
+            fps_text.label_text = format!("FPS:{frames}");
+            fps_text.dirty = true;
 
             now = Instant::now();
             frames = 0;
         }
 
+        ui.update(&mut renderer)?;
+
         frames += 1;
         renderer.batcher_draw()?;
-        renderer.draw(DrawableEnum::Text, fps_text_id)?;
+        ui.draw(&mut renderer, fps_text_id)?;
         window.swap_buffers();
     }
 

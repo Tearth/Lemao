@@ -93,6 +93,7 @@ impl Text {
     pub fn set_font(&mut self, font: &Font) {
         self.font_id = font.id;
         self.texture_gl_id = font.texture_gl_id;
+        self.line_height = font.cell_size.y as u32;
     }
 
     pub fn get_transformation_matrix(&self) -> Mat4x4 {

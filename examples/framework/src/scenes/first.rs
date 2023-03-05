@@ -3,9 +3,11 @@ use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_common_platform::input::Key;
 use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
-use lemao_core::renderer::drawable::DrawableEnum;
 use lemao_framework::app::Application;
 use lemao_framework::app::Scene;
+use lemao_ui::components::label::Label;
+use lemao_ui::components::ComponentPosition;
+use lemao_ui::context::UiContext;
 use std::any::Any;
 
 #[rustfmt::skip]
@@ -14,13 +16,13 @@ const DESCRIPTION: &str =
 Press Enter to switch";
 
 pub struct FirstScene {
+    ui: UiContext,
     description_text_id: usize,
 }
 
 impl FirstScene {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
-        Self { description_text_id: 0 }
+    pub fn new(app: &mut Application<GlobalAppData>) -> Self {
+        Self { ui: UiContext::new(&mut app.renderer).unwrap(), description_text_id: 0 }
     }
 }
 
@@ -28,12 +30,13 @@ impl Scene<GlobalAppData> for FirstScene {
     fn on_init(&mut self, app: &mut Application<GlobalAppData>) -> Result<(), String> {
         let font_id = app.renderer.create_font("./assets/inconsolata.bff")?;
 
-        self.description_text_id = app.renderer.create_text(font_id)?;
-        let description_text = app.renderer.texts.get_mut(self.description_text_id)?;
-        description_text.text = DESCRIPTION.to_string();
+        self.description_text_id = self.ui.create_label(&mut app.renderer, font_id)?;
+        let description_text = self.ui.get_component_and_cast_mut::<Label>(self.description_text_id)?;
+        description_text.label_text = DESCRIPTION.to_string();
+        description_text.position = ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0));
+        description_text.offset = Vec2::new(5.0, 0.0);
         description_text.anchor = Vec2::new(0.0, 1.0);
-        description_text.line_height = 20;
-        description_text.update();
+        self.ui.get_component_mut(self.ui.main_canvas_id)?.add_child(self.description_text_id);
 
         Ok(())
     }
@@ -42,7 +45,7 @@ impl Scene<GlobalAppData> for FirstScene {
         let size = app.window.get_size();
 
         app.renderer.set_viewport_size(size)?;
-        app.renderer.texts.get_mut(self.description_text_id)?.position = Vec2::new(5.0, size.y - 0.0);
+        self.ui.process_window_event(&mut app.renderer, &InputEvent::WindowSizeChanged(size))?;
 
         Ok(())
     }
@@ -59,17 +62,20 @@ impl Scene<GlobalAppData> for FirstScene {
                 }
                 InputEvent::WindowSizeChanged(size) => {
                     app.renderer.set_viewport_size(size)?;
-                    app.renderer.texts.get_mut(self.description_text_id)?.position = Vec2::new(5.0, size.y - 0.0);
                 }
                 InputEvent::WindowClosed => {
                     app.close();
                 }
                 _ => {}
             }
+
+            self.ui.process_window_event(&mut app.renderer, &event)?;
         }
 
+        self.ui.update(&mut app.renderer)?;
+
         app.renderer.clear(SolidColor::new(0.5, 0.5, 0.5, 1.0));
-        app.renderer.draw(DrawableEnum::Text, self.description_text_id)?;
+        self.ui.draw(&mut app.renderer, self.description_text_id)?;
         app.window.swap_buffers();
 
         Ok(())
