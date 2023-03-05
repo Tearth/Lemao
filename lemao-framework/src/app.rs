@@ -1,3 +1,4 @@
+use crate::assets::AssetsLoader;
 use crate::utils::storage::SceneStorage;
 use lemao_core::lemao_common_platform::window::WindowStyle;
 use lemao_core::renderer::context::RendererContext;
@@ -10,6 +11,7 @@ use std::time::SystemTime;
 pub struct Application<G> {
     pub window: WindowContext,
     pub renderer: RendererContext,
+    pub assets: AssetsLoader,
     pub global_data: G,
 
     pub running: bool,
@@ -46,6 +48,7 @@ where
         Ok(Self {
             window,
             renderer,
+            assets: Default::default(),
             global_data: Default::default(),
 
             running: true,

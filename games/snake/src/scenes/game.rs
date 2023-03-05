@@ -17,7 +17,16 @@ impl GameScene {
 }
 
 impl Scene<GlobalAppData> for GameScene {
-    fn on_init(&mut self, _app: &mut Application<GlobalAppData>) -> Result<(), String> {
+    fn on_init(&mut self, app: &mut Application<GlobalAppData>) -> Result<(), String> {
+        app.assets.set_queue("./assets/")?;
+        app.assets.start_loading();
+
+        loop {
+            if *app.assets.loaded_assets.read().unwrap() == app.assets.total_assets {
+                break;
+            }
+        }
+
         Ok(())
     }
 
