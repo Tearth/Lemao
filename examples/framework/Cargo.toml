@@ -7,5 +7,3 @@ edition = "2021"
 lemao-core = { path = "../../lemao-core" }
 lemao-framework = { path = "../../lemao-framework" }
 lemao-ui = { path = "../../lemao-ui" }
-chrono = { version = "0.4.22" }
-fastrand = { version = "1.8.0" }

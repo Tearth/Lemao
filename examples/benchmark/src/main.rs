@@ -3,6 +3,7 @@ use lemao_core::lemao_common_platform::window::WindowStyle;
 use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::drawable::DrawableEnum;
+use lemao_core::utils::rand;
 use lemao_core::window::context::WindowContext;
 use lemao_ui::components::label::Label;
 use lemao_ui::components::ComponentPosition;
@@ -57,11 +58,10 @@ pub fn main() -> Result<(), String> {
         sprite.size = cell_texture.size;
         sprite.set_texture(cell_texture);
 
-        cells.push(CellData {
-            sprite_id,
-            position: Vec2::new(fastrand::f32() * window_size.x, fastrand::f32() * window_size.y),
-            velocity: Vec2 { x: MAX_SPEED * (fastrand::f32() * 2.0 - 1.0), y: MAX_SPEED * (fastrand::f32() * 2.0 - 1.0) },
-        });
+        let position = Vec2::new(rand::i32(0..window_size.x as i32) as f32, rand::i32(0..window_size.y as i32) as f32);
+        let velocity = Vec2::new(MAX_SPEED * (rand::i32(-100..100) as f32 / 100.0), MAX_SPEED * (rand::i32(-100..100)as f32 / 100.0) );
+
+        cells.push(CellData { sprite_id, position, velocity });
     }
 
     let mut now = Instant::now();
