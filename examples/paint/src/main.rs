@@ -29,9 +29,9 @@ pub fn main() -> Result<(), String> {
     let mut ui = UiContext::new(&mut renderer)?;
     renderer.set_swap_interval(1);
 
-    let mut texture_data = vec![0; (window_size.x * window_size.y * 4.0) as usize];
+    let mut raw_texture = RawTexture::new(window_size, vec![0; (window_size.x * window_size.y * 4.0) as usize]);
 
-    let texture_id = renderer.textures.store(Texture::new(&renderer, &RawTexture::new(window_size, texture_data.clone()))?);
+    let texture_id = renderer.textures.store(Texture::new(&renderer, &raw_texture)?);
     renderer.textures.get_mut(texture_id)?.id = texture_id;
 
     let font_id = renderer.create_font("./assets/inconsolata.bff")?;
@@ -77,13 +77,13 @@ pub fn main() -> Result<(), String> {
             let index = (cursor_position.x + cursor_position.y * window_size.x) as usize;
 
             if cursor_position.x >= 0.0 && cursor_position.x < window_size.x && cursor_position.y >= 0.0 && cursor_position.y < window_size.y {
-                texture_data[index * 4 + 0] = 255;
-                texture_data[index * 4 + 1] = 255;
-                texture_data[index * 4 + 2] = 255;
-                texture_data[index * 4 + 3] = 255;
+                raw_texture.data[index * 4 + 0] = 255;
+                raw_texture.data[index * 4 + 1] = 255;
+                raw_texture.data[index * 4 + 2] = 255;
+                raw_texture.data[index * 4 + 3] = 255;
 
                 let texture = renderer.textures.get_mut(texture_id).unwrap();
-                texture.set_data(window_size, &texture_data);
+                texture.set_data(&raw_texture);
             }
         }
 

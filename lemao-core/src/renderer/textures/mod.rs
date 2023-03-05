@@ -40,25 +40,25 @@ impl Texture {
             (gl.glTexParameteri)(opengl::GL_TEXTURE_2D, opengl::GL_TEXTURE_MAG_FILTER, opengl::GL_LINEAR as i32);
 
             let mut texture = Self { id: 0, texture_gl_id, gl, size: raw.size };
-            texture.set_data(raw.size, &raw.data);
+            texture.set_data(raw);
 
             Ok(texture)
         }
     }
 
-    pub fn set_data(&mut self, size: Vec2, data: &Vec<u8>) {
+    pub fn set_data(&mut self, raw: &RawTexture) {
         unsafe {
             (self.gl.glBindTexture)(opengl::GL_TEXTURE_2D, self.texture_gl_id);
 
             let format = opengl::GL_RGBA;
-            let texture_width = size.x as i32;
-            let texture_height = size.y as i32;
-            let texture_ptr = data.as_ptr() as *const c_void;
+            let texture_width = raw.size.x as i32;
+            let texture_height = raw.size.y as i32;
+            let texture_ptr = raw.data.as_ptr() as *const c_void;
 
             (self.gl.glTexImage2D)(opengl::GL_TEXTURE_2D, 0, format as i32, texture_width, texture_height, 0, format, opengl::GL_UNSIGNED_BYTE, texture_ptr);
             (self.gl.glGenerateMipmap)(opengl::GL_TEXTURE_2D);
 
-            self.size = size;
+            self.size = raw.size;
         }
     }
 }
