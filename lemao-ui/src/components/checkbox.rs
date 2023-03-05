@@ -432,8 +432,8 @@ impl Component for Checkbox {
     }
 
     fn release_internal_resources(&mut self, renderer: &mut RendererContext) -> Result<(), String> {
-        renderer.rectangles.remove(self.box_id);
-        renderer.texts.remove(self.label_id);
+        renderer.rectangles.remove(self.box_id)?;
+        renderer.texts.remove(self.label_id)?;
 
         Ok(())
     }

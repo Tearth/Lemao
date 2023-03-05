@@ -685,19 +685,19 @@ impl Component for Slider {
     fn release_internal_resources(&mut self, renderer: &mut RendererContext) -> Result<(), String> {
         match self.selector_shape {
             ComponentShape::Rectangle => {
-                renderer.rectangles.remove(self.selector_id);
-                renderer.frames.remove(self.selector_border_id);
+                renderer.rectangles.remove(self.selector_id)?;
+                renderer.frames.remove(self.selector_border_id)?;
             }
             ComponentShape::Disc => {
-                renderer.discs.remove(self.selector_id);
-                renderer.circles.remove(self.selector_border_id);
+                renderer.discs.remove(self.selector_id)?;
+                renderer.circles.remove(self.selector_border_id)?;
             }
         };
 
-        renderer.rectangles.remove(self.filling_id);
-        renderer.rectangles.remove(self.border_id);
-        renderer.rectangles.remove(self.shadow_id);
-        renderer.rectangles.remove(self.bar_id);
+        renderer.rectangles.remove(self.filling_id)?;
+        renderer.rectangles.remove(self.border_id)?;
+        renderer.rectangles.remove(self.shadow_id)?;
+        renderer.rectangles.remove(self.bar_id)?;
 
         Ok(())
     }

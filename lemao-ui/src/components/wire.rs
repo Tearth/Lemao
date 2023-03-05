@@ -298,8 +298,10 @@ impl Component for Wire {
         self.screen_position = self.screen_position.floor();
 
         for chunk in &self.chunks {
-            renderer.lines.remove(chunk.line_id);
+            renderer.lines.remove(chunk.line_id)?;
         }
+
+        self.chunks.clear();
 
         for chunk_data in &mut self.data {
             let chunk = WireChunk::new(renderer)?;
@@ -334,7 +336,7 @@ impl Component for Wire {
 
     fn release_internal_resources(&mut self, renderer: &mut RendererContext) -> Result<(), String> {
         for chunk in &self.chunks {
-            renderer.lines.remove(chunk.line_id);
+            renderer.lines.remove(chunk.line_id)?;
         }
 
         Ok(())

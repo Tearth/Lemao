@@ -529,14 +529,14 @@ impl Component for ProgressBar {
     }
 
     fn release_internal_resources(&mut self, renderer: &mut RendererContext) -> Result<(), String> {
-        renderer.rectangles.remove(self.filling_id);
-        renderer.frames.remove(self.border_id);
-        renderer.rectangles.remove(self.shadow_id);
-        renderer.texts.remove(self.label_id);
+        renderer.rectangles.remove(self.filling_id)?;
+        renderer.frames.remove(self.border_id)?;
+        renderer.rectangles.remove(self.shadow_id)?;
+        renderer.texts.remove(self.label_id)?;
 
         for bar in &mut self.bars {
-            renderer.rectangles.remove(bar.filling_id);
-            renderer.frames.remove(bar.border_id);
+            renderer.rectangles.remove(bar.filling_id)?;
+            renderer.frames.remove(bar.border_id)?;
         }
 
         Ok(())

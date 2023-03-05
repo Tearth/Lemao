@@ -8,7 +8,7 @@ pub struct Storage<T> {
 impl<T> Storage<T> {
     pub fn store(&mut self, item: T) -> usize {
         let id = self.get_new_id();
-        self.data.insert(id, Some(item));
+        self.data[id] = Some(item);
 
         id
     }
@@ -27,16 +27,23 @@ impl<T> Storage<T> {
         }
     }
 
-    pub fn remove(&mut self, id: usize) {
-        self.data.remove(id);
+    pub fn remove(&mut self, id: usize) -> Result<(), String> {
+        if id >= self.data.len() || self.data[id].is_none() {
+            return Err(format!("Storage item {} not found", id));
+        }
+
+        self.data[id] = None;
         self.removed_ids.push_back(id);
+
+        Ok(())
     }
 
     fn get_new_id(&mut self) -> usize {
         if let Some(id) = self.removed_ids.pop_front() {
             id
         } else {
-            self.data.len()
+            self.data.push(None);
+            self.data.len() - 1
         }
     }
 }

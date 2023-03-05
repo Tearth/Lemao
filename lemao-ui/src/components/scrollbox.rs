@@ -799,14 +799,14 @@ impl Component for Scrollbox {
     }
 
     fn release_internal_resources(&mut self, renderer: &mut RendererContext) -> Result<(), String> {
-        renderer.rectangles.remove(self.vertical_scroll_id);
-        renderer.frames.remove(self.vertical_scroll_border_id);
-        renderer.rectangles.remove(self.vertical_scroll_background_id);
-        renderer.frames.remove(self.vertical_scroll_background_border_id);
-        renderer.rectangles.remove(self.horizontal_scroll_id);
-        renderer.frames.remove(self.horizontal_scroll_border_id);
-        renderer.rectangles.remove(self.horizontal_scroll_background_id);
-        renderer.frames.remove(self.horizontal_scroll_background_border_id);
+        renderer.rectangles.remove(self.vertical_scroll_id)?;
+        renderer.frames.remove(self.vertical_scroll_border_id)?;
+        renderer.rectangles.remove(self.vertical_scroll_background_id)?;
+        renderer.frames.remove(self.vertical_scroll_background_border_id)?;
+        renderer.rectangles.remove(self.horizontal_scroll_id)?;
+        renderer.frames.remove(self.horizontal_scroll_border_id)?;
+        renderer.rectangles.remove(self.horizontal_scroll_background_id)?;
+        renderer.frames.remove(self.horizontal_scroll_background_border_id)?;
 
         Ok(())
     }

@@ -379,7 +379,7 @@ impl Component for Label {
     }
 
     fn release_internal_resources(&mut self, renderer: &mut RendererContext) -> Result<(), String> {
-        renderer.texts.remove(self.label_id);
+        renderer.texts.remove(self.label_id)?;
 
         Ok(())
     }

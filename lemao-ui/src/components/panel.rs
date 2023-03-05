@@ -491,14 +491,14 @@ impl Component for Panel {
     fn release_internal_resources(&mut self, renderer: &mut RendererContext) -> Result<(), String> {
         match self.shape {
             ComponentShape::Rectangle => {
-                renderer.rectangles.remove(self.filling_id);
-                renderer.frames.remove(self.border_id);
-                renderer.rectangles.remove(self.shadow_id);
+                renderer.rectangles.remove(self.filling_id)?;
+                renderer.frames.remove(self.border_id)?;
+                renderer.rectangles.remove(self.shadow_id)?;
             }
             ComponentShape::Disc => {
-                renderer.discs.remove(self.filling_id);
-                renderer.circles.remove(self.border_id);
-                renderer.discs.remove(self.shadow_id);
+                renderer.discs.remove(self.filling_id)?;
+                renderer.circles.remove(self.border_id)?;
+                renderer.discs.remove(self.shadow_id)?;
             }
         };
 

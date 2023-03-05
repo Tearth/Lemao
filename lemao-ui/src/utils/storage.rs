@@ -1,10 +1,6 @@
 use crate::components::Component;
-use lemao_core::utils::hasher::StorageHasherBuilder;
-use lemao_core::utils::rand;
 use std::any::Any;
-use std::collections::hash_map::Values;
-use std::collections::hash_map::ValuesMut;
-use std::collections::HashMap;
+use std::collections::VecDeque;
 
 pub trait UiStorageItem {
     fn get_id(&self) -> usize;
@@ -22,23 +18,25 @@ pub trait UiStorageItem {
     }
 }
 
+#[derive(Default)]
 pub struct UiStorage {
-    data: HashMap<usize, Box<dyn UiStorageItem>, StorageHasherBuilder>,
+    data: Vec<Option<Box<dyn UiStorageItem>>>,
+    removed_ids: VecDeque<usize>,
 }
 
 impl UiStorage {
     pub fn store(&mut self, mut item: Box<dyn UiStorageItem>) -> usize {
         let id = self.get_new_id();
         item.set_id(id);
-        self.data.insert(id, item);
+        self.data[id] = Some(item);
 
         id
     }
 
     pub fn get(&self, id: usize) -> Result<&dyn UiStorageItem, String> {
-        match self.data.get(&id) {
-            Some(item) => Ok(item.as_ref()),
-            None => Err(format!("Storage item {} not found", id)),
+        match self.data.get(id) {
+            Some(Some(item)) => Ok(item.as_ref()),
+            _ => Err(format!("Storage item {} not found", id)),
         }
     }
 
@@ -50,9 +48,9 @@ impl UiStorage {
     }
 
     pub fn get_mut(&mut self, id: usize) -> Result<&mut dyn UiStorageItem, String> {
-        match self.data.get_mut(&id) {
-            Some(drawable) => Ok(drawable.as_mut()),
-            None => Err(format!("Storage item {} not found", id)),
+        match self.data.get_mut(id) {
+            Some(Some(item)) => Ok(item.as_mut()),
+            _ => Err(format!("Storage item {} not found", id)),
         }
     }
 
@@ -63,34 +61,31 @@ impl UiStorage {
         self.get_mut(id)?.as_any_mut().downcast_mut::<C>().ok_or_else(|| format!("Storage item {} cannot be downcasted", id))
     }
 
-    pub fn iter(&self) -> Values<usize, Box<dyn UiStorageItem>> {
-        self.data.values()
+    pub fn iter(&self) -> impl Iterator<Item = &Box<dyn UiStorageItem>> {
+        self.data.iter().filter_map(|p| p.as_ref())
     }
 
-    pub fn iter_mut(&mut self) -> ValuesMut<usize, Box<dyn UiStorageItem>> {
-        self.data.values_mut()
+    pub fn iter_mut(&mut self) -> impl Iterator<Item = &mut Box<dyn UiStorageItem>> {
+        self.data.iter_mut().filter_map(|p| p.as_mut())
     }
 
     pub fn remove(&mut self, id: usize) -> Result<(), String> {
-        if self.data.remove(&id).is_none() {
+        if id >= self.data.len() || self.data[id].is_none() {
             return Err(format!("Storage item {} not found", id));
         }
+
+        self.data[id] = None;
+        self.removed_ids.push_back(id);
 
         Ok(())
     }
 
-    fn get_new_id(&self) -> usize {
-        loop {
-            let id = rand::usize(..);
-            if !self.data.contains_key(&id) {
-                return id;
-            }
+    fn get_new_id(&mut self) -> usize {
+        if let Some(id) = self.removed_ids.pop_front() {
+            id
+        } else {
+            self.data.push(None);
+            self.data.len() - 1
         }
-    }
-}
-
-impl Default for UiStorage {
-    fn default() -> Self {
-        Self { data: HashMap::with_hasher(StorageHasherBuilder) }
     }
 }
