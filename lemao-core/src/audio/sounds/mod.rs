@@ -1,3 +1,5 @@
+use crate::utils::storage::StorageItem;
+
 use super::samples::Sample;
 use lemao_openal::bindings::openal;
 
@@ -100,6 +102,16 @@ impl Sound {
 
             Ok(())
         }
+    }
+}
+
+impl StorageItem for Sound {
+    fn get_id(&self) -> usize {
+        self.id
+    }
+
+    fn set_id(&mut self, id: usize) {
+        self.id = id;
     }
 }
 

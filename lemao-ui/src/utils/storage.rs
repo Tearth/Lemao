@@ -2,6 +2,12 @@ use crate::components::Component;
 use std::any::Any;
 use std::collections::VecDeque;
 
+#[derive(Default)]
+pub struct UiStorage {
+    data: Vec<Option<Box<dyn UiStorageItem>>>,
+    removed_ids: VecDeque<usize>,
+}
+
 pub trait UiStorageItem {
     fn get_id(&self) -> usize;
     fn set_id(&mut self, id: usize);
@@ -16,12 +22,6 @@ pub trait UiStorageItem {
     fn as_component_mut(&mut self) -> Option<&mut dyn Component> {
         None
     }
-}
-
-#[derive(Default)]
-pub struct UiStorage {
-    data: Vec<Option<Box<dyn UiStorageItem>>>,
-    removed_ids: VecDeque<usize>,
 }
 
 impl UiStorage {

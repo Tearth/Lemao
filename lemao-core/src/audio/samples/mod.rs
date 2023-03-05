@@ -1,3 +1,5 @@
+use crate::utils::storage::StorageItem;
+
 use super::context::AudioContext;
 use lemao_openal::bindings::openal;
 use std::ffi::c_void;
@@ -51,6 +53,16 @@ impl Sample {
 
             Ok(Self { id: 0, buffer_id })
         }
+    }
+}
+
+impl StorageItem for Sample {
+    fn get_id(&self) -> usize {
+        self.id
+    }
+
+    fn set_id(&mut self, id: usize) {
+        self.id = id;
     }
 }
 

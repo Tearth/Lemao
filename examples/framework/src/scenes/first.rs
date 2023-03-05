@@ -3,6 +3,8 @@ use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_common_platform::input::Key;
 use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
+use lemao_core::renderer::fonts::bff;
+use lemao_core::renderer::fonts::Font;
 use lemao_framework::app::Application;
 use lemao_framework::app::Scene;
 use lemao_ui::components::label::Label;
@@ -28,7 +30,7 @@ impl FirstScene {
 
 impl Scene<GlobalAppData> for FirstScene {
     fn on_init(&mut self, app: &mut Application<GlobalAppData>) -> Result<(), String> {
-        let font_id = app.renderer.create_font("./assets/inconsolata.bff")?;
+        let font_id = app.renderer.fonts.store(Font::new(&app.renderer, &bff::load("./assets/inconsolata.bff")?)?);
 
         self.description_text_id = self.ui.create_label(&mut app.renderer, font_id)?;
         let description_text = self.ui.get_component_and_cast_mut::<Label>(self.description_text_id)?;

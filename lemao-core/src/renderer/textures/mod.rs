@@ -1,3 +1,5 @@
+use crate::utils::storage::StorageItem;
+
 use super::context::RendererContext;
 use lemao_math::vec2::Vec2;
 use lemao_opengl::bindings::opengl;
@@ -60,6 +62,16 @@ impl Texture {
 
             self.size = raw.size;
         }
+    }
+}
+
+impl StorageItem for Texture {
+    fn get_id(&self) -> usize {
+        self.id
+    }
+
+    fn set_id(&mut self, id: usize) {
+        self.id = id;
     }
 }
 

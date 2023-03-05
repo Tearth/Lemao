@@ -9,14 +9,12 @@ use super::drawable::text::Text;
 use super::drawable::tilemap::Tilemap;
 use super::drawable::Color;
 use super::drawable::DrawableEnum;
-use super::fonts::bff;
 use super::fonts::Font;
 use super::shaders::Shader;
 use super::shaders::DEFAULT_VERTEX_SHADER;
 use super::shaders::GRADIENT_FRAGMENT_SHADER;
 use super::shaders::SOLID_FRAGMENT_SHADER;
 use super::shapes::Shape;
-use super::textures::bmp;
 use super::textures::RawTexture;
 use super::textures::Texture;
 use crate::utils::storage::Storage;
@@ -27,7 +25,6 @@ use lemao_math::vec3::Vec3;
 use lemao_opengl::bindings::opengl;
 use lemao_opengl::pointers::OpenGLPointers;
 use std::ffi::c_void;
-use std::fs;
 use std::rc::Rc;
 
 pub struct RendererContext {
@@ -121,7 +118,6 @@ impl RendererContext {
     pub fn init_default_camera(&mut self) -> Result<(), String> {
         let camera = Camera::new(Default::default(), Default::default());
         self.default_camera_id = self.cameras.store(camera);
-        self.cameras.get_mut(self.default_camera_id)?.id = self.default_camera_id;
         self.set_camera_as_active(self.default_camera_id)?;
 
         Ok(())
@@ -130,11 +126,9 @@ impl RendererContext {
     pub fn init_default_shaders(&mut self) -> Result<(), String> {
         let solid_shader = Shader::new(self, DEFAULT_VERTEX_SHADER, SOLID_FRAGMENT_SHADER)?;
         self.default_solid_shader_id = self.shaders.store(solid_shader);
-        self.shaders.get_mut(self.default_solid_shader_id)?.id = self.default_solid_shader_id;
 
         let gradient_shader = Shader::new(self, DEFAULT_VERTEX_SHADER, GRADIENT_FRAGMENT_SHADER)?;
         self.default_gradient_shader_id = self.shaders.store(gradient_shader);
-        self.shaders.get_mut(self.default_gradient_shader_id)?.id = self.default_gradient_shader_id;
 
         Ok(())
     }
@@ -153,7 +147,6 @@ impl RendererContext {
             ],
         );
         self.default_sprite_shape_id = self.shapes.store(sprite_shape);
-        self.shapes.get_mut(self.default_sprite_shape_id)?.id = self.default_sprite_shape_id;
 
         let line_shape = Shape::new(
             self,
@@ -168,7 +161,6 @@ impl RendererContext {
             ],
         );
         self.default_line_shape_id = self.shapes.store(line_shape);
-        self.shapes.get_mut(self.default_line_shape_id)?.id = self.default_line_shape_id;
 
         let rectangle_shape = Shape::new(
             self,
@@ -183,7 +175,6 @@ impl RendererContext {
             ],
         );
         self.default_rectangle_shape_id = self.shapes.store(rectangle_shape);
-        self.shapes.get_mut(self.default_rectangle_shape_id)?.id = self.default_rectangle_shape_id;
 
         Ok(())
     }
@@ -191,7 +182,6 @@ impl RendererContext {
     pub fn init_default_texture(&mut self) -> Result<(), String> {
         let texture = Texture::new(self, &RawTexture::new(Vec2::new(1.0, 1.0), vec![255, 255, 255, 255]))?;
         self.default_texture_id = self.textures.store(texture);
-        self.textures.get_mut(self.default_texture_id)?.id = self.default_texture_id;
 
         Ok(())
     }
@@ -210,54 +200,12 @@ impl RendererContext {
         }
     }
 
-    pub fn create_texture(&mut self, path: &str) -> Result<usize, String> {
-        let texture = Texture::new(self, &bmp::load(path)?)?;
-        let id = self.textures.store(texture);
-        self.textures.get_mut(id)?.id = id;
-
-        Ok(id)
-    }
-
-    pub fn create_font(&mut self, path: &str) -> Result<usize, String> {
-        let font = Font::new(self, &bff::load(path)?)?;
-        let id = self.fonts.store(font);
-        self.fonts.get_mut(id)?.id = id;
-
-        Ok(id)
-    }
-
-    pub fn create_shader(&mut self, vertex_shader_path: &str, fragment_shader_path: &str) -> Result<usize, String> {
-        let vertex_shader = match fs::read_to_string(vertex_shader_path) {
-            Ok(content) => content,
-            Err(message) => return Err(format!("Error while loading vertex shader: {}", message)),
-        };
-
-        let fragment_shader = match fs::read_to_string(fragment_shader_path) {
-            Ok(content) => content,
-            Err(message) => return Err(format!("Error while loading fragment shader: {}", message)),
-        };
-
-        let shader = Shader::new(self, &vertex_shader, &fragment_shader)?;
-        let id = self.shaders.store(shader);
-        self.shaders.get_mut(id)?.id = id;
-
-        Ok(id)
-    }
-
     pub fn set_shader_as_active(&mut self, shader_id: usize) -> Result<(), String> {
         let shader = self.shaders.get_mut(shader_id)?;
 
         self.active_shader_id = shader_id;
         shader.set_as_active();
         Ok(())
-    }
-
-    pub fn create_camera(&mut self, position: Vec2, size: Vec2) -> Result<usize, String> {
-        let camera = Camera::new(position, size);
-        let id = self.cameras.store(camera);
-        self.cameras.get_mut(id)?.id = id;
-
-        Ok(id)
     }
 
     pub fn set_camera_as_active(&mut self, camera_id: usize) -> Result<(), String> {
@@ -273,33 +221,21 @@ impl RendererContext {
         let texture = self.textures.get(self.default_texture_id)?;
         let circle = Circle::new(self, texture);
 
-        let id = self.circles.store(circle);
-        let circle = self.circles.get_mut(id)?;
-        circle.id = id;
-
-        Ok(id)
+        Ok(self.circles.store(circle))
     }
 
     pub fn create_disc(&mut self) -> Result<usize, String> {
         let texture = self.textures.get(self.default_texture_id)?;
         let disc = Disc::new(self, texture);
 
-        let id = self.discs.store(disc);
-        let disc = self.discs.get_mut(id)?;
-        disc.id = id;
-
-        Ok(id)
+        Ok(self.discs.store(disc))
     }
 
     pub fn create_frame(&mut self) -> Result<usize, String> {
         let texture = self.textures.get(self.default_texture_id)?;
         let frame = Frame::new(self, texture);
 
-        let id = self.frames.store(frame);
-        let frame = self.frames.get_mut(id)?;
-        frame.id = id;
-
-        Ok(id)
+        Ok(self.frames.store(frame))
     }
 
     pub fn create_line(&mut self) -> Result<usize, String> {
@@ -307,11 +243,7 @@ impl RendererContext {
         let texture = self.textures.get(self.default_texture_id)?;
         let line = Line::new(self, shape, texture);
 
-        let id = self.lines.store(line);
-        let line = self.lines.get_mut(id)?;
-        line.id = id;
-
-        Ok(id)
+        Ok(self.lines.store(line))
     }
 
     pub fn create_rectangle(&mut self) -> Result<usize, String> {
@@ -319,33 +251,21 @@ impl RendererContext {
         let texture = self.textures.get(self.default_texture_id)?;
         let rectangle = Rectangle::new(self, shape, texture);
 
-        let id = self.rectangles.store(rectangle);
-        let rectangle = self.rectangles.get_mut(id)?;
-        rectangle.id = id;
-
-        Ok(id)
+        Ok(self.rectangles.store(rectangle))
     }
 
     pub fn create_text(&mut self, font_id: usize) -> Result<usize, String> {
         let font = self.fonts.get(font_id)?;
         let text = Text::new(self, font);
 
-        let id = self.texts.store(text);
-        let text = self.texts.get_mut(id)?;
-        text.id = id;
-
-        Ok(id)
+        Ok(self.texts.store(text))
     }
 
     pub fn create_tilemap(&mut self, texture_id: usize) -> Result<usize, String> {
         let texture = self.textures.get(texture_id)?;
         let tilemap = Tilemap::new(self, texture);
 
-        let id = self.tilemaps.store(tilemap);
-        let tilemap = self.tilemaps.get_mut(id)?;
-        tilemap.id = id;
-
-        Ok(id)
+        Ok(self.tilemaps.store(tilemap))
     }
 
     pub fn enable_scissor(&self, position: Vec2, size: Vec2) {

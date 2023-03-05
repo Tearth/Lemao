@@ -43,18 +43,12 @@ impl AudioContext {
 
     pub fn create_sample(&mut self, path: &str) -> Result<usize, String> {
         let sample = Sample::new(self, &wav::load(path)?)?;
-        let id = self.samples.store(sample);
-        self.samples.get_mut(id)?.id = id;
-
-        Ok(id)
+        Ok(self.samples.store(sample))
     }
 
     pub fn create_sound(&mut self, sample_id: usize) -> Result<usize, String> {
         let sample = self.samples.get(sample_id)?;
-        let id = self.sounds.store(Sound::new(sample)?);
-        self.sounds.get_mut(id)?.id = id;
-
-        Ok(id)
+        Ok(self.sounds.store(Sound::new(sample)?))
     }
 }
 

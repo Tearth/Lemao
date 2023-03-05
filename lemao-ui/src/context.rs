@@ -17,6 +17,7 @@ use crate::events::UiEvent;
 use crate::utils::storage::UiStorage;
 use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_math::vec2::Vec2;
+use lemao_core::renderer::cameras::Camera;
 use lemao_core::renderer::context::RendererContext;
 use lemao_core::renderer::drawable::Color;
 use lemao_core::renderer::drawable::DrawableEnum;
@@ -36,7 +37,7 @@ pub struct UiContext {
 impl UiContext {
     pub fn new(renderer: &mut RendererContext) -> Result<Self, String> {
         let main_camera = renderer.cameras.get(renderer.active_camera_id)?;
-        let ui_camera_id = renderer.create_camera(main_camera.position, main_camera.size)?;
+        let ui_camera_id = renderer.cameras.store(Camera::new(main_camera.position, main_camera.size));
 
         let mut ui = Self {
             main_canvas_id: 0,

@@ -9,6 +9,8 @@ use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
 
 use lemao_core::renderer::drawable::DrawableEnum;
+use lemao_core::renderer::fonts::bff;
+use lemao_core::renderer::fonts::Font;
 use lemao_core::window::context::CoordinationSystem;
 use lemao_core::window::context::WindowContext;
 use lemao_ui::components::label::Label;
@@ -30,7 +32,7 @@ pub fn main() -> Result<(), String> {
     let mut ui = UiContext::new(&mut renderer)?;
     renderer.set_swap_interval(1);
 
-    let font_id = renderer.create_font("./assets/inconsolata.bff")?;
+    let font_id = renderer.fonts.store(Font::new(&renderer, &bff::load("./assets/inconsolata.bff")?)?);
 
     let rectangle_id = renderer.create_rectangle().unwrap();
     let rectangle = renderer.rectangles.get_mut(rectangle_id)?;

@@ -1,3 +1,5 @@
+use crate::utils::storage::StorageItem;
+
 use super::context::RendererContext;
 use lemao_math::color::SolidColor;
 use lemao_math::vec2::Vec2;
@@ -71,6 +73,16 @@ impl Shape {
 
             Self { id: 0, vao_gl_id, vbo_gl_id, ebo_gl_id, gl, vertices: data, indices }
         }
+    }
+}
+
+impl StorageItem for Shape {
+    fn get_id(&self) -> usize {
+        self.id
+    }
+
+    fn set_id(&mut self, id: usize) {
+        self.id = id;
     }
 }
 

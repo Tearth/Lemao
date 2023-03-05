@@ -2,6 +2,8 @@ use lemao_math::mat4x4::Mat4x4;
 use lemao_math::vec2::Vec2;
 use lemao_math::vec3::Vec3;
 
+use crate::utils::storage::StorageItem;
+
 pub struct Camera {
     pub id: usize,
 
@@ -21,5 +23,15 @@ impl Camera {
 
     pub(crate) fn get_view_matrix(&self) -> Mat4x4 {
         Mat4x4::translate(Vec3::new(-self.position.x, -self.position.y, -1.0))
+    }
+}
+
+impl StorageItem for Camera {
+    fn get_id(&self) -> usize {
+        self.id
+    }
+
+    fn set_id(&mut self, id: usize) {
+        self.id = id;
     }
 }

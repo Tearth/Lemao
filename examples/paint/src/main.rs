@@ -7,6 +7,8 @@ use lemao_core::lemao_common_platform::window::WindowStyle;
 use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::drawable::DrawableEnum;
+use lemao_core::renderer::fonts::bff;
+use lemao_core::renderer::fonts::Font;
 use lemao_core::renderer::textures::RawTexture;
 use lemao_core::renderer::textures::Texture;
 use lemao_core::window::context::CoordinationSystem;
@@ -32,9 +34,7 @@ pub fn main() -> Result<(), String> {
     let mut raw_texture = RawTexture::new(window_size, vec![0; (window_size.x * window_size.y * 4.0) as usize]);
 
     let texture_id = renderer.textures.store(Texture::new(&renderer, &raw_texture)?);
-    renderer.textures.get_mut(texture_id)?.id = texture_id;
-
-    let font_id = renderer.create_font("./assets/inconsolata.bff")?;
+    let font_id = renderer.fonts.store(Font::new(&renderer, &bff::load("./assets/inconsolata.bff")?)?);
 
     let sprite_id = renderer.create_rectangle()?;
     let sprite = renderer.rectangles.get_mut(sprite_id)?;

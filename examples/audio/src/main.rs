@@ -1,9 +1,13 @@
 use lemao_core::audio::context::AudioContext;
+use lemao_core::audio::samples::wav;
+use lemao_core::audio::samples::Sample;
 use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_common_platform::input::Key;
 use lemao_core::lemao_common_platform::window::WindowStyle;
 use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
+use lemao_core::renderer::fonts::bff;
+use lemao_core::renderer::fonts::Font;
 use lemao_core::window::context::WindowContext;
 use lemao_ui::components::label::Label;
 use lemao_ui::components::ComponentPosition;
@@ -32,8 +36,8 @@ pub fn main() -> Result<(), String> {
 
     renderer.set_swap_interval(1);
 
-    let font_id = renderer.create_font("./assets/inconsolata.bff")?;
-    let chopin_sample_id = audio.create_sample("./assets/chopin.wav")?;
+    let font_id = renderer.fonts.store(Font::new(&renderer, &bff::load("./assets/inconsolata.bff")?)?);
+    let chopin_sample_id = audio.samples.store(Sample::new(&audio, &wav::load("./assets/chopin.wav")?)?);
     let chopin_sound_id = audio.create_sound(chopin_sample_id)?;
 
     let description_text_id = ui.create_label(&mut renderer, font_id)?;

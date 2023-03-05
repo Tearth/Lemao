@@ -2,6 +2,7 @@ use super::*;
 use crate::renderer::context::RendererContext;
 use crate::renderer::shapes::Shape;
 use crate::renderer::textures::Texture;
+use crate::utils::storage::StorageItem;
 use lemao_math::mat4x4::Mat4x4;
 use lemao_math::vec2::Vec2;
 use lemao_math::vec3::Vec3;
@@ -78,5 +79,15 @@ impl Line {
 
             Ok(())
         }
+    }
+}
+
+impl StorageItem for Line {
+    fn get_id(&self) -> usize {
+        self.id
+    }
+
+    fn set_id(&mut self, id: usize) {
+        self.id = id;
     }
 }

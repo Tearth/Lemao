@@ -11,6 +11,7 @@ use lemao_core::renderer::drawable::Color;
 use lemao_core::renderer::fonts::bff;
 use lemao_core::renderer::fonts::Font;
 use lemao_core::renderer::textures::bmp;
+use lemao_core::renderer::textures::Texture;
 use lemao_core::window::context::WindowContext;
 use lemao_ui::components::button::Button;
 use lemao_ui::components::checkbox::Checkbox;
@@ -69,9 +70,9 @@ pub fn main() -> Result<(), String> {
     let bold_font_id = renderer.fonts.store(Font::new(&renderer, &bold_font)?);
     let header_font_id = renderer.fonts.store(Font::new(&renderer, &header_font)?);
 
-    let texture_id = renderer.create_texture("./assets/wheat.bmp")?;
-    let box_checked_id = renderer.create_texture("./assets/box_checked.bmp")?;
-    let box_unchecked_id = renderer.create_texture("./assets/box_unchecked.bmp")?;
+    let texture_id = renderer.textures.store(Texture::new(&renderer, &bmp::load("./cell/wheat.bmp")?)?);
+    let box_checked_id = renderer.textures.store(Texture::new(&renderer, &bmp::load("./cell/box_checked.bmp")?)?);
+    let box_unchecked_id = renderer.textures.store(Texture::new(&renderer, &bmp::load("./cell/box_unchecked.bmp")?)?);
 
     let mut ui = UiContext::new(&mut renderer)?;
     // ui.set_debug_flag(true);

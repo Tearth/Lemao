@@ -3,6 +3,8 @@ use lemao_core::lemao_common_platform::window::WindowStyle;
 use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::drawable::DrawableEnum;
+use lemao_core::renderer::fonts::{bff, Font};
+use lemao_core::renderer::textures::{bmp, Texture};
 use lemao_core::utils::rand;
 use lemao_core::window::context::WindowContext;
 use lemao_ui::components::label::Label;
@@ -36,8 +38,8 @@ pub fn main() -> Result<(), String> {
     let mut ui = UiContext::new(&mut renderer)?;
     renderer.set_swap_interval(0);
 
-    let cell_texture_id = renderer.create_texture("./assets/cell.bmp")?;
-    let font_id = renderer.create_font("./assets/inconsolata.bff")?;
+    let cell_texture_id = renderer.textures.store(Texture::new(&renderer, &bmp::load("./assets/cell.bmp")?)?);
+    let font_id = renderer.fonts.store(Font::new(&renderer, &bff::load("./assets/inconsolata.bff")?)?);
 
     let fps_text_id = ui.create_label(&mut renderer, font_id)?;
     let fps_text = ui.get_component_and_cast_mut::<Label>(fps_text_id)?;
@@ -59,7 +61,7 @@ pub fn main() -> Result<(), String> {
         sprite.set_texture(cell_texture);
 
         let position = Vec2::new(rand::i32(0..window_size.x as i32) as f32, rand::i32(0..window_size.y as i32) as f32);
-        let velocity = Vec2::new(MAX_SPEED * (rand::i32(-100..100) as f32 / 100.0), MAX_SPEED * (rand::i32(-100..100)as f32 / 100.0) );
+        let velocity = Vec2::new(MAX_SPEED * (rand::i32(-100..100) as f32 / 100.0), MAX_SPEED * (rand::i32(-100..100) as f32 / 100.0));
 
         cells.push(CellData { sprite_id, position, velocity });
     }

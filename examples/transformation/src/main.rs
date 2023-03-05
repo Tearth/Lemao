@@ -7,6 +7,10 @@ use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::drawable::DrawableEnum;
 
+use lemao_core::renderer::fonts::bff;
+use lemao_core::renderer::fonts::Font;
+use lemao_core::renderer::textures::bmp;
+use lemao_core::renderer::textures::Texture;
 use lemao_core::window::context::WindowContext;
 use lemao_ui::components::label::Label;
 use lemao_ui::components::ComponentPosition;
@@ -31,8 +35,8 @@ pub fn main() -> Result<(), String> {
     let mut ui = UiContext::new(&mut renderer)?;
     renderer.set_swap_interval(1);
 
-    let texture_id = renderer.create_texture("./assets/disc.bmp")?;
-    let font_id = renderer.create_font("./assets/inconsolata.bff")?;
+    let texture_id = renderer.textures.store(Texture::new(&renderer, &bmp::load("./cell/disc.bmp")?)?);
+    let font_id = renderer.fonts.store(Font::new(&renderer, &bff::load("./assets/inconsolata.bff")?)?);
 
     let sprite_id = renderer.create_rectangle()?;
     let sprite = renderer.rectangles.get_mut(sprite_id)?;

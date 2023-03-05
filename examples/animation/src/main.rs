@@ -7,6 +7,10 @@ use lemao_core::lemao_common_platform::window::WindowStyle;
 use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::drawable::DrawableEnum;
+use lemao_core::renderer::fonts::bff;
+use lemao_core::renderer::fonts::Font;
+use lemao_core::renderer::textures::bmp;
+use lemao_core::renderer::textures::Texture;
 use lemao_core::window::context::WindowContext;
 use lemao_ui::components::label::Label;
 use lemao_ui::components::ComponentPosition;
@@ -28,8 +32,8 @@ pub fn main() -> Result<(), String> {
     let mut ui = UiContext::new(&mut renderer)?;
     renderer.set_swap_interval(1);
 
-    let explosion_id = renderer.create_texture("./assets/explosion.bmp")?;
-    let font_id = renderer.create_font("./assets/inconsolata.bff")?;
+    let explosion_id = renderer.textures.store(Texture::new(&renderer, &bmp::load("./assets/explosion.bmp")?)?);
+    let font_id = renderer.fonts.store(Font::new(&renderer, &bff::load("./assets/inconsolata.bff")?)?);
 
     let animation_id = renderer.create_tilemap(explosion_id).unwrap();
     let animation = renderer.tilemaps.get_mut(animation_id)?;

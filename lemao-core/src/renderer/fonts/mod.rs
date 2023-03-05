@@ -1,3 +1,5 @@
+use crate::utils::storage::StorageItem;
+
 use super::context::RendererContext;
 use super::textures::RawTexture;
 use lemao_math::vec2::Vec2;
@@ -98,6 +100,16 @@ impl Font {
                 character_widths: raw.character_widths.clone(),
             })
         }
+    }
+}
+
+impl StorageItem for Font {
+    fn get_id(&self) -> usize {
+        self.id
+    }
+
+    fn set_id(&mut self, id: usize) {
+        self.id = id;
     }
 }
 

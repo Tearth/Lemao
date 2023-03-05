@@ -5,9 +5,18 @@ pub struct Storage<T> {
     removed_ids: VecDeque<usize>,
 }
 
-impl<T> Storage<T> {
-    pub fn store(&mut self, item: T) -> usize {
+pub trait StorageItem {
+    fn get_id(&self) -> usize;
+    fn set_id(&mut self, id: usize);
+}
+
+impl<T> Storage<T>
+where
+    T: StorageItem,
+{
+    pub fn store(&mut self, mut item: T) -> usize {
         let id = self.get_new_id();
+        item.set_id(id);
         self.data[id] = Some(item);
 
         id

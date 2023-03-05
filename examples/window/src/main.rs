@@ -3,6 +3,8 @@ use lemao_core::lemao_common_platform::input::Key;
 use lemao_core::lemao_common_platform::window::WindowStyle;
 use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
+use lemao_core::renderer::fonts::bff;
+use lemao_core::renderer::fonts::Font;
 use lemao_core::window::context::CoordinationSystem;
 use lemao_core::window::context::WindowContext;
 use lemao_ui::components::label::Label;
@@ -33,7 +35,7 @@ pub fn main() -> Result<(), String> {
 
     renderer.set_swap_interval(1);
 
-    let font_id = renderer.create_font("./assets/inconsolata.bff")?;
+    let font_id = renderer.fonts.store(Font::new(&renderer, &bff::load("./assets/inconsolata.bff")?)?);
 
     let description_text_id = ui.create_label(&mut renderer, font_id)?;
     let description_text = ui.get_component_and_cast_mut::<Label>(description_text_id)?;
