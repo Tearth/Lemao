@@ -24,4 +24,6 @@ members = [
     "examples/transformation",
     "examples/ui",
     "examples/window",
+    
+    "games/snake",
 ]

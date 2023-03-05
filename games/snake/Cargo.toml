@@ -1,0 +1,9 @@
+[package]
+name = "snake"
+version = "1.0.0"
+edition = "2021"
+
+[dependencies]
+lemao-core = { path = "../../lemao-core" }
+lemao-framework = { path = "../../lemao-framework" }
+lemao-ui = { path = "../../lemao-ui" }
