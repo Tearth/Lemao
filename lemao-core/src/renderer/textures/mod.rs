@@ -16,6 +16,7 @@ pub struct RawTexture {
 
 pub struct Texture {
     pub id: usize,
+    pub name: Option<String>,
     pub(crate) texture_gl_id: u32,
     gl: Rc<OpenGLPointers>,
 
@@ -41,7 +42,7 @@ impl Texture {
             (gl.glTexParameteri)(opengl::GL_TEXTURE_2D, opengl::GL_TEXTURE_MIN_FILTER, opengl::GL_LINEAR_MIPMAP_LINEAR as i32);
             (gl.glTexParameteri)(opengl::GL_TEXTURE_2D, opengl::GL_TEXTURE_MAG_FILTER, opengl::GL_LINEAR as i32);
 
-            let mut texture = Self { id: 0, texture_gl_id, gl, size: raw.size };
+            let mut texture = Self { id: 0, name: None, texture_gl_id, gl, size: raw.size };
             texture.set_data(raw);
 
             Ok(texture)
@@ -72,6 +73,14 @@ impl StorageItem for Texture {
 
     fn set_id(&mut self, id: usize) {
         self.id = id;
+    }
+
+    fn get_name(&self) -> Option<String> {
+        self.name.clone()
+    }
+
+    fn set_name(&mut self, name: Option<String>) {
+        self.name = name;
     }
 }
 

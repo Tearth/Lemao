@@ -5,13 +5,14 @@ use lemao_openal::bindings::openal;
 
 pub struct Sound {
     pub id: usize,
+    pub name: Option<String>,
     pub(crate) sample_id: usize,
     pub(crate) source_id: u32,
 }
 
 impl Sound {
     pub fn new(sample: &Sample) -> Result<Self, String> {
-        let mut sound = Sound { id: 0, sample_id: 0, source_id: 0 };
+        let mut sound = Sound { id: 0, name: None, sample_id: 0, source_id: 0 };
         sound.set_sample(sample)?;
 
         Ok(sound)
@@ -112,6 +113,14 @@ impl StorageItem for Sound {
 
     fn set_id(&mut self, id: usize) {
         self.id = id;
+    }
+
+    fn get_name(&self) -> Option<String> {
+        self.name.clone()
+    }
+
+    fn set_name(&mut self, name: Option<String>) {
+        self.name = name;
     }
 }
 

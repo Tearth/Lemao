@@ -1,8 +1,11 @@
 use crate::global::GlobalAppData;
 use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_math::color::SolidColor;
+use lemao_core::renderer::fonts::Font;
+use lemao_core::renderer::textures::Texture;
 use lemao_framework::app::Application;
 use lemao_framework::app::Scene;
+use lemao_framework::assets::AssetsLoader;
 use lemao_ui::context::UiContext;
 use std::any::Any;
 
@@ -18,13 +21,22 @@ impl GameScene {
 
 impl Scene<GlobalAppData> for GameScene {
     fn on_init(&mut self, app: &mut Application<GlobalAppData>) -> Result<(), String> {
-        app.assets.set_queue("./assets/")?;
-        app.assets.start_loading();
+        let mut assets_loader = AssetsLoader::default();
+        assets_loader.set_queue("./assets/")?;
+        assets_loader.start_loading();
 
         loop {
-            if *app.assets.loaded_assets.read().unwrap() == app.assets.total_assets {
+            if *assets_loader.loaded_assets.read().unwrap() == assets_loader.total_assets {
                 break;
             }
+        }
+
+        for texture in assets_loader.textures.read().unwrap().iter() {
+            app.renderer.textures.store_with_name(&texture.name, Texture::new(&app.renderer, &texture.data)?)?;
+        }
+
+        for font in assets_loader.fonts.read().unwrap().iter() {
+            app.renderer.fonts.store_with_name(&font.name, Font::new(&app.renderer, &font.data)?)?;
         }
 
         Ok(())

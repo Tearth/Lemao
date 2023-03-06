@@ -20,6 +20,7 @@ pub struct RawFont {
 
 pub struct Font {
     pub id: usize,
+    pub name: Option<String>,
     pub(crate) texture_gl_id: u32,
     gl: Rc<OpenGLPointers>,
 
@@ -92,6 +93,7 @@ impl Font {
 
             Ok(Self {
                 id: 0,
+                name: None,
                 texture_gl_id,
                 gl,
                 size: raw.size,
@@ -110,6 +112,14 @@ impl StorageItem for Font {
 
     fn set_id(&mut self, id: usize) {
         self.id = id;
+    }
+
+    fn get_name(&self) -> Option<String> {
+        self.name.clone()
+    }
+
+    fn set_name(&mut self, name: Option<String>) {
+        self.name = name;
     }
 }
 

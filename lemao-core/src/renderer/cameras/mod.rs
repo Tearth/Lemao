@@ -6,6 +6,7 @@ use crate::utils::storage::StorageItem;
 
 pub struct Camera {
     pub id: usize,
+    pub name: Option<String>,
 
     pub position: Vec2,
     pub size: Vec2,
@@ -14,7 +15,7 @@ pub struct Camera {
 
 impl Camera {
     pub fn new(position: Vec2, size: Vec2) -> Self {
-        Self { id: 0, position, size, dirty: false }
+        Self { id: 0, name: None, position, size, dirty: false }
     }
 
     pub(crate) fn get_projection_matrix(&self) -> Mat4x4 {
@@ -33,5 +34,13 @@ impl StorageItem for Camera {
 
     fn set_id(&mut self, id: usize) {
         self.id = id;
+    }
+
+    fn get_name(&self) -> Option<String> {
+        self.name.clone()
+    }
+
+    fn set_name(&mut self, name: Option<String>) {
+        self.name = name;
     }
 }

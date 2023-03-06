@@ -2,7 +2,6 @@ use lemao_core::renderer::fonts::bff;
 use lemao_core::renderer::fonts::RawFont;
 use lemao_core::renderer::textures::bmp;
 use lemao_core::renderer::textures::RawTexture;
-use std::collections::HashMap;
 use std::collections::VecDeque;
 use std::ffi::OsStr;
 use std::path::Path;
@@ -12,13 +11,18 @@ use std::thread;
 
 #[derive(Default)]
 pub struct AssetsLoader {
-    pub textures: Arc<RwLock<HashMap<String, RawTexture>>>,
-    pub fonts: Arc<RwLock<HashMap<String, RawFont>>>,
+    pub textures: Arc<RwLock<Vec<Asset<RawTexture>>>>,
+    pub fonts: Arc<RwLock<Vec<Asset<RawFont>>>>,
     pub queue: Arc<RwLock<VecDeque<String>>>,
 
     pub status: Arc<RwLock<String>>,
     pub loaded_assets: Arc<RwLock<u32>>,
     pub total_assets: u32,
+}
+
+pub struct Asset<T> {
+    pub name: String,
+    pub data: T,
 }
 
 impl AssetsLoader {
@@ -52,16 +56,10 @@ impl AssetsLoader {
 
                 match extension.to_str().unwrap() {
                     "bmp" => {
-                        let texture = bmp::load(&asset_to_load)?;
-                        if textures.write().unwrap().insert(name.to_str().unwrap().to_string(), texture).is_some() {
-                            return Err("Duplicated asset".to_string());
-                        }
+                        textures.write().unwrap().push(Asset::new(name.to_str().unwrap().to_string(), bmp::load(&asset_to_load)?));
                     }
                     "bff" => {
-                        let font = bff::load(&asset_to_load)?;
-                        if fonts.write().unwrap().insert(name.to_str().unwrap().to_string(), font).is_some() {
-                            return Err("Duplicated asset".to_string());
-                        }
+                        fonts.write().unwrap().push(Asset::new(name.to_str().unwrap().to_string(), bff::load(&asset_to_load)?));
                     }
                     _ => return Err("Unsupported extension".to_string()),
                 };
@@ -91,5 +89,11 @@ impl AssetsLoader {
     fn is_extension_allowed(&self, extension: &OsStr) -> bool {
         let allowed_extension = ["bmp"];
         allowed_extension.contains(&extension.to_str().unwrap())
+    }
+}
+
+impl<T> Asset<T> {
+    pub fn new(name: String, data: T) -> Self {
+        Self { name, data }
     }
 }

@@ -15,6 +15,7 @@ pub struct RawSample {
 
 pub struct Sample {
     pub(crate) id: usize,
+    pub(crate) name: Option<String>,
     pub(crate) buffer_id: u32,
 }
 
@@ -51,7 +52,7 @@ impl Sample {
                 return Err(format!("OpenAL error, code {}", error));
             }
 
-            Ok(Self { id: 0, buffer_id })
+            Ok(Self { id: 0, name: None, buffer_id })
         }
     }
 }
@@ -63,6 +64,14 @@ impl StorageItem for Sample {
 
     fn set_id(&mut self, id: usize) {
         self.id = id;
+    }
+
+    fn get_name(&self) -> Option<String> {
+        self.name.clone()
+    }
+
+    fn set_name(&mut self, name: Option<String>) {
+        self.name = name;
     }
 }
 

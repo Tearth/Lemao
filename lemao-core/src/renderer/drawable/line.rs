@@ -13,6 +13,7 @@ use std::rc::Rc;
 
 pub struct Line {
     pub id: usize,
+    pub name: Option<String>,
     pub(crate) shape_id: usize,
     pub(crate) shape_vao_gl_id: u32,
     pub(crate) texture_gl_id: u32,
@@ -32,6 +33,7 @@ impl Line {
     pub fn new(renderer: &RendererContext, shape: &Shape, texture: &Texture) -> Self {
         Line {
             id: 0,
+            name: None,
             shape_id: shape.id,
             shape_vao_gl_id: shape.vao_gl_id,
             texture_gl_id: texture.texture_gl_id,
@@ -89,5 +91,13 @@ impl StorageItem for Line {
 
     fn set_id(&mut self, id: usize) {
         self.id = id;
+    }
+
+    fn get_name(&self) -> Option<String> {
+        self.name.clone()
+    }
+
+    fn set_name(&mut self, name: Option<String>) {
+        self.name = name;
     }
 }

@@ -15,6 +15,7 @@ use std::rc::Rc;
 
 pub struct Frame {
     pub id: usize,
+    pub name: Option<String>,
     pub(crate) vao_gl_id: u32,
     pub(crate) vbo_gl_id: u32,
     pub(crate) ebo_gl_id: u32,
@@ -47,6 +48,7 @@ impl Frame {
     pub fn new(renderer: &RendererContext, texture: &Texture) -> Self {
         let mut frame = Frame {
             id: 0,
+            name: None,
             vao_gl_id: 0,
             vbo_gl_id: 0,
             ebo_gl_id: 0,
@@ -347,6 +349,14 @@ impl StorageItem for Frame {
 
     fn set_id(&mut self, id: usize) {
         self.id = id;
+    }
+
+    fn get_name(&self) -> Option<String> {
+        self.name.clone()
+    }
+
+    fn set_name(&mut self, name: Option<String>) {
+        self.name = name;
     }
 }
 

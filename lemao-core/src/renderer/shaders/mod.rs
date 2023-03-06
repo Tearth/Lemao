@@ -16,7 +16,8 @@ pub const SOLID_FRAGMENT_SHADER: &str = include_str!("./fragment/solid.frag");
 pub const GRADIENT_FRAGMENT_SHADER: &str = include_str!("./fragment/gradient.frag");
 
 pub struct Shader {
-    pub(crate) id: usize,
+    pub id: usize,
+    pub name: Option<String>,
     pub(crate) program_id: u32,
     gl: Rc<OpenGLPointers>,
 
@@ -115,7 +116,7 @@ impl Shader {
                 }
             }
 
-            Ok(Shader { id: 0, program_id, uniforms, gl })
+            Ok(Shader { id: 0, name: None, program_id, uniforms, gl })
         }
     }
 
@@ -188,6 +189,14 @@ impl StorageItem for Shader {
 
     fn set_id(&mut self, id: usize) {
         self.id = id;
+    }
+
+    fn get_name(&self) -> Option<String> {
+        self.name.clone()
+    }
+
+    fn set_name(&mut self, name: Option<String>) {
+        self.name = name;
     }
 }
 
