@@ -19,15 +19,15 @@ use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::cameras::Camera;
 use lemao_core::renderer::context::RendererContext;
+use lemao_core::renderer::drawable::frame::Frame;
 use lemao_core::renderer::drawable::Color;
-use lemao_core::renderer::drawable::DrawableEnum;
 use lemao_math::color::SolidColor;
 use std::collections::VecDeque;
 
 pub struct UiContext {
     pub ui_camera_id: usize,
     pub main_canvas_id: usize,
-    pub debug_frame_id: usize,
+    pub debug_frame: Frame,
     pub debug: bool,
 
     components: UiStorage,
@@ -42,7 +42,7 @@ impl UiContext {
         let mut ui = Self {
             main_canvas_id: 0,
             ui_camera_id,
-            debug_frame_id: renderer.create_frame()?,
+            debug_frame: renderer.create_frame()?,
             debug: false,
 
             components: Default::default(),
@@ -158,7 +158,6 @@ impl UiContext {
     }
 
     pub fn remove_component(&mut self, component_id: usize, renderer: &mut RendererContext) -> Result<(), String> {
-        self.get_component_mut(component_id)?.release_internal_resources(renderer)?;
         self.components.remove(component_id)
     }
 
@@ -275,14 +274,13 @@ impl UiContext {
         component.draw(renderer)?;
 
         if self.debug {
-            let debug_frame = renderer.frames.get_mut(self.debug_frame_id)?;
-            debug_frame.position = component_position;
-            debug_frame.size = component_size;
-            debug_frame.color = Color::SolidColor(match component_is_active {
+            self.debug_frame.position = component_position;
+            self.debug_frame.size = component_size;
+            self.debug_frame.color = Color::SolidColor(match component_is_active {
                 true => SolidColor::new(1.0, 0.0, 0.0, 1.0),
                 false => SolidColor::new(0.2, 0.2, 0.2, 1.0),
             });
-            renderer.draw(DrawableEnum::Frame, self.debug_frame_id)?;
+            renderer.draw(&mut self.debug_frame)?;
         }
 
         renderer.set_camera_as_active(active_camera_id)?;

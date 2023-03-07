@@ -14,8 +14,10 @@ use lemao_core::lemao_common_platform::input::MouseButton;
 use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::context::RendererContext;
+use lemao_core::renderer::drawable::frame::Frame;
+use lemao_core::renderer::drawable::rectangle::Rectangle;
+use lemao_core::renderer::drawable::text::Text;
 use lemao_core::renderer::drawable::Color;
-use lemao_core::renderer::drawable::DrawableEnum;
 use lemao_core::renderer::textures::Texture;
 use std::any::Any;
 
@@ -39,19 +41,19 @@ pub struct TextBox {
     pub event_mask: Option<EventMask>,
 
     // Shape properties
-    pub filling_id: usize,
+    pub filling: Rectangle,
     pub color: Color,
     pub corner_rounding: ComponentCornerRounding,
     pub texture_id: Option<usize>,
     pub texture_original_size: Vec2,
 
     // Border properties
-    pub border_id: usize,
+    pub border: Frame,
     pub border_color: Color,
     pub border_thickness: ComponentBorderThickness,
 
     // Label properties
-    pub label_id: usize,
+    pub label: Text,
     pub label_font_id: usize,
     pub label_text: String,
     pub label_horizontal_alignment: HorizontalAlignment,
@@ -61,7 +63,7 @@ pub struct TextBox {
     pub label_max_length: usize,
 
     // Shadow properties
-    pub shadow_id: usize,
+    pub shadow: Rectangle,
     pub shadow_enabled: bool,
     pub shadow_offset: Vec2,
     pub shadow_color: Color,
@@ -108,19 +110,19 @@ impl TextBox {
             event_mask: None,
 
             // Shape properties
-            filling_id: renderer.create_rectangle()?,
+            filling: renderer.create_rectangle()?,
             color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             corner_rounding: Default::default(),
             texture_id: None,
             texture_original_size: Default::default(),
 
             // Border properties
-            border_id: renderer.create_frame()?,
+            border: renderer.create_frame()?,
             border_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             border_thickness: Default::default(),
 
             // Label properties
-            label_id: renderer.create_text(label_font_id)?,
+            label: renderer.create_text(label_font_id)?,
             label_font_id,
             label_text: Default::default(),
             label_horizontal_alignment: HorizontalAlignment::Middle,
@@ -130,7 +132,7 @@ impl TextBox {
             label_max_length: usize::MAX,
 
             // Shadow properties
-            shadow_id: renderer.create_rectangle()?,
+            shadow: renderer.create_rectangle()?,
             shadow_enabled: false,
             shadow_offset: Default::default(),
             shadow_color: Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 1.0)),
@@ -425,13 +427,12 @@ impl Component for TextBox {
         self.screen_position = self.screen_position.floor();
 
         if self.border_thickness != Default::default() {
-            let border = renderer.frames.get_mut(self.border_id)?;
-            border.position = self.screen_position;
-            border.size = self.screen_size;
-            border.color = self.border_color.clone();
-            border.thickness = self.border_thickness.into();
-            border.corner_rounding = self.corner_rounding.into();
-            border.update();
+            self.border.position = self.screen_position;
+            self.border.size = self.screen_size;
+            self.border.color = self.border_color.clone();
+            self.border.thickness = self.border_thickness.into();
+            self.border.corner_rounding = self.corner_rounding.into();
+            self.border.update();
 
             self.screen_position += Vec2::new(self.border_thickness.left, self.border_thickness.bottom);
             self.screen_size -= Vec2::new(self.border_thickness.left + self.border_thickness.right, self.border_thickness.top + self.border_thickness.bottom);
@@ -440,17 +441,16 @@ impl Component for TextBox {
             self.screen_position = self.screen_position.floor();
         }
 
-        let filling = renderer.rectangles.get_mut(self.filling_id)?;
-        filling.position = self.screen_position;
-        filling.color = self.color.clone();
-        filling.size = self.screen_size;
-        filling.corner_rounding = self.corner_rounding.into();
+        self.filling.position = self.screen_position;
+        self.filling.color = self.color.clone();
+        self.filling.size = self.screen_size;
+        self.filling.corner_rounding = self.corner_rounding.into();
 
         if let Some(texture_id) = self.texture_id {
-            filling.set_texture(renderer.textures.get(texture_id)?)
+            self.filling.set_texture(renderer.textures.get(texture_id)?)
         }
 
-        filling.update();
+        self.filling.update();
 
         let (horizontal_position, horizontal_anchor) = match self.label_horizontal_alignment {
             HorizontalAlignment::Left => (Vec2::new(self.screen_position.x, 0.0), Vec2::new(0.0, 0.0)),
@@ -465,23 +465,21 @@ impl Component for TextBox {
         };
 
         let font = renderer.fonts.get(self.label_font_id)?;
-        let label = renderer.texts.get_mut(self.label_id)?;
-        label.set_font(font);
-        label.text = self.label_text.clone();
-        label.color = self.label_color.clone();
-        label.position = (horizontal_position + vertical_position + self.label_offset).floor();
-        label.anchor = horizontal_anchor + vertical_anchor;
-        label.update();
+        self.label.set_font(font);
+        self.label.text = self.label_text.clone();
+        self.label.color = self.label_color.clone();
+        self.label.position = (horizontal_position + vertical_position + self.label_offset).floor();
+        self.label.anchor = horizontal_anchor + vertical_anchor;
+        self.label.update();
 
         if self.shadow_enabled {
-            let shadow = renderer.rectangles.get_mut(self.shadow_id)?;
-            shadow.position = self.screen_position + self.screen_size / 2.0 + self.shadow_offset;
-            shadow.size = self.screen_size;
-            shadow.anchor = Vec2::new(0.5, 0.5);
-            shadow.color = self.shadow_color.clone();
-            shadow.scale = self.shadow_scale;
-            shadow.corner_rounding = self.shadow_corner_rounding.into();
-            shadow.update();
+            self.shadow.position = self.screen_position + self.screen_size / 2.0 + self.shadow_offset;
+            self.shadow.size = self.screen_size;
+            self.shadow.anchor = Vec2::new(0.5, 0.5);
+            self.shadow.color = self.shadow_color.clone();
+            self.shadow.scale = self.shadow_scale;
+            self.shadow.corner_rounding = self.shadow_corner_rounding.into();
+            self.shadow.update();
         }
 
         self.dirty = false;
@@ -490,29 +488,27 @@ impl Component for TextBox {
 
     fn draw(&mut self, renderer: &mut RendererContext) -> Result<(), String> {
         if self.shadow_enabled {
-            renderer.draw(DrawableEnum::Rectangle, self.shadow_id)?;
+            renderer.draw(&mut self.shadow)?;
         }
 
-        renderer.draw(DrawableEnum::Rectangle, self.filling_id)?;
+        renderer.draw(&mut self.filling)?;
 
         if self.label_shadow_enabled {
-            let drawable = renderer.texts.get_mut(self.label_id)?;
-            let original_position = drawable.position;
-            let original_color = drawable.color.clone();
+            let original_position = self.label.position;
+            let original_color = self.label.color.clone();
 
-            drawable.position = original_position + self.label_shadow_offset;
-            drawable.color = self.label_shadow_color.clone();
-            renderer.draw(DrawableEnum::Text, self.label_id)?;
+            self.label.position = original_position + self.label_shadow_offset;
+            self.label.color = self.label_shadow_color.clone();
+            renderer.draw(&mut self.label)?;
 
-            let drawable = renderer.texts.get_mut(self.label_id)?;
-            drawable.position = original_position;
-            drawable.color = original_color;
+            self.label.position = original_position;
+            self.label.color = original_color;
         }
 
-        renderer.draw(DrawableEnum::Text, self.label_id)?;
+        renderer.draw(&mut self.label)?;
 
         if self.border_thickness != Default::default() {
-            renderer.draw(DrawableEnum::Frame, self.border_id)?;
+            renderer.draw(&mut self.border)?;
         }
 
         Ok(())
@@ -524,15 +520,6 @@ impl Component for TextBox {
 
     fn set_active_flag(&mut self, active: bool) {
         self.active = active;
-    }
-
-    fn release_internal_resources(&mut self, renderer: &mut RendererContext) -> Result<(), String> {
-        renderer.rectangles.remove(self.filling_id)?;
-        renderer.frames.remove(self.border_id)?;
-        renderer.rectangles.remove(self.shadow_id)?;
-        renderer.texts.remove(self.label_id)?;
-
-        Ok(())
     }
 
     fn as_any(&self) -> &dyn Any {

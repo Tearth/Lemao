@@ -2,7 +2,6 @@ use super::*;
 use crate::renderer::context::RendererContext;
 use crate::renderer::shapes::Shape;
 use crate::renderer::textures::Texture;
-use crate::utils::storage::StorageItem;
 use lemao_math::mat4x4::Mat4x4;
 use lemao_math::vec2::Vec2;
 use lemao_math::vec3::Vec3;
@@ -13,8 +12,6 @@ use std::rc::Rc;
 use std::{mem, ptr};
 
 pub struct Rectangle {
-    pub id: usize,
-    pub name: Option<String>,
     pub(crate) shape_id: usize,
     pub(crate) shape_vao_gl_id: u32,
     pub(crate) vao_gl_id: u32,
@@ -41,8 +38,6 @@ pub struct Rectangle {
 impl Rectangle {
     pub fn new(renderer: &RendererContext, shape: &Shape, texture: &Texture) -> Self {
         Rectangle {
-            id: 0,
-            name: None,
             shape_id: shape.id,
             shape_vao_gl_id: shape.vao_gl_id,
             vao_gl_id: 0,
@@ -70,29 +65,6 @@ impl Rectangle {
     pub fn set_texture(&mut self, texture: &Texture) {
         self.texture_id = texture.id;
         self.texture_gl_id = texture.texture_gl_id;
-    }
-
-    pub fn get_transformation_matrix(&self) -> Mat4x4 {
-        let translation = Mat4x4::translate(Vec3::from(self.position));
-        let rotation = Mat4x4::rotate(self.rotation);
-
-        if self.custom_shape {
-            let anchor_offset = Mat4x4::translate(-Vec3::from(self.anchor * self.size));
-            let scale = Mat4x4::scale(Vec3::from(self.scale).floor());
-            translation * rotation * scale * anchor_offset
-        } else {
-            let anchor_offset = Mat4x4::translate(-Vec3::from(self.anchor));
-            let scale = Mat4x4::scale(Vec3::from(self.scale * self.size).floor());
-            translation * rotation * scale * anchor_offset
-        }
-    }
-
-    pub fn get_batch(&self) -> Batch {
-        if self.custom_shape {
-            Batch::new(None, Some(&self.vertices), Some(&self.indices), Some(self.texture_gl_id), Some(&self.color))
-        } else {
-            Batch::new(Some(self.shape_id), None, None, Some(self.texture_gl_id), Some(&self.color))
-        }
     }
 
     pub fn update(&mut self) {
@@ -240,27 +212,6 @@ impl Rectangle {
         }
     }
 
-    pub fn draw(&mut self, shader: &Shader) -> Result<(), String> {
-        unsafe {
-            let model = self.get_transformation_matrix();
-
-            shader.set_parameter("model", model.as_ptr())?;
-            shader.set_color(&self.color)?;
-
-            if self.custom_shape {
-                (self.gl.glBindVertexArray)(self.vao_gl_id);
-                (self.gl.glBindTexture)(opengl::GL_TEXTURE_2D, self.texture_gl_id);
-                (self.gl.glDrawElements)(opengl::GL_TRIANGLES, self.elements_count as i32, opengl::GL_UNSIGNED_INT, ptr::null());
-            } else {
-                (self.gl.glBindVertexArray)(self.shape_vao_gl_id);
-                (self.gl.glBindTexture)(opengl::GL_TEXTURE_2D, self.texture_gl_id);
-                (self.gl.glDrawElements)(opengl::GL_TRIANGLES, 6, opengl::GL_UNSIGNED_INT, ptr::null());
-            }
-
-            Ok(())
-        }
-    }
-
     #[rustfmt::skip]
     fn get_vertices(&self, position: Vec2, uv: Vec2, color: SolidColor) -> [f32; 9] {
         [
@@ -303,21 +254,53 @@ impl Rectangle {
     }
 }
 
-impl StorageItem for Rectangle {
-    fn get_id(&self) -> usize {
-        self.id
+impl Drawable for Rectangle {
+    fn get_transformation_matrix(&self) -> Mat4x4 {
+        let translation = Mat4x4::translate(Vec3::from(self.position));
+        let rotation = Mat4x4::rotate(self.rotation);
+
+        if self.custom_shape {
+            let anchor_offset = Mat4x4::translate(-Vec3::from(self.anchor * self.size));
+            let scale = Mat4x4::scale(Vec3::from(self.scale).floor());
+            translation * rotation * scale * anchor_offset
+        } else {
+            let anchor_offset = Mat4x4::translate(-Vec3::from(self.anchor));
+            let scale = Mat4x4::scale(Vec3::from(self.scale * self.size).floor());
+            translation * rotation * scale * anchor_offset
+        }
     }
 
-    fn set_id(&mut self, id: usize) {
-        self.id = id;
+    fn get_batch(&self) -> Batch {
+        if self.custom_shape {
+            Batch::new(None, Some(&self.vertices), Some(&self.indices), Some(self.texture_gl_id), Some(&self.color))
+        } else {
+            Batch::new(Some(self.shape_id), None, None, Some(self.texture_gl_id), Some(&self.color))
+        }
     }
 
-    fn get_name(&self) -> Option<String> {
-        self.name.clone()
+    fn get_color(&self) -> &Color {
+        &self.color
     }
 
-    fn set_name(&mut self, name: Option<String>) {
-        self.name = name;
+    fn draw(&mut self, shader: &Shader) -> Result<(), String> {
+        unsafe {
+            let model = self.get_transformation_matrix();
+
+            shader.set_parameter("model", model.as_ptr())?;
+            shader.set_color(&self.color)?;
+
+            if self.custom_shape {
+                (self.gl.glBindVertexArray)(self.vao_gl_id);
+                (self.gl.glBindTexture)(opengl::GL_TEXTURE_2D, self.texture_gl_id);
+                (self.gl.glDrawElements)(opengl::GL_TRIANGLES, self.elements_count as i32, opengl::GL_UNSIGNED_INT, ptr::null());
+            } else {
+                (self.gl.glBindVertexArray)(self.shape_vao_gl_id);
+                (self.gl.glBindTexture)(opengl::GL_TEXTURE_2D, self.texture_gl_id);
+                (self.gl.glDrawElements)(opengl::GL_TRIANGLES, 6, opengl::GL_UNSIGNED_INT, ptr::null());
+            }
+
+            Ok(())
+        }
     }
 }
 

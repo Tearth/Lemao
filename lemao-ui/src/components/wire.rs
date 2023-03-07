@@ -9,8 +9,8 @@ use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_common_platform::input::MouseButton;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::context::RendererContext;
+use lemao_core::renderer::drawable::line::Line;
 use lemao_core::renderer::drawable::Color;
-use lemao_core::renderer::drawable::DrawableEnum;
 use std::any::Any;
 
 pub struct Wire {
@@ -52,7 +52,7 @@ pub struct WireChunkData {
 
 pub struct WireChunk {
     // Shape properties
-    line_id: usize,
+    line: Line,
 }
 
 impl Wire {
@@ -297,20 +297,15 @@ impl Component for Wire {
         self.screen_size = self.screen_size.floor();
         self.screen_position = self.screen_position.floor();
 
-        for chunk in &self.chunks {
-            renderer.lines.remove(chunk.line_id)?;
-        }
-
         self.chunks.clear();
 
         for chunk_data in &mut self.data {
-            let chunk = WireChunk::new(renderer)?;
-            let line = renderer.lines.get_mut(chunk.line_id)?;
-            line.from = self.screen_position + chunk_data.from * self.screen_size;
-            line.to = self.screen_position + chunk_data.to * self.screen_size;
-            line.color = chunk_data.color.clone();
-            line.thickness = chunk_data.thickness;
-            line.update();
+            let mut chunk = WireChunk::new(renderer)?;
+            chunk.line.from = self.screen_position + chunk_data.from * self.screen_size;
+            chunk.line.to = self.screen_position + chunk_data.to * self.screen_size;
+            chunk.line.color = chunk_data.color.clone();
+            chunk.line.thickness = chunk_data.thickness;
+            chunk.line.update();
             self.chunks.push(chunk);
         }
 
@@ -319,8 +314,8 @@ impl Component for Wire {
     }
 
     fn draw(&mut self, renderer: &mut RendererContext) -> Result<(), String> {
-        for chunk in &self.chunks {
-            renderer.draw(DrawableEnum::Line, chunk.line_id)?;
+        for chunk in &mut self.chunks {
+            renderer.draw(&mut chunk.line)?;
         }
 
         Ok(())
@@ -334,14 +329,6 @@ impl Component for Wire {
         self.active = active;
     }
 
-    fn release_internal_resources(&mut self, renderer: &mut RendererContext) -> Result<(), String> {
-        for chunk in &self.chunks {
-            renderer.lines.remove(chunk.line_id)?;
-        }
-
-        Ok(())
-    }
-
     fn as_any(&self) -> &dyn Any {
         self
     }
@@ -353,7 +340,7 @@ impl Component for Wire {
 
 impl WireChunk {
     pub fn new(renderer: &mut RendererContext) -> Result<Self, String> {
-        Ok(Self { line_id: renderer.create_line()? })
+        Ok(Self { line: renderer.create_line()? })
     }
 }
 

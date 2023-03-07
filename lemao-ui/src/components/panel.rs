@@ -1,6 +1,8 @@
 use super::Component;
+use super::ComponentBorderShape;
 use super::ComponentBorderThickness;
 use super::ComponentCornerRounding;
+use super::ComponentFillingShape;
 use super::ComponentMargin;
 use super::ComponentPosition;
 use super::ComponentShape;
@@ -14,7 +16,6 @@ use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::context::RendererContext;
 use lemao_core::renderer::drawable::Color;
-use lemao_core::renderer::drawable::DrawableEnum;
 use lemao_core::renderer::textures::Texture;
 use std::any::Any;
 
@@ -38,7 +39,7 @@ pub struct Panel {
     pub event_mask: Option<EventMask>,
 
     // Shape properties
-    pub filling_id: usize,
+    pub filling: ComponentFillingShape,
     pub shape: ComponentShape,
     pub color: Color,
     pub corner_rounding: ComponentCornerRounding,
@@ -48,12 +49,12 @@ pub struct Panel {
     pub texture_original_size: Vec2,
 
     // Border properties
-    pub border_id: usize,
+    pub border: ComponentBorderShape,
     pub border_color: Color,
     pub border_thickness: ComponentBorderThickness,
 
     // Shadow properties
-    pub shadow_id: usize,
+    pub shadow: ComponentFillingShape,
     pub shadow_enabled: bool,
     pub shadow_offset: Vec2,
     pub shadow_color: Color,
@@ -89,9 +90,9 @@ impl Panel {
             event_mask: None,
 
             // Shape properties
-            filling_id: match shape {
-                ComponentShape::Rectangle => renderer.create_rectangle()?,
-                ComponentShape::Disc => renderer.create_disc()?,
+            filling: match shape {
+                ComponentShape::Rectangle => ComponentFillingShape::Rectangle(renderer.create_rectangle()?),
+                ComponentShape::Disc => ComponentFillingShape::Disc(renderer.create_disc()?),
             },
             shape,
             color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
@@ -102,17 +103,17 @@ impl Panel {
             texture_original_size: Default::default(),
 
             // Border properties
-            border_id: match shape {
-                ComponentShape::Rectangle => renderer.create_frame()?,
-                ComponentShape::Disc => renderer.create_circle()?,
+            border: match shape {
+                ComponentShape::Rectangle => ComponentBorderShape::Frame(renderer.create_frame()?),
+                ComponentShape::Disc => ComponentBorderShape::Circle(renderer.create_circle()?),
             },
             border_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             border_thickness: Default::default(),
 
             // Shadow properties
-            shadow_id: match shape {
-                ComponentShape::Rectangle => renderer.create_rectangle()?,
-                ComponentShape::Disc => renderer.create_disc()?,
+            shadow: match shape {
+                ComponentShape::Rectangle => ComponentFillingShape::Rectangle(renderer.create_rectangle()?),
+                ComponentShape::Disc => ComponentFillingShape::Disc(renderer.create_disc()?),
             },
             shadow_enabled: false,
             shadow_offset: Default::default(),
@@ -366,9 +367,8 @@ impl Component for Panel {
         self.screen_position = self.screen_position.floor();
 
         if self.border_thickness != Default::default() {
-            match self.shape {
-                ComponentShape::Rectangle => {
-                    let border = renderer.frames.get_mut(self.border_id)?;
+            match &mut self.border {
+                ComponentBorderShape::Frame(border) => {
                     border.position = self.screen_position;
                     border.size = self.screen_size;
                     border.color = self.border_color.clone();
@@ -377,8 +377,7 @@ impl Component for Panel {
 
                     border.update();
                 }
-                ComponentShape::Disc => {
-                    let border = renderer.circles.get_mut(self.border_id)?;
+                ComponentBorderShape::Circle(border) => {
                     border.position = self.screen_position;
                     border.size = self.screen_size;
                     border.color = self.border_color.clone();
@@ -397,22 +396,20 @@ impl Component for Panel {
             self.screen_position = self.screen_position.floor();
         }
 
-        match self.shape {
-            ComponentShape::Rectangle => {
-                let filling = renderer.rectangles.get_mut(self.filling_id)?;
+        match &mut self.filling {
+            ComponentFillingShape::Rectangle(filling) => {
                 filling.position = self.screen_position;
                 filling.color = self.color.clone();
                 filling.size = self.screen_size;
                 filling.corner_rounding = self.corner_rounding.into();
 
                 if let Some(texture_id) = self.texture_id {
-                    filling.set_texture(renderer.textures.get(texture_id)?);
+                    filling.set_texture(renderer.textures.get(texture_id)?)
                 }
 
                 filling.update();
             }
-            ComponentShape::Disc => {
-                let filling = renderer.discs.get_mut(self.filling_id)?;
+            ComponentFillingShape::Disc(filling) => {
                 filling.position = self.screen_position;
                 filling.color = self.color.clone();
                 filling.size = self.screen_size;
@@ -420,7 +417,7 @@ impl Component for Panel {
                 filling.end_angle = self.end_angle;
 
                 if let Some(texture_id) = self.texture_id {
-                    filling.set_texture(renderer.textures.get(texture_id)?);
+                    filling.set_texture(renderer.textures.get(texture_id)?)
                 }
 
                 filling.update();
@@ -428,19 +425,18 @@ impl Component for Panel {
         };
 
         if self.shadow_enabled {
-            match self.shape {
-                ComponentShape::Rectangle => {
-                    let shadow = renderer.rectangles.get_mut(self.shadow_id)?;
+            match &mut self.shadow {
+                ComponentFillingShape::Rectangle(shadow) => {
                     shadow.position = self.screen_position + self.screen_size / 2.0 + self.shadow_offset;
                     shadow.size = self.screen_size;
                     shadow.anchor = Vec2::new(0.5, 0.5);
                     shadow.color = self.shadow_color.clone();
                     shadow.scale = self.shadow_scale;
                     shadow.corner_rounding = self.shadow_corner_rounding.into();
+
                     shadow.update();
                 }
-                ComponentShape::Disc => {
-                    let shadow = renderer.discs.get_mut(self.shadow_id)?;
+                ComponentFillingShape::Disc(shadow) => {
                     shadow.position = self.screen_position + self.screen_size / 2.0 + self.shadow_offset;
                     shadow.size = self.screen_size;
                     shadow.anchor = Vec2::new(0.5, 0.5);
@@ -448,7 +444,8 @@ impl Component for Panel {
                     shadow.scale = self.shadow_scale;
                     shadow.start_angle = self.start_angle;
                     shadow.end_angle = self.end_angle;
-                    shadow.update()
+
+                    shadow.update();
                 }
             };
         }
@@ -458,23 +455,23 @@ impl Component for Panel {
     }
 
     fn draw(&mut self, renderer: &mut RendererContext) -> Result<(), String> {
-        let filling_type = match self.shape {
-            ComponentShape::Rectangle => DrawableEnum::Rectangle,
-            ComponentShape::Disc => DrawableEnum::Disc,
-        };
-        let border_type = match self.shape {
-            ComponentShape::Rectangle => DrawableEnum::Frame,
-            ComponentShape::Disc => DrawableEnum::Circle,
-        };
-
         if self.shadow_enabled {
-            renderer.draw(filling_type, self.shadow_id)?;
+            match &mut self.shadow {
+                ComponentFillingShape::Rectangle(shadow) => renderer.draw(shadow)?,
+                ComponentFillingShape::Disc(shadow) => renderer.draw(shadow)?,
+            }
         }
 
-        renderer.draw(filling_type, self.filling_id)?;
+        match &mut self.filling {
+            ComponentFillingShape::Rectangle(filling) => renderer.draw(filling)?,
+            ComponentFillingShape::Disc(filling) => renderer.draw(filling)?,
+        }
 
         if self.border_thickness != Default::default() {
-            renderer.draw(border_type, self.border_id)?;
+            match &mut self.border {
+                ComponentBorderShape::Frame(border) => renderer.draw(border)?,
+                ComponentBorderShape::Circle(border) => renderer.draw(border)?,
+            }
         }
 
         Ok(())
@@ -486,23 +483,6 @@ impl Component for Panel {
 
     fn set_active_flag(&mut self, active: bool) {
         self.active = active;
-    }
-
-    fn release_internal_resources(&mut self, renderer: &mut RendererContext) -> Result<(), String> {
-        match self.shape {
-            ComponentShape::Rectangle => {
-                renderer.rectangles.remove(self.filling_id)?;
-                renderer.frames.remove(self.border_id)?;
-                renderer.rectangles.remove(self.shadow_id)?;
-            }
-            ComponentShape::Disc => {
-                renderer.discs.remove(self.filling_id)?;
-                renderer.circles.remove(self.border_id)?;
-                renderer.discs.remove(self.shadow_id)?;
-            }
-        };
-
-        Ok(())
     }
 
     fn as_any(&self) -> &dyn Any {

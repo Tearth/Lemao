@@ -6,7 +6,6 @@ use lemao_core::lemao_common_platform::input::MouseButton;
 use lemao_core::lemao_common_platform::window::WindowStyle;
 use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
-use lemao_core::renderer::drawable::DrawableEnum;
 use lemao_core::renderer::fonts::bff;
 use lemao_core::renderer::fonts::Font;
 use lemao_core::renderer::textures::RawTexture;
@@ -36,8 +35,7 @@ pub fn main() -> Result<(), String> {
     let texture_id = renderer.textures.store(Texture::new(&renderer, &raw_texture)?);
     let font_id = renderer.fonts.store(Font::new(&renderer, &bff::load("./assets/inconsolata.bff")?)?);
 
-    let sprite_id = renderer.create_rectangle()?;
-    let sprite = renderer.rectangles.get_mut(sprite_id)?;
+    let mut sprite = renderer.create_rectangle()?;
     sprite.set_texture(renderer.textures.get(texture_id)?);
     sprite.size = window_size;
 
@@ -90,7 +88,7 @@ pub fn main() -> Result<(), String> {
         ui.update(&mut renderer)?;
 
         renderer.clear(SolidColor::new(0.0, 0.0, 0.0, 1.0));
-        renderer.draw(DrawableEnum::Rectangle, sprite_id)?;
+        renderer.draw(&mut sprite)?;
         ui.draw(&mut renderer, description_text_id)?;
         window.swap_buffers();
     }

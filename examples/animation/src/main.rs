@@ -6,7 +6,6 @@ use lemao_core::lemao_common_platform::input::MouseWheelDirection;
 use lemao_core::lemao_common_platform::window::WindowStyle;
 use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
-use lemao_core::renderer::drawable::DrawableEnum;
 use lemao_core::renderer::fonts::bff;
 use lemao_core::renderer::fonts::Font;
 use lemao_core::renderer::textures::bmp;
@@ -35,8 +34,7 @@ pub fn main() -> Result<(), String> {
     let explosion_id = renderer.textures.store(Texture::new(&renderer, &bmp::load("./assets/explosion.bmp")?)?);
     let font_id = renderer.fonts.store(Font::new(&renderer, &bff::load("./assets/inconsolata.bff")?)?);
 
-    let animation_id = renderer.create_tilemap(explosion_id).unwrap();
-    let animation = renderer.tilemaps.get_mut(animation_id)?;
+    let mut animation = renderer.create_tilemap(explosion_id).unwrap();
     animation.size = Vec2::new(128.0, 128.0);
     animation.anchor = Vec2::new(0.5, 0.5);
     animation.position = window_size / 2.0;
@@ -86,14 +84,13 @@ pub fn main() -> Result<(), String> {
 
         thread::sleep(Duration::from_millis(sleep_duration));
 
-        let animation = renderer.tilemaps.get_mut(animation_id)?;
         animation.set_next_frame();
         animation.update();
 
         ui.update(&mut renderer)?;
 
         renderer.clear(SolidColor::new(0.5, 0.5, 0.5, 1.0));
-        renderer.draw(DrawableEnum::Tilemap, animation_id)?;
+        renderer.draw(&mut animation)?;
         ui.draw(&mut renderer, description_text_id)?;
         window.swap_buffers();
     }

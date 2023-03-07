@@ -10,8 +10,8 @@ use lemao_core::lemao_common_platform::input::MouseButton;
 use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::context::RendererContext;
+use lemao_core::renderer::drawable::text::Text;
 use lemao_core::renderer::drawable::Color;
-use lemao_core::renderer::drawable::DrawableEnum;
 use lemao_core::renderer::fonts::Font;
 use std::any::Any;
 
@@ -35,7 +35,7 @@ pub struct Label {
     pub event_mask: Option<EventMask>,
 
     // Label properties
-    pub label_id: usize,
+    pub label: Text,
     pub label_font_id: usize,
     pub label_text: String,
     pub label_color: Color,
@@ -77,7 +77,7 @@ impl Label {
             event_mask: None,
 
             // Label properties
-            label_id: renderer.create_text(label_font_id)?,
+            label: renderer.create_text(label_font_id)?,
             label_font_id,
             label_text: Default::default(),
             label_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
@@ -298,7 +298,6 @@ impl Component for Label {
 
     fn update(&mut self, renderer: &mut RendererContext, area_position: Vec2, area_size: Vec2) -> Result<(), String> {
         // We have to set text first, to get the size used later
-        let label = renderer.texts.get_mut(self.label_id)?;
         let mut label_text_processed = self.label_text.clone();
 
         if self.multiline {
@@ -306,7 +305,7 @@ impl Component for Label {
             let mut result = String::new();
 
             for token in label_text_processed.split(' ') {
-                if label.calculate_text_size(line.clone() + token).x > self.max_multiline_width {
+                if self.label.calculate_text_size(line.clone() + token).x > self.max_multiline_width {
                     result += &(line.trim().to_string() + "\n");
                     line.clear();
                 }
@@ -319,12 +318,12 @@ impl Component for Label {
         }
 
         let font = renderer.fonts.get(self.label_font_id)?;
-        label.set_font(font);
-        label.text = label_text_processed;
-        label.line_height = self.label_line_height;
-        label.update();
+        self.label.set_font(font);
+        self.label.text = label_text_processed;
+        self.label.line_height = self.label_line_height;
+        self.label.update();
 
-        self.screen_size = label.size;
+        self.screen_size = self.label.size;
         self.size = ComponentSize::Absolute(self.screen_size);
 
         self.screen_position = match self.position {
@@ -341,10 +340,9 @@ impl Component for Label {
         self.screen_size = self.screen_size.floor();
         self.screen_position = self.screen_position.floor();
 
-        let label = renderer.texts.get_mut(self.label_id)?;
-        label.position = self.screen_position;
-        label.color = self.label_color.clone();
-        label.update();
+        self.label.position = self.screen_position;
+        self.label.color = self.label_color.clone();
+        self.label.update();
 
         self.dirty = false;
 
@@ -353,20 +351,18 @@ impl Component for Label {
 
     fn draw(&mut self, renderer: &mut RendererContext) -> Result<(), String> {
         if self.shadow_enabled {
-            let drawable = renderer.texts.get_mut(self.label_id)?;
-            let original_position = drawable.position;
-            let original_color = drawable.color.clone();
+            let original_position = self.label.position;
+            let original_color = self.label.color.clone();
 
-            drawable.position = original_position + self.shadow_offset;
-            drawable.color = self.shadow_color.clone();
-            renderer.draw(DrawableEnum::Text, self.label_id)?;
+            self.label.position = original_position + self.shadow_offset;
+            self.label.color = self.shadow_color.clone();
+            renderer.draw(&mut self.label)?;
 
-            let drawable = renderer.texts.get_mut(self.label_id)?;
-            drawable.position = original_position;
-            drawable.color = original_color;
+            self.label.position = original_position;
+            self.label.color = original_color;
         }
 
-        renderer.draw(DrawableEnum::Text, self.label_id)?;
+        renderer.draw(&mut self.label)?;
         Ok(())
     }
 
@@ -376,12 +372,6 @@ impl Component for Label {
 
     fn set_active_flag(&mut self, active: bool) {
         self.active = active;
-    }
-
-    fn release_internal_resources(&mut self, renderer: &mut RendererContext) -> Result<(), String> {
-        renderer.texts.remove(self.label_id)?;
-
-        Ok(())
     }
 
     fn as_any(&self) -> &dyn Any {

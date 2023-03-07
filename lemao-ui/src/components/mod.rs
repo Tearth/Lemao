@@ -2,7 +2,10 @@ use crate::events::UiEvent;
 use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::context::RendererContext;
-use lemao_core::renderer::drawable::frame::FrameThickness;
+use lemao_core::renderer::drawable::circle::Circle;
+use lemao_core::renderer::drawable::disc::Disc;
+use lemao_core::renderer::drawable::frame::{Frame, FrameThickness};
+use lemao_core::renderer::drawable::rectangle::Rectangle;
 use lemao_core::renderer::drawable::CornerRounding;
 use std::any::Any;
 
@@ -33,6 +36,16 @@ pub enum ComponentSize {
 pub enum ComponentShape {
     Rectangle,
     Disc,
+}
+
+pub enum ComponentFillingShape {
+    Rectangle(Rectangle),
+    Disc(Disc),
+}
+
+pub enum ComponentBorderShape {
+    Frame(Frame),
+    Circle(Circle),
 }
 
 #[derive(Copy, Clone, Debug, Default)]
@@ -121,8 +134,6 @@ pub trait Component {
 
     fn get_event_mask(&self) -> Option<EventMask>;
     fn set_event_mask(&mut self, event_mask: Option<EventMask>);
-
-    fn release_internal_resources(&mut self, renderer: &mut RendererContext) -> Result<(), String>;
 
     fn as_any(&self) -> &dyn Any;
     fn as_any_mut(&mut self) -> &mut dyn Any;

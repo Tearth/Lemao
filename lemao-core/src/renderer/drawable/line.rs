@@ -2,7 +2,6 @@ use super::*;
 use crate::renderer::context::RendererContext;
 use crate::renderer::shapes::Shape;
 use crate::renderer::textures::Texture;
-use crate::utils::storage::StorageItem;
 use lemao_math::mat4x4::Mat4x4;
 use lemao_math::vec2::Vec2;
 use lemao_math::vec3::Vec3;
@@ -12,8 +11,6 @@ use std::ptr;
 use std::rc::Rc;
 
 pub struct Line {
-    pub id: usize,
-    pub name: Option<String>,
     pub(crate) shape_id: usize,
     pub(crate) shape_vao_gl_id: u32,
     pub(crate) texture_gl_id: u32,
@@ -32,8 +29,6 @@ pub struct Line {
 impl Line {
     pub fn new(renderer: &RendererContext, shape: &Shape, texture: &Texture) -> Self {
         Line {
-            id: 0,
-            name: None,
             shape_id: shape.id,
             shape_vao_gl_id: shape.vao_gl_id,
             texture_gl_id: texture.texture_gl_id,
@@ -50,7 +45,15 @@ impl Line {
         }
     }
 
-    pub fn get_transformation_matrix(&self) -> Mat4x4 {
+    pub fn update(&mut self) {
+        self.position = self.from;
+        self.rotation = Vec2::new(0.0, 1.0).signed_angle(self.to - self.from);
+        self.size = Vec2::new(self.thickness, self.from.distance(self.to) + 1.0);
+    }
+}
+
+impl Drawable for Line {
+    fn get_transformation_matrix(&self) -> Mat4x4 {
         let translation = Mat4x4::translate(Vec3::from(self.position + Vec2::new(0.5, 0.5)));
         let anchor_offset = Mat4x4::translate(Vec3::new(0.0, -0.5, 0.0));
         let scale = Mat4x4::scale(Vec3::from(self.scale * self.size).floor());
@@ -58,17 +61,15 @@ impl Line {
         translation * rotation * anchor_offset * scale
     }
 
-    pub fn get_batch(&self) -> Batch {
+    fn get_batch(&self) -> Batch {
         Batch::new(Some(self.shape_id), None, None, Some(self.texture_gl_id), Some(&self.color))
     }
 
-    pub fn update(&mut self) {
-        self.position = self.from;
-        self.rotation = Vec2::new(0.0, 1.0).signed_angle(self.to - self.from);
-        self.size = Vec2::new(self.thickness, self.from.distance(self.to) + 1.0);
+    fn get_color(&self) -> &Color {
+        &self.color
     }
 
-    pub fn draw(&mut self, shader: &Shader) -> Result<(), String> {
+    fn draw(&mut self, shader: &Shader) -> Result<(), String> {
         unsafe {
             let model = self.get_transformation_matrix();
 
@@ -81,23 +82,5 @@ impl Line {
 
             Ok(())
         }
-    }
-}
-
-impl StorageItem for Line {
-    fn get_id(&self) -> usize {
-        self.id
-    }
-
-    fn set_id(&mut self, id: usize) {
-        self.id = id;
-    }
-
-    fn get_name(&self) -> Option<String> {
-        self.name.clone()
-    }
-
-    fn set_name(&mut self, name: Option<String>) {
-        self.name = name;
     }
 }

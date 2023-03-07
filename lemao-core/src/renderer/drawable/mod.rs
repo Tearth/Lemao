@@ -2,6 +2,7 @@ use super::batcher::Batch;
 use super::shaders::Shader;
 use lemao_math::color::SolidColor;
 use lemao_math::gradient::Gradient;
+use lemao_math::mat4x4::Mat4x4;
 
 pub mod circle;
 pub mod disc;
@@ -34,6 +35,13 @@ pub enum DrawableEnum {
     Rectangle,
     Text,
     Tilemap,
+}
+
+pub trait Drawable {
+    fn get_transformation_matrix(&self) -> Mat4x4;
+    fn get_batch(&self) -> Batch;
+    fn get_color(&self) -> &Color;
+    fn draw(&mut self, shader: &Shader) -> Result<(), String>;
 }
 
 impl Color {

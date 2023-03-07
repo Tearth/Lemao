@@ -7,7 +7,6 @@ use lemao_core::lemao_common_platform::input::MouseWheelDirection;
 use lemao_core::lemao_common_platform::window::WindowStyle;
 use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
-use lemao_core::renderer::drawable::DrawableEnum;
 use lemao_core::renderer::fonts::bff;
 use lemao_core::renderer::fonts::Font;
 use lemao_core::window::context::CoordinationSystem;
@@ -33,8 +32,7 @@ pub fn main() -> Result<(), String> {
 
     let font_id = renderer.fonts.store(Font::new(&renderer, &bff::load("./assets/inconsolata.bff")?)?);
 
-    let disc_id = renderer.create_disc()?;
-    let disc = renderer.discs.get_mut(disc_id)?;
+    let mut disc = renderer.create_disc()?;
     disc.size = Vec2::new(100.0, 100.0);
     disc.sides = 32;
     disc.anchor = Vec2::new(0.5, 0.5);
@@ -60,7 +58,6 @@ pub fn main() -> Result<(), String> {
                     }
                 }
                 InputEvent::MouseWheelRotated(direction, _) => {
-                    let disc = renderer.discs.get_mut(disc_id)?;
                     if direction == MouseWheelDirection::Up {
                         disc.sides += 1;
                     } else {
@@ -84,15 +81,14 @@ pub fn main() -> Result<(), String> {
         }
 
         if window.is_mouse_button_pressed(MouseButton::Left) {
-            let position = window.get_cursor_position(CoordinationSystem::Window);
-            renderer.discs.get_mut(disc_id)?.position = position;
-            renderer.discs.get_mut(disc_id)?.update()
+            disc.position = window.get_cursor_position(CoordinationSystem::Window);
+            disc.update()
         }
 
         ui.update(&mut renderer)?;
 
         renderer.clear(SolidColor::new(0.5, 0.5, 0.5, 1.0));
-        renderer.draw(DrawableEnum::Disc, disc_id)?;
+        renderer.draw(&mut disc)?;
         ui.draw(&mut renderer, description_text_id)?;
         window.swap_buffers();
     }

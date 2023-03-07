@@ -10,8 +10,9 @@ use lemao_core::lemao_common_platform::input::MouseButton;
 use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::context::RendererContext;
+use lemao_core::renderer::drawable::rectangle::Rectangle;
+use lemao_core::renderer::drawable::text::Text;
 use lemao_core::renderer::drawable::Color;
-use lemao_core::renderer::drawable::DrawableEnum;
 use lemao_core::renderer::fonts::Font;
 use lemao_core::renderer::textures::Texture;
 use std::any::Any;
@@ -36,7 +37,7 @@ pub struct Checkbox {
     pub event_mask: Option<EventMask>,
 
     // Box properties
-    pub box_id: usize,
+    pub r#box: Rectangle,
     pub box_color: Color,
     pub box_offset: Vec2,
     pub box_size: Vec2,
@@ -44,7 +45,7 @@ pub struct Checkbox {
     pub box_unchecked_texture_id: usize,
 
     // Label properties
-    pub label_id: usize,
+    pub label: Text,
     pub label_font_id: usize,
     pub label_text: String,
     pub label_offset: Vec2,
@@ -91,7 +92,7 @@ impl Checkbox {
             event_mask: None,
 
             // Box properties
-            box_id: renderer.create_rectangle()?,
+            r#box: renderer.create_rectangle()?,
             box_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             box_offset: Default::default(),
             box_size: Default::default(),
@@ -99,7 +100,7 @@ impl Checkbox {
             box_unchecked_texture_id,
 
             // Label properties
-            label_id: renderer.create_text(label_font_id)?,
+            label: renderer.create_text(label_font_id)?,
             label_font_id,
             label_text: Default::default(),
             label_offset: Default::default(),
@@ -355,11 +356,11 @@ impl Component for Checkbox {
     fn update(&mut self, renderer: &mut RendererContext, area_position: Vec2, area_size: Vec2) -> Result<(), String> {
         // We have to set text first, to get the size used later
         let font = renderer.fonts.get(self.label_font_id)?;
-        renderer.texts.get_mut(self.label_id)?.set_font(font);
-        renderer.texts.get_mut(self.label_id)?.text = self.label_text.clone();
-        renderer.texts.get_mut(self.label_id)?.update();
+        self.label.set_font(font);
+        self.label.text = self.label_text.clone();
+        self.label.update();
 
-        self.screen_size = renderer.texts.get_mut(self.label_id)?.size + self.label_offset;
+        self.screen_size = self.label.size + self.label_offset;
         self.size = ComponentSize::Absolute(self.screen_size);
 
         self.screen_position = match self.position {
@@ -376,27 +377,25 @@ impl Component for Checkbox {
         self.screen_size = self.screen_size.floor();
         self.screen_position = self.screen_position.floor();
 
-        let r#box = renderer.rectangles.get_mut(self.box_id)?;
-        r#box.position = self.screen_position + self.box_offset;
-        r#box.color = self.box_color.clone();
+        self.r#box.position = self.screen_position + self.box_offset;
+        self.r#box.color = self.box_color.clone();
 
         if self.checked {
             let texture = renderer.textures.get(self.box_checked_texture_id)?;
             self.box_size = texture.size;
-            r#box.set_texture(texture);
+            self.r#box.set_texture(texture);
         } else {
             let texture = renderer.textures.get(self.box_unchecked_texture_id)?;
             self.box_size = texture.size;
-            r#box.set_texture(texture);
+            self.r#box.set_texture(texture);
         }
 
-        r#box.size = self.box_size;
-        r#box.update();
+        self.r#box.size = self.box_size;
+        self.r#box.update();
 
-        let label = renderer.texts.get_mut(self.label_id)?;
-        label.position = self.screen_position + self.label_offset;
-        label.color = self.label_color.clone();
-        label.update();
+        self.label.position = self.screen_position + self.label_offset;
+        self.label.color = self.label_color.clone();
+        self.label.update();
 
         self.dirty = false;
 
@@ -405,21 +404,19 @@ impl Component for Checkbox {
 
     fn draw(&mut self, renderer: &mut RendererContext) -> Result<(), String> {
         if self.label_shadow_enabled {
-            let drawable = renderer.texts.get_mut(self.label_id)?;
-            let original_position = drawable.position;
-            let original_color = drawable.color.clone();
+            let original_position = self.label.position;
+            let original_color = self.label.color.clone();
 
-            drawable.position = original_position + self.label_shadow_offset;
-            drawable.color = self.label_shadow_color.clone();
-            renderer.draw(DrawableEnum::Text, self.label_id)?;
+            self.label.position = original_position + self.label_shadow_offset;
+            self.label.color = self.label_shadow_color.clone();
+            renderer.draw(&mut self.label)?;
 
-            let drawable = renderer.texts.get_mut(self.label_id)?;
-            drawable.position = original_position;
-            drawable.color = original_color;
+            self.label.position = original_position;
+            self.label.color = original_color;
         }
 
-        renderer.draw(DrawableEnum::Rectangle, self.box_id)?;
-        renderer.draw(DrawableEnum::Text, self.label_id)?;
+        renderer.draw(&mut self.r#box)?;
+        renderer.draw(&mut self.label)?;
         Ok(())
     }
 
@@ -429,13 +426,6 @@ impl Component for Checkbox {
 
     fn set_active_flag(&mut self, active: bool) {
         self.active = active;
-    }
-
-    fn release_internal_resources(&mut self, renderer: &mut RendererContext) -> Result<(), String> {
-        renderer.rectangles.remove(self.box_id)?;
-        renderer.texts.remove(self.label_id)?;
-
-        Ok(())
     }
 
     fn as_any(&self) -> &dyn Any {

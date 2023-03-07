@@ -1,6 +1,8 @@
 use super::Component;
+use super::ComponentBorderShape;
 use super::ComponentBorderThickness;
 use super::ComponentCornerRounding;
+use super::ComponentFillingShape;
 use super::ComponentMargin;
 use super::ComponentPosition;
 use super::ComponentShape;
@@ -14,8 +16,9 @@ use lemao_core::lemao_common_platform::input::MouseWheelDirection;
 use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::context::RendererContext;
+use lemao_core::renderer::drawable::frame::Frame;
+use lemao_core::renderer::drawable::rectangle::Rectangle;
 use lemao_core::renderer::drawable::Color;
-use lemao_core::renderer::drawable::DrawableEnum;
 use lemao_core::renderer::textures::Texture;
 use std::any::Any;
 
@@ -39,19 +42,19 @@ pub struct Slider {
     pub event_mask: Option<EventMask>,
 
     // Shape properties
-    pub filling_id: usize,
+    pub filling: Rectangle,
     pub color: Color,
     pub corner_rounding: ComponentCornerRounding,
     pub texture_id: Option<usize>,
     pub texture_original_size: Vec2,
 
     // Border properties
-    pub border_id: usize,
+    pub border: Frame,
     pub border_color: Color,
     pub border_thickness: ComponentBorderThickness,
 
     // Shadow properties
-    pub shadow_id: usize,
+    pub shadow: Rectangle,
     pub shadow_enabled: bool,
     pub shadow_offset: Vec2,
     pub shadow_color: Color,
@@ -59,18 +62,18 @@ pub struct Slider {
     pub shadow_corner_rounding: ComponentCornerRounding,
 
     // Bar properties
-    pub bar_id: usize,
+    pub bar: Rectangle,
     pub bar_color: Color,
 
     // Selector properties
-    pub selector_id: usize,
+    pub selector: ComponentFillingShape,
     pub selector_shape: ComponentShape,
     pub selector_position: Vec2,
     pub selector_size: Vec2,
     pub selector_color: Color,
 
     // Selector border properties
-    pub selector_border_id: usize,
+    pub selector_border: ComponentBorderShape,
     pub selector_border_color: Color,
     pub selector_border_thickness: ComponentBorderThickness,
 
@@ -115,19 +118,19 @@ impl Slider {
             event_mask: None,
 
             // Shape properties
-            filling_id: renderer.create_rectangle()?,
+            filling: renderer.create_rectangle()?,
             color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             corner_rounding: Default::default(),
             texture_id: None,
             texture_original_size: Default::default(),
 
             // Border properties
-            border_id: renderer.create_frame()?,
+            border: renderer.create_frame()?,
             border_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
             border_thickness: Default::default(),
 
             // Shadow properties
-            shadow_id: renderer.create_rectangle()?,
+            shadow: renderer.create_rectangle()?,
             shadow_enabled: false,
             shadow_offset: Default::default(),
             shadow_color: Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 1.0)),
@@ -135,13 +138,13 @@ impl Slider {
             shadow_corner_rounding: Default::default(),
 
             // Bar properties
-            bar_id: renderer.create_rectangle()?,
+            bar: renderer.create_rectangle()?,
             bar_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
 
             // Selector properties
-            selector_id: match selector_shape {
-                ComponentShape::Rectangle => renderer.create_rectangle()?,
-                ComponentShape::Disc => renderer.create_disc()?,
+            selector: match selector_shape {
+                ComponentShape::Rectangle => ComponentFillingShape::Rectangle(renderer.create_rectangle()?),
+                ComponentShape::Disc => ComponentFillingShape::Disc(renderer.create_disc()?),
             },
             selector_shape,
             selector_position: Default::default(),
@@ -149,9 +152,9 @@ impl Slider {
             selector_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
 
             // Selector border properties
-            selector_border_id: match selector_shape {
-                ComponentShape::Rectangle => renderer.create_frame()?,
-                ComponentShape::Disc => renderer.create_circle()?,
+            selector_border: match selector_shape {
+                ComponentShape::Rectangle => ComponentBorderShape::Frame(renderer.create_frame()?),
+                ComponentShape::Disc => ComponentBorderShape::Circle(renderer.create_circle()?),
             },
             selector_border_thickness: Default::default(),
             selector_border_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
@@ -531,13 +534,12 @@ impl Component for Slider {
         self.screen_position = self.screen_position.floor();
 
         if self.border_thickness != Default::default() {
-            let border = renderer.frames.get_mut(self.border_id)?;
-            border.position = self.screen_position;
-            border.size = self.screen_size;
-            border.color = self.border_color.clone();
-            border.thickness = self.border_thickness.into();
-            border.corner_rounding = self.corner_rounding.into();
-            border.update();
+            self.border.position = self.screen_position;
+            self.border.size = self.screen_size;
+            self.border.color = self.border_color.clone();
+            self.border.thickness = self.border_thickness.into();
+            self.border.corner_rounding = self.corner_rounding.into();
+            self.border.update();
 
             self.screen_position += Vec2::new(self.border_thickness.left, self.border_thickness.bottom);
             self.screen_size -= Vec2::new(self.border_thickness.left + self.border_thickness.right, self.border_thickness.top + self.border_thickness.bottom);
@@ -546,31 +548,28 @@ impl Component for Slider {
             self.screen_position = self.screen_position.floor();
         }
 
-        let filling = renderer.rectangles.get_mut(self.filling_id)?;
-        filling.position = self.screen_position;
-        filling.color = self.color.clone();
-        filling.corner_rounding = self.corner_rounding.into();
+        self.filling.position = self.screen_position;
+        self.filling.color = self.color.clone();
+        self.filling.corner_rounding = self.corner_rounding.into();
 
         if let Some(texture_id) = self.texture_id {
-            filling.set_texture(renderer.textures.get(texture_id)?)
+            self.filling.set_texture(renderer.textures.get(texture_id)?)
         }
 
-        filling.update();
+        self.filling.update();
 
-        let bar = renderer.rectangles.get_mut(self.bar_id)?;
-        bar.position = self.screen_position;
-        bar.color = self.bar_color.clone();
-        bar.size = self.screen_size * Vec2::new(self.phase, 1.0);
-        bar.corner_rounding = self.corner_rounding.into();
-        bar.update();
+        self.bar.position = self.screen_position;
+        self.bar.color = self.bar_color.clone();
+        self.bar.size = self.screen_size * Vec2::new(self.phase, 1.0);
+        self.bar.corner_rounding = self.corner_rounding.into();
+        self.bar.update();
 
         self.selector_position = Vec2::new(self.screen_position.x + self.screen_size.x * self.phase, self.screen_position.y + self.screen_size.y / 2.0);
 
         let mut selector_size_offset = Default::default();
         if self.selector_border_thickness != Default::default() {
-            match self.selector_shape {
-                ComponentShape::Rectangle => {
-                    let selector_border = renderer.frames.get_mut(self.selector_border_id)?;
+            match &mut self.selector_border {
+                ComponentBorderShape::Frame(selector_border) => {
                     selector_border.position = self.selector_position;
                     selector_border.size = self.selector_size;
                     selector_border.color = self.selector_border_color.clone();
@@ -578,8 +577,7 @@ impl Component for Slider {
                     selector_border.thickness = self.selector_border_thickness.into();
                     selector_border.update();
                 }
-                ComponentShape::Disc => {
-                    let selector_border = renderer.circles.get_mut(self.selector_border_id)?;
+                ComponentBorderShape::Circle(selector_border) => {
                     selector_border.position = self.selector_position;
                     selector_border.size = self.selector_size;
                     selector_border.color = self.selector_border_color.clone();
@@ -587,7 +585,7 @@ impl Component for Slider {
                     selector_border.thickness = Vec2::new(self.selector_border_thickness.left, self.selector_border_thickness.top);
                     selector_border.update();
                 }
-            };
+            }
 
             selector_size_offset = Vec2::new(
                 self.selector_border_thickness.left + self.selector_border_thickness.right,
@@ -595,17 +593,15 @@ impl Component for Slider {
             );
         }
 
-        match self.selector_shape {
-            ComponentShape::Rectangle => {
-                let selector = renderer.rectangles.get_mut(self.selector_id)?;
+        match &mut self.selector {
+            ComponentFillingShape::Rectangle(selector) => {
                 selector.position = self.selector_position;
                 selector.anchor = Vec2::new(0.5, 0.5);
                 selector.color = self.selector_color.clone();
                 selector.size = self.selector_size - selector_size_offset;
                 selector.update();
             }
-            ComponentShape::Disc => {
-                let selector = renderer.discs.get_mut(self.selector_id)?;
+            ComponentFillingShape::Disc(selector) => {
                 selector.position = self.selector_position;
                 selector.anchor = Vec2::new(0.5, 0.5);
                 selector.color = self.selector_color.clone();
@@ -615,29 +611,14 @@ impl Component for Slider {
         };
 
         if self.shadow_enabled {
-            match self.selector_shape {
-                ComponentShape::Rectangle => {
-                    let shadow = renderer.rectangles.get_mut(self.shadow_id)?;
-                    shadow.position = self.screen_position + self.screen_size / 2.0 + self.shadow_offset;
-                    shadow.size = self.screen_size;
-                    shadow.anchor = Vec2::new(0.5, 0.5);
-                    shadow.color = self.shadow_color.clone();
-                    shadow.scale = self.shadow_scale;
-                    shadow.corner_rounding = self.shadow_corner_rounding.into();
+            self.shadow.position = self.screen_position + self.screen_size / 2.0 + self.shadow_offset;
+            self.shadow.size = self.screen_size;
+            self.shadow.anchor = Vec2::new(0.5, 0.5);
+            self.shadow.color = self.shadow_color.clone();
+            self.shadow.scale = self.shadow_scale;
+            self.shadow.corner_rounding = self.shadow_corner_rounding.into();
 
-                    shadow.update();
-                }
-                ComponentShape::Disc => {
-                    let shadow = renderer.discs.get_mut(self.shadow_id)?;
-                    shadow.position = self.screen_position + self.screen_size / 2.0 + self.shadow_offset;
-                    shadow.size = self.screen_size;
-                    shadow.anchor = Vec2::new(0.5, 0.5);
-                    shadow.color = self.shadow_color.clone();
-                    shadow.scale = self.shadow_scale;
-
-                    shadow.update();
-                }
-            };
+            self.shadow.update();
         }
 
         self.dirty = false;
@@ -645,30 +626,27 @@ impl Component for Slider {
     }
 
     fn draw(&mut self, renderer: &mut RendererContext) -> Result<(), String> {
-        let selector_filling_type = match self.selector_shape {
-            ComponentShape::Rectangle => DrawableEnum::Rectangle,
-            ComponentShape::Disc => DrawableEnum::Disc,
-        };
-        let selector_border_type = match self.selector_shape {
-            ComponentShape::Rectangle => DrawableEnum::Frame,
-            ComponentShape::Disc => DrawableEnum::Circle,
-        };
-
         if self.shadow_enabled {
-            renderer.draw(DrawableEnum::Rectangle, self.shadow_id)?;
+            renderer.draw(&mut self.shadow)?;
         }
 
-        renderer.draw(DrawableEnum::Rectangle, self.filling_id)?;
-        renderer.draw(DrawableEnum::Rectangle, self.bar_id)?;
+        renderer.draw(&mut self.filling)?;
+        renderer.draw(&mut self.bar)?;
 
         if self.border_thickness != Default::default() {
-            renderer.draw(DrawableEnum::Frame, self.border_id)?;
+            renderer.draw(&mut self.border)?;
         }
 
-        renderer.draw(selector_filling_type, self.selector_id)?;
+        match &mut self.selector {
+            ComponentFillingShape::Rectangle(selector) => renderer.draw(selector)?,
+            ComponentFillingShape::Disc(selector) => renderer.draw(selector)?,
+        }
 
         if self.selector_border_thickness != Default::default() {
-            renderer.draw(selector_border_type, self.selector_border_id)?;
+            match &mut self.selector_border {
+                ComponentBorderShape::Frame(selector_border) => renderer.draw(selector_border)?,
+                ComponentBorderShape::Circle(selector_border) => renderer.draw(selector_border)?,
+            }
         }
 
         Ok(())
@@ -680,26 +658,6 @@ impl Component for Slider {
 
     fn set_active_flag(&mut self, active: bool) {
         self.active = active;
-    }
-
-    fn release_internal_resources(&mut self, renderer: &mut RendererContext) -> Result<(), String> {
-        match self.selector_shape {
-            ComponentShape::Rectangle => {
-                renderer.rectangles.remove(self.selector_id)?;
-                renderer.frames.remove(self.selector_border_id)?;
-            }
-            ComponentShape::Disc => {
-                renderer.discs.remove(self.selector_id)?;
-                renderer.circles.remove(self.selector_border_id)?;
-            }
-        };
-
-        renderer.rectangles.remove(self.filling_id)?;
-        renderer.rectangles.remove(self.border_id)?;
-        renderer.rectangles.remove(self.shadow_id)?;
-        renderer.rectangles.remove(self.bar_id)?;
-
-        Ok(())
     }
 
     fn as_any(&self) -> &dyn Any {

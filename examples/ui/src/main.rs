@@ -70,9 +70,9 @@ pub fn main() -> Result<(), String> {
     let bold_font_id = renderer.fonts.store(Font::new(&renderer, &bold_font)?);
     let header_font_id = renderer.fonts.store(Font::new(&renderer, &header_font)?);
 
-    let texture_id = renderer.textures.store(Texture::new(&renderer, &bmp::load("./cell/wheat.bmp")?)?);
-    let box_checked_id = renderer.textures.store(Texture::new(&renderer, &bmp::load("./cell/box_checked.bmp")?)?);
-    let box_unchecked_id = renderer.textures.store(Texture::new(&renderer, &bmp::load("./cell/box_unchecked.bmp")?)?);
+    let texture_id = renderer.textures.store(Texture::new(&renderer, &bmp::load("./assets/wheat.bmp")?)?);
+    let box_checked_id = renderer.textures.store(Texture::new(&renderer, &bmp::load("./assets/box_checked.bmp")?)?);
+    let box_unchecked_id = renderer.textures.store(Texture::new(&renderer, &bmp::load("./assets/box_unchecked.bmp")?)?);
 
     let mut ui = UiContext::new(&mut renderer)?;
     // ui.set_debug_flag(true);

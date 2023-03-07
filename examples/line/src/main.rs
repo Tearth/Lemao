@@ -7,9 +7,6 @@ use lemao_core::lemao_common_platform::input::MouseWheelDirection;
 use lemao_core::lemao_common_platform::window::WindowStyle;
 use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
-
-use lemao_core::renderer::drawable::DrawableEnum;
-
 use lemao_core::renderer::fonts::bff;
 use lemao_core::renderer::fonts::Font;
 use lemao_core::window::context::CoordinationSystem;
@@ -36,8 +33,7 @@ pub fn main() -> Result<(), String> {
 
     let font_id = renderer.fonts.store(Font::new(&renderer, &bff::load("./assets/inconsolata.bff")?)?);
 
-    let line_id = renderer.create_line().unwrap();
-    let line = renderer.lines.get_mut(line_id)?;
+    let mut line = renderer.create_line().unwrap();
     line.from = Vec2::new(200.0, 200.0);
     line.to = Vec2::new(400.0, 400.0);
 
@@ -60,7 +56,6 @@ pub fn main() -> Result<(), String> {
                     }
                 }
                 InputEvent::MouseWheelRotated(direction, _) => {
-                    let line = renderer.lines.get_mut(line_id)?;
                     if direction == MouseWheelDirection::Up {
                         line.thickness += 1.0;
                     } else {
@@ -82,21 +77,19 @@ pub fn main() -> Result<(), String> {
         }
 
         if window.is_mouse_button_pressed(MouseButton::Left) {
-            let position = window.get_cursor_position(CoordinationSystem::Window);
-            renderer.lines.get_mut(line_id)?.from = position;
-            renderer.lines.get_mut(line_id)?.update();
+            line.from = window.get_cursor_position(CoordinationSystem::Window);
+            line.update();
         }
 
         if window.is_mouse_button_pressed(MouseButton::Right) {
-            let position = window.get_cursor_position(CoordinationSystem::Window);
-            renderer.lines.get_mut(line_id)?.to = position;
-            renderer.lines.get_mut(line_id)?.update();
+            line.to = window.get_cursor_position(CoordinationSystem::Window);
+            line.update();
         }
 
         ui.update(&mut renderer)?;
 
         renderer.clear(SolidColor::new(0.5, 0.5, 0.5, 1.0));
-        renderer.draw(DrawableEnum::Line, line_id)?;
+        renderer.draw(&mut line)?;
         ui.draw(&mut renderer, description_text_id)?;
         window.swap_buffers();
     }

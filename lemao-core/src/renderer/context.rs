@@ -8,7 +8,7 @@ use super::drawable::rectangle::Rectangle;
 use super::drawable::text::Text;
 use super::drawable::tilemap::Tilemap;
 use super::drawable::Color;
-use super::drawable::DrawableEnum;
+use super::drawable::Drawable;
 use super::fonts::Font;
 use super::shaders::Shader;
 use super::shaders::DEFAULT_VERTEX_SHADER;
@@ -48,16 +48,8 @@ pub struct RendererContext {
     pub fonts: Storage<Font>,
     pub cameras: Storage<Camera>,
     pub shaders: Storage<Shader>,
-
-    pub circles: Storage<Circle>,
-    pub discs: Storage<Disc>,
-    pub frames: Storage<Frame>,
-    pub lines: Storage<Line>,
-    pub rectangles: Storage<Rectangle>,
-    pub texts: Storage<Text>,
-    pub tilemaps: Storage<Tilemap>,
-
     pub shapes: Storage<Shape>,
+
     pub batch_renderer: Option<BatchRenderer>,
 }
 
@@ -84,16 +76,8 @@ impl RendererContext {
             fonts: Default::default(),
             shaders: Default::default(),
             cameras: Default::default(),
-
-            circles: Default::default(),
-            discs: Default::default(),
-            frames: Default::default(),
-            lines: Default::default(),
-            rectangles: Default::default(),
-            texts: Default::default(),
-            tilemaps: Default::default(),
-
             shapes: Default::default(),
+
             batch_renderer: None,
         })
     }
@@ -217,55 +201,55 @@ impl RendererContext {
         Ok(())
     }
 
-    pub fn create_circle(&mut self) -> Result<usize, String> {
+    pub fn create_circle(&mut self) -> Result<Circle, String> {
         let texture = self.textures.get(self.default_texture_id)?;
         let circle = Circle::new(self, texture);
 
-        Ok(self.circles.store(circle))
+        Ok(circle)
     }
 
-    pub fn create_disc(&mut self) -> Result<usize, String> {
+    pub fn create_disc(&mut self) -> Result<Disc, String> {
         let texture = self.textures.get(self.default_texture_id)?;
         let disc = Disc::new(self, texture);
 
-        Ok(self.discs.store(disc))
+        Ok(disc)
     }
 
-    pub fn create_frame(&mut self) -> Result<usize, String> {
+    pub fn create_frame(&mut self) -> Result<Frame, String> {
         let texture = self.textures.get(self.default_texture_id)?;
         let frame = Frame::new(self, texture);
 
-        Ok(self.frames.store(frame))
+        Ok(frame)
     }
 
-    pub fn create_line(&mut self) -> Result<usize, String> {
+    pub fn create_line(&mut self) -> Result<Line, String> {
         let shape = self.shapes.get(self.default_line_shape_id)?;
         let texture = self.textures.get(self.default_texture_id)?;
         let line = Line::new(self, shape, texture);
 
-        Ok(self.lines.store(line))
+        Ok(line)
     }
 
-    pub fn create_rectangle(&mut self) -> Result<usize, String> {
+    pub fn create_rectangle(&mut self) -> Result<Rectangle, String> {
         let shape = self.shapes.get(self.default_rectangle_shape_id)?;
         let texture = self.textures.get(self.default_texture_id)?;
         let rectangle = Rectangle::new(self, shape, texture);
 
-        Ok(self.rectangles.store(rectangle))
+        Ok(rectangle)
     }
 
-    pub fn create_text(&mut self, font_id: usize) -> Result<usize, String> {
+    pub fn create_text(&mut self, font_id: usize) -> Result<Text, String> {
         let font = self.fonts.get(font_id)?;
         let text = Text::new(self, font);
 
-        Ok(self.texts.store(text))
+        Ok(text)
     }
 
-    pub fn create_tilemap(&mut self, texture_id: usize) -> Result<usize, String> {
+    pub fn create_tilemap(&mut self, texture_id: usize) -> Result<Tilemap, String> {
         let texture = self.textures.get(texture_id)?;
         let tilemap = Tilemap::new(self, texture);
 
-        Ok(self.tilemaps.store(tilemap))
+        Ok(tilemap)
     }
 
     pub fn enable_scissor(&self, position: Vec2, size: Vec2) {
@@ -281,16 +265,9 @@ impl RendererContext {
         }
     }
 
-    pub fn batcher_add_drawable(&mut self, r#type: DrawableEnum, drawable_id: usize) -> Result<(), String> {
-        let (transformation_matrix, mut batch) = match r#type {
-            DrawableEnum::Circle => (self.circles.get(drawable_id)?.get_transformation_matrix(), self.circles.get(drawable_id)?.get_batch()),
-            DrawableEnum::Disc => (self.discs.get(drawable_id)?.get_transformation_matrix(), self.discs.get(drawable_id)?.get_batch()),
-            DrawableEnum::Frame => (self.frames.get(drawable_id)?.get_transformation_matrix(), self.frames.get(drawable_id)?.get_batch()),
-            DrawableEnum::Line => (self.lines.get(drawable_id)?.get_transformation_matrix(), self.lines.get(drawable_id)?.get_batch()),
-            DrawableEnum::Rectangle => (self.rectangles.get(drawable_id)?.get_transformation_matrix(), self.rectangles.get(drawable_id)?.get_batch()),
-            DrawableEnum::Text => (self.texts.get(drawable_id)?.get_transformation_matrix(), self.texts.get(drawable_id)?.get_batch()),
-            DrawableEnum::Tilemap => (self.tilemaps.get(drawable_id)?.get_transformation_matrix(), self.tilemaps.get(drawable_id)?.get_batch()),
-        };
+    pub fn batcher_add_drawable<T: Drawable>(&mut self, drawable: &T) -> Result<(), String> {
+        let transformation_matrix = drawable.get_transformation_matrix();
+        let mut batch = drawable.get_batch();
 
         if let Some(shape_id) = batch.shape_id {
             let shape = self.shapes.get(shape_id)?;
@@ -321,16 +298,8 @@ impl RendererContext {
         self.batch_renderer.as_mut().unwrap().draw(self.shaders.get(shader_id)?)
     }
 
-    pub fn draw(&mut self, r#type: DrawableEnum, drawable_id: usize) -> Result<(), String> {
-        let color = match r#type {
-            DrawableEnum::Circle => &self.circles.get(drawable_id)?.color,
-            DrawableEnum::Disc => &self.discs.get(drawable_id)?.color,
-            DrawableEnum::Frame => &self.frames.get(drawable_id)?.color,
-            DrawableEnum::Line => &self.lines.get(drawable_id)?.color,
-            DrawableEnum::Rectangle => &self.rectangles.get(drawable_id)?.color,
-            DrawableEnum::Text => &self.texts.get(drawable_id)?.color,
-            DrawableEnum::Tilemap => &self.tilemaps.get(drawable_id)?.color,
-        };
+    pub fn draw<T: Drawable>(&mut self, drawable: &mut T) -> Result<(), String> {
+        let color = drawable.get_color();
 
         let shader_id = match color {
             Color::SolidColor(_) => self.default_solid_shader_id,
@@ -348,15 +317,7 @@ impl RendererContext {
         }
 
         let shader = self.shaders.get(shader_id)?;
-        match r#type {
-            DrawableEnum::Circle => self.circles.get_mut(drawable_id)?.draw(shader)?,
-            DrawableEnum::Disc => self.discs.get_mut(drawable_id)?.draw(shader)?,
-            DrawableEnum::Frame => self.frames.get_mut(drawable_id)?.draw(shader)?,
-            DrawableEnum::Line => self.lines.get_mut(drawable_id)?.draw(shader)?,
-            DrawableEnum::Rectangle => self.rectangles.get_mut(drawable_id)?.draw(shader)?,
-            DrawableEnum::Text => self.texts.get_mut(drawable_id)?.draw(shader)?,
-            DrawableEnum::Tilemap => self.tilemaps.get_mut(drawable_id)?.draw(shader)?,
-        };
+        drawable.draw(shader)?;
 
         Ok(())
     }

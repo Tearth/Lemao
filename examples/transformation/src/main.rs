@@ -5,8 +5,6 @@ use lemao_core::lemao_common_platform::input::Key;
 use lemao_core::lemao_common_platform::window::WindowStyle;
 use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
-use lemao_core::renderer::drawable::DrawableEnum;
-
 use lemao_core::renderer::fonts::bff;
 use lemao_core::renderer::fonts::Font;
 use lemao_core::renderer::textures::bmp;
@@ -38,8 +36,7 @@ pub fn main() -> Result<(), String> {
     let texture_id = renderer.textures.store(Texture::new(&renderer, &bmp::load("./cell/disc.bmp")?)?);
     let font_id = renderer.fonts.store(Font::new(&renderer, &bff::load("./assets/inconsolata.bff")?)?);
 
-    let sprite_id = renderer.create_rectangle()?;
-    let sprite = renderer.rectangles.get_mut(sprite_id)?;
+    let mut sprite = renderer.create_rectangle()?;
     sprite.set_texture(renderer.textures.get(texture_id)?);
     sprite.anchor = Vec2::new(0.5, 0.5);
     sprite.position = Vec2::new(400.0, 300.0);
@@ -98,7 +95,6 @@ pub fn main() -> Result<(), String> {
             camera.dirty = true;
         }
 
-        let sprite = renderer.rectangles.get_mut(sprite_id)?;
         if window.is_key_pressed(Key::KeyW) {
             sprite.position += Vec2::new(0.0, 200.0 * delta);
         }
@@ -124,7 +120,7 @@ pub fn main() -> Result<(), String> {
         ui.update(&mut renderer)?;
 
         renderer.clear(SolidColor::new(0.5, 0.5, 0.5, 1.0));
-        renderer.draw(DrawableEnum::Rectangle, sprite_id)?;
+        renderer.draw(&mut sprite)?;
         ui.draw(&mut renderer, description_text_id)?;
         window.swap_buffers();
     }

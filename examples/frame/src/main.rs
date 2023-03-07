@@ -8,7 +8,6 @@ use lemao_core::lemao_common_platform::window::WindowStyle;
 use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::drawable::frame::FrameThickness;
-use lemao_core::renderer::drawable::DrawableEnum;
 use lemao_core::renderer::fonts::bff;
 use lemao_core::renderer::fonts::Font;
 use lemao_core::window::context::CoordinationSystem;
@@ -34,8 +33,7 @@ pub fn main() -> Result<(), String> {
 
     let font_id = renderer.fonts.store(Font::new(&renderer, &bff::load("./assets/inconsolata.bff")?)?);
 
-    let frame_id = renderer.create_frame()?;
-    let frame = renderer.frames.get_mut(frame_id)?;
+    let mut frame = renderer.create_frame()?;
     frame.size = Vec2::new(100.0, 100.0);
     frame.anchor = Vec2::new(0.5, 0.5);
     frame.position = Vec2::new(400.0, 300.0);
@@ -60,7 +58,6 @@ pub fn main() -> Result<(), String> {
                     }
                 }
                 InputEvent::MouseWheelRotated(direction, _) => {
-                    let frame = renderer.frames.get_mut(frame_id)?;
                     if direction == MouseWheelDirection::Up {
                         frame.thickness = frame.thickness + FrameThickness::new(1.0, 1.0, 1.0, 1.0);
                     } else {
@@ -82,15 +79,14 @@ pub fn main() -> Result<(), String> {
         }
 
         if window.is_mouse_button_pressed(MouseButton::Left) {
-            let position = window.get_cursor_position(CoordinationSystem::Window);
-            renderer.frames.get_mut(frame_id)?.position = position;
-            renderer.frames.get_mut(frame_id)?.update();
+            frame.position = window.get_cursor_position(CoordinationSystem::Window);
+            frame.update();
         }
 
         ui.update(&mut renderer)?;
 
         renderer.clear(SolidColor::new(0.5, 0.5, 0.5, 1.0));
-        renderer.draw(DrawableEnum::Frame, frame_id)?;
+        renderer.draw(&mut frame)?;
         ui.draw(&mut renderer, description_text_id)?;
         window.swap_buffers();
     }

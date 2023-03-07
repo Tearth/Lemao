@@ -292,10 +292,6 @@ impl Component for Canvas {
         self.active = active;
     }
 
-    fn release_internal_resources(&mut self, _renderer: &mut RendererContext) -> Result<(), String> {
-        Ok(())
-    }
-
     fn as_any(&self) -> &dyn Any {
         self
     }

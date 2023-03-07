@@ -1,6 +1,8 @@
 use super::Component;
+use super::ComponentBorderShape;
 use super::ComponentBorderThickness;
 use super::ComponentCornerRounding;
+use super::ComponentFillingShape;
 use super::ComponentMargin;
 use super::ComponentPosition;
 use super::ComponentShape;
@@ -15,8 +17,8 @@ use lemao_core::lemao_common_platform::input::MouseButton;
 use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::context::RendererContext;
+use lemao_core::renderer::drawable::text::Text;
 use lemao_core::renderer::drawable::Color;
-use lemao_core::renderer::drawable::DrawableEnum;
 use lemao_core::renderer::fonts::Font;
 use lemao_core::renderer::textures::Texture;
 use std::any::Any;
@@ -41,7 +43,7 @@ pub struct Button {
     pub event_mask: Option<EventMask>,
 
     // Shape properties
-    pub filling_id: usize,
+    pub filling: ComponentFillingShape,
     pub shape: ComponentShape,
     pub color: Color,
     pub corner_rounding: ComponentCornerRounding,
@@ -49,12 +51,12 @@ pub struct Button {
     pub texture_original_size: Vec2,
 
     // Border properties
-    pub border_id: usize,
+    pub border: ComponentBorderShape,
     pub border_thickness: ComponentBorderThickness,
     pub border_color: Color,
 
     // Label properties
-    pub label_id: usize,
+    pub label: Text,
     pub label_font_id: usize,
     pub label_text: String,
     pub label_horizontal_alignment: HorizontalAlignment,
@@ -63,7 +65,7 @@ pub struct Button {
     pub label_color: Color,
 
     // Shadow properties
-    pub shadow_id: usize,
+    pub shadow: ComponentFillingShape,
     pub shadow_enabled: bool,
     pub shadow_offset: Vec2,
     pub shadow_color: Color,
@@ -111,9 +113,9 @@ impl Button {
             event_mask: None,
 
             // Shape properties
-            filling_id: match shape {
-                ComponentShape::Rectangle => renderer.create_rectangle()?,
-                ComponentShape::Disc => renderer.create_disc()?,
+            filling: match shape {
+                ComponentShape::Rectangle => ComponentFillingShape::Rectangle(renderer.create_rectangle()?),
+                ComponentShape::Disc => ComponentFillingShape::Disc(renderer.create_disc()?),
             },
             shape,
             color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
@@ -122,15 +124,15 @@ impl Button {
             texture_original_size: Default::default(),
 
             // Border properties
-            border_id: match shape {
-                ComponentShape::Rectangle => renderer.create_frame()?,
-                ComponentShape::Disc => renderer.create_circle()?,
+            border: match shape {
+                ComponentShape::Rectangle => ComponentBorderShape::Frame(renderer.create_frame()?),
+                ComponentShape::Disc => ComponentBorderShape::Circle(renderer.create_circle()?),
             },
             border_thickness: Default::default(),
             border_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
 
             // Label properties
-            label_id: renderer.create_text(label_font_id)?,
+            label: renderer.create_text(label_font_id)?,
             label_font_id,
             label_text: Default::default(),
             label_horizontal_alignment: HorizontalAlignment::Middle,
@@ -139,9 +141,9 @@ impl Button {
             label_color: Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0)),
 
             // Shadow properties
-            shadow_id: match shape {
-                ComponentShape::Rectangle => renderer.create_rectangle()?,
-                ComponentShape::Disc => renderer.create_disc()?,
+            shadow: match shape {
+                ComponentShape::Rectangle => ComponentFillingShape::Rectangle(renderer.create_rectangle()?),
+                ComponentShape::Disc => ComponentFillingShape::Disc(renderer.create_disc()?),
             },
             shadow_enabled: false,
             shadow_offset: Default::default(),
@@ -448,9 +450,8 @@ impl Component for Button {
         self.screen_position = self.screen_position.floor();
 
         if self.border_thickness != Default::default() {
-            match self.shape {
-                ComponentShape::Rectangle => {
-                    let border = renderer.frames.get_mut(self.border_id)?;
+            match &mut self.border {
+                ComponentBorderShape::Frame(border) => {
                     border.position = self.screen_position;
                     border.size = self.screen_size;
                     border.color = self.border_color.clone();
@@ -459,8 +460,7 @@ impl Component for Button {
 
                     border.update();
                 }
-                ComponentShape::Disc => {
-                    let border = renderer.circles.get_mut(self.border_id)?;
+                ComponentBorderShape::Circle(border) => {
                     border.position = self.screen_position;
                     border.size = self.screen_size;
                     border.color = self.border_color.clone();
@@ -477,9 +477,8 @@ impl Component for Button {
             self.screen_position = self.screen_position.floor();
         }
 
-        match self.shape {
-            ComponentShape::Rectangle => {
-                let filling = renderer.rectangles.get_mut(self.filling_id)?;
+        match &mut self.filling {
+            ComponentFillingShape::Rectangle(filling) => {
                 filling.position = self.screen_position;
                 filling.color = self.color.clone();
                 filling.size = self.screen_size;
@@ -491,8 +490,7 @@ impl Component for Button {
 
                 filling.update();
             }
-            ComponentShape::Disc => {
-                let filling = renderer.discs.get_mut(self.filling_id)?;
+            ComponentFillingShape::Disc(filling) => {
                 filling.position = self.screen_position;
                 filling.color = self.color.clone();
                 filling.size = self.screen_size;
@@ -506,9 +504,8 @@ impl Component for Button {
         };
 
         if self.shadow_enabled {
-            match self.shape {
-                ComponentShape::Rectangle => {
-                    let shadow = renderer.rectangles.get_mut(self.shadow_id)?;
+            match &mut self.shadow {
+                ComponentFillingShape::Rectangle(shadow) => {
                     shadow.position = self.screen_position + self.screen_size / 2.0 + self.shadow_offset;
                     shadow.size = self.screen_size;
                     shadow.anchor = Vec2::new(0.5, 0.5);
@@ -518,8 +515,7 @@ impl Component for Button {
 
                     shadow.update();
                 }
-                ComponentShape::Disc => {
-                    let shadow = renderer.discs.get_mut(self.shadow_id)?;
+                ComponentFillingShape::Disc(shadow) => {
                     shadow.position = self.screen_position + self.screen_size / 2.0 + self.shadow_offset;
                     shadow.size = self.screen_size;
                     shadow.anchor = Vec2::new(0.5, 0.5);
@@ -544,13 +540,12 @@ impl Component for Button {
         };
 
         let font = renderer.fonts.get(self.label_font_id)?;
-        let label = renderer.texts.get_mut(self.label_id)?;
-        label.set_font(font);
-        label.text = self.label_text.clone();
-        label.color = self.label_color.clone();
-        label.position = horizontal_position + vertical_position + self.label_offset;
-        label.anchor = horizontal_anchor + vertical_anchor;
-        label.update();
+        self.label.set_font(font);
+        self.label.text = self.label_text.clone();
+        self.label.color = self.label_color.clone();
+        self.label.position = horizontal_position + vertical_position + self.label_offset;
+        self.label.anchor = horizontal_anchor + vertical_anchor;
+        self.label.update();
 
         self.dirty = false;
 
@@ -558,39 +553,37 @@ impl Component for Button {
     }
 
     fn draw(&mut self, renderer: &mut RendererContext) -> Result<(), String> {
-        let filling_type = match self.shape {
-            ComponentShape::Rectangle => DrawableEnum::Rectangle,
-            ComponentShape::Disc => DrawableEnum::Disc,
-        };
-        let border_type = match self.shape {
-            ComponentShape::Rectangle => DrawableEnum::Frame,
-            ComponentShape::Disc => DrawableEnum::Circle,
-        };
-
         if self.shadow_enabled {
-            renderer.draw(filling_type, self.shadow_id)?;
+            match &mut self.shadow {
+                ComponentFillingShape::Rectangle(shadow) => renderer.draw(shadow)?,
+                ComponentFillingShape::Disc(shadow) => renderer.draw(shadow)?,
+            }
         }
 
-        renderer.draw(filling_type, self.filling_id)?;
+        match &mut self.filling {
+            ComponentFillingShape::Rectangle(filling) => renderer.draw(filling)?,
+            ComponentFillingShape::Disc(filling) => renderer.draw(filling)?,
+        }
 
         if self.label_shadow_enabled {
-            let drawable = renderer.texts.get_mut(self.label_id)?;
-            let original_position = drawable.position;
-            let original_color = drawable.color.clone();
+            let original_position = self.label.position;
+            let original_color = self.label.color.clone();
 
-            drawable.position = original_position + self.label_shadow_offset;
-            drawable.color = self.label_shadow_color.clone();
-            renderer.draw(DrawableEnum::Text, self.label_id)?;
+            self.label.position = original_position + self.label_shadow_offset;
+            self.label.color = self.label_shadow_color.clone();
+            renderer.draw(&mut self.label)?;
 
-            let drawable = renderer.texts.get_mut(self.label_id)?;
-            drawable.position = original_position;
-            drawable.color = original_color;
+            self.label.position = original_position;
+            self.label.color = original_color;
         }
 
-        renderer.draw(DrawableEnum::Text, self.label_id)?;
+        renderer.draw(&mut self.label)?;
 
         if self.border_thickness != Default::default() {
-            renderer.draw(border_type, self.border_id)?;
+            match &mut self.border {
+                ComponentBorderShape::Frame(border) => renderer.draw(border)?,
+                ComponentBorderShape::Circle(border) => renderer.draw(border)?,
+            }
         }
 
         Ok(())
@@ -602,25 +595,6 @@ impl Component for Button {
 
     fn set_active_flag(&mut self, active: bool) {
         self.active = active;
-    }
-
-    fn release_internal_resources(&mut self, renderer: &mut RendererContext) -> Result<(), String> {
-        match self.shape {
-            ComponentShape::Rectangle => {
-                renderer.rectangles.remove(self.filling_id)?;
-                renderer.frames.remove(self.border_id)?;
-                renderer.rectangles.remove(self.shadow_id)?;
-            }
-            ComponentShape::Disc => {
-                renderer.discs.remove(self.filling_id)?;
-                renderer.circles.remove(self.border_id)?;
-                renderer.discs.remove(self.shadow_id)?;
-            }
-        };
-
-        renderer.texts.remove(self.label_id)?;
-
-        Ok(())
     }
 
     fn as_any(&self) -> &dyn Any {
