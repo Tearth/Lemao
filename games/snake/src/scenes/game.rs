@@ -1,4 +1,9 @@
+use crate::components::sprite::Sprite;
 use crate::global::GlobalAppData;
+use crate::systems::gui;
+use crate::systems::init;
+use crate::systems::renderer;
+use crate::systems::window;
 use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::renderer::fonts::Font;
@@ -6,16 +11,20 @@ use lemao_core::renderer::textures::Texture;
 use lemao_framework::app::Application;
 use lemao_framework::app::Scene;
 use lemao_framework::assets::AssetsLoader;
+use lemao_framework::ecs::world::World;
 use lemao_ui::context::UiContext;
 use std::any::Any;
+use std::sync::Arc;
+use std::sync::RwLock;
 
 pub struct GameScene {
-    ui: UiContext,
+    pub ui: UiContext,
+    pub world: Arc<RwLock<World<GlobalAppData, GameScene>>>,
 }
 
 impl GameScene {
     pub fn new(app: &mut Application<GlobalAppData>) -> Self {
-        Self { ui: UiContext::new(&mut app.renderer).unwrap() }
+        Self { ui: UiContext::new(&mut app.renderer).unwrap(), world: Arc::new(RwLock::new(World::new())) }
     }
 }
 
@@ -39,6 +48,16 @@ impl Scene<GlobalAppData> for GameScene {
             app.renderer.fonts.store_with_name(&font.name, Font::new(&app.renderer, &font.data)?)?;
         }
 
+        let world = self.world.clone();
+        let mut world = world.write().unwrap();
+
+        world.register_component::<Sprite>()?;
+        world.create_system(window::update);
+        world.create_system(renderer::update);
+        world.create_system(gui::update);
+
+        init::update(app, self, &mut world, &Vec::new())?;
+
         Ok(())
     }
 
@@ -56,25 +75,17 @@ impl Scene<GlobalAppData> for GameScene {
     }
 
     fn on_tick(&mut self, app: &mut Application<GlobalAppData>) -> Result<(), String> {
+        let mut events = Vec::new();
         while let Some(event) = app.window.poll_event() {
-            match event {
-                InputEvent::WindowSizeChanged(size) => {
-                    app.renderer.set_viewport_size(size)?;
-                }
-                InputEvent::WindowClosed => {
-                    app.close();
-                }
-                _ => {}
-            }
-
-            self.ui.process_window_event(&mut app.renderer, &event)?;
+            events.push(event);
         }
 
-        self.ui.update(&mut app.renderer)?;
-
         app.renderer.clear(SolidColor::new(0.5, 0.5, 0.5, 1.0));
-        app.window.swap_buffers();
 
+        let world = self.world.clone();
+        world.write().unwrap().update(app, self, &events)?;
+
+        app.window.swap_buffers();
         Ok(())
     }
 

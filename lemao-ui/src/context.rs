@@ -157,7 +157,7 @@ impl UiContext {
         self.get_component_mut(component_id)?.as_any_mut().downcast_mut::<T>().ok_or_else(|| format!("Component {} cannot be downcasted", component_id))
     }
 
-    pub fn remove_component(&mut self, component_id: usize, renderer: &mut RendererContext) -> Result<(), String> {
+    pub fn remove_component(&mut self, component_id: usize) -> Result<(), String> {
         self.components.remove(component_id)
     }
 
