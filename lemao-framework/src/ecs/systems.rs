@@ -2,4 +2,9 @@ use super::world::World;
 use crate::app::Application;
 use lemao_core::lemao_common_platform::input::InputEvent;
 
-pub type System<G, S> = fn(app: &mut Application<G>, scene: &mut S, world: &mut World<G, S>, input: &[InputEvent]) -> Result<(), String>;
+pub trait System<G, S, M>
+where
+    M: Copy + Clone,
+{
+    fn update(&mut self, app: &mut Application<G>, scene: &mut S, world: &mut World<G, S, M>, input: &[InputEvent]) -> Result<(), String>;
+}

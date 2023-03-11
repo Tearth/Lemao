@@ -3,11 +3,13 @@ use crate::components::obstacle::ObstacleComponent;
 use crate::components::position::PositionComponent;
 use crate::components::sprite::SpriteComponent;
 use crate::global::GlobalAppData;
-use crate::systems::gui;
-use crate::systems::init;
-use crate::systems::renderer;
-use crate::systems::synchronization;
-use crate::systems::window;
+use crate::messages::Message;
+use crate::systems::gui::GuiSystem;
+use crate::systems::head::HeadSystem;
+use crate::systems::init::InitSystem;
+use crate::systems::renderer::RendererSystem;
+use crate::systems::synchronization::SynchronizationSystem;
+use crate::systems::window::WindowSystem;
 use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::renderer::fonts::Font;
@@ -15,6 +17,7 @@ use lemao_core::renderer::textures::Texture;
 use lemao_framework::app::Application;
 use lemao_framework::app::Scene;
 use lemao_framework::assets::AssetsLoader;
+use lemao_framework::ecs::systems::System;
 use lemao_framework::ecs::world::World;
 use lemao_ui::context::UiContext;
 use std::any::Any;
@@ -24,7 +27,7 @@ use std::time::SystemTime;
 
 pub struct GameScene {
     pub ui: UiContext,
-    pub world: Arc<RwLock<World<GlobalAppData, GameScene>>>,
+    pub world: Arc<RwLock<World<GlobalAppData, GameScene, Message>>>,
 
     pub tick_length: u32,
     pub time_of_last_tick: SystemTime,
@@ -68,12 +71,13 @@ impl Scene<GlobalAppData> for GameScene {
         world.register_component::<ObstacleComponent>()?;
         world.register_component::<PositionComponent>()?;
         world.register_component::<SpriteComponent>()?;
-        world.create_system(window::update);
-        world.create_system(synchronization::update);
-        world.create_system(renderer::update);
-        world.create_system(gui::update);
+        world.create_system::<HeadSystem>(Box::<HeadSystem>::default())?;
+        world.create_system::<GuiSystem>(Box::<GuiSystem>::default())?;
+        world.create_system::<RendererSystem>(Box::<RendererSystem>::default())?;
+        world.create_system::<SynchronizationSystem>(Box::<SynchronizationSystem>::default())?;
+        world.create_system::<WindowSystem>(Box::<WindowSystem>::default())?;
 
-        init::update(app, self, &mut world, &Vec::new())?;
+        InitSystem::default().update(app, self, &mut world, &Vec::new())?;
 
         Ok(())
     }

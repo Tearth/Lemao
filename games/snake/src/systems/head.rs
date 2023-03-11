@@ -1,4 +1,3 @@
-use super::head::HeadSystem;
 use crate::global::GlobalAppData;
 use crate::messages::Message;
 use crate::scenes::game::GameScene;
@@ -6,22 +5,24 @@ use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_framework::app::Application;
 use lemao_framework::ecs::systems::System;
 use lemao_framework::ecs::world::World;
-use std::time::SystemTime;
 
 #[derive(Default)]
-pub struct SynchronizationSystem {}
+pub struct HeadSystem {}
 
-impl System<GlobalAppData, GameScene, Message> for SynchronizationSystem {
+impl System<GlobalAppData, GameScene, Message> for HeadSystem {
     fn update(
         &mut self,
         _app: &mut Application<GlobalAppData>,
-        scene: &mut GameScene,
+        _scene: &mut GameScene,
         world: &mut World<GlobalAppData, GameScene, Message>,
         _input: &[InputEvent],
     ) -> Result<(), String> {
-        if scene.time_of_last_tick.elapsed().unwrap().as_millis() >= scene.tick_length as u128 {
-            world.bus.send_to_1::<HeadSystem>(Message::GameTick)?;
-            scene.time_of_last_tick = SystemTime::now();
+        while let Some(message) = world.bus.poll_message::<HeadSystem>() {
+            match message {
+                Message::GameTick => {
+                    println!("TICK");
+                }
+            }
         }
 
         Ok(())

@@ -6,6 +6,7 @@ use scenes::game::GameScene;
 pub mod components;
 pub mod core;
 pub mod global;
+pub mod messages;
 pub mod scenes;
 pub mod systems;
 
