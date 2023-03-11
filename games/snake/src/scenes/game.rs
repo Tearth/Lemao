@@ -1,8 +1,12 @@
-use crate::components::sprite::Sprite;
+use crate::components::cell::CellComponent;
+use crate::components::obstacle::ObstacleComponent;
+use crate::components::position::PositionComponent;
+use crate::components::sprite::SpriteComponent;
 use crate::global::GlobalAppData;
 use crate::systems::gui;
 use crate::systems::init;
 use crate::systems::renderer;
+use crate::systems::synchronization;
 use crate::systems::window;
 use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_math::color::SolidColor;
@@ -16,15 +20,24 @@ use lemao_ui::context::UiContext;
 use std::any::Any;
 use std::sync::Arc;
 use std::sync::RwLock;
+use std::time::SystemTime;
 
 pub struct GameScene {
     pub ui: UiContext,
     pub world: Arc<RwLock<World<GlobalAppData, GameScene>>>,
+
+    pub tick_length: u32,
+    pub time_of_last_tick: SystemTime,
 }
 
 impl GameScene {
     pub fn new(app: &mut Application<GlobalAppData>) -> Self {
-        Self { ui: UiContext::new(&mut app.renderer).unwrap(), world: Arc::new(RwLock::new(World::new())) }
+        Self {
+            ui: UiContext::new(&mut app.renderer).unwrap(),
+            world: Arc::new(RwLock::new(World::new())),
+            tick_length: 500,
+            time_of_last_tick: SystemTime::now(),
+        }
     }
 }
 
@@ -51,8 +64,12 @@ impl Scene<GlobalAppData> for GameScene {
         let world = self.world.clone();
         let mut world = world.write().unwrap();
 
-        world.register_component::<Sprite>()?;
+        world.register_component::<CellComponent>()?;
+        world.register_component::<ObstacleComponent>()?;
+        world.register_component::<PositionComponent>()?;
+        world.register_component::<SpriteComponent>()?;
         world.create_system(window::update);
+        world.create_system(synchronization::update);
         world.create_system(renderer::update);
         world.create_system(gui::update);
 

@@ -28,9 +28,7 @@ impl<T> ComponentManager<T> {
 
         self.data.push(item);
 
-        if self.id_lookup.len() < self.data.len() {
-            self.id_lookup.resize(self.data.len(), None);
-        }
+        self.id_lookup.resize(entity_id + 1, None);
         self.id_lookup[entity_id] = Some(self.data.len() - 1);
 
         Ok(())

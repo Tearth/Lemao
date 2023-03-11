@@ -4,6 +4,7 @@ use lemao_framework::app::Application;
 use scenes::game::GameScene;
 
 pub mod components;
+pub mod core;
 pub mod global;
 pub mod scenes;
 pub mod systems;

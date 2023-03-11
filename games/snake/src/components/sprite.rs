@@ -1,10 +1,10 @@
 use lemao_core::renderer::drawable::rectangle::Rectangle;
 
-pub struct Sprite {
+pub struct SpriteComponent {
     pub rectangle: Rectangle,
 }
 
-impl Sprite {
+impl SpriteComponent {
     pub fn new(rectangle: Rectangle) -> Self {
         Self { rectangle }
     }

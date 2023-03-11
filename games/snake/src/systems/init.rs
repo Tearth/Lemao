@@ -1,4 +1,7 @@
-use crate::components::sprite::Sprite;
+use crate::components::cell::CellComponent;
+use crate::components::obstacle::ObstacleComponent;
+use crate::components::position::PositionComponent;
+use crate::components::sprite::SpriteComponent;
 use crate::global::GlobalAppData;
 use crate::scenes::game::GameScene;
 use lemao_core::lemao_common_platform::input::InputEvent;
@@ -12,13 +15,30 @@ pub fn update(
     world: &mut World<GlobalAppData, GameScene>,
     _input: &[InputEvent],
 ) -> Result<(), String> {
-    let tile_id = world.create_entity();
-    let mut rectangle = app.renderer.create_rectangle()?;
-    rectangle.set_texture(app.renderer.textures.get_by_name("cell")?);
-    rectangle.position = Vec2::new(200.0, 200.0);
-    rectangle.size = Vec2::new(32.0, 32.0);
-    rectangle.update();
+    let rows = 20;
+    let cols = 40;
 
-    world.create_component(tile_id, Sprite::new(rectangle))?;
+    for row in 0..rows {
+        for col in 0..cols {
+            let cell_id = world.create_entity();
+            let mut rectangle = app.renderer.create_rectangle()?;
+            rectangle.position = Vec2::new(col as f32 * 24.0, row as f32 * 24.0);
+            rectangle.size = Vec2::new(24.0, 24.0);
+
+            if row == 0 || row == rows - 1 || col == 0 || col == cols - 1 {
+                rectangle.set_texture(app.renderer.textures.get_by_name("border")?);
+                world.create_component(cell_id, ObstacleComponent::default())?;
+            } else {
+                rectangle.set_texture(app.renderer.textures.get_by_name("cell")?);
+                world.create_component(cell_id, CellComponent::default())?;
+            }
+
+            rectangle.update();
+
+            world.create_component(cell_id, PositionComponent::new(row, col))?;
+            world.create_component(cell_id, SpriteComponent::new(rectangle))?;
+        }
+    }
+
     Ok(())
 }
