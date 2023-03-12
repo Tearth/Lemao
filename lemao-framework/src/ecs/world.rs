@@ -1,4 +1,5 @@
 use super::bus::MessageBus;
+use super::components::Component;
 use super::components::ComponentManager;
 use super::components::ComponentManagerTrait;
 use super::entites::Entity;
@@ -34,9 +35,27 @@ where
         self.entities.store(Entity::default())
     }
 
+    pub fn remove_entity(&mut self, entity_id: usize) -> Result<(), String> {
+        if !self.entities.contains(entity_id) {
+            return Err("Entity not found".to_string());
+        }
+
+        self.entities.remove(entity_id)?;
+
+        for component_manager in self.components.values_mut() {
+            let mut component_manager = component_manager.write().unwrap();
+
+            if component_manager.contains(entity_id) {
+                component_manager.remove(entity_id)?;
+            }
+        }
+
+        Ok(())
+    }
+
     pub fn register_component<T>(&mut self) -> Result<(), String>
     where
-        T: 'static,
+        T: Component + 'static,
     {
         if self.components.contains_key(&TypeId::of::<T>()) {
             return Err("Component already registered".to_string());
@@ -48,7 +67,7 @@ where
 
     pub fn create_component<T>(&mut self, entity_id: usize, component: T) -> Result<(), String>
     where
-        T: 'static,
+        T: Component + 'static,
     {
         match self.components.get_mut(&TypeId::of::<T>()) {
             Some(component_manager) => {

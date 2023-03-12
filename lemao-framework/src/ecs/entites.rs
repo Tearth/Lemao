@@ -19,6 +19,10 @@ impl EntityManager {
         id
     }
 
+    pub fn contains(&self, id: usize) -> bool {
+        matches!(self.data.get(id), Some(Some(_)))
+    }
+
     pub fn get(&self, id: usize) -> Result<&Entity, String> {
         match self.data.get(id) {
             Some(Some(item)) => Ok(item),

@@ -1,3 +1,4 @@
+use super::body::BodySystem;
 use super::head::HeadSystem;
 use crate::global::GlobalAppData;
 use crate::messages::Message;
@@ -9,9 +10,9 @@ use lemao_framework::ecs::world::World;
 use std::time::SystemTime;
 
 #[derive(Default)]
-pub struct SynchronizationSystem {}
+pub struct SyncSystem {}
 
-impl System<GlobalAppData, GameScene, Message> for SynchronizationSystem {
+impl System<GlobalAppData, GameScene, Message> for SyncSystem {
     fn update(
         &mut self,
         _app: &mut Application<GlobalAppData>,
@@ -20,7 +21,7 @@ impl System<GlobalAppData, GameScene, Message> for SynchronizationSystem {
         _input: &[InputEvent],
     ) -> Result<(), String> {
         if scene.time_of_last_tick.elapsed().unwrap().as_millis() >= scene.tick_length as u128 {
-            world.bus.send_to_1::<HeadSystem>(Message::GameTick)?;
+            world.bus.send_to_2::<HeadSystem, BodySystem>(Message::GameTick)?;
             scene.time_of_last_tick = SystemTime::now();
         }
 

@@ -1,4 +1,5 @@
 use crate::components::cell::CellComponent;
+use crate::components::head::{HeadComponent, HeadDirection};
 use crate::components::obstacle::ObstacleComponent;
 use crate::components::position::PositionComponent;
 use crate::components::sprite::SpriteComponent;
@@ -29,23 +30,32 @@ impl System<GlobalAppData, GameScene, Message> for InitSystem {
             for col in 0..cols {
                 let cell_id = world.create_entity();
                 let mut rectangle = app.renderer.create_rectangle()?;
-                rectangle.position = Vec2::new(col as f32 * 24.0, row as f32 * 24.0);
                 rectangle.size = Vec2::new(24.0, 24.0);
 
                 if row == 0 || row == rows - 1 || col == 0 || col == cols - 1 {
                     rectangle.set_texture(app.renderer.textures.get_by_name("border")?);
-                    world.create_component(cell_id, ObstacleComponent::default())?;
+                    world.create_component(cell_id, ObstacleComponent::new(cell_id))?;
                 } else {
                     rectangle.set_texture(app.renderer.textures.get_by_name("cell")?);
-                    world.create_component(cell_id, CellComponent::default())?;
+                    world.create_component(cell_id, CellComponent::new(cell_id))?;
                 }
 
                 rectangle.update();
 
-                world.create_component(cell_id, PositionComponent::new(row, col))?;
-                world.create_component(cell_id, SpriteComponent::new(rectangle))?;
+                world.create_component(cell_id, PositionComponent::new(cell_id, row, col))?;
+                world.create_component(cell_id, SpriteComponent::new(cell_id, rectangle))?;
             }
         }
+
+        let head_id = world.create_entity();
+        let mut head_rectangle = app.renderer.create_rectangle()?;
+        head_rectangle.size = Vec2::new(24.0, 24.0);
+        head_rectangle.set_texture(app.renderer.textures.get_by_name("head")?);
+        head_rectangle.update();
+
+        world.create_component(head_id, HeadComponent::new(head_id, HeadDirection::Right))?;
+        world.create_component(head_id, PositionComponent::new(head_id, 10, 10))?;
+        world.create_component(head_id, SpriteComponent::new(head_id, head_rectangle))?;
 
         Ok(())
     }

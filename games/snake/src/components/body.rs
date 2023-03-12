@@ -1,16 +1,17 @@
 use lemao_framework::ecs::components::Component;
 
-pub struct CellComponent {
+pub struct BodyComponent {
     pub entity_id: usize,
+    pub lifetime: u32,
 }
 
-impl CellComponent {
-    pub fn new(entity_id: usize) -> Self {
-        Self { entity_id }
+impl BodyComponent {
+    pub fn new(entity_id: usize, lifetime: u32) -> Self {
+        Self { entity_id, lifetime }
     }
 }
 
-impl Component for CellComponent {
+impl Component for BodyComponent {
     fn get_entity(&self) -> usize {
         self.entity_id
     }

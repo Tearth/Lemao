@@ -1,14 +1,17 @@
+use crate::components::body::BodyComponent;
 use crate::components::cell::CellComponent;
+use crate::components::head::HeadComponent;
 use crate::components::obstacle::ObstacleComponent;
 use crate::components::position::PositionComponent;
 use crate::components::sprite::SpriteComponent;
 use crate::global::GlobalAppData;
 use crate::messages::Message;
+use crate::systems::body::BodySystem;
 use crate::systems::gui::GuiSystem;
 use crate::systems::head::HeadSystem;
 use crate::systems::init::InitSystem;
 use crate::systems::renderer::RendererSystem;
-use crate::systems::synchronization::SynchronizationSystem;
+use crate::systems::sync::SyncSystem;
 use crate::systems::window::WindowSystem;
 use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_math::color::SolidColor;
@@ -67,14 +70,18 @@ impl Scene<GlobalAppData> for GameScene {
         let world = self.world.clone();
         let mut world = world.write().unwrap();
 
+        world.register_component::<BodyComponent>()?;
         world.register_component::<CellComponent>()?;
+        world.register_component::<HeadComponent>()?;
         world.register_component::<ObstacleComponent>()?;
         world.register_component::<PositionComponent>()?;
         world.register_component::<SpriteComponent>()?;
+
+        world.create_system::<BodySystem>(Box::<BodySystem>::default())?;
         world.create_system::<HeadSystem>(Box::<HeadSystem>::default())?;
         world.create_system::<GuiSystem>(Box::<GuiSystem>::default())?;
         world.create_system::<RendererSystem>(Box::<RendererSystem>::default())?;
-        world.create_system::<SynchronizationSystem>(Box::<SynchronizationSystem>::default())?;
+        world.create_system::<SyncSystem>(Box::<SyncSystem>::default())?;
         world.create_system::<WindowSystem>(Box::<WindowSystem>::default())?;
 
         InitSystem::default().update(app, self, &mut world, &Vec::new())?;
