@@ -33,7 +33,7 @@ impl System<GlobalAppData, GameScene, Message> for RendererSystem {
         for sprite in sprites.iter_mut() {
             let position = positions.get_mut(sprite.entity_id)?;
             if position.changed {
-                sprite.rectangle.position = Vec2::new(position.col as f32 * 24.0, position.row as f32 * 24.0);
+                sprite.rectangle.position = Vec2::new(position.col as f32, position.row as f32) * app.global_data.cell_size;
                 position.changed = false;
             }
 

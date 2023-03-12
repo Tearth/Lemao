@@ -74,6 +74,14 @@ where
     pub fn iter_mut(&mut self) -> IterMut<T> {
         self.data.iter_mut()
     }
+
+    pub fn is_empty(&mut self) -> bool {
+        self.data.is_empty()
+    }
+
+    pub fn len(&mut self) -> usize {
+        self.data.len()
+    }
 }
 
 impl<T> ComponentManagerTrait for ComponentManager<T>

@@ -1,5 +1,6 @@
 use crate::components::body::BodyComponent;
 use crate::components::cell::CellComponent;
+use crate::components::food::FoodComponent;
 use crate::components::head::HeadComponent;
 use crate::components::obstacle::ObstacleComponent;
 use crate::components::position::PositionComponent;
@@ -7,6 +8,7 @@ use crate::components::sprite::SpriteComponent;
 use crate::global::GlobalAppData;
 use crate::messages::Message;
 use crate::systems::body::BodySystem;
+use crate::systems::food::FoodSystem;
 use crate::systems::gui::GuiSystem;
 use crate::systems::head::HeadSystem;
 use crate::systems::init::InitSystem;
@@ -34,6 +36,8 @@ pub struct GameScene {
 
     pub tick_length: u32,
     pub time_of_last_tick: SystemTime,
+    pub lifetime: u32,
+    pub food_last_refresh_time: SystemTime,
 }
 
 impl GameScene {
@@ -43,6 +47,8 @@ impl GameScene {
             world: Arc::new(RwLock::new(World::new())),
             tick_length: 500,
             time_of_last_tick: SystemTime::now(),
+            lifetime: 3,
+            food_last_refresh_time: SystemTime::now(),
         }
     }
 }
@@ -72,6 +78,7 @@ impl Scene<GlobalAppData> for GameScene {
 
         world.register_component::<BodyComponent>()?;
         world.register_component::<CellComponent>()?;
+        world.register_component::<FoodComponent>()?;
         world.register_component::<HeadComponent>()?;
         world.register_component::<ObstacleComponent>()?;
         world.register_component::<PositionComponent>()?;
@@ -79,6 +86,7 @@ impl Scene<GlobalAppData> for GameScene {
 
         world.create_system::<BodySystem>(Box::<BodySystem>::default())?;
         world.create_system::<HeadSystem>(Box::<HeadSystem>::default())?;
+        world.create_system::<FoodSystem>(Box::<FoodSystem>::default())?;
         world.create_system::<GuiSystem>(Box::<GuiSystem>::default())?;
         world.create_system::<RendererSystem>(Box::<RendererSystem>::default())?;
         world.create_system::<SyncSystem>(Box::<SyncSystem>::default())?;

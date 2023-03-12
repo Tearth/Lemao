@@ -20,7 +20,7 @@ impl System<GlobalAppData, GameScene, Message> for HeadSystem {
     fn update(
         &mut self,
         app: &mut Application<GlobalAppData>,
-        _scene: &mut GameScene,
+        scene: &mut GameScene,
         world: &mut World<GlobalAppData, GameScene, Message>,
         input: &[InputEvent],
     ) -> Result<(), String> {
@@ -81,11 +81,11 @@ impl System<GlobalAppData, GameScene, Message> for HeadSystem {
 
                     let body_id = world.create_entity();
                     let mut body_rectangle = app.renderer.create_rectangle()?;
-                    body_rectangle.size = Vec2::new(24.0, 24.0);
+                    body_rectangle.size = app.global_data.cell_size;
                     body_rectangle.set_texture(app.renderer.textures.get_by_name("body")?);
                     body_rectangle.update();
 
-                    world.create_component(body_id, BodyComponent::new(body_id, 2))?;
+                    world.create_component(body_id, BodyComponent::new(body_id, scene.lifetime))?;
                     world.create_component(body_id, PositionComponent::new(body_id, last_row, last_col))?;
                     world.create_component(body_id, SpriteComponent::new(body_id, body_rectangle))?;
                 }

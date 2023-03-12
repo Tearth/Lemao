@@ -1,4 +1,5 @@
 use super::body::BodySystem;
+use super::food::FoodSystem;
 use super::head::HeadSystem;
 use crate::global::GlobalAppData;
 use crate::messages::Message;
@@ -21,7 +22,7 @@ impl System<GlobalAppData, GameScene, Message> for SyncSystem {
         _input: &[InputEvent],
     ) -> Result<(), String> {
         if scene.time_of_last_tick.elapsed().unwrap().as_millis() >= scene.tick_length as u128 {
-            world.bus.send_to_2::<HeadSystem, BodySystem>(Message::GameTick)?;
+            world.bus.send_to_3::<HeadSystem, BodySystem, FoodSystem>(Message::GameTick)?;
             scene.time_of_last_tick = SystemTime::now();
         }
 
