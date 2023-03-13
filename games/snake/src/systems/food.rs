@@ -12,7 +12,7 @@ use crate::scenes::game::GameScene;
 use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::utils::rand;
 use lemao_framework::app::Application;
-use lemao_framework::ecs::components::ComponentManager;
+use lemao_framework::ecs::components::ComponentManagerHashMap;
 use lemao_framework::ecs::systems::System;
 use lemao_framework::ecs::world::World;
 
@@ -30,9 +30,7 @@ impl System<GlobalAppData, GameScene, Message> for FoodSystem {
         while let Some(message) = world.bus.poll_message::<Self>() {
             match message {
                 Message::GameTick => {
-                    let foods = world.components.get_mut(&TypeId::of::<FoodComponent>()).unwrap().clone();
-                    let mut foods_lock = foods.write().unwrap();
-                    let foods = foods_lock.as_any_mut().downcast_mut::<ComponentManager<FoodComponent>>().unwrap();
+                    let foods = world.components.get_component_managers_1::<FoodComponent>();
 
                     if foods.is_empty() || scene.food_last_refresh_time.elapsed().unwrap().as_millis() >= app.global_data.food_refresh_interval as u128 {
                         let mut entites_to_remove = Vec::new();
@@ -40,27 +38,14 @@ impl System<GlobalAppData, GameScene, Message> for FoodSystem {
                             entites_to_remove.push(body.entity_id);
                         }
 
-                        drop(foods_lock);
+                        // drop(foods);
 
                         for entity_id in entites_to_remove {
                             world.remove_entity(entity_id)?;
                         }
 
-                        let foods = world.components.get_mut(&TypeId::of::<FoodComponent>()).unwrap().clone();
-                        let mut foods_lock = foods.write().unwrap();
-                        let foods = foods_lock.as_any_mut().downcast_mut::<ComponentManager<FoodComponent>>().unwrap();
-
-                        let heads = world.components.get_mut(&TypeId::of::<HeadComponent>()).unwrap().clone();
-                        let mut heads_lock = heads.read().unwrap();
-                        let heads = heads_lock.as_any().downcast_ref::<ComponentManager<HeadComponent>>().unwrap();
-
-                        let bodies = world.components.get_mut(&TypeId::of::<BodyComponent>()).unwrap().clone();
-                        let mut bodies_lock = bodies.read().unwrap();
-                        let bodies = bodies_lock.as_any().downcast_ref::<ComponentManager<BodyComponent>>().unwrap();
-
-                        let positions = world.components.get_mut(&TypeId::of::<PositionComponent>()).unwrap().clone();
-                        let mut positions_lock = positions.read().unwrap();
-                        let positions = positions_lock.as_any().downcast_ref::<ComponentManager<PositionComponent>>().unwrap();
+                        let (foods, heads, bodies, positions) =
+                            world.components.get_component_managers_4::<FoodComponent, HeadComponent, BodyComponent, PositionComponent>();
 
                         let mut forbidden_positions = heads.iter().map(|h| positions.get(h.entity_id).unwrap()).collect::<Vec<&PositionComponent>>();
                         forbidden_positions.extend(bodies.iter().map(|h| positions.get(h.entity_id).unwrap()));
@@ -82,10 +67,10 @@ impl System<GlobalAppData, GameScene, Message> for FoodSystem {
                             new_food_positions.push((row, col));
                         }
 
-                        drop(foods_lock);
-                        drop(heads_lock);
-                        drop(bodies_lock);
-                        drop(positions_lock);
+                        // drop(foods);
+                        // drop(heads);
+                        // drop(bodies);
+                        // drop(positions);
 
                         for position in new_food_positions {
                             let food_id = world.create_entity();

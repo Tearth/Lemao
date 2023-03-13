@@ -8,7 +8,7 @@ use crate::scenes::game::GameScene;
 use lemao_core::lemao_common_platform::input::{InputEvent, Key};
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_framework::app::Application;
-use lemao_framework::ecs::components::ComponentManager;
+use lemao_framework::ecs::components::ComponentManagerHashMap;
 use lemao_framework::ecs::systems::System;
 use lemao_framework::ecs::world::World;
 use std::any::TypeId;
@@ -24,13 +24,11 @@ impl System<GlobalAppData, GameScene, Message> for HeadSystem {
         world: &mut World<GlobalAppData, GameScene, Message>,
         input: &[InputEvent],
     ) -> Result<(), String> {
-        let heads = world.components.get_mut(&TypeId::of::<HeadComponent>()).unwrap().clone();
-        let mut heads = heads.write().unwrap();
-        let heads = heads.as_any_mut().downcast_mut::<ComponentManager<HeadComponent>>().unwrap();
-        let head = heads.iter_mut().next().unwrap();
-
         for event in input {
             if let InputEvent::KeyPressed(key) = event {
+                let heads = world.components.get_component_managers_1::<HeadComponent>();
+                let head = heads.iter_mut().next().unwrap();
+
                 match key {
                     Key::KeyW => {
                         if head.direction != HeadDirection::Down {
@@ -60,9 +58,8 @@ impl System<GlobalAppData, GameScene, Message> for HeadSystem {
         while let Some(message) = world.bus.poll_message::<Self>() {
             match message {
                 Message::GameTick => {
-                    let positions = world.components.get_mut(&TypeId::of::<PositionComponent>()).unwrap().clone();
-                    let mut positions_lock = positions.write().unwrap();
-                    let positions = positions_lock.as_any_mut().downcast_mut::<ComponentManager<PositionComponent>>().unwrap();
+                    let (heads, positions) = world.components.get_component_managers_2::<HeadComponent, PositionComponent>();
+                    let head = heads.iter_mut().next().unwrap();
 
                     let position = positions.get_mut(head.entity_id)?;
                     let last_row = position.row;
@@ -77,7 +74,8 @@ impl System<GlobalAppData, GameScene, Message> for HeadSystem {
 
                     position.changed = true;
 
-                    drop(positions_lock);
+                    // drop(heads);
+                    // drop(positions);
 
                     let body_id = world.create_entity();
                     let mut body_rectangle = app.renderer.create_rectangle()?;

@@ -1,11 +1,8 @@
-use std::any::Any;
-use std::slice::Iter;
-use std::slice::IterMut;
-
-pub trait Component {
-    fn get_entity(&self) -> usize;
-    fn set_entity_id(&mut self, entity_id: usize);
-}
+use super::Component;
+use std::{
+    any::Any,
+    slice::{Iter, IterMut},
+};
 
 pub struct ComponentManager<T>
 where

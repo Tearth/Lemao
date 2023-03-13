@@ -2,8 +2,7 @@ use std::collections::VecDeque;
 use std::slice::Iter;
 use std::slice::IterMut;
 
-#[derive(Default)]
-pub struct Entity {}
+use super::Entity;
 
 #[derive(Default)]
 pub struct EntityManager {

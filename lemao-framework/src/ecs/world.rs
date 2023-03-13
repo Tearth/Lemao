@@ -1,13 +1,14 @@
 use super::bus::MessageBus;
+use super::components::storage::ComponentManager;
+use super::components::storage::ComponentManagerTrait;
 use super::components::Component;
-use super::components::ComponentManager;
-use super::components::ComponentManagerTrait;
-use super::entites::Entity;
-use super::entites::EntityManager;
+use super::entities::storage::EntityManager;
+use super::entities::Entity;
 use super::systems::System;
 use crate::app::Application;
 use lemao_core::lemao_common_platform::input::InputEvent;
 use std::any::TypeId;
+use std::cell::Cell;
 use std::collections::HashMap;
 use std::sync::Arc;
 use std::sync::RwLock;
@@ -18,7 +19,7 @@ where
     M: Copy,
 {
     pub entities: EntityManager,
-    pub components: HashMap<TypeId, Arc<RwLock<Box<dyn ComponentManagerTrait>>>>,
+    pub components: HashMap<TypeId, Box<dyn ComponentManagerTrait>>,
     pub systems: Arc<RwLock<Vec<Box<dyn System<G, S, M>>>>>,
     pub bus: MessageBus<M>,
 }
@@ -43,7 +44,7 @@ where
         self.entities.remove(entity_id)?;
 
         for component_manager in self.components.values_mut() {
-            let mut component_manager = component_manager.write().unwrap();
+            let mut component_manager = component_manager;
 
             if component_manager.contains(entity_id) {
                 component_manager.remove(entity_id)?;
@@ -61,7 +62,7 @@ where
             return Err("Component already registered".to_string());
         }
 
-        self.components.insert(TypeId::of::<T>(), Arc::new(RwLock::new(Box::new(ComponentManager::<T>::new()))));
+        self.components.insert(TypeId::of::<T>(), Box::new(ComponentManager::<T>::new()));
         Ok(())
     }
 
@@ -71,8 +72,7 @@ where
     {
         match self.components.get_mut(&TypeId::of::<T>()) {
             Some(component_manager) => {
-                let mut components = component_manager.write().unwrap();
-                let component_manager = components.as_any_mut().downcast_mut::<ComponentManager<T>>().unwrap();
+                let component_manager = component_manager.as_any_mut().downcast_mut::<ComponentManager<T>>().unwrap();
                 component_manager.store(entity_id, component)?;
 
                 Ok(())

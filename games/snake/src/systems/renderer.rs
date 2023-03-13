@@ -6,7 +6,7 @@ use crate::scenes::game::GameScene;
 use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_framework::app::Application;
-use lemao_framework::ecs::components::ComponentManager;
+use lemao_framework::ecs::components::ComponentManagerHashMap;
 use lemao_framework::ecs::systems::System;
 use lemao_framework::ecs::world::World;
 use std::any::TypeId;
@@ -22,13 +22,7 @@ impl System<GlobalAppData, GameScene, Message> for RendererSystem {
         world: &mut World<GlobalAppData, GameScene, Message>,
         _input: &[InputEvent],
     ) -> Result<(), String> {
-        let sprites = world.components.get_mut(&TypeId::of::<SpriteComponent>()).unwrap().clone();
-        let mut sprites = sprites.write().unwrap();
-        let sprites = sprites.as_any_mut().downcast_mut::<ComponentManager<SpriteComponent>>().unwrap();
-
-        let positions = world.components.get_mut(&TypeId::of::<PositionComponent>()).unwrap().clone();
-        let mut positions = positions.write().unwrap();
-        let positions = positions.as_any_mut().downcast_mut::<ComponentManager<PositionComponent>>().unwrap();
+        let (sprites, positions) = world.components.get_component_managers_2::<SpriteComponent, PositionComponent>();
 
         for sprite in sprites.iter_mut() {
             let position = positions.get_mut(sprite.entity_id)?;
