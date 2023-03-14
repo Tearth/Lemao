@@ -20,7 +20,7 @@ impl System<GlobalAppData, GameScene, Message> for BodySystem {
         world: &mut World<GlobalAppData, GameScene, Message>,
         _input: &[InputEvent],
     ) -> Result<(), String> {
-        while let Some(message) = world.bus.poll_message::<Self>() {
+        while let Some(message) = world.messages.poll_message::<Self>() {
             match message {
                 Message::GameTick => {
                     let bodies = world.components.get_component_managers_1::<BodyComponent>();

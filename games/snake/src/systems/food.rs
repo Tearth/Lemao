@@ -27,7 +27,7 @@ impl System<GlobalAppData, GameScene, Message> for FoodSystem {
         world: &mut World<GlobalAppData, GameScene, Message>,
         _input: &[InputEvent],
     ) -> Result<(), String> {
-        while let Some(message) = world.bus.poll_message::<Self>() {
+        while let Some(message) = world.messages.poll_message::<Self>() {
             match message {
                 Message::GameTick => {
                     let foods = world.components.get_component_managers_1::<FoodComponent>();
@@ -73,7 +73,7 @@ impl System<GlobalAppData, GameScene, Message> for FoodSystem {
                         // drop(positions);
 
                         for position in new_food_positions {
-                            let food_id = world.create_entity();
+                            let food_id = world.entities.create();
                             let mut food_rectangle = app.renderer.create_rectangle()?;
                             food_rectangle.size = app.global_data.cell_size;
                             food_rectangle.set_texture(app.renderer.textures.get_by_name("food")?);

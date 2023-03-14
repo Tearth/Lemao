@@ -24,7 +24,7 @@ impl System<GlobalAppData, GameScene, Message> for InitSystem {
     ) -> Result<(), String> {
         for row in 0..app.global_data.board_height {
             for col in 0..app.global_data.board_width {
-                let cell_id = world.create_entity();
+                let cell_id = world.entities.create();
                 let mut rectangle = app.renderer.create_rectangle()?;
                 rectangle.size = app.global_data.cell_size;
 
@@ -43,7 +43,7 @@ impl System<GlobalAppData, GameScene, Message> for InitSystem {
             }
         }
 
-        let head_id = world.create_entity();
+        let head_id = world.entities.create();
         let mut head_rectangle = app.renderer.create_rectangle()?;
         head_rectangle.size = app.global_data.cell_size;
         head_rectangle.set_texture(app.renderer.textures.get_by_name("head")?);

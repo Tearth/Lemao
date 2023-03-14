@@ -11,9 +11,9 @@ pub struct EntityManager {
 }
 
 impl EntityManager {
-    pub fn store(&mut self, item: Entity) -> usize {
+    pub fn create(&mut self) -> usize {
         let id = self.get_new_id();
-        self.data[id] = Some(item);
+        self.data[id] = Some(Default::default());
 
         id
     }

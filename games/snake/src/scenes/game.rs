@@ -22,6 +22,7 @@ use lemao_core::renderer::textures::Texture;
 use lemao_framework::app::Application;
 use lemao_framework::app::Scene;
 use lemao_framework::assets::AssetsLoader;
+use lemao_framework::ecs::components::list::ComponentList;
 use lemao_framework::ecs::systems::System;
 use lemao_framework::ecs::world::World;
 use lemao_ui::context::UiContext;
@@ -76,21 +77,25 @@ impl Scene<GlobalAppData> for GameScene {
         let world = self.world.clone();
         let mut world = world.write().unwrap();
 
-        world.register_component::<BodyComponent>()?;
-        world.register_component::<CellComponent>()?;
-        world.register_component::<FoodComponent>()?;
-        world.register_component::<HeadComponent>()?;
-        world.register_component::<ObstacleComponent>()?;
-        world.register_component::<PositionComponent>()?;
-        world.register_component::<SpriteComponent>()?;
+        world.components.store::<BodyComponent>(Box::new(ComponentList::<BodyComponent>::new()))?;
+        world.components.store::<CellComponent>(Box::new(ComponentList::<CellComponent>::new()))?;
+        world.components.store::<FoodComponent>(Box::new(ComponentList::<FoodComponent>::new()))?;
+        world.components.store::<HeadComponent>(Box::new(ComponentList::<HeadComponent>::new()))?;
+        world.components.store::<ObstacleComponent>(Box::new(ComponentList::<ObstacleComponent>::new()))?;
+        world.components.store::<PositionComponent>(Box::new(ComponentList::<PositionComponent>::new()))?;
+        world.components.store::<SpriteComponent>(Box::new(ComponentList::<SpriteComponent>::new()))?;
 
-        world.create_system::<BodySystem>(Box::<BodySystem>::default())?;
-        world.create_system::<HeadSystem>(Box::<HeadSystem>::default())?;
-        world.create_system::<FoodSystem>(Box::<FoodSystem>::default())?;
-        world.create_system::<GuiSystem>(Box::<GuiSystem>::default())?;
-        world.create_system::<RendererSystem>(Box::<RendererSystem>::default())?;
-        world.create_system::<SyncSystem>(Box::<SyncSystem>::default())?;
-        world.create_system::<WindowSystem>(Box::<WindowSystem>::default())?;
+        world.systems.write().unwrap().store(Box::<BodySystem>::default())?;
+        world.systems.write().unwrap().store(Box::<HeadSystem>::default())?;
+        world.systems.write().unwrap().store(Box::<FoodSystem>::default())?;
+        world.systems.write().unwrap().store(Box::<GuiSystem>::default())?;
+        world.systems.write().unwrap().store(Box::<RendererSystem>::default())?;
+        world.systems.write().unwrap().store(Box::<SyncSystem>::default())?;
+        world.systems.write().unwrap().store(Box::<WindowSystem>::default())?;
+
+        world.messages.register_receiver::<BodySystem>()?;
+        world.messages.register_receiver::<HeadSystem>()?;
+        world.messages.register_receiver::<FoodSystem>()?;
 
         InitSystem::default().update(app, self, &mut world, &Vec::new())?;
 

@@ -55,7 +55,7 @@ impl System<GlobalAppData, GameScene, Message> for HeadSystem {
             }
         }
 
-        while let Some(message) = world.bus.poll_message::<Self>() {
+        while let Some(message) = world.messages.poll_message::<Self>() {
             match message {
                 Message::GameTick => {
                     let (heads, positions) = world.components.get_component_managers_2::<HeadComponent, PositionComponent>();
@@ -77,7 +77,7 @@ impl System<GlobalAppData, GameScene, Message> for HeadSystem {
                     // drop(heads);
                     // drop(positions);
 
-                    let body_id = world.create_entity();
+                    let body_id = world.entities.create();
                     let mut body_rectangle = app.renderer.create_rectangle()?;
                     body_rectangle.size = app.global_data.cell_size;
                     body_rectangle.set_texture(app.renderer.textures.get_by_name("body")?);

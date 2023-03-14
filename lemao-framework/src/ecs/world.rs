@@ -1,9 +1,11 @@
 use super::bus::MessageBus;
-use super::components::storage::ComponentManager;
-use super::components::storage::ComponentManagerTrait;
+use super::components::list::ComponentList;
+use super::components::list::ComponentListTrait;
+use super::components::manager::ComponentManager;
 use super::components::Component;
 use super::entities::storage::EntityManager;
 use super::entities::Entity;
+use super::systems::list::SystemList;
 use super::systems::System;
 use crate::app::Application;
 use lemao_core::lemao_common_platform::input::InputEvent;
@@ -19,9 +21,9 @@ where
     M: Copy,
 {
     pub entities: EntityManager,
-    pub components: HashMap<TypeId, Box<dyn ComponentManagerTrait>>,
-    pub systems: Arc<RwLock<Vec<Box<dyn System<G, S, M>>>>>,
-    pub bus: MessageBus<M>,
+    pub components: ComponentManager,
+    pub systems: Arc<RwLock<SystemList<G, S, M>>>,
+    pub messages: MessageBus<M>,
 }
 
 impl<G, S, M> World<G, S, M>
@@ -29,11 +31,12 @@ where
     M: Copy,
 {
     pub fn new() -> Self {
-        Self { entities: Default::default(), components: Default::default(), systems: Default::default(), bus: MessageBus::<M>::new() }
-    }
-
-    pub fn create_entity(&mut self) -> usize {
-        self.entities.store(Entity::default())
+        Self {
+            entities: Default::default(),
+            components: Default::default(),
+            systems: Arc::new(RwLock::new(SystemList::<G, S, M>::new())),
+            messages: MessageBus::<M>::new(),
+        }
     }
 
     pub fn remove_entity(&mut self, entity_id: usize) -> Result<(), String> {
@@ -43,7 +46,7 @@ where
 
         self.entities.remove(entity_id)?;
 
-        for component_manager in self.components.values_mut() {
+        for component_manager in self.components.iter_mut() {
             let mut component_manager = component_manager;
 
             if component_manager.contains(entity_id) {
@@ -51,18 +54,6 @@ where
             }
         }
 
-        Ok(())
-    }
-
-    pub fn register_component<T>(&mut self) -> Result<(), String>
-    where
-        T: Component + 'static,
-    {
-        if self.components.contains_key(&TypeId::of::<T>()) {
-            return Err("Component already registered".to_string());
-        }
-
-        self.components.insert(TypeId::of::<T>(), Box::new(ComponentManager::<T>::new()));
         Ok(())
     }
 
@@ -80,17 +71,6 @@ where
             None => Err("Invalid component".to_string()),
         }
     }
-
-    pub fn create_system<T>(&mut self, system: Box<dyn System<G, S, M>>) -> Result<(), String>
-    where
-        T: 'static,
-    {
-        self.systems.write().unwrap().push(system);
-        self.bus.register_receiver::<T>()?;
-
-        Ok(())
-    }
-
     pub fn update(&mut self, app: &mut Application<G>, scene: &mut S, input: &[InputEvent]) -> Result<(), String> {
         let systems = self.systems.clone();
         let mut systems = systems.write().unwrap();

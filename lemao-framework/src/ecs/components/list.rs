@@ -4,7 +4,7 @@ use std::{
     slice::{Iter, IterMut},
 };
 
-pub struct ComponentManager<T>
+pub struct ComponentList<T>
 where
     T: Component + 'static,
 {
@@ -12,7 +12,7 @@ where
     data: Vec<T>,
 }
 
-pub trait ComponentManagerTrait {
+pub trait ComponentListTrait {
     fn contains(&self, id: usize) -> bool;
     fn remove(&mut self, entity_id: usize) -> Result<(), String>;
 
@@ -20,7 +20,7 @@ pub trait ComponentManagerTrait {
     fn as_any_mut(&mut self) -> &mut dyn Any;
 }
 
-impl<T> ComponentManager<T>
+impl<T> ComponentList<T>
 where
     T: Component + 'static,
 {
@@ -81,7 +81,7 @@ where
     }
 }
 
-impl<T> ComponentManagerTrait for ComponentManager<T>
+impl<T> ComponentListTrait for ComponentList<T>
 where
     T: Component + 'static,
 {
