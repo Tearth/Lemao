@@ -4,6 +4,7 @@ use crate::messages::Message;
 use crate::scenes::game::GameScene;
 use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_framework::app::Application;
+use lemao_framework::ecs::commands::kill::KillCommand;
 use lemao_framework::ecs::components::ComponentManagerHashMap;
 use lemao_framework::ecs::systems::System;
 use lemao_framework::ecs::world::World;
@@ -34,10 +35,8 @@ impl System<GlobalAppData, GameScene, Message> for BodySystem {
                         }
                     }
 
-                    //drop(bodies);
-
                     for entity_id in entites_to_remove {
-                        world.remove_entity(entity_id)?;
+                        world.commands.write().unwrap().send(Box::new(KillCommand::new(entity_id)));
                     }
                 }
             }

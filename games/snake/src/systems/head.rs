@@ -8,6 +8,7 @@ use crate::scenes::game::GameScene;
 use lemao_core::lemao_common_platform::input::{InputEvent, Key};
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_framework::app::Application;
+use lemao_framework::ecs::commands::spawn::SpawnCommand;
 use lemao_framework::ecs::components::ComponentManagerHashMap;
 use lemao_framework::ecs::systems::System;
 use lemao_framework::ecs::world::World;
@@ -74,18 +75,15 @@ impl System<GlobalAppData, GameScene, Message> for HeadSystem {
 
                     position.changed = true;
 
-                    // drop(heads);
-                    // drop(positions);
-
                     let body_id = world.entities.create();
                     let mut body_rectangle = app.renderer.create_rectangle()?;
                     body_rectangle.size = app.global_data.cell_size;
                     body_rectangle.set_texture(app.renderer.textures.get_by_name("body")?);
                     body_rectangle.update();
 
-                    world.create_component(body_id, BodyComponent::new(body_id, scene.lifetime))?;
-                    world.create_component(body_id, PositionComponent::new(body_id, last_row, last_col))?;
-                    world.create_component(body_id, SpriteComponent::new(body_id, body_rectangle))?;
+                    world.commands.write().unwrap().send(Box::new(SpawnCommand::new(body_id, BodyComponent::new(body_id, scene.lifetime))));
+                    world.commands.write().unwrap().send(Box::new(SpawnCommand::new(body_id, PositionComponent::new(body_id, last_row, last_col))));
+                    world.commands.write().unwrap().send(Box::new(SpawnCommand::new(body_id, SpriteComponent::new(body_id, body_rectangle))));
                 }
             }
         }

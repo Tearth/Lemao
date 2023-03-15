@@ -8,6 +8,7 @@ use crate::messages::Message;
 use crate::scenes::game::GameScene;
 use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_framework::app::Application;
+use lemao_framework::ecs::commands::spawn::SpawnCommand;
 use lemao_framework::ecs::systems::System;
 use lemao_framework::ecs::world::World;
 
@@ -30,16 +31,16 @@ impl System<GlobalAppData, GameScene, Message> for InitSystem {
 
                 if row == 0 || row == app.global_data.board_height - 1 || col == 0 || col == app.global_data.board_width - 1 {
                     rectangle.set_texture(app.renderer.textures.get_by_name("border")?);
-                    world.create_component(cell_id, ObstacleComponent::new(cell_id))?;
+                    world.commands.write().unwrap().send(Box::new(SpawnCommand::new(cell_id, ObstacleComponent::new(cell_id))));
                 } else {
                     rectangle.set_texture(app.renderer.textures.get_by_name("cell")?);
-                    world.create_component(cell_id, CellComponent::new(cell_id))?;
+                    world.commands.write().unwrap().send(Box::new(SpawnCommand::new(cell_id, CellComponent::new(cell_id))));
                 }
 
                 rectangle.update();
 
-                world.create_component(cell_id, PositionComponent::new(cell_id, row, col))?;
-                world.create_component(cell_id, SpriteComponent::new(cell_id, rectangle))?;
+                world.commands.write().unwrap().send(Box::new(SpawnCommand::new(cell_id, PositionComponent::new(cell_id, row, col))));
+                world.commands.write().unwrap().send(Box::new(SpawnCommand::new(cell_id, SpriteComponent::new(cell_id, rectangle))));
             }
         }
 
@@ -49,9 +50,13 @@ impl System<GlobalAppData, GameScene, Message> for InitSystem {
         head_rectangle.set_texture(app.renderer.textures.get_by_name("head")?);
         head_rectangle.update();
 
-        world.create_component(head_id, HeadComponent::new(head_id, HeadDirection::Right))?;
-        world.create_component(head_id, PositionComponent::new(head_id, app.global_data.board_height / 2, app.global_data.board_width / 2))?;
-        world.create_component(head_id, SpriteComponent::new(head_id, head_rectangle))?;
+        world.commands.write().unwrap().send(Box::new(SpawnCommand::new(head_id, HeadComponent::new(head_id, HeadDirection::Right))));
+        world
+            .commands
+            .write()
+            .unwrap()
+            .send(Box::new(SpawnCommand::new(head_id, PositionComponent::new(head_id, app.global_data.board_height / 2, app.global_data.board_width / 2))));
+        world.commands.write().unwrap().send(Box::new(SpawnCommand::new(head_id, SpriteComponent::new(head_id, head_rectangle))));
 
         Ok(())
     }

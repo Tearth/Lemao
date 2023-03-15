@@ -12,6 +12,8 @@ use crate::scenes::game::GameScene;
 use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::utils::rand;
 use lemao_framework::app::Application;
+use lemao_framework::ecs::commands::kill::KillCommand;
+use lemao_framework::ecs::commands::spawn::SpawnCommand;
 use lemao_framework::ecs::components::ComponentManagerHashMap;
 use lemao_framework::ecs::systems::System;
 use lemao_framework::ecs::world::World;
@@ -38,14 +40,11 @@ impl System<GlobalAppData, GameScene, Message> for FoodSystem {
                             entites_to_remove.push(body.entity_id);
                         }
 
-                        // drop(foods);
-
                         for entity_id in entites_to_remove {
-                            world.remove_entity(entity_id)?;
+                            world.commands.write().unwrap().send(Box::new(KillCommand::new(entity_id)));
                         }
 
-                        let (foods, heads, bodies, positions) =
-                            world.components.get_component_managers_4::<FoodComponent, HeadComponent, BodyComponent, PositionComponent>();
+                        let (heads, bodies, positions) = world.components.get_component_managers_3::<HeadComponent, BodyComponent, PositionComponent>();
 
                         let mut forbidden_positions = heads.iter().map(|h| positions.get(h.entity_id).unwrap()).collect::<Vec<&PositionComponent>>();
                         forbidden_positions.extend(bodies.iter().map(|h| positions.get(h.entity_id).unwrap()));
@@ -67,11 +66,6 @@ impl System<GlobalAppData, GameScene, Message> for FoodSystem {
                             new_food_positions.push((row, col));
                         }
 
-                        // drop(foods);
-                        // drop(heads);
-                        // drop(bodies);
-                        // drop(positions);
-
                         for position in new_food_positions {
                             let food_id = world.entities.create();
                             let mut food_rectangle = app.renderer.create_rectangle()?;
@@ -79,9 +73,9 @@ impl System<GlobalAppData, GameScene, Message> for FoodSystem {
                             food_rectangle.set_texture(app.renderer.textures.get_by_name("food")?);
                             food_rectangle.update();
 
-                            world.create_component(food_id, FoodComponent::new(food_id))?;
-                            world.create_component(food_id, PositionComponent::new(food_id, position.0, position.1))?;
-                            world.create_component(food_id, SpriteComponent::new(food_id, food_rectangle))?;
+                            world.commands.write().unwrap().send(Box::new(SpawnCommand::new(food_id, FoodComponent::new(food_id))));
+                            world.commands.write().unwrap().send(Box::new(SpawnCommand::new(food_id, PositionComponent::new(food_id, position.0, position.1))));
+                            world.commands.write().unwrap().send(Box::new(SpawnCommand::new(food_id, SpriteComponent::new(food_id, food_rectangle))));
                         }
 
                         scene.food_last_refresh_time = SystemTime::now();

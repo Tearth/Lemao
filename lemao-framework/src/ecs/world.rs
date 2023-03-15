@@ -1,4 +1,5 @@
 use super::bus::MessageBus;
+use super::commands::CommandBus;
 use super::components::list::ComponentList;
 use super::components::list::ComponentListTrait;
 use super::components::manager::ComponentManager;
@@ -15,7 +16,6 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use std::sync::RwLock;
 
-#[derive(Default)]
 pub struct World<G, S, M>
 where
     M: Copy,
@@ -23,6 +23,7 @@ where
     pub entities: EntityManager,
     pub components: ComponentManager,
     pub systems: Arc<RwLock<SystemList<G, S, M>>>,
+    pub commands: Arc<RwLock<CommandBus<G, S, M>>>,
     pub messages: MessageBus<M>,
 }
 
@@ -35,48 +36,24 @@ where
             entities: Default::default(),
             components: Default::default(),
             systems: Arc::new(RwLock::new(SystemList::<G, S, M>::new())),
+            commands: Arc::new(RwLock::new(CommandBus::new())),
             messages: MessageBus::<M>::new(),
         }
     }
 
-    pub fn remove_entity(&mut self, entity_id: usize) -> Result<(), String> {
-        if !self.entities.contains(entity_id) {
-            return Err("Entity not found".to_string());
-        }
-
-        self.entities.remove(entity_id)?;
-
-        for component_manager in self.components.iter_mut() {
-            let mut component_manager = component_manager;
-
-            if component_manager.contains(entity_id) {
-                component_manager.remove(entity_id)?;
-            }
-        }
-
-        Ok(())
-    }
-
-    pub fn create_component<T>(&mut self, entity_id: usize, component: T) -> Result<(), String>
-    where
-        T: Component + 'static,
-    {
-        match self.components.get_mut(&TypeId::of::<T>()) {
-            Some(component_manager) => {
-                let component_manager = component_manager.as_any_mut().downcast_mut::<ComponentManager<T>>().unwrap();
-                component_manager.store(entity_id, component)?;
-
-                Ok(())
-            }
-            None => Err("Invalid component".to_string()),
-        }
-    }
     pub fn update(&mut self, app: &mut Application<G>, scene: &mut S, input: &[InputEvent]) -> Result<(), String> {
         let systems = self.systems.clone();
         let mut systems = systems.write().unwrap();
 
         for system in &mut systems.iter_mut() {
             system.update(app, scene, self, input)?;
+
+            let commands = self.commands.clone();
+            let mut commands = commands.write().unwrap();
+
+            while let Some(command) = commands.poll_message() {
+                command.execute(self)?;
+            }
         }
 
         Ok(())
