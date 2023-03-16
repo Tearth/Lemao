@@ -1,4 +1,5 @@
 use crate::components::body::BodyComponent;
+use crate::components::food::FoodComponent;
 use crate::components::head::{HeadComponent, HeadDirection};
 use crate::components::position::PositionComponent;
 use crate::components::sprite::SpriteComponent;
@@ -8,7 +9,9 @@ use crate::scenes::game::GameScene;
 use lemao_core::lemao_common_platform::input::{InputEvent, Key};
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_framework::app::Application;
+use lemao_framework::ecs::commands::kill::KillCommand;
 use lemao_framework::ecs::commands::spawn::SpawnCommand;
+use lemao_framework::ecs::components::list::ComponentListTrait;
 use lemao_framework::ecs::components::ComponentManagerHashMap;
 use lemao_framework::ecs::systems::System;
 use lemao_framework::ecs::world::World;
@@ -59,21 +62,38 @@ impl System<GlobalAppData, GameScene, Message> for HeadSystem {
         while let Some(message) = world.messages.poll_message::<Self>() {
             match message {
                 Message::GameTick => {
-                    let (heads, positions) = world.components.get_many_mut_2::<HeadComponent, PositionComponent>();
+                    let (heads, bodies, foods, positions) = world.components.get_many_mut_4::<HeadComponent, BodyComponent, FoodComponent, PositionComponent>();
                     let head = heads.iter_mut().next().unwrap();
 
                     let position = positions.get_mut(head.entity_id)?;
                     let last_row = position.row;
                     let last_col = position.col;
+                    let mut new_row = last_row;
+                    let mut new_col = last_col;
 
                     match head.direction {
-                        HeadDirection::Up => position.row += 1,
-                        HeadDirection::Down => position.row -= 1,
-                        HeadDirection::Right => position.col += 1,
-                        HeadDirection::Left => position.col -= 1,
+                        HeadDirection::Up => new_row += 1,
+                        HeadDirection::Down => new_row -= 1,
+                        HeadDirection::Right => new_col += 1,
+                        HeadDirection::Left => new_col -= 1,
                     }
 
+                    position.row = new_row;
+                    position.col = new_col;
                     position.changed = true;
+
+                    for food in foods.iter() {
+                        let food_position = positions.get(food.entity_id)?;
+                        if food_position.row == new_row && food_position.col == new_col {
+                            scene.lifetime += 1;
+
+                            for body in bodies.iter_mut() {
+                                body.lifetime += 1;
+                            }
+
+                            world.commands.send(Box::new(KillCommand::new(food_position.entity_id)));
+                        }
+                    }
 
                     let body_id = world.entities.create();
                     let mut body_rectangle = app.renderer.create_rectangle()?;
