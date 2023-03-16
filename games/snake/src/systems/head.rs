@@ -27,7 +27,7 @@ impl System<GlobalAppData, GameScene, Message> for HeadSystem {
     ) -> Result<(), String> {
         for event in input {
             if let InputEvent::KeyPressed(key) = event {
-                let heads = world.components.get_component_managers_1::<HeadComponent>();
+                let heads = world.components.get_many_mut_1::<HeadComponent>();
                 let head = heads.iter_mut().next().unwrap();
 
                 match key {
@@ -59,7 +59,7 @@ impl System<GlobalAppData, GameScene, Message> for HeadSystem {
         while let Some(message) = world.messages.poll_message::<Self>() {
             match message {
                 Message::GameTick => {
-                    let (heads, positions) = world.components.get_component_managers_2::<HeadComponent, PositionComponent>();
+                    let (heads, positions) = world.components.get_many_mut_2::<HeadComponent, PositionComponent>();
                     let head = heads.iter_mut().next().unwrap();
 
                     let position = positions.get_mut(head.entity_id)?;
@@ -81,9 +81,9 @@ impl System<GlobalAppData, GameScene, Message> for HeadSystem {
                     body_rectangle.set_texture(app.renderer.textures.get_by_name("body")?);
                     body_rectangle.update();
 
-                    world.commands.write().unwrap().send(Box::new(SpawnCommand::new(body_id, BodyComponent::new(body_id, scene.lifetime))));
-                    world.commands.write().unwrap().send(Box::new(SpawnCommand::new(body_id, PositionComponent::new(body_id, last_row, last_col))));
-                    world.commands.write().unwrap().send(Box::new(SpawnCommand::new(body_id, SpriteComponent::new(body_id, body_rectangle))));
+                    world.commands.send(Box::new(SpawnCommand::new(body_id, BodyComponent::new(body_id, scene.lifetime))));
+                    world.commands.send(Box::new(SpawnCommand::new(body_id, PositionComponent::new(body_id, last_row, last_col))));
+                    world.commands.send(Box::new(SpawnCommand::new(body_id, SpriteComponent::new(body_id, body_rectangle))));
                 }
             }
         }

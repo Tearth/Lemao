@@ -24,19 +24,14 @@ impl System<GlobalAppData, GameScene, Message> for BodySystem {
         while let Some(message) = world.messages.poll_message::<Self>() {
             match message {
                 Message::GameTick => {
-                    let bodies = world.components.get_component_managers_1::<BodyComponent>();
+                    let bodies = world.components.get_many_mut_1::<BodyComponent>();
 
-                    let mut entites_to_remove = Vec::new();
                     for body in bodies.iter_mut() {
                         body.lifetime -= 1;
 
                         if body.lifetime == 0 {
-                            entites_to_remove.push(body.entity_id);
+                            world.commands.send(Box::new(KillCommand::new(body.entity_id)));
                         }
-                    }
-
-                    for entity_id in entites_to_remove {
-                        world.commands.write().unwrap().send(Box::new(KillCommand::new(entity_id)));
                     }
                 }
             }

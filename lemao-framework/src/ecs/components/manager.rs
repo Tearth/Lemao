@@ -54,17 +54,7 @@ impl ComponentManager {
         }
     }
 
-    pub fn iter(&self) -> Values<TypeId, Box<dyn ComponentListTrait>> {
-        self.data.values()
-    }
-
-    pub fn iter_mut(&mut self) -> ValuesMut<TypeId, Box<dyn ComponentListTrait>> {
-        self.data.values_mut()
-    }
-
-    ///////////////
-
-    pub fn get_component_managers_1<C1>(&mut self) -> (&mut ComponentList<C1>)
+    pub fn get_many_mut_1<C1>(&mut self) -> (&mut ComponentList<C1>)
     where
         C1: Component + 'static,
     {
@@ -72,7 +62,7 @@ impl ComponentManager {
         a.as_any_mut().downcast_mut::<ComponentList<C1>>().unwrap()
     }
 
-    pub fn get_component_managers_2<C1, C2>(&mut self) -> (&mut ComponentList<C1>, &mut ComponentList<C2>)
+    pub fn get_many_mut_2<C1, C2>(&mut self) -> (&mut ComponentList<C1>, &mut ComponentList<C2>)
     where
         C1: Component + 'static,
         C2: Component + 'static,
@@ -81,7 +71,7 @@ impl ComponentManager {
         (a.as_any_mut().downcast_mut::<ComponentList<C1>>().unwrap(), b.as_any_mut().downcast_mut::<ComponentList<C2>>().unwrap())
     }
 
-    pub fn get_component_managers_3<C1, C2, C3>(&mut self) -> (&mut ComponentList<C1>, &mut ComponentList<C2>, &mut ComponentList<C3>)
+    pub fn get_many_mut_3<C1, C2, C3>(&mut self) -> (&mut ComponentList<C1>, &mut ComponentList<C2>, &mut ComponentList<C3>)
     where
         C1: Component + 'static,
         C2: Component + 'static,
@@ -95,9 +85,7 @@ impl ComponentManager {
         )
     }
 
-    pub fn get_component_managers_4<C1, C2, C3, C4>(
-        &mut self,
-    ) -> (&mut ComponentList<C1>, &mut ComponentList<C2>, &mut ComponentList<C3>, &mut ComponentList<C4>)
+    pub fn get_many_mut_4<C1, C2, C3, C4>(&mut self) -> (&mut ComponentList<C1>, &mut ComponentList<C2>, &mut ComponentList<C3>, &mut ComponentList<C4>)
     where
         C1: Component + 'static,
         C2: Component + 'static,
@@ -111,5 +99,13 @@ impl ComponentManager {
             c.as_any_mut().downcast_mut::<ComponentList<C3>>().unwrap(),
             d.as_any_mut().downcast_mut::<ComponentList<C4>>().unwrap(),
         )
+    }
+
+    pub fn iter(&self) -> Values<TypeId, Box<dyn ComponentListTrait>> {
+        self.data.values()
+    }
+
+    pub fn iter_mut(&mut self) -> ValuesMut<TypeId, Box<dyn ComponentListTrait>> {
+        self.data.values_mut()
     }
 }

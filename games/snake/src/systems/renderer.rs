@@ -22,7 +22,7 @@ impl System<GlobalAppData, GameScene, Message> for RendererSystem {
         world: &mut World<GlobalAppData, GameScene, Message>,
         _input: &[InputEvent],
     ) -> Result<(), String> {
-        let (sprites, positions) = world.components.get_component_managers_2::<SpriteComponent, PositionComponent>();
+        let (sprites, positions) = world.components.get_many_mut_2::<SpriteComponent, PositionComponent>();
 
         for sprite in sprites.iter_mut() {
             let position = positions.get_mut(sprite.entity_id)?;

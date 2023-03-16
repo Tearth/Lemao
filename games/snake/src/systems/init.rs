@@ -31,16 +31,16 @@ impl System<GlobalAppData, GameScene, Message> for InitSystem {
 
                 if row == 0 || row == app.global_data.board_height - 1 || col == 0 || col == app.global_data.board_width - 1 {
                     rectangle.set_texture(app.renderer.textures.get_by_name("border")?);
-                    world.commands.write().unwrap().send(Box::new(SpawnCommand::new(cell_id, ObstacleComponent::new(cell_id))));
+                    world.commands.send(Box::new(SpawnCommand::new(cell_id, ObstacleComponent::new(cell_id))));
                 } else {
                     rectangle.set_texture(app.renderer.textures.get_by_name("cell")?);
-                    world.commands.write().unwrap().send(Box::new(SpawnCommand::new(cell_id, CellComponent::new(cell_id))));
+                    world.commands.send(Box::new(SpawnCommand::new(cell_id, CellComponent::new(cell_id))));
                 }
 
                 rectangle.update();
 
-                world.commands.write().unwrap().send(Box::new(SpawnCommand::new(cell_id, PositionComponent::new(cell_id, row, col))));
-                world.commands.write().unwrap().send(Box::new(SpawnCommand::new(cell_id, SpriteComponent::new(cell_id, rectangle))));
+                world.commands.send(Box::new(SpawnCommand::new(cell_id, PositionComponent::new(cell_id, row, col))));
+                world.commands.send(Box::new(SpawnCommand::new(cell_id, SpriteComponent::new(cell_id, rectangle))));
             }
         }
 
@@ -50,13 +50,11 @@ impl System<GlobalAppData, GameScene, Message> for InitSystem {
         head_rectangle.set_texture(app.renderer.textures.get_by_name("head")?);
         head_rectangle.update();
 
-        world.commands.write().unwrap().send(Box::new(SpawnCommand::new(head_id, HeadComponent::new(head_id, HeadDirection::Right))));
+        world.commands.send(Box::new(SpawnCommand::new(head_id, HeadComponent::new(head_id, HeadDirection::Right))));
         world
             .commands
-            .write()
-            .unwrap()
             .send(Box::new(SpawnCommand::new(head_id, PositionComponent::new(head_id, app.global_data.board_height / 2, app.global_data.board_width / 2))));
-        world.commands.write().unwrap().send(Box::new(SpawnCommand::new(head_id, SpriteComponent::new(head_id, head_rectangle))));
+        world.commands.send(Box::new(SpawnCommand::new(head_id, SpriteComponent::new(head_id, head_rectangle))));
 
         Ok(())
     }

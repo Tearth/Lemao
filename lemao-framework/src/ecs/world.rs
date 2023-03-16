@@ -23,7 +23,7 @@ where
     pub entities: EntityManager,
     pub components: ComponentManager,
     pub systems: Arc<RwLock<SystemList<G, S, M>>>,
-    pub commands: Arc<RwLock<CommandBus<G, S, M>>>,
+    pub commands: CommandBus<G, S, M>,
     pub messages: MessageBus<M>,
 }
 
@@ -36,7 +36,7 @@ where
             entities: Default::default(),
             components: Default::default(),
             systems: Arc::new(RwLock::new(SystemList::<G, S, M>::new())),
-            commands: Arc::new(RwLock::new(CommandBus::new())),
+            commands: CommandBus::new(),
             messages: MessageBus::<M>::new(),
         }
     }
@@ -48,10 +48,7 @@ where
         for system in &mut systems.iter_mut() {
             system.update(app, scene, self, input)?;
 
-            let commands = self.commands.clone();
-            let mut commands = commands.write().unwrap();
-
-            while let Some(command) = commands.poll_message() {
+            while let Some(command) = self.commands.poll_message() {
                 command.execute(self)?;
             }
         }

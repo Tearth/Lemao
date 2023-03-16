@@ -32,38 +32,29 @@ impl System<GlobalAppData, GameScene, Message> for FoodSystem {
         while let Some(message) = world.messages.poll_message::<Self>() {
             match message {
                 Message::GameTick => {
-                    let foods = world.components.get_component_managers_1::<FoodComponent>();
+                    let foods = world.components.get_many_mut_1::<FoodComponent>();
 
                     if foods.is_empty() || scene.food_last_refresh_time.elapsed().unwrap().as_millis() >= app.global_data.food_refresh_interval as u128 {
-                        let mut entites_to_remove = Vec::new();
                         for body in foods.iter_mut() {
-                            entites_to_remove.push(body.entity_id);
+                            world.commands.send(Box::new(KillCommand::new(body.entity_id)));
                         }
 
-                        for entity_id in entites_to_remove {
-                            world.commands.write().unwrap().send(Box::new(KillCommand::new(entity_id)));
-                        }
-
-                        let (heads, bodies, positions) = world.components.get_component_managers_3::<HeadComponent, BodyComponent, PositionComponent>();
+                        let (heads, bodies, positions) = world.components.get_many_mut_3::<HeadComponent, BodyComponent, PositionComponent>();
 
                         let mut forbidden_positions = heads.iter().map(|h| positions.get(h.entity_id).unwrap()).collect::<Vec<&PositionComponent>>();
                         forbidden_positions.extend(bodies.iter().map(|h| positions.get(h.entity_id).unwrap()));
 
                         let mut new_food_positions = Vec::new();
                         for _ in 0..app.global_data.food_refresh_amount {
-                            let mut row = 0;
-                            let mut col = 0;
-
                             loop {
-                                row = rand::u8(1..app.global_data.board_height - 2);
-                                col = rand::u8(1..app.global_data.board_width - 2);
+                                let row = rand::u8(1..app.global_data.board_height - 2);
+                                let col = rand::u8(1..app.global_data.board_width - 2);
 
                                 if !forbidden_positions.iter().any(|p| p.row == row && p.col == col) {
+                                    new_food_positions.push((row, col));
                                     break;
                                 }
                             }
-
-                            new_food_positions.push((row, col));
                         }
 
                         for position in new_food_positions {
@@ -73,9 +64,9 @@ impl System<GlobalAppData, GameScene, Message> for FoodSystem {
                             food_rectangle.set_texture(app.renderer.textures.get_by_name("food")?);
                             food_rectangle.update();
 
-                            world.commands.write().unwrap().send(Box::new(SpawnCommand::new(food_id, FoodComponent::new(food_id))));
-                            world.commands.write().unwrap().send(Box::new(SpawnCommand::new(food_id, PositionComponent::new(food_id, position.0, position.1))));
-                            world.commands.write().unwrap().send(Box::new(SpawnCommand::new(food_id, SpriteComponent::new(food_id, food_rectangle))));
+                            world.commands.send(Box::new(SpawnCommand::new(food_id, FoodComponent::new(food_id))));
+                            world.commands.send(Box::new(SpawnCommand::new(food_id, PositionComponent::new(food_id, position.0, position.1))));
+                            world.commands.send(Box::new(SpawnCommand::new(food_id, SpriteComponent::new(food_id, food_rectangle))));
                         }
 
                         scene.food_last_refresh_time = SystemTime::now();
