@@ -22,6 +22,7 @@ impl System<GlobalAppData, GameScene, Message> for GuiSystem {
         }
 
         scene.ui.update(&mut app.renderer)?;
+        scene.ui.draw(&mut app.renderer, scene.score_label_id)?;
 
         Ok(())
     }

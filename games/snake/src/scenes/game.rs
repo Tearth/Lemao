@@ -39,6 +39,8 @@ pub struct GameScene {
     pub time_of_last_tick: SystemTime,
     pub lifetime: u32,
     pub food_last_refresh_time: SystemTime,
+
+    pub score_label_id: usize,
 }
 
 impl GameScene {
@@ -50,6 +52,8 @@ impl GameScene {
             time_of_last_tick: SystemTime::now(),
             lifetime: 3,
             food_last_refresh_time: SystemTime::now(),
+
+            score_label_id: 0,
         }
     }
 }
@@ -88,8 +92,8 @@ impl Scene<GlobalAppData> for GameScene {
         world.systems.write().unwrap().store(Box::<BodySystem>::default())?;
         world.systems.write().unwrap().store(Box::<HeadSystem>::default())?;
         world.systems.write().unwrap().store(Box::<FoodSystem>::default())?;
-        world.systems.write().unwrap().store(Box::<GuiSystem>::default())?;
         world.systems.write().unwrap().store(Box::<RendererSystem>::default())?;
+        world.systems.write().unwrap().store(Box::<GuiSystem>::default())?;
         world.systems.write().unwrap().store(Box::<SyncSystem>::default())?;
         world.systems.write().unwrap().store(Box::<WindowSystem>::default())?;
 

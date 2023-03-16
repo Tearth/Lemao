@@ -87,7 +87,7 @@ impl AssetsLoader {
     }
 
     fn is_extension_allowed(&self, extension: &OsStr) -> bool {
-        let allowed_extension = ["bmp"];
+        let allowed_extension = ["bmp", "bff"];
         allowed_extension.contains(&extension.to_str().unwrap())
     }
 }

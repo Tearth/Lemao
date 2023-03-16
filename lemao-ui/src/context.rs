@@ -280,6 +280,7 @@ impl UiContext {
                 true => SolidColor::new(1.0, 0.0, 0.0, 1.0),
                 false => SolidColor::new(0.2, 0.2, 0.2, 1.0),
             });
+            self.debug_frame.update();
             renderer.draw(&mut self.debug_frame)?;
         }
 

@@ -10,6 +10,6 @@ pub struct GlobalAppData {
 
 impl Default for GlobalAppData {
     fn default() -> Self {
-        Self { board_width: 40, board_height: 30, cell_size: Vec2::new(24.0, 24.0), food_refresh_interval: 2000, food_refresh_amount: 30 }
+        Self { board_width: 40, board_height: 20, cell_size: Vec2::new(24.0, 24.0), food_refresh_interval: 2000, food_refresh_amount: 30 }
     }
 }
