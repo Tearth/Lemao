@@ -254,6 +254,8 @@ impl WindowPlatformSpecific for WindowWinAPI {
                     winapi::SetWindowLongPtrA(self.hwnd, winapi::GWL_STYLE, (winapi::WS_OVERLAPPEDWINDOW | winapi::WS_VISIBLE) as i64);
                     winapi::AdjustWindowRect(&mut rect, winapi::WS_OVERLAPPEDWINDOW, 0);
                     winapi::MoveWindow(self.hwnd, position.x as i32, position.y as i32, rect.right - rect.left, rect.bottom - rect.top, 1);
+
+                    self.size = size;
                 }
                 WindowStyle::Borderless => {
                     let mut rect = mem::zeroed();
