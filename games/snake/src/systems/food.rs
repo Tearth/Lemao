@@ -6,9 +6,9 @@ use crate::components::food::FoodComponent;
 use crate::components::head::HeadComponent;
 use crate::components::position::PositionComponent;
 use crate::components::sprite::SpriteComponent;
-use crate::global::GlobalAppData;
 use crate::messages::Message;
 use crate::scenes::game::GameScene;
+use crate::state::global::GlobalAppData;
 use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::utils::rand;
 use lemao_framework::app::Application;
@@ -34,7 +34,9 @@ impl System<GlobalAppData, GameScene, Message> for FoodSystem {
                 Message::GameTick => {
                     let foods = world.components.get_many_mut_1::<FoodComponent>();
 
-                    if foods.is_empty() || scene.food_last_refresh_time.elapsed().unwrap().as_millis() >= app.global_data.food_refresh_interval as u128 {
+                    if foods.is_empty()
+                        || scene.state.game.food_last_refresh_time.elapsed().unwrap().as_millis() >= app.global_data.food_refresh_interval as u128
+                    {
                         for body in foods.iter_mut() {
                             world.commands.send(Box::new(KillCommand::new(body.entity_id)));
                         }
@@ -69,7 +71,7 @@ impl System<GlobalAppData, GameScene, Message> for FoodSystem {
                             world.commands.send(Box::new(SpawnCommand::new(food_id, SpriteComponent::new(food_id, food_rectangle))));
                         }
 
-                        scene.food_last_refresh_time = SystemTime::now();
+                        scene.state.game.food_last_refresh_time = SystemTime::now();
                     }
                 }
             }

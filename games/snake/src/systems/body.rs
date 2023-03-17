@@ -1,7 +1,7 @@
 use crate::components::body::BodyComponent;
-use crate::global::GlobalAppData;
 use crate::messages::Message;
 use crate::scenes::game::GameScene;
+use crate::state::global::GlobalAppData;
 use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_framework::app::Application;
 use lemao_framework::ecs::commands::kill::KillCommand;

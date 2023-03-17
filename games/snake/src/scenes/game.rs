@@ -5,15 +5,16 @@ use crate::components::head::HeadComponent;
 use crate::components::obstacle::ObstacleComponent;
 use crate::components::position::PositionComponent;
 use crate::components::sprite::SpriteComponent;
-use crate::global::GlobalAppData;
 use crate::messages::Message;
+use crate::state::global::GlobalAppData;
+use crate::state::scene::SceneState;
 use crate::systems::body::BodySystem;
 use crate::systems::food::FoodSystem;
-use crate::systems::gui::GuiSystem;
 use crate::systems::head::HeadSystem;
 use crate::systems::init::InitSystem;
 use crate::systems::renderer::RendererSystem;
 use crate::systems::sync::SyncSystem;
+use crate::systems::ui::UiSystem;
 use crate::systems::window::WindowSystem;
 use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_math::color::SolidColor;
@@ -29,32 +30,16 @@ use lemao_ui::context::UiContext;
 use std::any::Any;
 use std::sync::Arc;
 use std::sync::RwLock;
-use std::time::SystemTime;
 
 pub struct GameScene {
     pub ui: UiContext,
     pub world: Arc<RwLock<World<GlobalAppData, GameScene, Message>>>,
-
-    pub tick_length: u32,
-    pub time_of_last_tick: SystemTime,
-    pub lifetime: u32,
-    pub food_last_refresh_time: SystemTime,
-
-    pub score_label_id: usize,
+    pub state: SceneState,
 }
 
 impl GameScene {
     pub fn new(app: &mut Application<GlobalAppData>) -> Self {
-        Self {
-            ui: UiContext::new(&mut app.renderer).unwrap(),
-            world: Arc::new(RwLock::new(World::new())),
-            tick_length: 500,
-            time_of_last_tick: SystemTime::now(),
-            lifetime: 3,
-            food_last_refresh_time: SystemTime::now(),
-
-            score_label_id: 0,
-        }
+        Self { ui: UiContext::new(&mut app.renderer).unwrap(), world: Arc::new(RwLock::new(World::new())), state: Default::default() }
     }
 }
 
@@ -93,7 +78,7 @@ impl Scene<GlobalAppData> for GameScene {
         world.systems.write().unwrap().store(Box::<HeadSystem>::default())?;
         world.systems.write().unwrap().store(Box::<FoodSystem>::default())?;
         world.systems.write().unwrap().store(Box::<RendererSystem>::default())?;
-        world.systems.write().unwrap().store(Box::<GuiSystem>::default())?;
+        world.systems.write().unwrap().store(Box::<UiSystem>::default())?;
         world.systems.write().unwrap().store(Box::<SyncSystem>::default())?;
         world.systems.write().unwrap().store(Box::<WindowSystem>::default())?;
 

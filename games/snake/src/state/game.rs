@@ -1,0 +1,14 @@
+use std::time::SystemTime;
+
+pub struct GameState {
+    pub tick_length: u32,
+    pub time_of_last_tick: SystemTime,
+    pub lifetime: u32,
+    pub food_last_refresh_time: SystemTime,
+}
+
+impl Default for GameState {
+    fn default() -> Self {
+        Self { tick_length: 500, time_of_last_tick: SystemTime::now(), lifetime: 3, food_last_refresh_time: SystemTime::now() }
+    }
+}

@@ -1,9 +1,9 @@
 use super::body::BodySystem;
 use super::food::FoodSystem;
 use super::head::HeadSystem;
-use crate::global::GlobalAppData;
 use crate::messages::Message;
 use crate::scenes::game::GameScene;
+use crate::state::global::GlobalAppData;
 use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_framework::app::Application;
 use lemao_framework::ecs::systems::System;
@@ -21,9 +21,9 @@ impl System<GlobalAppData, GameScene, Message> for SyncSystem {
         world: &mut World<GlobalAppData, GameScene, Message>,
         _input: &[InputEvent],
     ) -> Result<(), String> {
-        if scene.time_of_last_tick.elapsed().unwrap().as_millis() >= scene.tick_length as u128 {
+        if scene.state.game.time_of_last_tick.elapsed().unwrap().as_millis() >= scene.state.game.tick_length as u128 {
             world.messages.send_to_3::<HeadSystem, BodySystem, FoodSystem>(Message::GameTick)?;
-            scene.time_of_last_tick = SystemTime::now();
+            scene.state.game.time_of_last_tick = SystemTime::now();
         }
 
         Ok(())

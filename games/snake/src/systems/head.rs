@@ -3,9 +3,9 @@ use crate::components::food::FoodComponent;
 use crate::components::head::{HeadComponent, HeadDirection};
 use crate::components::position::PositionComponent;
 use crate::components::sprite::SpriteComponent;
-use crate::global::GlobalAppData;
 use crate::messages::Message;
 use crate::scenes::game::GameScene;
+use crate::state::global::GlobalAppData;
 use lemao_core::lemao_common_platform::input::{InputEvent, Key};
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_framework::app::Application;
@@ -85,7 +85,7 @@ impl System<GlobalAppData, GameScene, Message> for HeadSystem {
                     for food in foods.iter() {
                         let food_position = positions.get(food.entity_id)?;
                         if food_position.row == new_row && food_position.col == new_col {
-                            scene.lifetime += 1;
+                            scene.state.game.lifetime += 1;
 
                             for body in bodies.iter_mut() {
                                 body.lifetime += 1;
@@ -101,7 +101,7 @@ impl System<GlobalAppData, GameScene, Message> for HeadSystem {
                     body_rectangle.set_texture(app.renderer.textures.get_by_name("body")?);
                     body_rectangle.update();
 
-                    world.commands.send(Box::new(SpawnCommand::new(body_id, BodyComponent::new(body_id, scene.lifetime))));
+                    world.commands.send(Box::new(SpawnCommand::new(body_id, BodyComponent::new(body_id, scene.state.game.lifetime))));
                     world.commands.send(Box::new(SpawnCommand::new(body_id, PositionComponent::new(body_id, last_row, last_col))));
                     world.commands.send(Box::new(SpawnCommand::new(body_id, SpriteComponent::new(body_id, body_rectangle))));
                 }

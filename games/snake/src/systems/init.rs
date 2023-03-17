@@ -3,9 +3,9 @@ use crate::components::head::{HeadComponent, HeadDirection};
 use crate::components::obstacle::ObstacleComponent;
 use crate::components::position::PositionComponent;
 use crate::components::sprite::SpriteComponent;
-use crate::global::GlobalAppData;
 use crate::messages::Message;
 use crate::scenes::game::GameScene;
+use crate::state::global::GlobalAppData;
 use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
@@ -28,6 +28,15 @@ impl System<GlobalAppData, GameScene, Message> for InitSystem {
         world: &mut World<GlobalAppData, GameScene, Message>,
         _input: &[InputEvent],
     ) -> Result<(), String> {
+        self.init_board(app, world)?;
+        self.init_ui(app, scene)?;
+
+        Ok(())
+    }
+}
+
+impl InitSystem {
+    fn init_board(&mut self, app: &mut Application<GlobalAppData>, world: &mut World<GlobalAppData, GameScene, Message>) -> Result<(), String> {
         for row in 0..app.global_data.board_height {
             for col in 0..app.global_data.board_width {
                 let cell_id = world.entities.create();
@@ -68,9 +77,13 @@ impl System<GlobalAppData, GameScene, Message> for InitSystem {
             .send(Box::new(SpawnCommand::new(head_id, PositionComponent::new(head_id, app.global_data.board_height / 2, app.global_data.board_width / 2))));
         world.commands.send(Box::new(SpawnCommand::new(head_id, SpriteComponent::new(head_id, head_rectangle))));
 
+        Ok(())
+    }
+
+    fn init_ui(&mut self, app: &mut Application<GlobalAppData>, scene: &mut GameScene) -> Result<(), String> {
         let font_id = app.renderer.fonts.get_by_name("pixeled")?.id;
-        scene.score_label_id = scene.ui.create_label(&mut app.renderer, font_id)?;
-        let score_label = scene.ui.get_component_and_cast_mut::<Label>(scene.score_label_id)?;
+        scene.state.ui.score_label_id = scene.ui.create_label(&mut app.renderer, font_id)?;
+        let score_label = scene.ui.get_component_and_cast_mut::<Label>(scene.state.ui.score_label_id)?;
         score_label.position = ComponentPosition::RelativeToParent(Vec2::new(0.5, 0.0));
         score_label.anchor = Vec2::new(0.5, 0.5);
         score_label.offset = Vec2::new(0.0, 50.0);
@@ -78,7 +91,7 @@ impl System<GlobalAppData, GameScene, Message> for InitSystem {
         score_label.shadow_enabled = true;
         score_label.shadow_offset = Vec2::new(1.0, -1.0);
         score_label.shadow_color = Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 1.0));
-        scene.ui.get_component_mut(scene.ui.main_canvas_id)?.add_child(scene.score_label_id);
+        scene.ui.get_component_mut(scene.ui.main_canvas_id)?.add_child(scene.state.ui.score_label_id);
 
         Ok(())
     }
