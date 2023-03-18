@@ -1,3 +1,5 @@
+use std::time::SystemTime;
+
 use crate::components::position::PositionComponent;
 use crate::components::sprite::SpriteComponent;
 use crate::messages::Message;
@@ -28,6 +30,12 @@ impl System<GlobalAppData, GameScene, Message> for RendererSystem {
             if position.changed {
                 sprite.rectangle.position = Vec2::new(position.col as f32, position.row as f32) * app.global_data.cell_size;
                 position.changed = false;
+            }
+
+            if sprite.blinking && sprite.blinking_last_change_time.elapsed().unwrap().as_millis() >= sprite.blinking_interval as u128 {
+                let alpha = 1.0 - sprite.rectangle.color.get_alpha();
+                sprite.rectangle.color.set_alpha(alpha);
+                sprite.blinking_last_change_time = SystemTime::now();
             }
 
             if sprite.layer as usize >= layers.len() {

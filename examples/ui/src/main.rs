@@ -340,14 +340,14 @@ pub fn main() -> Result<(), String> {
     ok_button.shadow_corner_rounding = ComponentCornerRounding::new(5.0, 5.0, 5.0, 5.0);
     ok_button.shadow_scale = Vec2::new(1.01, 1.01);
     ok_button.on_button_pressed = Some(|button, _, _| {
-        button.color = button.color.clone().set_alpha(0.8);
-        button.border_color = button.border_color.clone().set_alpha(0.8);
-        button.shadow_color = button.shadow_color.clone().set_alpha(0.4);
+        button.color.set_alpha(0.8);
+        button.border_color.set_alpha(0.8);
+        button.shadow_color.set_alpha(0.4);
     });
     ok_button.on_button_released = Some(|button, _, _| {
-        button.color = button.color.clone().set_alpha(1.0);
-        button.border_color = button.border_color.clone().set_alpha(1.0);
-        button.shadow_color = button.shadow_color.clone().set_alpha(1.0);
+        button.color.set_alpha(1.0);
+        button.border_color.set_alpha(1.0);
+        button.shadow_color.set_alpha(1.0);
     });
     ui.get_component_mut(main_window_id)?.add_child(ok_button_id);
     /* #endregion */
@@ -406,8 +406,8 @@ pub fn main() -> Result<(), String> {
         checkbox.label_shadow_enabled = true;
         checkbox.label_shadow_offset = Vec2::new(1.0, -1.0);
         checkbox.label_shadow_color = Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 1.0));
-        checkbox.on_cursor_enter = Some(|checkbox, _| checkbox.box_color = checkbox.box_color.clone().set_alpha(0.8));
-        checkbox.on_cursor_leave = Some(|checkbox, _| checkbox.box_color = checkbox.box_color.clone().set_alpha(1.0));
+        checkbox.on_cursor_enter = Some(|checkbox, _| checkbox.box_color.set_alpha(0.8));
+        checkbox.on_cursor_leave = Some(|checkbox, _| checkbox.box_color.set_alpha(1.0));
         ui.get_component_mut(right_window_id)?.add_child(checkbox_id);
 
         checkbox_ids.push(checkbox_id);
@@ -446,16 +446,16 @@ pub fn main() -> Result<(), String> {
         textbox.label_max_length = 15;
         textbox.on_cursor_enter = Some(|textbox, _| {
             if !textbox.active {
-                textbox.color = textbox.color.clone().set_alpha(0.8);
+                textbox.color.set_alpha(0.8);
             }
         });
         textbox.on_cursor_leave = Some(|textbox, _| {
             if !textbox.active {
-                textbox.color = textbox.color.clone().set_alpha(1.0);
+                textbox.color.set_alpha(1.0);
             }
         });
-        textbox.on_activation = Some(|textbox, _| textbox.color = textbox.color.clone().set_alpha(0.5));
-        textbox.on_deactivation = Some(|textbox, _| textbox.color = textbox.color.clone().set_alpha(1.0));
+        textbox.on_activation = Some(|textbox, _| textbox.color.set_alpha(0.5));
+        textbox.on_deactivation = Some(|textbox, _| textbox.color.set_alpha(1.0));
         ui.get_component_mut(right_window_id)?.add_child(textbox_id);
 
         textbox_ids.push(textbox_id);
@@ -498,16 +498,16 @@ pub fn main() -> Result<(), String> {
         button.shadow_scale = Vec2::new(1.01, 1.01);
         button.toggleable = true;
         button.on_button_pressed = Some(|button, _, _| {
-            button.color = button.color.clone().set_alpha(0.4);
-            button.border_color = button.border_color.clone().set_alpha(0.4);
-            button.shadow_color = button.shadow_color.clone().set_alpha(0.0);
-            button.label_color = button.label_color.clone().set_alpha(0.2);
+            button.color.set_alpha(0.4);
+            button.border_color.set_alpha(0.4);
+            button.shadow_color.set_alpha(0.0);
+            button.label_color.set_alpha(0.2);
         });
         button.on_button_released = Some(|button, _, _| {
-            button.color = button.color.clone().set_alpha(1.0);
-            button.border_color = button.border_color.clone().set_alpha(1.0);
-            button.shadow_color = button.shadow_color.clone().set_alpha(1.0);
-            button.label_color = button.label_color.clone().set_alpha(1.0);
+            button.color.set_alpha(1.0);
+            button.border_color.set_alpha(1.0);
+            button.shadow_color.set_alpha(1.0);
+            button.label_color.set_alpha(1.0);
         });
         ui.get_component_mut(right_window_id)?.add_child(button_id);
 
@@ -606,8 +606,8 @@ pub fn main() -> Result<(), String> {
     pie_chart_1.border_thickness = ComponentBorderThickness::new(1.0, 1.0, 1.0, 1.0);
     pie_chart_1.start_angle = 0.0;
     pie_chart_1.end_angle = std::f32::consts::PI * 0.7;
-    pie_chart_1.on_cursor_enter = Some(|panel, _| panel.color = panel.color.clone().set_alpha(0.5));
-    pie_chart_1.on_cursor_leave = Some(|panel, _| panel.color = panel.color.clone().set_alpha(1.0));
+    pie_chart_1.on_cursor_enter = Some(|panel, _| panel.color.set_alpha(0.5));
+    pie_chart_1.on_cursor_leave = Some(|panel, _| panel.color.set_alpha(1.0));
     ui.get_component_mut(left_window_id)?.add_child(pie_chart_1_id);
 
     let mut pie_chart_2_filling_gradient = Gradient::new(GradientType::Radial, Vec2::new(0.0, 0.0));
@@ -625,8 +625,8 @@ pub fn main() -> Result<(), String> {
     pie_chart_2.border_thickness = ComponentBorderThickness::new(1.0, 1.0, 1.0, 1.0);
     pie_chart_2.start_angle = std::f32::consts::PI * 0.7;
     pie_chart_2.end_angle = std::f32::consts::PI * 1.3;
-    pie_chart_2.on_cursor_enter = Some(|panel, _| panel.color = panel.color.clone().set_alpha(0.5));
-    pie_chart_2.on_cursor_leave = Some(|panel, _| panel.color = panel.color.clone().set_alpha(1.0));
+    pie_chart_2.on_cursor_enter = Some(|panel, _| panel.color.set_alpha(0.5));
+    pie_chart_2.on_cursor_leave = Some(|panel, _| panel.color.set_alpha(1.0));
     ui.get_component_mut(left_window_id)?.add_child(pie_chart_2_id);
 
     let mut pie_chart_3_filling_gradient = Gradient::new(GradientType::Radial, Vec2::new(0.0, 0.0));
@@ -644,8 +644,8 @@ pub fn main() -> Result<(), String> {
     pie_chart_3.border_thickness = ComponentBorderThickness::new(1.0, 1.0, 1.0, 1.0);
     pie_chart_3.start_angle = std::f32::consts::PI * 1.3;
     pie_chart_3.end_angle = std::f32::consts::PI * 2.0;
-    pie_chart_3.on_cursor_enter = Some(|panel, _| panel.color = panel.color.clone().set_alpha(0.5));
-    pie_chart_3.on_cursor_leave = Some(|panel, _| panel.color = panel.color.clone().set_alpha(1.0));
+    pie_chart_3.on_cursor_enter = Some(|panel, _| panel.color.set_alpha(0.5));
+    pie_chart_3.on_cursor_leave = Some(|panel, _| panel.color.set_alpha(1.0));
     ui.get_component_mut(left_window_id)?.add_child(pie_chart_3_id);
 
     let pie_chart_legend_id = ui.create_label(&mut renderer, regular_font_id)?;

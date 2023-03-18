@@ -2,5 +2,6 @@
 pub enum Message {
     Init,
     GameTick,
+    KillSnake,
     ResetSnake,
 }

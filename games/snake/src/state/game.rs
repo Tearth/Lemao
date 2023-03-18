@@ -5,10 +5,19 @@ pub struct GameState {
     pub time_of_last_tick: SystemTime,
     pub lifetime: u32,
     pub food_last_refresh_time: SystemTime,
+    pub snake_killed: bool,
+    pub snake_killed_time: SystemTime,
 }
 
 impl Default for GameState {
     fn default() -> Self {
-        Self { tick_length: 500, time_of_last_tick: SystemTime::now(), lifetime: 3, food_last_refresh_time: SystemTime::now() }
+        Self {
+            tick_length: 500,
+            time_of_last_tick: SystemTime::now(),
+            lifetime: 3,
+            food_last_refresh_time: SystemTime::now(),
+            snake_killed: false,
+            snake_killed_time: SystemTime::now(),
+        }
     }
 }

@@ -1,4 +1,5 @@
 use crate::components::body::BodyComponent;
+use crate::components::sprite::SpriteComponent;
 use crate::messages::Message;
 use crate::scenes::game::GameScene;
 use crate::state::global::GlobalAppData;
@@ -15,21 +16,34 @@ impl System<GlobalAppData, GameScene, Message> for BodySystem {
     fn update(
         &mut self,
         _app: &mut Application<GlobalAppData>,
-        _scene: &mut GameScene,
+        scene: &mut GameScene,
         world: &mut World<GlobalAppData, GameScene, Message>,
         _input: &[InputEvent],
     ) -> Result<(), String> {
         while let Some(message) = world.messages.poll_message::<Self>() {
             match message {
                 Message::GameTick => {
-                    let bodies = world.components.get_many_mut_1::<BodyComponent>();
+                    if !scene.state.game.snake_killed {
+                        let bodies = world.components.get_many_mut_1::<BodyComponent>();
+
+                        for body in bodies.iter_mut() {
+                            body.lifetime -= 1;
+
+                            if body.lifetime == 0 {
+                                world.commands.send(Box::new(KillCommand::new(body.entity_id)));
+                            }
+                        }
+                    }
+                }
+                Message::KillSnake => {
+                    let (bodies, sprites) = world.components.get_many_mut_2::<BodyComponent, SpriteComponent>();
 
                     for body in bodies.iter_mut() {
-                        body.lifetime -= 1;
+                        body.killed = true;
 
-                        if body.lifetime == 0 {
-                            world.commands.send(Box::new(KillCommand::new(body.entity_id)));
-                        }
+                        let sprite = sprites.get_mut(body.entity_id)?;
+                        sprite.blinking = true;
+                        sprite.blinking_interval = 200;
                     }
                 }
                 Message::ResetSnake => {
