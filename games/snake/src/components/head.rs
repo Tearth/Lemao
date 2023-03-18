@@ -3,9 +3,10 @@ use lemao_framework::ecs::components::Component;
 pub struct HeadComponent {
     pub entity_id: usize,
     pub direction: HeadDirection,
+    pub next_direction: HeadDirection,
 }
 
-#[derive(PartialEq)]
+#[derive(Copy, Clone, PartialEq)]
 pub enum HeadDirection {
     Up,
     Down,
@@ -15,7 +16,7 @@ pub enum HeadDirection {
 
 impl HeadComponent {
     pub fn new(entity_id: usize, direction: HeadDirection) -> Self {
-        Self { entity_id, direction }
+        Self { entity_id, direction, next_direction: direction }
     }
 }
 

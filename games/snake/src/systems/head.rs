@@ -37,22 +37,22 @@ impl System<GlobalAppData, GameScene, Message> for HeadSystem {
                 match key {
                     Key::KeyW => {
                         if head.direction != HeadDirection::Down {
-                            head.direction = HeadDirection::Up
+                            head.next_direction = HeadDirection::Up
                         }
                     }
                     Key::KeyS => {
                         if head.direction != HeadDirection::Up {
-                            head.direction = HeadDirection::Down
+                            head.next_direction = HeadDirection::Down
                         }
                     }
                     Key::KeyA => {
                         if head.direction != HeadDirection::Right {
-                            head.direction = HeadDirection::Left
+                            head.next_direction = HeadDirection::Left
                         }
                     }
                     Key::KeyD => {
                         if head.direction != HeadDirection::Left {
-                            head.direction = HeadDirection::Right
+                            head.next_direction = HeadDirection::Right
                         }
                     }
                     _ => {}
@@ -85,6 +85,8 @@ impl System<GlobalAppData, GameScene, Message> for HeadSystem {
                         let last_col = position.col;
                         let mut new_row = last_row;
                         let mut new_col = last_col;
+
+                        head.direction = head.next_direction;
 
                         match head.direction {
                             HeadDirection::Up => new_row += 1,
