@@ -26,7 +26,7 @@ impl System<GlobalAppData, GameScene, Message> for BodySystem {
                     if !scene.state.game.snake_killed {
                         let bodies = world.components.get_many_mut_1::<BodyComponent>();
 
-                        for body in bodies.iter_mut() {
+                        for body in bodies.iter_mut().filter(|b| !b.killed) {
                             body.lifetime -= 1;
 
                             if body.lifetime == 0 {
@@ -44,6 +44,7 @@ impl System<GlobalAppData, GameScene, Message> for BodySystem {
                         let sprite = sprites.get_mut(body.entity_id)?;
                         sprite.blinking = true;
                         sprite.blinking_interval = 200;
+                        sprite.blinking_last_change_time = scene.state.game.snake_killed_time;
                     }
                 }
                 Message::ResetSnake => {

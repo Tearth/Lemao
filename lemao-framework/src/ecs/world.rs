@@ -13,6 +13,7 @@ use lemao_core::lemao_common_platform::input::InputEvent;
 use std::any::TypeId;
 use std::cell::Cell;
 use std::collections::HashMap;
+use std::fmt::Debug;
 use std::sync::Arc;
 use std::sync::RwLock;
 
@@ -29,7 +30,7 @@ where
 
 impl<G, S, M> World<G, S, M>
 where
-    M: Copy,
+    M: Copy + Debug,
 {
     pub fn new() -> Self {
         Self {

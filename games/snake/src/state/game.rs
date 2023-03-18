@@ -12,9 +12,9 @@ pub struct GameState {
 impl Default for GameState {
     fn default() -> Self {
         Self {
-            tick_length: 500,
+            tick_length: 0,
             time_of_last_tick: SystemTime::now(),
-            lifetime: 3,
+            lifetime: 0,
             food_last_refresh_time: SystemTime::now(),
             snake_killed: false,
             snake_killed_time: SystemTime::now(),

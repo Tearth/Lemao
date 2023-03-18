@@ -1,6 +1,7 @@
 use std::any::TypeId;
 use std::collections::HashMap;
 use std::collections::VecDeque;
+use std::fmt::Debug;
 
 const MAX_EVENTS_PER_QUEUE: usize = 100;
 
@@ -11,7 +12,7 @@ pub struct MessageBus<M> {
 
 impl<M> MessageBus<M>
 where
-    M: Copy,
+    M: Copy + Debug,
 {
     pub fn new() -> Self {
         Self { queues: Default::default() }

@@ -32,10 +32,14 @@ impl System<GlobalAppData, GameScene, Message> for RendererSystem {
                 position.changed = false;
             }
 
-            if sprite.blinking && sprite.blinking_last_change_time.elapsed().unwrap().as_millis() >= sprite.blinking_interval as u128 {
-                let alpha = 1.0 - sprite.rectangle.color.get_alpha();
-                sprite.rectangle.color.set_alpha(alpha);
-                sprite.blinking_last_change_time = SystemTime::now();
+            if sprite.blinking {
+                if sprite.blinking_last_change_time.elapsed().unwrap().as_millis() >= sprite.blinking_interval as u128 {
+                    let alpha = 1.0 - sprite.rectangle.color.get_alpha();
+                    sprite.rectangle.color.set_alpha(alpha);
+                    sprite.blinking_last_change_time = SystemTime::now();
+                }
+            } else {
+                sprite.rectangle.color.set_alpha(1.0);
             }
 
             if sprite.layer as usize >= layers.len() {

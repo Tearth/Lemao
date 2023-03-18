@@ -73,6 +73,9 @@ impl System<GlobalAppData, GameScene, Message> for HeadSystem {
                     world.commands.send(Box::new(SpawnCommand::new(head_id, HeadComponent::new(head_id, HeadDirection::Right))));
                     world.commands.send(Box::new(SpawnCommand::new(head_id, PositionComponent::new(head_id, row, col))));
                     world.commands.send(Box::new(SpawnCommand::new(head_id, SpriteComponent::new(head_id, head_rectangle, LAYER_SNAKE))));
+
+                    scene.state.game.lifetime = app.global_data.initial_lifetime;
+                    scene.state.game.tick_length = app.global_data.initial_tick_length;
                 }
                 Message::GameTick => {
                     if !scene.state.game.snake_killed {
@@ -126,6 +129,7 @@ impl System<GlobalAppData, GameScene, Message> for HeadSystem {
                                 let food_position = positions.get(food.entity_id)?;
                                 if food_position.row == new_row && food_position.col == new_col {
                                     scene.state.game.lifetime += 1;
+                                    scene.state.game.tick_length = (scene.state.game.tick_length as f32 * 0.8) as u32;
 
                                     for body in bodies.iter_mut() {
                                         body.lifetime += 1;
@@ -154,12 +158,14 @@ impl System<GlobalAppData, GameScene, Message> for HeadSystem {
 
                     sprite.blinking = true;
                     sprite.blinking_interval = 200;
+                    sprite.blinking_last_change_time = scene.state.game.snake_killed_time;
                 }
                 Message::ResetSnake => {
                     let (heads, positions, sprites) = world.components.get_many_mut_3::<HeadComponent, PositionComponent, SpriteComponent>();
                     let head = heads.iter_mut().next().unwrap();
 
                     head.direction = HeadDirection::Right;
+                    head.next_direction = HeadDirection::Right;
 
                     let head_position = positions.get_mut(head.entity_id)?;
                     let (row, col) = self.get_head_default_position(app);
@@ -169,7 +175,8 @@ impl System<GlobalAppData, GameScene, Message> for HeadSystem {
                     let sprite = sprites.get_mut(head.entity_id)?;
                     sprite.blinking = false;
 
-                    scene.state.game.lifetime = 3;
+                    scene.state.game.lifetime = app.global_data.initial_lifetime;
+                    scene.state.game.tick_length = app.global_data.initial_tick_length;
                 }
             }
         }
