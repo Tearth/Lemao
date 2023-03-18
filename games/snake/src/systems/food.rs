@@ -1,6 +1,3 @@
-use std::any::TypeId;
-use std::time::SystemTime;
-
 use crate::components::body::BodyComponent;
 use crate::components::food::FoodComponent;
 use crate::components::head::HeadComponent;
@@ -14,9 +11,9 @@ use lemao_core::utils::rand;
 use lemao_framework::app::Application;
 use lemao_framework::ecs::commands::kill::KillCommand;
 use lemao_framework::ecs::commands::spawn::SpawnCommand;
-use lemao_framework::ecs::components::ComponentManagerHashMap;
 use lemao_framework::ecs::systems::System;
 use lemao_framework::ecs::world::World;
+use std::time::SystemTime;
 
 #[derive(Default)]
 pub struct FoodSystem {}
@@ -74,6 +71,7 @@ impl System<GlobalAppData, GameScene, Message> for FoodSystem {
                         scene.state.game.food_last_refresh_time = SystemTime::now();
                     }
                 }
+                _ => {}
             }
         }
 

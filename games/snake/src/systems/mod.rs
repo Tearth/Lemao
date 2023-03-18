@@ -1,3 +1,4 @@
+pub mod board;
 pub mod body;
 pub mod food;
 pub mod head;

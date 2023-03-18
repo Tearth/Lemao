@@ -8,6 +8,7 @@ use crate::components::sprite::SpriteComponent;
 use crate::messages::Message;
 use crate::state::global::GlobalAppData;
 use crate::state::scene::SceneState;
+use crate::systems::board::BoardSystem;
 use crate::systems::body::BodySystem;
 use crate::systems::food::FoodSystem;
 use crate::systems::head::HeadSystem;
@@ -81,10 +82,14 @@ impl Scene<GlobalAppData> for GameScene {
         world.systems.write().unwrap().store(Box::<UiSystem>::default())?;
         world.systems.write().unwrap().store(Box::<SyncSystem>::default())?;
         world.systems.write().unwrap().store(Box::<WindowSystem>::default())?;
+        world.systems.write().unwrap().store(Box::<BoardSystem>::default())?;
+        world.systems.write().unwrap().store(Box::<UiSystem>::default())?;
 
         world.messages.register_receiver::<BodySystem>()?;
         world.messages.register_receiver::<HeadSystem>()?;
         world.messages.register_receiver::<FoodSystem>()?;
+        world.messages.register_receiver::<BoardSystem>()?;
+        world.messages.register_receiver::<UiSystem>()?;
 
         InitSystem::default().update(app, self, &mut world, &Vec::new())?;
 

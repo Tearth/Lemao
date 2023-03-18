@@ -5,10 +5,8 @@ use crate::state::global::GlobalAppData;
 use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_framework::app::Application;
 use lemao_framework::ecs::commands::kill::KillCommand;
-use lemao_framework::ecs::components::ComponentManagerHashMap;
 use lemao_framework::ecs::systems::System;
 use lemao_framework::ecs::world::World;
-use std::any::TypeId;
 
 #[derive(Default)]
 pub struct BodySystem {}
@@ -34,6 +32,13 @@ impl System<GlobalAppData, GameScene, Message> for BodySystem {
                         }
                     }
                 }
+                Message::ResetSnake => {
+                    let bodies = world.components.get_many_mut_1::<BodyComponent>();
+                    for body in bodies.iter() {
+                        world.commands.send(Box::new(KillCommand::new(body.entity_id)));
+                    }
+                }
+                _ => {}
             }
         }
 

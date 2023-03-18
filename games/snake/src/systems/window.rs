@@ -14,7 +14,7 @@ impl System<GlobalAppData, GameScene, Message> for WindowSystem {
     fn update(
         &mut self,
         app: &mut Application<GlobalAppData>,
-        scene: &mut GameScene,
+        _scene: &mut GameScene,
         _world: &mut World<GlobalAppData, GameScene, Message>,
         input: &[InputEvent],
     ) -> Result<(), String> {

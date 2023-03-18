@@ -6,10 +6,8 @@ use crate::state::global::GlobalAppData;
 use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_framework::app::Application;
-use lemao_framework::ecs::components::ComponentManagerHashMap;
 use lemao_framework::ecs::systems::System;
 use lemao_framework::ecs::world::World;
-use std::any::TypeId;
 
 #[derive(Default)]
 pub struct RendererSystem {}
