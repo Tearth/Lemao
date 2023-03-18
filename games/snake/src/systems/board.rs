@@ -12,6 +12,8 @@ use lemao_framework::ecs::commands::spawn::SpawnCommand;
 use lemao_framework::ecs::systems::System;
 use lemao_framework::ecs::world::World;
 
+use super::LAYER_BOARD;
+
 #[derive(Default)]
 pub struct BoardSystem {}
 
@@ -43,7 +45,7 @@ impl System<GlobalAppData, GameScene, Message> for BoardSystem {
                             rectangle.update();
 
                             world.commands.send(Box::new(SpawnCommand::new(cell_id, PositionComponent::new(cell_id, row, col))));
-                            world.commands.send(Box::new(SpawnCommand::new(cell_id, SpriteComponent::new(cell_id, rectangle))));
+                            world.commands.send(Box::new(SpawnCommand::new(cell_id, SpriteComponent::new(cell_id, rectangle, LAYER_BOARD))));
                         }
                     }
 

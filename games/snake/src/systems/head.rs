@@ -13,6 +13,9 @@ use lemao_framework::ecs::commands::spawn::SpawnCommand;
 use lemao_framework::ecs::systems::System;
 use lemao_framework::ecs::world::World;
 
+use super::body::BodySystem;
+use super::LAYER_SNAKE;
+
 #[derive(Default)]
 pub struct HeadSystem {}
 
@@ -67,7 +70,7 @@ impl System<GlobalAppData, GameScene, Message> for HeadSystem {
                     let (row, col) = self.get_head_default_position(app);
                     world.commands.send(Box::new(SpawnCommand::new(head_id, HeadComponent::new(head_id, HeadDirection::Right))));
                     world.commands.send(Box::new(SpawnCommand::new(head_id, PositionComponent::new(head_id, row, col))));
-                    world.commands.send(Box::new(SpawnCommand::new(head_id, SpriteComponent::new(head_id, head_rectangle))));
+                    world.commands.send(Box::new(SpawnCommand::new(head_id, SpriteComponent::new(head_id, head_rectangle, LAYER_SNAKE))));
                 }
                 Message::GameTick => {
                     let (heads, bodies, foods, positions) = world.components.get_many_mut_4::<HeadComponent, BodyComponent, FoodComponent, PositionComponent>();
@@ -110,7 +113,7 @@ impl System<GlobalAppData, GameScene, Message> for HeadSystem {
                     }
 
                     if collision {
-                        world.messages.send_to_1::<HeadSystem>(Message::ResetSnake)?;
+                        world.messages.send_to_2::<HeadSystem, BodySystem>(Message::ResetSnake)?;
                     } else {
                         for food in foods.iter() {
                             let food_position = positions.get(food.entity_id)?;
@@ -133,7 +136,7 @@ impl System<GlobalAppData, GameScene, Message> for HeadSystem {
 
                         world.commands.send(Box::new(SpawnCommand::new(body_id, BodyComponent::new(body_id, scene.state.game.lifetime))));
                         world.commands.send(Box::new(SpawnCommand::new(body_id, PositionComponent::new(body_id, last_row, last_col))));
-                        world.commands.send(Box::new(SpawnCommand::new(body_id, SpriteComponent::new(body_id, body_rectangle))));
+                        world.commands.send(Box::new(SpawnCommand::new(body_id, SpriteComponent::new(body_id, body_rectangle, LAYER_SNAKE))));
                     }
                 }
                 Message::ResetSnake => {

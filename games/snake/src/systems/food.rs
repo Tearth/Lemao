@@ -15,6 +15,8 @@ use lemao_framework::ecs::systems::System;
 use lemao_framework::ecs::world::World;
 use std::time::SystemTime;
 
+use super::LAYER_FOOD;
+
 #[derive(Default)]
 pub struct FoodSystem {}
 
@@ -65,7 +67,7 @@ impl System<GlobalAppData, GameScene, Message> for FoodSystem {
 
                             world.commands.send(Box::new(SpawnCommand::new(food_id, FoodComponent::new(food_id))));
                             world.commands.send(Box::new(SpawnCommand::new(food_id, PositionComponent::new(food_id, position.0, position.1))));
-                            world.commands.send(Box::new(SpawnCommand::new(food_id, SpriteComponent::new(food_id, food_rectangle))));
+                            world.commands.send(Box::new(SpawnCommand::new(food_id, SpriteComponent::new(food_id, food_rectangle, LAYER_FOOD))));
                         }
 
                         scene.state.game.food_last_refresh_time = SystemTime::now();

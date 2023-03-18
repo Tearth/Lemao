@@ -4,11 +4,12 @@ use lemao_framework::ecs::components::Component;
 pub struct SpriteComponent {
     pub entity_id: usize,
     pub rectangle: Rectangle,
+    pub layer: u8,
 }
 
 impl SpriteComponent {
-    pub fn new(entity_id: usize, rectangle: Rectangle) -> Self {
-        Self { entity_id, rectangle }
+    pub fn new(entity_id: usize, rectangle: Rectangle, layer: u8) -> Self {
+        Self { entity_id, rectangle, layer }
     }
 }
 

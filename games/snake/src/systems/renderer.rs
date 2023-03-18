@@ -21,6 +21,7 @@ impl System<GlobalAppData, GameScene, Message> for RendererSystem {
         _input: &[InputEvent],
     ) -> Result<(), String> {
         let (sprites, positions) = world.components.get_many_mut_2::<SpriteComponent, PositionComponent>();
+        let mut layers = Vec::new();
 
         for sprite in sprites.iter_mut() {
             let position = positions.get_mut(sprite.entity_id)?;
@@ -29,7 +30,17 @@ impl System<GlobalAppData, GameScene, Message> for RendererSystem {
                 position.changed = false;
             }
 
-            app.renderer.draw(&mut sprite.rectangle)?;
+            if sprite.layer as usize >= layers.len() {
+                layers.resize(sprite.layer as usize + 1, Vec::new());
+            }
+
+            layers[sprite.layer as usize].push(sprite.entity_id);
+        }
+
+        for layer in layers.iter().rev() {
+            for entity_id in layer {
+                app.renderer.draw(&mut world.components.get_many_mut_1::<SpriteComponent>().get_mut(*entity_id)?.rectangle)?;
+            }
         }
 
         Ok(())
