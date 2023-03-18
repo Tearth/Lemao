@@ -79,7 +79,6 @@ impl Scene<GlobalAppData> for GameScene {
         world.systems.write().unwrap().store(Box::<HeadSystem>::default())?;
         world.systems.write().unwrap().store(Box::<FoodSystem>::default())?;
         world.systems.write().unwrap().store(Box::<RendererSystem>::default())?;
-        world.systems.write().unwrap().store(Box::<UiSystem>::default())?;
         world.systems.write().unwrap().store(Box::<SyncSystem>::default())?;
         world.systems.write().unwrap().store(Box::<WindowSystem>::default())?;
         world.systems.write().unwrap().store(Box::<BoardSystem>::default())?;

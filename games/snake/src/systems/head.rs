@@ -1,3 +1,4 @@
+use std::cmp;
 use std::time::SystemTime;
 
 use crate::components::body::BodyComponent;
@@ -16,6 +17,7 @@ use lemao_framework::ecs::systems::System;
 use lemao_framework::ecs::world::World;
 
 use super::body::BodySystem;
+use super::ui::UiSystem;
 use super::LAYER_SNAKE;
 
 #[derive(Default)]
@@ -130,12 +132,14 @@ impl System<GlobalAppData, GameScene, Message> for HeadSystem {
                                 if food_position.row == new_row && food_position.col == new_col {
                                     scene.state.game.lifetime += 1;
                                     scene.state.game.tick_length = (scene.state.game.tick_length as f32 * 0.8) as u32;
+                                    scene.state.game.score += 1;
 
                                     for body in bodies.iter_mut() {
                                         body.lifetime += 1;
                                     }
 
                                     world.commands.send(Box::new(KillCommand::new(food_position.entity_id)));
+                                    world.messages.send_to_1::<UiSystem>(Message::FoodEaten)?;
                                 }
                             }
 
@@ -171,19 +175,23 @@ impl System<GlobalAppData, GameScene, Message> for HeadSystem {
                     let (row, col) = self.get_head_default_position(app);
                     head_position.row = row;
                     head_position.col = col;
+                    head_position.changed = true;
 
                     let sprite = sprites.get_mut(head.entity_id)?;
                     sprite.blinking = false;
-
-                    scene.state.game.lifetime = app.global_data.initial_lifetime;
-                    scene.state.game.tick_length = app.global_data.initial_tick_length;
                 }
+                _ => {}
             }
         }
 
         if scene.state.game.snake_killed && scene.state.game.snake_killed_time.elapsed().unwrap().as_millis() >= 2000 {
-            world.messages.send_to_2::<HeadSystem, BodySystem>(Message::ResetSnake)?;
             scene.state.game.snake_killed = false;
+            scene.state.game.best_score = cmp::max(scene.state.game.score, scene.state.game.best_score);
+            scene.state.game.score = 0;
+            scene.state.game.lifetime = app.global_data.initial_lifetime;
+            scene.state.game.tick_length = app.global_data.initial_tick_length;
+
+            world.messages.send_to_3::<HeadSystem, BodySystem, UiSystem>(Message::ResetSnake)?;
         }
 
         Ok(())

@@ -1,6 +1,8 @@
 use std::time::SystemTime;
 
 pub struct GameState {
+    pub score: u32,
+    pub best_score: u32,
     pub tick_length: u32,
     pub time_of_last_tick: SystemTime,
     pub lifetime: u32,
@@ -12,6 +14,8 @@ pub struct GameState {
 impl Default for GameState {
     fn default() -> Self {
         Self {
+            score: 0,
+            best_score: 0,
             tick_length: 0,
             time_of_last_tick: SystemTime::now(),
             lifetime: 0,

@@ -4,4 +4,5 @@ pub enum Message {
     GameTick,
     KillSnake,
     ResetSnake,
+    FoodEaten,
 }
