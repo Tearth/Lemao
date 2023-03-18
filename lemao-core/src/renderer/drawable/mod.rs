@@ -45,16 +45,20 @@ pub trait Drawable {
 }
 
 impl Color {
-    pub fn set_alpha(self, alpha: f32) -> Color {
+    pub fn get_alpha(&self) -> f32 {
         match self {
-            Self::SolidColor(solid) => Color::SolidColor(SolidColor::new(solid.r, solid.g, solid.b, alpha)),
+            Self::SolidColor(solid) => solid.a,
+            Self::Gradient(gradient) => gradient.steps[0].color.a,
+        }
+    }
+
+    pub fn set_alpha(&mut self, alpha: f32) {
+        match self {
+            Self::SolidColor(solid) => solid.a = alpha,
             Self::Gradient(gradient) => {
-                let mut gradient = gradient;
                 for step in &mut gradient.steps {
                     step.color = SolidColor::new(step.color.r, step.color.g, step.color.b, alpha);
                 }
-
-                Color::Gradient(gradient)
             }
         }
     }
