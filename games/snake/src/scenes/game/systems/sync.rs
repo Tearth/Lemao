@@ -1,9 +1,9 @@
 use super::body::BodySystem;
 use super::food::FoodSystem;
 use super::head::HeadSystem;
-use crate::messages::Message;
+use crate::scenes::game::messages::Message;
+use crate::scenes::game::state::global::GlobalAppData;
 use crate::scenes::game::GameScene;
-use crate::state::global::GlobalAppData;
 use lemao_core::lemao_common_platform::input::{InputEvent, Key};
 use lemao_framework::app::Application;
 use lemao_framework::ecs::systems::System;

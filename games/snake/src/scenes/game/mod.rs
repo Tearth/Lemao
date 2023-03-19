@@ -1,22 +1,22 @@
-use crate::components::body::BodyComponent;
-use crate::components::cell::CellComponent;
-use crate::components::food::FoodComponent;
-use crate::components::head::HeadComponent;
-use crate::components::obstacle::ObstacleComponent;
-use crate::components::position::PositionComponent;
-use crate::components::sprite::SpriteComponent;
-use crate::messages::Message;
-use crate::state::global::GlobalAppData;
-use crate::state::scene::SceneState;
-use crate::systems::board::BoardSystem;
-use crate::systems::body::BodySystem;
-use crate::systems::food::FoodSystem;
-use crate::systems::head::HeadSystem;
-use crate::systems::init::InitSystem;
-use crate::systems::renderer::RendererSystem;
-use crate::systems::sync::SyncSystem;
-use crate::systems::ui::UiSystem;
-use crate::systems::window::WindowSystem;
+use self::components::body::BodyComponent;
+use self::components::cell::CellComponent;
+use self::components::food::FoodComponent;
+use self::components::head::HeadComponent;
+use self::components::obstacle::ObstacleComponent;
+use self::components::position::PositionComponent;
+use self::components::sprite::SpriteComponent;
+use self::messages::Message;
+use self::state::global::GlobalAppData;
+use self::state::scene::SceneState;
+use self::systems::board::BoardSystem;
+use self::systems::body::BodySystem;
+use self::systems::food::FoodSystem;
+use self::systems::head::HeadSystem;
+use self::systems::init::InitSystem;
+use self::systems::renderer::RendererSystem;
+use self::systems::sync::SyncSystem;
+use self::systems::ui::UiSystem;
+use self::systems::window::WindowSystem;
 use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::renderer::fonts::Font;
@@ -31,6 +31,12 @@ use lemao_ui::context::UiContext;
 use std::any::Any;
 use std::sync::Arc;
 use std::sync::RwLock;
+
+pub mod components;
+pub mod messages;
+pub mod state;
+pub mod systems;
+pub mod utils;
 
 pub struct GameScene {
     pub ui: UiContext,

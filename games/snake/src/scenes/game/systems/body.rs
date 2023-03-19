@@ -1,10 +1,10 @@
-use crate::components::body::{BodyComponent, BodyOrientation};
-use crate::components::head::{HeadComponent, HeadDirection};
-use crate::components::position::PositionComponent;
-use crate::components::sprite::SpriteComponent;
-use crate::messages::Message;
+use crate::scenes::game::components::body::{BodyComponent, BodyOrientation};
+use crate::scenes::game::components::head::{HeadComponent, HeadDirection};
+use crate::scenes::game::components::position::PositionComponent;
+use crate::scenes::game::components::sprite::SpriteComponent;
+use crate::scenes::game::messages::Message;
+use crate::scenes::game::state::global::GlobalAppData;
 use crate::scenes::game::GameScene;
-use crate::state::global::GlobalAppData;
 use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_framework::app::Application;
 use lemao_framework::ecs::commands::kill::KillCommand;

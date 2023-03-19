@@ -1,6 +1,6 @@
 use lemao_framework::ecs::components::Component;
 
-use crate::utils::Coordinates;
+use crate::scenes::game::utils::Coordinates;
 
 pub struct PositionComponent {
     pub entity_id: usize,

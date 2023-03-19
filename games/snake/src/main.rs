@@ -5,13 +5,7 @@ use lemao_core::lemao_math::vec2::Vec2;
 use lemao_framework::app::Application;
 use scenes::game::GameScene;
 
-pub mod components;
-pub mod core;
-pub mod messages;
 pub mod scenes;
-pub mod state;
-pub mod systems;
-pub mod utils;
 
 #[no_mangle]
 #[cfg(windows)]

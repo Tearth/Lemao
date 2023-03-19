@@ -1,6 +1,6 @@
-use crate::messages::Message;
+use crate::scenes::game::messages::Message;
+use crate::scenes::game::state::global::GlobalAppData;
 use crate::scenes::game::GameScene;
-use crate::state::global::GlobalAppData;
 use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
