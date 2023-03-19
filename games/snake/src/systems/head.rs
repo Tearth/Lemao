@@ -229,6 +229,7 @@ impl System<GlobalAppData, GameScene, Message> for HeadSystem {
             scene.state.game.score = 0;
             scene.state.game.lifetime = app.global_data.initial_lifetime;
             scene.state.game.tick_length = app.global_data.initial_tick_length;
+            scene.state.game.game_start_time = SystemTime::now();
 
             world.messages.send_to_3::<HeadSystem, BodySystem, UiSystem>(Message::ResetSnake)?;
         }

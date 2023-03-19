@@ -9,6 +9,7 @@ pub struct GameState {
     pub food_last_refresh_time: SystemTime,
     pub snake_killed: bool,
     pub snake_killed_time: SystemTime,
+    pub game_start_time: SystemTime,
 }
 
 impl Default for GameState {
@@ -22,6 +23,7 @@ impl Default for GameState {
             food_last_refresh_time: SystemTime::now(),
             snake_killed: false,
             snake_killed_time: SystemTime::now(),
+            game_start_time: SystemTime::now(),
         }
     }
 }

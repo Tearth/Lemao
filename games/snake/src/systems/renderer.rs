@@ -29,6 +29,7 @@ impl System<GlobalAppData, GameScene, Message> for RendererSystem {
             let position = positions.get_mut(sprite.entity_id)?;
             if position.changed {
                 sprite.tilemap.position = Vec2::new(position.coordinates.col as f32, position.coordinates.row as f32) * app.global_data.cell_size;
+                sprite.tilemap.position = sprite.tilemap.position.floor();
                 position.changed = false;
             }
 
