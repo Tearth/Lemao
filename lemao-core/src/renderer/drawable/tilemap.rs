@@ -111,8 +111,8 @@ impl Tilemap {
             let uv_height = self.size.y / self.texture_size.y;
             let uv_size = Vec2::new(uv_width, uv_height);
 
+            let col = self.frame / (self.frames_count.x as u32);
             let row = self.frame % (self.frames_count.x as u32);
-            let col = self.frame / (self.frames_count.y as u32);
             let uv = Vec2::new(row as f32 * uv_width, 1.0 - col as f32 * uv_height - uv_size.y);
 
             self.vertices.extend_from_slice(&self.get_vertices(uv, uv_size, SolidColor::new(1.0, 1.0, 1.0, 1.0)));
