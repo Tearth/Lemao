@@ -83,11 +83,14 @@ impl RendererContext {
     }
 
     pub fn init(&mut self) -> Result<(), String> {
-        // #[cfg(debug_assertions)]
-        // unsafe {
-        //     (self.gl.glEnable)(opengl::GL_DEBUG_OUTPUT);
-        //     (self.gl.glDebugMessageCallback)(gl_error, std::ptr::null_mut());
-        // }
+        #[cfg(debug_assertions)]
+        unsafe {
+            (self.gl.glEnable)(opengl::GL_DEBUG_OUTPUT);
+            (self.gl.glDebugMessageCallback)(gl_error, std::ptr::null_mut());
+
+            // Test error handler
+            // (self.gl.glEnable)(99999);
+        }
 
         self.init_default_camera()?;
         self.set_viewport_size(self.viewport_size)?;
