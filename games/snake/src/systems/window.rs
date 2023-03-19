@@ -28,7 +28,8 @@ impl System<GlobalAppData, GameScene, Message> for WindowSystem {
                     camera.position = Vec2::new(
                         -(window_size.x - (app.global_data.board_width as f32 * app.global_data.cell_size.x)) / 2.0,
                         -(window_size.y - (app.global_data.board_height as f32 * app.global_data.cell_size.y)) / 2.0,
-                    );
+                    ) - Vec2::new(app.global_data.cell_size.x, app.global_data.cell_size.y) / 2.0;
+                    camera.position = camera.position.floor();
                 }
                 InputEvent::WindowClosed => {
                     app.close();

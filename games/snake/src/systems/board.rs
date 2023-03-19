@@ -55,13 +55,6 @@ impl System<GlobalAppData, GameScene, Message> for BoardSystem {
                             world.commands.send(Box::new(SpawnCommand::new(cell_id, SpriteComponent::new(cell_id, rectangle, LAYER_BOARD))));
                         }
                     }
-
-                    let window_size = app.window.get_size();
-                    let mut camera = app.renderer.cameras.get_mut(app.renderer.active_camera_id)?;
-                    camera.position = Vec2::new(
-                        -(window_size.x - (app.global_data.board_width as f32 * app.global_data.cell_size.x)) / 2.0,
-                        -(window_size.y - (app.global_data.board_height as f32 * app.global_data.cell_size.y)) / 2.0,
-                    ) - Vec2::new(app.global_data.cell_size.x, app.global_data.cell_size.y) / 2.0;
                 }
                 _ => {}
             }
