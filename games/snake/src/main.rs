@@ -11,6 +11,7 @@ pub mod messages;
 pub mod scenes;
 pub mod state;
 pub mod systems;
+pub mod utils;
 
 #[no_mangle]
 #[cfg(windows)]

@@ -101,6 +101,27 @@ impl ComponentManager {
         )
     }
 
+    pub fn get_many_mut_5<C1, C2, C3, C4, C5>(
+        &mut self,
+    ) -> (&mut ComponentList<C1>, &mut ComponentList<C2>, &mut ComponentList<C3>, &mut ComponentList<C4>, &mut ComponentList<C5>)
+    where
+        C1: Component + 'static,
+        C2: Component + 'static,
+        C3: Component + 'static,
+        C4: Component + 'static,
+        C5: Component + 'static,
+    {
+        let [a, b, c, d, e] =
+            self.data.get_many_mut([&TypeId::of::<C1>(), &TypeId::of::<C2>(), &TypeId::of::<C3>(), &TypeId::of::<C4>(), &TypeId::of::<C5>()]).unwrap();
+        (
+            a.as_any_mut().downcast_mut::<ComponentList<C1>>().unwrap(),
+            b.as_any_mut().downcast_mut::<ComponentList<C2>>().unwrap(),
+            c.as_any_mut().downcast_mut::<ComponentList<C3>>().unwrap(),
+            d.as_any_mut().downcast_mut::<ComponentList<C4>>().unwrap(),
+            e.as_any_mut().downcast_mut::<ComponentList<C5>>().unwrap(),
+        )
+    }
+
     pub fn iter(&self) -> Values<TypeId, Box<dyn ComponentListTrait>> {
         self.data.values()
     }

@@ -28,18 +28,18 @@ impl System<GlobalAppData, GameScene, Message> for RendererSystem {
         for sprite in sprites.iter_mut() {
             let position = positions.get_mut(sprite.entity_id)?;
             if position.changed {
-                sprite.rectangle.position = Vec2::new(position.col as f32, position.row as f32) * app.global_data.cell_size;
+                sprite.tilemap.position = Vec2::new(position.coordinates.col as f32, position.coordinates.row as f32) * app.global_data.cell_size;
                 position.changed = false;
             }
 
             if sprite.blinking {
                 if sprite.blinking_last_change_time.elapsed().unwrap().as_millis() >= sprite.blinking_interval as u128 {
-                    let alpha = 1.0 - sprite.rectangle.color.get_alpha();
-                    sprite.rectangle.color.set_alpha(alpha);
+                    let alpha = 1.0 - sprite.tilemap.color.get_alpha();
+                    sprite.tilemap.color.set_alpha(alpha);
                     sprite.blinking_last_change_time = SystemTime::now();
                 }
             } else {
-                sprite.rectangle.color.set_alpha(1.0);
+                sprite.tilemap.color.set_alpha(1.0);
             }
 
             if sprite.layer as usize >= layers.len() {
@@ -51,7 +51,7 @@ impl System<GlobalAppData, GameScene, Message> for RendererSystem {
 
         for layer in layers.iter().rev() {
             for entity_id in layer {
-                app.renderer.draw(&mut world.components.get_many_mut_1::<SpriteComponent>().get_mut(*entity_id)?.rectangle)?;
+                app.renderer.draw(&mut world.components.get_many_mut_1::<SpriteComponent>().get_mut(*entity_id)?.tilemap)?;
             }
         }
 

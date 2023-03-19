@@ -114,7 +114,7 @@ impl Scene<GlobalAppData> for GameScene {
             events.push(event);
         }
 
-        app.renderer.clear(SolidColor::new(0.5, 0.5, 0.5, 1.0));
+        app.renderer.clear(SolidColor::new_rgb(210, 150, 100, 255));
 
         let world = self.world.clone();
         world.write().unwrap().update(app, self, &events)?;

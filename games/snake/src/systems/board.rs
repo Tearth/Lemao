@@ -5,6 +5,7 @@ use crate::components::sprite::SpriteComponent;
 use crate::messages::Message;
 use crate::scenes::game::GameScene;
 use crate::state::global::GlobalAppData;
+use crate::utils::Coordinates;
 use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_framework::app::Application;
@@ -30,21 +31,27 @@ impl System<GlobalAppData, GameScene, Message> for BoardSystem {
                 Message::Init => {
                     for row in 0..app.global_data.board_height {
                         for col in 0..app.global_data.board_width {
+                            let border = if row == 0 || row == app.global_data.board_height - 1 || col == 0 || col == app.global_data.board_width - 1 {
+                                true
+                            } else {
+                                false
+                            };
+                            let texture_name = if border { "border" } else { "cell" };
+
                             let cell_id = world.entities.create();
-                            let mut rectangle = app.renderer.create_rectangle()?;
+                            let mut rectangle = app.renderer.create_tilemap(app.renderer.textures.get_by_name(texture_name)?.id)?;
                             rectangle.size = app.global_data.cell_size;
+                            rectangle.anchor = Vec2::new(0.5, 0.5);
 
                             if row == 0 || row == app.global_data.board_height - 1 || col == 0 || col == app.global_data.board_width - 1 {
-                                rectangle.set_texture(app.renderer.textures.get_by_name("border")?);
                                 world.commands.send(Box::new(SpawnCommand::new(cell_id, ObstacleComponent::new(cell_id))));
                             } else {
-                                rectangle.set_texture(app.renderer.textures.get_by_name("cell")?);
                                 world.commands.send(Box::new(SpawnCommand::new(cell_id, CellComponent::new(cell_id))));
                             }
 
                             rectangle.update();
 
-                            world.commands.send(Box::new(SpawnCommand::new(cell_id, PositionComponent::new(cell_id, row, col))));
+                            world.commands.send(Box::new(SpawnCommand::new(cell_id, PositionComponent::new(cell_id, Coordinates::new(row, col)))));
                             world.commands.send(Box::new(SpawnCommand::new(cell_id, SpriteComponent::new(cell_id, rectangle, LAYER_BOARD))));
                         }
                     }
@@ -54,7 +61,7 @@ impl System<GlobalAppData, GameScene, Message> for BoardSystem {
                     camera.position = Vec2::new(
                         -(window_size.x - (app.global_data.board_width as f32 * app.global_data.cell_size.x)) / 2.0,
                         -(window_size.y - (app.global_data.board_height as f32 * app.global_data.cell_size.y)) / 2.0,
-                    );
+                    ) - Vec2::new(app.global_data.cell_size.x, app.global_data.cell_size.y) / 2.0;
                 }
                 _ => {}
             }

@@ -1,15 +1,16 @@
 use lemao_framework::ecs::components::Component;
 
+use crate::utils::Coordinates;
+
 pub struct PositionComponent {
     pub entity_id: usize,
-    pub row: u8,
-    pub col: u8,
+    pub coordinates: Coordinates,
     pub changed: bool,
 }
 
 impl PositionComponent {
-    pub fn new(entity_id: usize, row: u8, col: u8) -> Self {
-        Self { entity_id, row, col, changed: true }
+    pub fn new(entity_id: usize, coordinates: Coordinates) -> Self {
+        Self { entity_id, coordinates, changed: true }
     }
 }
 

@@ -6,7 +6,9 @@ use crate::components::sprite::SpriteComponent;
 use crate::messages::Message;
 use crate::scenes::game::GameScene;
 use crate::state::global::GlobalAppData;
+use crate::utils::Coordinates;
 use lemao_core::lemao_common_platform::input::InputEvent;
+use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::utils::rand;
 use lemao_framework::app::Application;
 use lemao_framework::ecs::commands::kill::KillCommand;
@@ -51,7 +53,7 @@ impl System<GlobalAppData, GameScene, Message> for FoodSystem {
                                 let row = rand::u8(1..app.global_data.board_height - 2);
                                 let col = rand::u8(1..app.global_data.board_width - 2);
 
-                                if !forbidden_positions.iter().any(|p| p.row == row && p.col == col) {
+                                if !forbidden_positions.iter().any(|p| p.coordinates.row == row && p.coordinates.col == col) {
                                     new_food_positions.push((row, col));
                                     break;
                                 }
@@ -60,13 +62,15 @@ impl System<GlobalAppData, GameScene, Message> for FoodSystem {
 
                         for position in new_food_positions {
                             let food_id = world.entities.create();
-                            let mut food_rectangle = app.renderer.create_rectangle()?;
+                            let mut food_rectangle = app.renderer.create_tilemap(app.renderer.textures.get_by_name("food")?.id)?;
                             food_rectangle.size = app.global_data.cell_size;
-                            food_rectangle.set_texture(app.renderer.textures.get_by_name("food")?);
+                            food_rectangle.anchor = Vec2::new(0.5, 0.5);
                             food_rectangle.update();
 
                             world.commands.send(Box::new(SpawnCommand::new(food_id, FoodComponent::new(food_id))));
-                            world.commands.send(Box::new(SpawnCommand::new(food_id, PositionComponent::new(food_id, position.0, position.1))));
+                            world
+                                .commands
+                                .send(Box::new(SpawnCommand::new(food_id, PositionComponent::new(food_id, Coordinates::new(position.0, position.1)))));
                             world.commands.send(Box::new(SpawnCommand::new(food_id, SpriteComponent::new(food_id, food_rectangle, LAYER_FOOD))));
                         }
 
