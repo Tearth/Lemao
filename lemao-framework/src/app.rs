@@ -1,4 +1,5 @@
 use crate::utils::storage::SceneStorage;
+use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_common_platform::window::WindowStyle;
 use lemao_core::renderer::context::RendererContext;
 use lemao_core::window::context::WindowContext;
@@ -93,6 +94,7 @@ where
                 scene.on_activation(&mut self)?;
 
                 self.current_scene = self.pending_scene.to_string();
+                self.window.force_event(InputEvent::WindowSizeChanged(self.window.get_size()));
             }
 
             self.delta_time = dt_timestamp.elapsed().unwrap().as_secs_f32();

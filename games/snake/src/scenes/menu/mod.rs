@@ -97,11 +97,6 @@ impl Scene<GlobalAppData> for MenuScene {
     }
 
     fn on_activation(&mut self, app: &mut Application<GlobalAppData>) -> Result<(), String> {
-        let size = app.window.get_size();
-
-        app.renderer.set_viewport_size(size)?;
-        self.ui.process_window_event(&mut app.renderer, &InputEvent::WindowSizeChanged(size))?;
-
         Ok(())
     }
 

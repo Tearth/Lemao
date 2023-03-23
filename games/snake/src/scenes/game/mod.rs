@@ -53,6 +53,13 @@ impl GameScene {
 
 impl Scene<GlobalAppData> for GameScene {
     fn on_init(&mut self, app: &mut Application<GlobalAppData>) -> Result<(), String> {
+        Ok(())
+    }
+
+    fn on_activation(&mut self, app: &mut Application<GlobalAppData>) -> Result<(), String> {
+        self.world = Arc::new(RwLock::new(World::new()));
+        self.state = Default::default();
+
         let world = self.world.clone();
         let mut world = world.write().unwrap();
 
@@ -80,15 +87,6 @@ impl Scene<GlobalAppData> for GameScene {
         world.messages.register_receiver::<UiSystem>()?;
 
         InitSystem::default().update(app, self, &mut world, &Vec::new())?;
-
-        Ok(())
-    }
-
-    fn on_activation(&mut self, app: &mut Application<GlobalAppData>) -> Result<(), String> {
-        let size = app.window.get_size();
-
-        app.renderer.set_viewport_size(size)?;
-        self.ui.process_window_event(&mut app.renderer, &InputEvent::WindowSizeChanged(size))?;
 
         Ok(())
     }

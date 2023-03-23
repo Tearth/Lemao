@@ -32,6 +32,10 @@ impl WindowContext {
         self.events.pop_front()
     }
 
+    pub fn force_event(&mut self, event: InputEvent) {
+        self.events.push_back(event);
+    }
+
     pub fn create_renderer(&mut self) -> Result<RendererContext, String> {
         let renderer_platform_specific = self.window.create_renderer()?;
         let mut renderer = RendererContext::new(renderer_platform_specific, self.window.get_size())?;

@@ -1,7 +1,7 @@
 use crate::scenes::game::messages::Message;
 use crate::scenes::game::GameScene;
 use crate::state::global::GlobalAppData;
-use lemao_core::lemao_common_platform::input::InputEvent;
+use lemao_core::lemao_common_platform::input::{InputEvent, Key};
 use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::drawable::Color;
@@ -23,6 +23,15 @@ impl System<GlobalAppData, GameScene, Message> for UiSystem {
         input: &[InputEvent],
     ) -> Result<(), String> {
         let mut update_score = false;
+
+        for event in input {
+            match event {
+                InputEvent::KeyPressed(Key::Escape) => {
+                    app.switch_to_scene("Menu");
+                }
+                _ => {}
+            }
+        }
 
         while let Some(message) = world.messages.poll_message::<Self>() {
             match message {
