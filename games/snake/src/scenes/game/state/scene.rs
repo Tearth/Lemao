@@ -1,4 +1,4 @@
-use super::{game::GameState, ui::UiState};
+use super::{ui::UiState, GameState};
 
 #[derive(Default)]
 pub struct SceneState {

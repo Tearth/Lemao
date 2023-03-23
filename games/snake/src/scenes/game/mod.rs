@@ -1,3 +1,5 @@
+use crate::state::global::GlobalAppData;
+
 use self::components::body::BodyComponent;
 use self::components::cell::CellComponent;
 use self::components::food::FoodComponent;
@@ -6,7 +8,6 @@ use self::components::obstacle::ObstacleComponent;
 use self::components::position::PositionComponent;
 use self::components::sprite::SpriteComponent;
 use self::messages::Message;
-use self::state::global::GlobalAppData;
 use self::state::scene::SceneState;
 use self::systems::board::BoardSystem;
 use self::systems::body::BodySystem;
@@ -52,24 +53,6 @@ impl GameScene {
 
 impl Scene<GlobalAppData> for GameScene {
     fn on_init(&mut self, app: &mut Application<GlobalAppData>) -> Result<(), String> {
-        let mut assets_loader = AssetsLoader::default();
-        assets_loader.set_queue("./assets/")?;
-        assets_loader.start_loading();
-
-        loop {
-            if *assets_loader.loaded_assets.read().unwrap() == assets_loader.total_assets {
-                break;
-            }
-        }
-
-        for texture in assets_loader.textures.read().unwrap().iter() {
-            app.renderer.textures.store_with_name(&texture.name, Texture::new(&app.renderer, &texture.data)?)?;
-        }
-
-        for font in assets_loader.fonts.read().unwrap().iter() {
-            app.renderer.fonts.store_with_name(&font.name, Font::new(&app.renderer, &font.data)?)?;
-        }
-
         let world = self.world.clone();
         let mut world = world.write().unwrap();
 
