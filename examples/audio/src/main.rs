@@ -40,7 +40,7 @@ pub fn main() -> Result<(), String> {
     let chopin_sample_id = audio.samples.store(Sample::new(&audio, &wav::load("./assets/chopin.wav")?)?);
     let chopin_sound_id = audio.create_sound(chopin_sample_id)?;
 
-    let description_text_id = ui.components.store(Box::new(Label::new(&mut renderer, font_id)?));
+    let description_text_id = ui.components.store(Label::new(&mut renderer, font_id)?);
     let description_text = ui.components.get_and_cast_mut::<Label>(description_text_id)?;
     description_text.label_text = DESCRIPTION.to_string();
     description_text.position = ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0));
@@ -49,7 +49,7 @@ pub fn main() -> Result<(), String> {
     description_text.label_line_height = 20;
     ui.components.get_mut(ui.main_canvas_id)?.add_child(description_text_id);
 
-    let status_text_id = ui.components.store(Box::new(Label::new(&mut renderer, font_id)?));
+    let status_text_id = ui.components.store(Label::new(&mut renderer, font_id)?);
     let status_text = ui.components.get_and_cast_mut::<Label>(status_text_id)?;
     status_text.label_text = "Status: stopped".to_string();
     status_text.position = ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0));

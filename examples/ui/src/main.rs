@@ -95,7 +95,7 @@ pub fn main() -> Result<(), String> {
     bar_2_gradient.steps.push(GradientStep::new(SolidColor::new_rgb(10, 152, 38, 255), 0.55));
     bar_2_gradient.steps.push(GradientStep::new(SolidColor::new_rgb(10, 152, 38, 255), 1.0));
 
-    let progressbar_id = ui.components.store(Box::new(ProgressBar::new(&mut renderer, regular_font_id)?));
+    let progressbar_id = ui.components.store(ProgressBar::new(&mut renderer, regular_font_id)?);
     let progressbar = ui.components.get_and_cast_mut::<ProgressBar>(progressbar_id)?;
     progressbar.position = ComponentPosition::RelativeToParent(Vec2::new(0.5, 1.0));
     progressbar.size = ComponentSize::Relative(Vec2::new(0.6, 1.0));
@@ -140,7 +140,7 @@ pub fn main() -> Result<(), String> {
     window_shadow_gradient.steps.push(GradientStep::new(SolidColor::new_rgb(0, 0, 0, 255), 0.99));
     window_shadow_gradient.steps.push(GradientStep::new(SolidColor::new_rgb(0, 0, 0, 0), 1.0));
 
-    let main_window_id = ui.components.store(Box::new(Panel::new(&mut renderer, ComponentShape::Rectangle)?));
+    let main_window_id = ui.components.store(Panel::new(&mut renderer, ComponentShape::Rectangle)?);
     let main_window = ui.components.get_and_cast_mut::<Panel>(main_window_id)?;
     main_window.position = ComponentPosition::RelativeToParent(Vec2::new(0.5, 0.5));
     main_window.size = ComponentSize::Absolute(Vec2::new(690.0, 620.0));
@@ -156,7 +156,7 @@ pub fn main() -> Result<(), String> {
     main_window.shadow_scale = Vec2::new(1.03, 1.03);
     ui.components.get_mut(ui.main_canvas_id)?.add_child(main_window_id);
 
-    let window_title_id = ui.components.store(Box::new(Label::new(&mut renderer, header_font_id)?));
+    let window_title_id = ui.components.store(Label::new(&mut renderer, header_font_id)?);
     let window_title = ui.components.get_and_cast_mut::<Label>(window_title_id)?;
     window_title.position = ComponentPosition::RelativeToParent(Vec2::new(0.5, 1.0));
     window_title.anchor = Vec2::new(0.5, 0.5);
@@ -167,7 +167,7 @@ pub fn main() -> Result<(), String> {
     window_title.shadow_color = Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 1.0));
     ui.components.get_mut(main_window_id)?.add_child(window_title_id);
 
-    let image_id = ui.components.store(Box::new(Panel::new(&mut renderer, ComponentShape::Rectangle)?));
+    let image_id = ui.components.store(Panel::new(&mut renderer, ComponentShape::Rectangle)?);
     let image = ui.components.get_and_cast_mut::<Panel>(image_id)?;
     image.set_texture(renderer.textures.get(texture_id)?);
     image.size = ComponentSize::Absolute(Vec2::new(300.0, 150.0));
@@ -184,7 +184,7 @@ pub fn main() -> Result<(), String> {
     quote_panel_gradient.steps.push(GradientStep::new(SolidColor::new_rgb(96, 97, 115, 0), 0.0));
     quote_panel_gradient.steps.push(GradientStep::new(SolidColor::new_rgb(96, 97, 115, 255), 1.0));
 
-    let quote_panel_id = ui.components.store(Box::new(Panel::new(&mut renderer, ComponentShape::Rectangle)?));
+    let quote_panel_id = ui.components.store(Panel::new(&mut renderer, ComponentShape::Rectangle)?);
     let quote_panel = ui.components.get_and_cast_mut::<Panel>(quote_panel_id)?;
     quote_panel.position = ComponentPosition::RelativeToParent(Vec2::new(1.0, 1.0));
     quote_panel.size = ComponentSize::Absolute(Vec2::new(400.0, 150.0));
@@ -198,7 +198,7 @@ pub fn main() -> Result<(), String> {
     quote_panel.border_color = Color::SolidColor(SolidColor::new_rgb(86, 92, 107, 255));
     ui.components.get_mut(main_window_id)?.add_child(quote_panel_id);
 
-    let quote_id = ui.components.store(Box::new(Label::new(&mut renderer, regular_font_id)?));
+    let quote_id = ui.components.store(Label::new(&mut renderer, regular_font_id)?);
     let quote = ui.components.get_and_cast_mut::<Label>(quote_id)?;
     quote.position = ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0));
     quote.anchor = Vec2::new(0.0, 1.0);
@@ -213,7 +213,7 @@ pub fn main() -> Result<(), String> {
     quote.shadow_color = Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 0.5));
     ui.components.get_mut(quote_panel_id)?.add_child(quote_id);
 
-    let description_panel_id = ui.components.store(Box::new(Panel::new(&mut renderer, ComponentShape::Rectangle)?));
+    let description_panel_id = ui.components.store(Panel::new(&mut renderer, ComponentShape::Rectangle)?);
     let description_panel = ui.components.get_and_cast_mut::<Panel>(description_panel_id)?;
     description_panel.position = ComponentPosition::RelativeToParent(Vec2::new(1.0, 1.0));
     description_panel.size = ComponentSize::Relative(Vec2::new(1.0, 150.0));
@@ -231,7 +231,7 @@ pub fn main() -> Result<(), String> {
     scroll_gradient.steps.push(GradientStep::new(SolidColor::new_rgb(213, 195, 168, 255), 0.0));
     scroll_gradient.steps.push(GradientStep::new(SolidColor::new_rgb(167, 148, 134, 255), 1.0));
 
-    let description_scrollbox_id = ui.components.store(Box::new(Scrollbox::new(&mut renderer)?));
+    let description_scrollbox_id = ui.components.store(Scrollbox::new(&mut renderer)?);
     let description_scrollbox = ui.components.get_and_cast_mut::<Scrollbox>(description_scrollbox_id)?;
     description_scrollbox.size = ComponentSize::Relative(Vec2::new(1.0, 1.0));
     description_scrollbox.vertical_scroll_background_color = Color::SolidColor(SolidColor::new_rgb(0, 0, 0, 120));
@@ -255,7 +255,7 @@ pub fn main() -> Result<(), String> {
     description_scrollbox.scroll_width = Vec2::new(20.0, 0.0);
     ui.components.get_mut(description_panel_id)?.add_child(description_scrollbox_id);
 
-    let description_id = ui.components.store(Box::new(Label::new(&mut renderer, regular_font_id)?));
+    let description_id = ui.components.store(Label::new(&mut renderer, regular_font_id)?);
     let description = ui.components.get_and_cast_mut::<Label>(description_id)?;
     description.position = ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0));
     description.anchor = Vec2::new(0.0, 1.0);
@@ -276,7 +276,7 @@ pub fn main() -> Result<(), String> {
     effect_panel_1_gradient.steps.push(GradientStep::new(SolidColor::new_rgb(96, 97, 115, 0), 0.0));
     effect_panel_1_gradient.steps.push(GradientStep::new(SolidColor::new_rgb(96, 97, 115, 255), 1.0));
 
-    let effect_panel_1_id = ui.components.store(Box::new(Panel::new(&mut renderer, ComponentShape::Rectangle)?));
+    let effect_panel_1_id = ui.components.store(Panel::new(&mut renderer, ComponentShape::Rectangle)?);
     let effect_panel_1 = ui.components.get_and_cast_mut::<Panel>(effect_panel_1_id)?;
     effect_panel_1.position = ComponentPosition::RelativeToParent(Vec2::new(0.5, 0.0));
     effect_panel_1.size = ComponentSize::Relative(Vec2::new(1.0, 1.0));
@@ -288,7 +288,7 @@ pub fn main() -> Result<(), String> {
     effect_panel_1.corner_rounding = ComponentCornerRounding::new(5.0, 5.0, 5.0, 5.0);
     ui.components.get_mut(main_window_id)?.add_child(effect_panel_1_id);
 
-    let effect_panel_2_id = ui.components.store(Box::new(Panel::new(&mut renderer, ComponentShape::Rectangle)?));
+    let effect_panel_2_id = ui.components.store(Panel::new(&mut renderer, ComponentShape::Rectangle)?);
     let effect_panel_2 = ui.components.get_and_cast_mut::<Panel>(effect_panel_2_id)?;
     effect_panel_2.position = ComponentPosition::RelativeToParent(Vec2::new(0.5, 0.0));
     effect_panel_2.size = ComponentSize::Relative(Vec2::new(1.0, 1.0));
@@ -300,7 +300,7 @@ pub fn main() -> Result<(), String> {
     effect_panel_2.corner_rounding = ComponentCornerRounding::new(5.0, 5.0, 5.0, 5.0);
     ui.components.get_mut(main_window_id)?.add_child(effect_panel_2_id);
 
-    let effect_id = ui.components.store(Box::new(Label::new(&mut renderer, regular_font_id)?));
+    let effect_id = ui.components.store(Label::new(&mut renderer, regular_font_id)?);
     let effect = ui.components.get_and_cast_mut::<Label>(effect_id)?;
     effect.position = ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0));
     effect.anchor = Vec2::new(0.0, 1.0);
@@ -318,7 +318,7 @@ pub fn main() -> Result<(), String> {
     button_filling_gradient.steps.push(GradientStep::new(SolidColor::new_rgb(159, 148, 135, 255), 0.0));
     button_filling_gradient.steps.push(GradientStep::new(SolidColor::new_rgb(234, 221, 198, 255), 1.0));
 
-    let ok_button_id = ui.components.store(Box::new(Button::new(&mut renderer, ComponentShape::Rectangle, bold_font_id)?));
+    let ok_button_id = ui.components.store(Button::new(&mut renderer, ComponentShape::Rectangle, bold_font_id)?);
     let ok_button = ui.components.get_and_cast_mut::<Button>(ok_button_id)?;
     ok_button.position = ComponentPosition::RelativeToParent(Vec2::new(0.5, 0.0));
     ok_button.size = ComponentSize::Absolute(Vec2::new(100.0, 25.0));
@@ -353,7 +353,7 @@ pub fn main() -> Result<(), String> {
     /* #endregion */
 
     /* #region Right side window */
-    let right_window_id = ui.components.store(Box::new(Panel::new(&mut renderer, ComponentShape::Rectangle)?));
+    let right_window_id = ui.components.store(Panel::new(&mut renderer, ComponentShape::Rectangle)?);
     let right_window = ui.components.get_and_cast_mut::<Panel>(right_window_id)?;
     right_window.position = ComponentPosition::RelativeToParent(Vec2::new(1.0, 0.5));
     right_window.offset = Vec2::new(-15.0, 0.0);
@@ -370,7 +370,7 @@ pub fn main() -> Result<(), String> {
     right_window.shadow_scale = Vec2::new(1.03, 1.03);
     ui.components.get_mut(ui.main_canvas_id)?.add_child(right_window_id);
 
-    let right_window_title_id = ui.components.store(Box::new(Label::new(&mut renderer, header_font_id)?));
+    let right_window_title_id = ui.components.store(Label::new(&mut renderer, header_font_id)?);
     let right_window_title = ui.components.get_and_cast_mut::<Label>(right_window_title_id)?;
     right_window_title.position = ComponentPosition::RelativeToParent(Vec2::new(0.5, 1.0));
     right_window_title.anchor = Vec2::new(0.5, 0.5);
@@ -395,7 +395,7 @@ pub fn main() -> Result<(), String> {
     ];
 
     for checkbox_label in checkbox_labels {
-        let checkbox_id = ui.components.store(Box::new(Checkbox::new(&mut renderer, regular_font_id, box_checked_id, box_unchecked_id)?));
+        let checkbox_id = ui.components.store(Checkbox::new(&mut renderer, regular_font_id, box_checked_id, box_unchecked_id)?);
         let checkbox = ui.components.get_and_cast_mut::<Checkbox>(checkbox_id)?;
         checkbox.position = ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0));
         checkbox.offset = Vec2::new(0.0, -75.0 - 30.0 * checkbox_ids.len() as f32);
@@ -418,7 +418,7 @@ pub fn main() -> Result<(), String> {
     let textbox_labels = ["Player name:", "Empire name:", "World name:"];
 
     for textbox_label in textbox_labels {
-        let label_id = ui.components.store(Box::new(Label::new(&mut renderer, regular_font_id)?));
+        let label_id = ui.components.store(Label::new(&mut renderer, regular_font_id)?);
         let label = ui.components.get_and_cast_mut::<Label>(label_id)?;
         label.position = ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0));
         label.offset = Vec2::new(0.0, -348.0 - 30.0 * textbox_label_ids.len() as f32);
@@ -431,7 +431,7 @@ pub fn main() -> Result<(), String> {
 
         textbox_label_ids.push(label_id);
 
-        let textbox_id = ui.components.store(Box::new(TextBox::new(&mut renderer, regular_font_id)?));
+        let textbox_id = ui.components.store(TextBox::new(&mut renderer, regular_font_id)?);
         let textbox = ui.components.get_and_cast_mut::<TextBox>(textbox_id)?;
         textbox.position = ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0));
         textbox.size = ComponentSize::Absolute(Vec2::new(180.0, 30.0));
@@ -461,7 +461,7 @@ pub fn main() -> Result<(), String> {
         textbox_ids.push(textbox_id);
     }
 
-    let right_window_focuses_title_id = ui.components.store(Box::new(Label::new(&mut renderer, header_font_id)?));
+    let right_window_focuses_title_id = ui.components.store(Label::new(&mut renderer, header_font_id)?);
     let right_window_focuses_title = ui.components.get_and_cast_mut::<Label>(right_window_focuses_title_id)?;
     right_window_focuses_title.position = ComponentPosition::RelativeToParent(Vec2::new(0.5, 1.0));
     right_window_focuses_title.anchor = Vec2::new(0.5, 0.5);
@@ -476,7 +476,7 @@ pub fn main() -> Result<(), String> {
     let toggle_button_labels = ["\u{C8}", "\u{C9}", "\u{CA}"];
 
     for toggle_button_label in toggle_button_labels {
-        let button_id = ui.components.store(Box::new(Button::new(&mut renderer, ComponentShape::Rectangle, regular_font_id)?));
+        let button_id = ui.components.store(Button::new(&mut renderer, ComponentShape::Rectangle, regular_font_id)?);
         let button = ui.components.get_and_cast_mut::<Button>(button_id)?;
         button.position = ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0));
         button.size = ComponentSize::Absolute(Vec2::new(40.0, 30.0));
@@ -524,7 +524,7 @@ pub fn main() -> Result<(), String> {
     let slider_steps_count = [5, 11, u32::MAX];
 
     for slider_label in slider_labels {
-        let label_id = ui.components.store(Box::new(Label::new(&mut renderer, regular_font_id)?));
+        let label_id = ui.components.store(Label::new(&mut renderer, regular_font_id)?);
         let label = ui.components.get_and_cast_mut::<Label>(label_id)?;
         label.position = ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0));
         label.anchor = Vec2::new(0.0, 0.5);
@@ -538,7 +538,7 @@ pub fn main() -> Result<(), String> {
 
         slider_label_ids.push(label_id);
 
-        let slider_id = ui.components.store(Box::new(Slider::new(&mut renderer, ComponentShape::Disc)?));
+        let slider_id = ui.components.store(Slider::new(&mut renderer, ComponentShape::Disc)?);
         let slider = ui.components.get_and_cast_mut::<Slider>(slider_id)?;
         slider.position = ComponentPosition::RelativeToParent(Vec2::new(0.5, 1.0));
         slider.size = ComponentSize::Absolute(Vec2::new(210.0, 10.0));
@@ -563,7 +563,7 @@ pub fn main() -> Result<(), String> {
     /* #endregion */
 
     /* #region Left side window */
-    let left_window_id = ui.components.store(Box::new(Panel::new(&mut renderer, ComponentShape::Rectangle)?));
+    let left_window_id = ui.components.store(Panel::new(&mut renderer, ComponentShape::Rectangle)?);
     let left_window = ui.components.get_and_cast_mut::<Panel>(left_window_id)?;
     left_window.position = ComponentPosition::RelativeToParent(Vec2::new(0.0, 0.5));
     left_window.offset = Vec2::new(15.0, 0.0);
@@ -580,7 +580,7 @@ pub fn main() -> Result<(), String> {
     left_window.shadow_scale = Vec2::new(1.03, 1.03);
     ui.components.get_mut(ui.main_canvas_id)?.add_child(left_window_id);
 
-    let left_window_title_id = ui.components.store(Box::new(Label::new(&mut renderer, header_font_id)?));
+    let left_window_title_id = ui.components.store(Label::new(&mut renderer, header_font_id)?);
     let left_window_title = ui.components.get_and_cast_mut::<Label>(left_window_title_id)?;
     left_window_title.position = ComponentPosition::RelativeToParent(Vec2::new(0.5, 1.0));
     left_window_title.anchor = Vec2::new(0.5, 0.5);
@@ -595,7 +595,7 @@ pub fn main() -> Result<(), String> {
     pie_chart_1_filling_gradient.steps.push(GradientStep::new(SolidColor::new_rgb(254, 135, 177, 255), 0.0));
     pie_chart_1_filling_gradient.steps.push(GradientStep::new(SolidColor::new_rgb(234, 95, 137, 255), 1.0));
 
-    let pie_chart_1_id = ui.components.store(Box::new(Panel::new(&mut renderer, ComponentShape::Disc)?));
+    let pie_chart_1_id = ui.components.store(Panel::new(&mut renderer, ComponentShape::Disc)?);
     let pie_chart_1 = ui.components.get_and_cast_mut::<Panel>(pie_chart_1_id)?;
     pie_chart_1.position = ComponentPosition::RelativeToParent(Vec2::new(0.5, 1.0));
     pie_chart_1.offset = Vec2::new(0.0, -180.0);
@@ -614,7 +614,7 @@ pub fn main() -> Result<(), String> {
     pie_chart_2_filling_gradient.steps.push(GradientStep::new(SolidColor::new_rgb(175, 69, 166, 255), 0.0));
     pie_chart_2_filling_gradient.steps.push(GradientStep::new(SolidColor::new_rgb(135, 29, 126, 255), 1.0));
 
-    let pie_chart_2_id = ui.components.store(Box::new(Panel::new(&mut renderer, ComponentShape::Disc)?));
+    let pie_chart_2_id = ui.components.store(Panel::new(&mut renderer, ComponentShape::Disc)?);
     let pie_chart_2 = ui.components.get_and_cast_mut::<Panel>(pie_chart_2_id)?;
     pie_chart_2.position = ComponentPosition::RelativeToParent(Vec2::new(0.5, 1.0));
     pie_chart_2.offset = Vec2::new(0.0, -180.0);
@@ -633,7 +633,7 @@ pub fn main() -> Result<(), String> {
     pie_chart_3_filling_gradient.steps.push(GradientStep::new(SolidColor::new_rgb(147, 82, 186, 255), 0.0));
     pie_chart_3_filling_gradient.steps.push(GradientStep::new(SolidColor::new_rgb(107, 42, 146, 255), 1.0));
 
-    let pie_chart_3_id = ui.components.store(Box::new(Panel::new(&mut renderer, ComponentShape::Disc)?));
+    let pie_chart_3_id = ui.components.store(Panel::new(&mut renderer, ComponentShape::Disc)?);
     let pie_chart_3 = ui.components.get_and_cast_mut::<Panel>(pie_chart_3_id)?;
     pie_chart_3.position = ComponentPosition::RelativeToParent(Vec2::new(0.5, 1.0));
     pie_chart_3.offset = Vec2::new(0.0, -180.0);
@@ -648,7 +648,7 @@ pub fn main() -> Result<(), String> {
     pie_chart_3.on_cursor_leave = Some(|panel, _| panel.color.set_alpha(1.0));
     ui.components.get_mut(left_window_id)?.add_child(pie_chart_3_id);
 
-    let pie_chart_legend_id = ui.components.store(Box::new(Label::new(&mut renderer, regular_font_id)?));
+    let pie_chart_legend_id = ui.components.store(Label::new(&mut renderer, regular_font_id)?);
     let pie_chart_legend = ui.components.get_and_cast_mut::<Label>(pie_chart_legend_id)?;
     pie_chart_legend.position = ComponentPosition::RelativeToParent(Vec2::new(0.5, 1.0));
     pie_chart_legend.anchor = Vec2::new(0.5, 1.0);
@@ -661,7 +661,7 @@ pub fn main() -> Result<(), String> {
     pie_chart_legend.shadow_color = Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 0.5));
     ui.components.get_mut(left_window_id)?.add_child(pie_chart_legend_id);
 
-    let line_chart_id = ui.components.store(Box::new(Wire::new(&mut renderer)?));
+    let line_chart_id = ui.components.store(Wire::new(&mut renderer)?);
     let line_chart = ui.components.get_and_cast_mut::<Wire>(line_chart_id)?;
     line_chart.position = ComponentPosition::RelativeToParent(Vec2::new(0.5, 1.0));
     line_chart.offset = Vec2::new(0.0, -480.0);

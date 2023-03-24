@@ -40,7 +40,7 @@ pub fn main() -> Result<(), String> {
     animation.position = window_size / 2.0;
     animation.update();
 
-    let description_text_id = ui.components.store(Box::new(Label::new(&mut renderer, font_id)?));
+    let description_text_id = ui.components.store(Label::new(&mut renderer, font_id)?);
     let description_text = ui.components.get_and_cast_mut::<Label>(description_text_id)?;
     description_text.label_text = DESCRIPTION.to_string();
     description_text.position = ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0));

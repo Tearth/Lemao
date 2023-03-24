@@ -8,10 +8,13 @@ pub struct UiStorage {
 }
 
 impl UiStorage {
-    pub fn store(&mut self, mut item: Box<dyn Component>) -> usize {
+    pub fn store<T>(&mut self, mut item: T) -> usize
+    where
+        T: Component + 'static,
+    {
         let id = self.get_new_id();
         item.set_id(id);
-        self.data[id] = Some(item);
+        self.data[id] = Some(Box::new(item));
 
         id
     }

@@ -39,7 +39,7 @@ impl UiContext {
             components: Default::default(),
             events: Default::default(),
         };
-        ui.main_canvas_id = ui.components.store(Box::new(Canvas::new()?));
+        ui.main_canvas_id = ui.components.store(Canvas::new()?);
 
         let main_canvas = ui.components.get_mut(ui.main_canvas_id)?;
         main_canvas.set_size(ComponentSize::Absolute(renderer.viewport_size));

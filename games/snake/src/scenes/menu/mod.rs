@@ -53,14 +53,14 @@ impl Scene<GlobalAppData> for MenuScene {
 
         let font_id = app.renderer.fonts.get_by_name("pixeled")?.id;
 
-        self.state.ui.logo_panel_id = self.ui.components.store(Box::new(Panel::new(&mut app.renderer, ComponentShape::Rectangle)?));
+        self.state.ui.logo_panel_id = self.ui.components.store(Panel::new(&mut app.renderer, ComponentShape::Rectangle)?);
         let logo_panel = self.ui.components.get_and_cast_mut::<Panel>(self.state.ui.logo_panel_id)?;
         logo_panel.position = ComponentPosition::RelativeToParent(Vec2::new(0.5, 1.0));
         logo_panel.anchor = Vec2::new(0.5, 1.0);
         logo_panel.set_texture(app.renderer.textures.get_by_name("logo")?);
         self.ui.components.get_mut(self.ui.main_canvas_id)?.add_child(self.state.ui.logo_panel_id);
 
-        self.state.ui.play_button_id = self.ui.components.store(Box::new(Button::new(&mut app.renderer, ComponentShape::Rectangle, font_id)?));
+        self.state.ui.play_button_id = self.ui.components.store(Button::new(&mut app.renderer, ComponentShape::Rectangle, font_id)?);
         let play_button = self.ui.components.get_and_cast_mut::<Button>(self.state.ui.play_button_id)?;
         play_button.position = ComponentPosition::RelativeToParent(Vec2::new(0.5, 0.5));
         play_button.anchor = Vec2::new(0.5, 0.5);
@@ -73,7 +73,7 @@ impl Scene<GlobalAppData> for MenuScene {
         play_button.on_mouse_button_released = Some(|button, _, _| button.color.set_alpha(1.0));
         self.ui.components.get_mut(self.ui.main_canvas_id)?.add_child(self.state.ui.play_button_id);
 
-        self.state.ui.exit_button_id = self.ui.components.store(Box::new(Button::new(&mut app.renderer, ComponentShape::Rectangle, font_id)?));
+        self.state.ui.exit_button_id = self.ui.components.store(Button::new(&mut app.renderer, ComponentShape::Rectangle, font_id)?);
         let exit_button = self.ui.components.get_and_cast_mut::<Button>(self.state.ui.exit_button_id)?;
         exit_button.position = ComponentPosition::RelativeToParent(Vec2::new(0.5, 0.5));
         exit_button.anchor = Vec2::new(0.5, 0.5);
