@@ -216,7 +216,6 @@ impl Button {
 }
 
 impl Component for Button {
-    /* #region Common properties */
     fn get_id(&self) -> usize {
         self.id
     }
@@ -225,6 +224,7 @@ impl Component for Button {
         self.id = id;
     }
 
+    /* #region Common properties */
     fn get_position(&self) -> ComponentPosition {
         self.position
     }

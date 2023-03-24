@@ -1,6 +1,7 @@
 use lemao_core::lemao_common_platform::input::MouseButton;
 use lemao_math::vec2::Vec2;
 
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub enum UiEvent {
     CursorEnter(usize, Vec2),
     CursorLeave(usize, Vec2),

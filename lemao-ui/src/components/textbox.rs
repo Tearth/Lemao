@@ -189,7 +189,6 @@ impl TextBox {
 }
 
 impl Component for TextBox {
-    /* #region Common properties */
     fn get_id(&self) -> usize {
         self.id
     }
@@ -198,6 +197,7 @@ impl Component for TextBox {
         self.id = id;
     }
 
+    /* #region Common properties */
     fn get_position(&self) -> ComponentPosition {
         self.position
     }

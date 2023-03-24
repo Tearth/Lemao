@@ -1,4 +1,4 @@
-#![allow(clippy::collapsible_else_if, clippy::too_many_arguments, clippy::uninlined_format_args)]
+#![allow(clippy::collapsible_else_if, clippy::too_many_arguments)]
 
 pub mod components;
 pub mod context;

@@ -78,7 +78,10 @@ impl UiContext {
 
     pub fn begin_scrollbox(&self, scrollbox_id: usize, renderer: &RendererContext) -> Result<(), String> {
         let scrollbox = self.components.get(scrollbox_id)?;
-        renderer.enable_scissor(scrollbox.get_work_area_position(), scrollbox.get_work_area_size());
+        let position = scrollbox.get_work_area_position();
+        let size = scrollbox.get_work_area_size();
+
+        renderer.enable_scissor(position, size);
 
         Ok(())
     }
@@ -140,10 +143,10 @@ impl UiContext {
             updated_components += 1;
         }
 
-        let component_area_position = component.get_work_area_position();
-        let component_area_size = component.get_work_area_size();
+        let area_position = component.get_work_area_position();
+        let area_size = component.get_work_area_size();
         let (event_mask, scroll_offset) = if let Ok(scrollbox) = self.components.get_and_cast::<Scrollbox>(component_id) {
-            (Some(EventMask::new(component_area_position, component_area_size)), if update { Some(scrollbox.get_scroll_delta()) } else { None })
+            (Some(EventMask::new(area_position, area_size)), if update { Some(scrollbox.get_scroll_delta()) } else { None })
         } else {
             (event_mask, Default::default())
         };
@@ -151,8 +154,7 @@ impl UiContext {
         self.components.get_mut(component_id)?.set_event_mask(event_mask);
 
         for child_id in self.components.get_mut(component_id)?.get_children().clone() {
-            updated_components +=
-                self.update_internal(renderer, child_id, component_area_position, component_area_size, event_mask, scroll_offset, force || update)?;
+            updated_components += self.update_internal(renderer, child_id, area_position, area_size, event_mask, scroll_offset, force || update)?;
         }
 
         // Scrollbox needs to be updated second time, after all children are refreshed
@@ -196,6 +198,7 @@ impl UiContext {
                 false => SolidColor::new(0.2, 0.2, 0.2, 1.0),
             });
             self.debug_frame.update();
+
             renderer.draw(&mut self.debug_frame)?;
         }
 

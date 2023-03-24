@@ -90,7 +90,6 @@ impl Canvas {
 }
 
 impl Component for Canvas {
-    /* #region Common properties */
     fn get_id(&self) -> usize {
         self.id
     }
@@ -99,6 +98,7 @@ impl Component for Canvas {
         self.id = id;
     }
 
+    /* #region Common properties */
     fn get_position(&self) -> ComponentPosition {
         self.position
     }

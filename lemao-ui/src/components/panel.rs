@@ -175,7 +175,6 @@ impl Panel {
 }
 
 impl Component for Panel {
-    /* #region Common properties */
     fn get_id(&self) -> usize {
         self.id
     }
@@ -184,6 +183,7 @@ impl Component for Panel {
         self.id = id;
     }
 
+    /* #region Common properties */
     fn get_position(&self) -> ComponentPosition {
         self.position
     }

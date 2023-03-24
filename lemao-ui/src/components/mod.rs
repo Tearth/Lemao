@@ -20,13 +20,13 @@ pub mod slider;
 pub mod textbox;
 pub mod wire;
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub enum ComponentPosition {
     AbsoluteToParent(Vec2),
     RelativeToParent(Vec2),
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub enum ComponentSize {
     Absolute(Vec2),
     Relative(Vec2),
@@ -48,7 +48,7 @@ pub enum ComponentBorderShape {
     Circle(Circle),
 }
 
-#[derive(Copy, Clone, Debug, Default)]
+#[derive(Copy, Clone, Debug, Default, PartialEq)]
 pub struct ComponentMargin {
     pub top: f32,
     pub bottom: f32,
@@ -72,14 +72,14 @@ pub struct ComponentCornerRounding {
     pub left_top: f32,
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub enum HorizontalAlignment {
     Left,
     Middle,
     Right,
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub enum VerticalAlignment {
     Top,
     Middle,
@@ -137,10 +137,6 @@ impl ComponentMargin {
 impl ComponentBorderThickness {
     pub fn new(top: f32, bottom: f32, right: f32, left: f32) -> Self {
         Self { top, bottom, right, left }
-    }
-
-    pub fn is_axially_uniform(&self) -> bool {
-        self.top == self.bottom && self.left == self.right
     }
 }
 

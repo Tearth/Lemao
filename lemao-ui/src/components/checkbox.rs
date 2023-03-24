@@ -167,7 +167,6 @@ impl Checkbox {
 }
 
 impl Component for Checkbox {
-    /* #region Common properties */
     fn get_id(&self) -> usize {
         self.id
     }
@@ -176,6 +175,7 @@ impl Component for Checkbox {
         self.id = id;
     }
 
+    /* #region Common properties */
     fn get_position(&self) -> ComponentPosition {
         self.position
     }
@@ -342,15 +342,10 @@ impl Component for Checkbox {
         self.r#box.position = self.screen_position + self.box_offset;
         self.r#box.color = self.box_color.clone();
 
-        if self.checked {
-            let texture = renderer.textures.get(self.box_checked_texture_id)?;
-            self.box_size = texture.size;
-            self.r#box.set_texture(texture);
-        } else {
-            let texture = renderer.textures.get(self.box_unchecked_texture_id)?;
-            self.box_size = texture.size;
-            self.r#box.set_texture(texture);
-        }
+        let texture_id = if self.checked { self.box_checked_texture_id } else { self.box_unchecked_texture_id };
+        let texture = renderer.textures.get(texture_id)?;
+        self.box_size = texture.size;
+        self.r#box.set_texture(texture);
 
         self.r#box.size = self.box_size;
         self.r#box.update();

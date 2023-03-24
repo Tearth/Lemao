@@ -170,10 +170,6 @@ impl ProgressBar {
         })
     }
 
-    pub fn get_id(&self) -> usize {
-        self.id
-    }
-
     pub fn set_bar_texture(&mut self, bar_id: usize, texture: &Texture) {
         self.bars[bar_id].texture_id = Some(texture.id);
         self.dirty = true;
@@ -216,7 +212,6 @@ impl ProgressBar {
 }
 
 impl Component for ProgressBar {
-    /* #region Common properties */
     fn get_id(&self) -> usize {
         self.id
     }
@@ -225,6 +220,7 @@ impl Component for ProgressBar {
         self.id = id;
     }
 
+    /* #region Common properties */
     fn get_position(&self) -> ComponentPosition {
         self.position
     }
