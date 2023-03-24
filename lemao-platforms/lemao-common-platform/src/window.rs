@@ -1,11 +1,10 @@
-use lemao_math::vec2::Vec2;
-
 use crate::input::InputEvent;
 use crate::input::Key;
 use crate::input::MouseButton;
 use crate::renderer::RendererPlatformSpecific;
+use lemao_math::vec2::Vec2;
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub enum WindowStyle {
     Window { position: Vec2, size: Vec2 },
     Borderless,

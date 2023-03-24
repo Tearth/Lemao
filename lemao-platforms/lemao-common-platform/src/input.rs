@@ -1,5 +1,6 @@
 use lemao_math::vec2::Vec2;
 
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub enum InputEvent {
     Unknown,
     WindowMoved(Vec2),
@@ -14,7 +15,7 @@ pub enum InputEvent {
     MouseWheelRotated(MouseWheelDirection, Vec2),
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub enum Key {
     Unknown,
     Enter,
