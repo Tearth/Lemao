@@ -1,5 +1,5 @@
 use crate::scenes::game::components::body::{BodyComponent, BodyOrientation};
-use crate::scenes::game::components::head::{HeadComponent, HeadDirection};
+use crate::scenes::game::components::head::HeadDirection;
 use crate::scenes::game::components::position::PositionComponent;
 use crate::scenes::game::components::sprite::SpriteComponent;
 use crate::scenes::game::messages::Message;
@@ -26,10 +26,7 @@ impl System<GlobalAppData, GameScene, Message> for BodySystem {
             match message {
                 Message::GameTick => {
                     if !scene.state.game.snake_killed {
-                        let (heads, bodies, positions, sprites) =
-                            world.components.get_many_mut_4::<HeadComponent, BodyComponent, PositionComponent, SpriteComponent>();
-                        let head = heads.iter().next().unwrap();
-                        let head_position = positions.get(head.entity_id)?;
+                        let (bodies, positions, sprites) = world.components.get_many_mut_3::<BodyComponent, PositionComponent, SpriteComponent>();
                         let mut body_positions = Vec::new();
 
                         for body in bodies.iter_mut().filter(|b| !b.killed) {

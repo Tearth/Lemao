@@ -1,6 +1,6 @@
-use std::{alloc::System, time::SystemTime};
+use std::time::SystemTime;
 
-use lemao_core::renderer::drawable::{rectangle::Rectangle, tilemap::Tilemap};
+use lemao_core::renderer::drawable::tilemap::Tilemap;
 use lemao_framework::ecs::components::Component;
 
 pub struct SpriteComponent {

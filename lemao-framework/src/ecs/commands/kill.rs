@@ -1,7 +1,4 @@
-use crate::ecs::{
-    components::{list::ComponentList, Component},
-    world::World,
-};
+use crate::ecs::world::World;
 
 use super::Command;
 
@@ -28,7 +25,7 @@ impl<G, S, M> Command<G, S, M> for KillCommand {
         world.entities.remove(self.entity_id)?;
 
         for component_manager in world.components.iter_mut() {
-            let mut component_manager = component_manager;
+            let component_manager = component_manager;
 
             if component_manager.contains(self.entity_id) {
                 component_manager.remove(self.entity_id)?;

@@ -43,7 +43,7 @@ impl Scene<GlobalAppData> for FirstScene {
         Ok(())
     }
 
-    fn on_activation(&mut self, app: &mut Application<GlobalAppData>) -> Result<(), String> {
+    fn on_activation(&mut self, _app: &mut Application<GlobalAppData>) -> Result<(), String> {
         Ok(())
     }
 

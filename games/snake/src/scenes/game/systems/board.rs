@@ -31,11 +31,7 @@ impl System<GlobalAppData, GameScene, Message> for BoardSystem {
                 Message::Init => {
                     for row in 0..app.global_data.board_height {
                         for col in 0..app.global_data.board_width {
-                            let border = if row == 0 || row == app.global_data.board_height - 1 || col == 0 || col == app.global_data.board_width - 1 {
-                                true
-                            } else {
-                                false
-                            };
+                            let border = row == 0 || row == app.global_data.board_height - 1 || col == 0 || col == app.global_data.board_width - 1;
                             let texture_name = if border { "border" } else { "cell" };
 
                             let cell_id = world.entities.create();

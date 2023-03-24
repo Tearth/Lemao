@@ -1,16 +1,7 @@
-use crate::components::button::Button;
 use crate::components::canvas::Canvas;
-use crate::components::checkbox::Checkbox;
-use crate::components::label::Label;
-use crate::components::panel::Panel;
-use crate::components::progressbar::ProgressBar;
 use crate::components::scrollbox::Scrollbox;
-use crate::components::slider::Slider;
-use crate::components::textbox::TextBox;
-use crate::components::wire::Wire;
 use crate::components::Component;
 use crate::components::ComponentPosition;
-use crate::components::ComponentShape;
 use crate::components::ComponentSize;
 use crate::components::EventMask;
 use crate::events::UiEvent;

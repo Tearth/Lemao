@@ -11,7 +11,7 @@ pub trait Component {
 }
 
 pub trait ComponentManagerHashMap {
-    fn get_component_managers_1<C1>(&mut self) -> (&mut ComponentList<C1>)
+    fn get_component_managers_1<C1>(&mut self) -> &mut ComponentList<C1>
     where
         C1: Component + 'static;
 
@@ -35,7 +35,7 @@ pub trait ComponentManagerHashMap {
 }
 
 impl ComponentManagerHashMap for HashMap<TypeId, Box<dyn ComponentListTrait>> {
-    fn get_component_managers_1<C1>(&mut self) -> (&mut ComponentList<C1>)
+    fn get_component_managers_1<C1>(&mut self) -> &mut ComponentList<C1>
     where
         C1: Component + 'static,
     {

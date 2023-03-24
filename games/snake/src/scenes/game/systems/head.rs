@@ -19,7 +19,7 @@ use lemao_framework::ecs::commands::spawn::SpawnCommand;
 use lemao_framework::ecs::systems::System;
 use lemao_framework::ecs::world::World;
 
-use super::body::{self, BodySystem};
+use super::body::BodySystem;
 use super::ui::UiSystem;
 use super::LAYER_SNAKE;
 

@@ -10,19 +10,13 @@ use lemao_core::renderer::textures::Texture;
 use lemao_framework::app::Application;
 use lemao_framework::app::Scene;
 use lemao_framework::assets::AssetsLoader;
-use lemao_framework::ecs::components::list::ComponentList;
-use lemao_framework::ecs::systems::System;
-use lemao_framework::ecs::world::World;
 use lemao_ui::components::button::Button;
 use lemao_ui::components::panel::Panel;
 use lemao_ui::components::ComponentPosition;
 use lemao_ui::components::ComponentShape;
-use lemao_ui::components::ComponentSize;
 use lemao_ui::context::UiContext;
 use lemao_ui::events::UiEvent;
 use std::any::Any;
-use std::sync::Arc;
-use std::sync::RwLock;
 
 pub mod state;
 
@@ -96,7 +90,7 @@ impl Scene<GlobalAppData> for MenuScene {
         Ok(())
     }
 
-    fn on_activation(&mut self, app: &mut Application<GlobalAppData>) -> Result<(), String> {
+    fn on_activation(&mut self, _app: &mut Application<GlobalAppData>) -> Result<(), String> {
         Ok(())
     }
 

@@ -83,11 +83,11 @@ impl System<GlobalAppData, GameScene, Message> for UiSystem {
 
         if update_score {
             let score_label = scene.ui.components.get_and_cast_mut::<Label>(scene.state.ui.score_label_id)?;
-            score_label.label_text = format!("SCORE: {}", scene.state.game.score).to_string();
+            score_label.label_text = format!("SCORE: {}", scene.state.game.score);
             score_label.dirty = true;
 
             let best_score_label = scene.ui.components.get_and_cast_mut::<Label>(scene.state.ui.best_score_label_id)?;
-            best_score_label.label_text = format!("BEST SCORE: {}", scene.state.game.best_score).to_string();
+            best_score_label.label_text = format!("BEST SCORE: {}", scene.state.game.best_score);
             best_score_label.dirty = true;
         }
 

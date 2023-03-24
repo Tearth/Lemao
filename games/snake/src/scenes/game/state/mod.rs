@@ -1,7 +1,5 @@
 use std::time::SystemTime;
 
-use lemao_core::lemao_math::vec2::Vec2;
-
 pub mod scene;
 pub mod ui;
 

@@ -2,8 +2,6 @@ use std::any::TypeId;
 use std::collections::hash_map::Values;
 use std::collections::hash_map::ValuesMut;
 use std::collections::HashMap;
-use std::slice::Iter;
-use std::slice::IterMut;
 
 use super::list::ComponentList;
 use super::list::ComponentListTrait;
@@ -34,12 +32,12 @@ impl ComponentManager {
         self.data.contains_key(&TypeId::of::<C>())
     }
 
-    pub fn get<C>(&self) -> Result<&Box<dyn ComponentListTrait>, String>
+    pub fn get<C>(&self) -> Result<&dyn ComponentListTrait, String>
     where
         C: 'static,
     {
         match self.data.get(&TypeId::of::<C>()) {
-            Some(item) => Ok(item),
+            Some(item) => Ok(item.as_ref()),
             _ => Err(format!("Storage item {} not found", 0)),
         }
     }
@@ -54,7 +52,7 @@ impl ComponentManager {
         }
     }
 
-    pub fn get_many_mut_1<C1>(&mut self) -> (&mut ComponentList<C1>)
+    pub fn get_many_mut_1<C1>(&mut self) -> &mut ComponentList<C1>
     where
         C1: Component + 'static,
     {
@@ -101,6 +99,7 @@ impl ComponentManager {
         )
     }
 
+    #[allow(clippy::type_complexity)]
     pub fn get_many_mut_5<C1, C2, C3, C4, C5>(
         &mut self,
     ) -> (&mut ComponentList<C1>, &mut ComponentList<C2>, &mut ComponentList<C3>, &mut ComponentList<C4>, &mut ComponentList<C5>)

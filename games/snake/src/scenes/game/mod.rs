@@ -18,13 +18,9 @@ use self::systems::renderer::RendererSystem;
 use self::systems::sync::SyncSystem;
 use self::systems::ui::UiSystem;
 use self::systems::window::WindowSystem;
-use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_math::color::SolidColor;
-use lemao_core::renderer::fonts::Font;
-use lemao_core::renderer::textures::Texture;
 use lemao_framework::app::Application;
 use lemao_framework::app::Scene;
-use lemao_framework::assets::AssetsLoader;
 use lemao_framework::ecs::components::list::ComponentList;
 use lemao_framework::ecs::systems::System;
 use lemao_framework::ecs::world::World;
@@ -52,7 +48,7 @@ impl GameScene {
 }
 
 impl Scene<GlobalAppData> for GameScene {
-    fn on_init(&mut self, app: &mut Application<GlobalAppData>) -> Result<(), String> {
+    fn on_init(&mut self, _app: &mut Application<GlobalAppData>) -> Result<(), String> {
         Ok(())
     }
 
