@@ -8,7 +8,7 @@ use std::ops::Mul;
 
 #[repr(C)]
 #[repr(align(16))]
-#[derive(Copy, Clone, Default, Debug, PartialEq)]
+#[derive(Copy, Clone, Debug, Default, PartialEq)]
 pub struct Mat4x4 {
     data: [f32; 16],
 }

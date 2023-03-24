@@ -1,14 +1,14 @@
 use crate::color::SolidColor;
 use crate::vec2::Vec2;
 
-#[derive(Clone, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct Gradient {
     pub r#type: GradientType,
     pub offset: Vec2,
     pub steps: Vec<GradientStep>,
 }
 
-#[derive(Copy, Clone, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub enum GradientType {
     Horizontal,
     Vertical,
@@ -16,7 +16,7 @@ pub enum GradientType {
     Rectangular,
 }
 
-#[derive(Copy, Clone, Default, PartialEq)]
+#[derive(Copy, Clone, Debug, Default, PartialEq)]
 pub struct GradientStep {
     pub color: SolidColor,
     pub step: f32,

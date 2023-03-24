@@ -1,6 +1,6 @@
 #[repr(C)]
 #[repr(align(16))]
-#[derive(Copy, Clone, Default, Debug, PartialEq)]
+#[derive(Copy, Clone, Debug, Default, PartialEq)]
 pub struct Vec4 {
     pub x: f32,
     pub y: f32,

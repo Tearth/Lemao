@@ -2,7 +2,7 @@ use std::ops::Add;
 use std::ops::Sub;
 
 #[repr(C)]
-#[derive(Copy, Clone, Default, PartialEq)]
+#[derive(Copy, Clone, Debug, Default, PartialEq)]
 pub struct SolidColor {
     pub r: f32,
     pub g: f32,
