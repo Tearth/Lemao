@@ -1,31 +1,14 @@
 use crate::components::Component;
-use std::any::Any;
 use std::collections::VecDeque;
 
 #[derive(Default)]
 pub struct UiStorage {
-    data: Vec<Option<Box<dyn UiStorageItem>>>,
+    data: Vec<Option<Box<dyn Component>>>,
     removed_ids: VecDeque<usize>,
 }
 
-pub trait UiStorageItem {
-    fn get_id(&self) -> usize;
-    fn set_id(&mut self, id: usize);
-
-    fn as_any(&self) -> &dyn Any;
-    fn as_any_mut(&mut self) -> &mut dyn Any;
-
-    fn as_component(&self) -> Option<&dyn Component> {
-        None
-    }
-
-    fn as_component_mut(&mut self) -> Option<&mut dyn Component> {
-        None
-    }
-}
-
 impl UiStorage {
-    pub fn store(&mut self, mut item: Box<dyn UiStorageItem>) -> usize {
+    pub fn store(&mut self, mut item: Box<dyn Component>) -> usize {
         let id = self.get_new_id();
         item.set_id(id);
         self.data[id] = Some(item);
@@ -33,7 +16,7 @@ impl UiStorage {
         id
     }
 
-    pub fn get(&self, id: usize) -> Result<&dyn UiStorageItem, String> {
+    pub fn get(&self, id: usize) -> Result<&dyn Component, String> {
         match self.data.get(id) {
             Some(Some(item)) => Ok(item.as_ref()),
             _ => Err(format!("Storage item {} not found", id)),
@@ -47,7 +30,7 @@ impl UiStorage {
         self.get(id)?.as_any().downcast_ref::<C>().ok_or_else(|| format!("Storage item {} cannot be downcasted", id))
     }
 
-    pub fn get_mut(&mut self, id: usize) -> Result<&mut dyn UiStorageItem, String> {
+    pub fn get_mut(&mut self, id: usize) -> Result<&mut dyn Component, String> {
         match self.data.get_mut(id) {
             Some(Some(item)) => Ok(item.as_mut()),
             _ => Err(format!("Storage item {} not found", id)),
@@ -61,11 +44,11 @@ impl UiStorage {
         self.get_mut(id)?.as_any_mut().downcast_mut::<C>().ok_or_else(|| format!("Storage item {} cannot be downcasted", id))
     }
 
-    pub fn iter(&self) -> impl Iterator<Item = &Box<dyn UiStorageItem>> {
+    pub fn iter(&self) -> impl Iterator<Item = &Box<dyn Component>> {
         self.data.iter().filter_map(|p| p.as_ref())
     }
 
-    pub fn iter_mut(&mut self) -> impl Iterator<Item = &mut Box<dyn UiStorageItem>> {
+    pub fn iter_mut(&mut self) -> impl Iterator<Item = &mut Box<dyn Component>> {
         self.data.iter_mut().filter_map(|p| p.as_mut())
     }
 

@@ -93,6 +93,9 @@ pub struct EventMask {
 }
 
 pub trait Component {
+    fn get_id(&self) -> usize;
+    fn set_id(&mut self, id: usize);
+
     fn get_position(&self) -> ComponentPosition;
     fn get_work_area_position(&self) -> Vec2;
     fn set_position(&mut self, position: ComponentPosition);

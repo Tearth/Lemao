@@ -33,12 +33,12 @@ impl Scene<GlobalAppData> for SecondScene {
         let font_id = app.renderer.fonts.store(Font::new(&app.renderer, &bff::load("./assets/inconsolata.bff")?)?);
 
         self.description_text_id = self.ui.components.store(Box::new(Label::new(&mut app.renderer, font_id)?));
-        let description_text = self.ui.get_component_and_cast_mut::<Label>(self.description_text_id)?;
+        let description_text = self.ui.components.get_and_cast_mut::<Label>(self.description_text_id)?;
         description_text.label_text = DESCRIPTION.to_string();
         description_text.position = ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0));
         description_text.offset = Vec2::new(5.0, 0.0);
         description_text.anchor = Vec2::new(0.0, 1.0);
-        self.ui.get_component_mut(self.ui.main_canvas_id)?.add_child(self.description_text_id);
+        self.ui.components.get_mut(self.ui.main_canvas_id)?.add_child(self.description_text_id);
 
         Ok(())
     }

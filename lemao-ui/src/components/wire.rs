@@ -4,7 +4,6 @@ use super::ComponentPosition;
 use super::ComponentSize;
 use super::EventMask;
 use crate::events::UiEvent;
-use crate::utils::storage::UiStorageItem;
 use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_common_platform::input::MouseButton;
 use lemao_core::lemao_math::vec2::Vec2;
@@ -114,6 +113,14 @@ impl Wire {
 
 impl Component for Wire {
     /* #region Common properties */
+    fn get_id(&self) -> usize {
+        self.id
+    }
+
+    fn set_id(&mut self, id: usize) {
+        self.id = id;
+    }
+
     fn get_position(&self) -> ComponentPosition {
         self.position
     }
@@ -302,31 +309,5 @@ impl WireChunk {
 impl WireChunkData {
     pub fn new(color: Color, from: Vec2, to: Vec2, thickness: f32) -> Self {
         Self { color, from, to, thickness }
-    }
-}
-
-impl UiStorageItem for Wire {
-    fn get_id(&self) -> usize {
-        self.id
-    }
-
-    fn set_id(&mut self, id: usize) {
-        self.id = id;
-    }
-
-    fn as_any(&self) -> &dyn Any {
-        self
-    }
-
-    fn as_any_mut(&mut self) -> &mut dyn Any {
-        self
-    }
-
-    fn as_component(&self) -> Option<&dyn Component> {
-        Some(self)
-    }
-
-    fn as_component_mut(&mut self) -> Option<&mut dyn Component> {
-        Some(self)
     }
 }

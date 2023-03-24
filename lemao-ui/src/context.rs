@@ -50,7 +50,7 @@ impl UiContext {
         };
         ui.main_canvas_id = ui.components.store(Box::new(Canvas::new()?));
 
-        let main_canvas = ui.get_component_mut(ui.main_canvas_id)?;
+        let main_canvas = ui.components.get_mut(ui.main_canvas_id)?;
         main_canvas.set_size(ComponentSize::Absolute(renderer.viewport_size));
 
         Ok(ui)
@@ -59,13 +59,13 @@ impl UiContext {
     pub fn process_window_event(&mut self, renderer: &mut RendererContext, event: &InputEvent) -> Result<(), String> {
         if let InputEvent::WindowSizeChanged(size) = event {
             let ui_camera = renderer.cameras.get_mut(self.ui_camera_id)?;
-            let main_canvas = self.get_component_mut(self.main_canvas_id)?;
+            let main_canvas = self.components.get_mut(self.main_canvas_id)?;
 
             ui_camera.size = *size;
             ui_camera.dirty = true;
             main_canvas.set_size(ComponentSize::Absolute(*size));
 
-            for component in self.components.iter_mut().map(|p| p.as_component_mut().unwrap()) {
+            for component in self.components.iter_mut() {
                 component.set_dirty_flag(true);
             }
         } else {
@@ -74,7 +74,7 @@ impl UiContext {
                     continue;
                 }
 
-                self.events.extend(component.as_component_mut().unwrap().process_window_event(event));
+                self.events.extend(component.process_window_event(event));
             }
         }
 
@@ -85,24 +85,8 @@ impl UiContext {
         self.events.pop_front()
     }
 
-    pub fn get_component(&self, component_id: usize) -> Result<&dyn Component, String> {
-        self.components.get(component_id)?.as_component().ok_or_else(|| format!("Storage item {} is not drawable", component_id))
-    }
-
-    pub fn get_component_and_cast<T: 'static>(&self, component_id: usize) -> Result<&T, String> {
-        self.get_component(component_id)?.as_any().downcast_ref::<T>().ok_or_else(|| format!("Storage item {} cannot be downcasted", component_id))
-    }
-
-    pub fn get_component_mut(&mut self, component_id: usize) -> Result<&mut dyn Component, String> {
-        self.components.get_mut(component_id)?.as_component_mut().ok_or_else(|| format!("Storage item {} is not drawable", component_id))
-    }
-
-    pub fn get_component_and_cast_mut<T: 'static>(&mut self, component_id: usize) -> Result<&mut T, String> {
-        self.get_component_mut(component_id)?.as_any_mut().downcast_mut::<T>().ok_or_else(|| format!("Component {} cannot be downcasted", component_id))
-    }
-
     pub fn begin_scrollbox(&self, scrollbox_id: usize, renderer: &RendererContext) -> Result<(), String> {
-        let scrollbox = self.get_component(scrollbox_id)?;
+        let scrollbox = self.components.get(scrollbox_id)?;
         renderer.enable_scissor(scrollbox.get_work_area_position(), scrollbox.get_work_area_size());
 
         Ok(())
@@ -113,7 +97,7 @@ impl UiContext {
     }
 
     pub fn set_active_flag_for_tree(&mut self, root_component: usize, active: bool) -> Result<(), String> {
-        let component = self.get_component_mut(root_component)?;
+        let component = self.components.get_mut(root_component)?;
         component.set_active_flag(active);
 
         for child_id in component.get_children().clone() {
@@ -124,7 +108,7 @@ impl UiContext {
     }
 
     pub fn update(&mut self, renderer: &mut RendererContext) -> Result<(), String> {
-        let main_canvas = self.get_component_mut(self.main_canvas_id)?;
+        let main_canvas = self.components.get_mut(self.main_canvas_id)?;
         let area_position = match main_canvas.get_position() {
             ComponentPosition::AbsoluteToParent(position) => position,
             _ => return Err("Invalid canvas".to_string()),
@@ -152,7 +136,7 @@ impl UiContext {
         scroll_offset: Option<Vec2>,
         force: bool,
     ) -> Result<u32, String> {
-        let component = self.get_component_mut(component_id)?;
+        let component = self.components.get_mut(component_id)?;
         let update = force || component.is_dirty();
         let mut updated_components = 0;
 
@@ -167,26 +151,26 @@ impl UiContext {
 
         let component_area_position = component.get_work_area_position();
         let component_area_size = component.get_work_area_size();
-        let (event_mask, scroll_offset) = if let Ok(scrollbox) = self.get_component_and_cast::<Scrollbox>(component_id) {
+        let (event_mask, scroll_offset) = if let Ok(scrollbox) = self.components.get_and_cast::<Scrollbox>(component_id) {
             (Some(EventMask::new(component_area_position, component_area_size)), if update { Some(scrollbox.get_scroll_delta()) } else { None })
         } else {
             (event_mask, Default::default())
         };
 
-        self.get_component_mut(component_id)?.set_event_mask(event_mask);
+        self.components.get_mut(component_id)?.set_event_mask(event_mask);
 
-        for child_id in self.get_component_mut(component_id)?.get_children().clone() {
+        for child_id in self.components.get_mut(component_id)?.get_children().clone() {
             updated_components +=
                 self.update_internal(renderer, child_id, component_area_position, component_area_size, event_mask, scroll_offset, force || update)?;
         }
 
         // Scrollbox needs to be updated second time, after all children are refreshed
-        if self.get_component_and_cast::<Scrollbox>(component_id).is_ok() && updated_components > 1 {
+        if self.components.get_and_cast::<Scrollbox>(component_id).is_ok() && updated_components > 1 {
             let mut left_bottom_corner: Vec2 = Vec2::new(f32::MAX, f32::MAX);
             let mut right_top_corner: Vec2 = Vec2::new(f32::MIN, f32::MIN);
 
-            for child_id in self.get_component(component_id)?.get_children().clone() {
-                let child = self.get_component(child_id)?;
+            for child_id in self.components.get(component_id)?.get_children().clone() {
+                let child = self.components.get(child_id)?;
                 let child_area_position = child.get_work_area_position();
                 let child_area_size = child.get_work_area_size();
 
@@ -196,8 +180,8 @@ impl UiContext {
                 right_top_corner.y = f32::max(right_top_corner.y, child_area_position.y + child_area_size.y);
             }
 
-            self.get_component_and_cast_mut::<Scrollbox>(component_id)?.set_total_size(right_top_corner - left_bottom_corner);
-            self.get_component_and_cast_mut::<Scrollbox>(component_id)?.update(renderer, area_position, area_size)?;
+            self.components.get_and_cast_mut::<Scrollbox>(component_id)?.set_total_size(right_top_corner - left_bottom_corner);
+            self.components.get_and_cast_mut::<Scrollbox>(component_id)?.update(renderer, area_position, area_size)?;
         }
 
         Ok(updated_components)
@@ -207,7 +191,7 @@ impl UiContext {
         let active_camera_id = renderer.active_camera_id;
         renderer.set_camera_as_active(self.ui_camera_id)?;
 
-        let component = self.get_component_mut(component_id)?;
+        let component = self.components.get_mut(component_id)?;
         let component_position = component.get_work_area_position();
         let component_size = component.get_work_area_size();
         let component_is_active = component.is_active();

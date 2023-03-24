@@ -39,7 +39,7 @@ impl System<GlobalAppData, GameScene, Message> for UiSystem {
                     let font_id = app.renderer.fonts.get_by_name("pixeled")?.id;
 
                     scene.state.ui.score_label_id = scene.ui.components.store(Box::new(Label::new(&mut app.renderer, font_id)?));
-                    let score_label = scene.ui.get_component_and_cast_mut::<Label>(scene.state.ui.score_label_id)?;
+                    let score_label = scene.ui.components.get_and_cast_mut::<Label>(scene.state.ui.score_label_id)?;
                     score_label.position = ComponentPosition::RelativeToParent(Vec2::new(0.5, 0.0));
                     score_label.anchor = Vec2::new(0.0, 0.5);
                     score_label.offset = Vec2::new(-250.0, 50.0);
@@ -47,10 +47,10 @@ impl System<GlobalAppData, GameScene, Message> for UiSystem {
                     score_label.shadow_enabled = true;
                     score_label.shadow_offset = Vec2::new(1.0, -1.0);
                     score_label.shadow_color = Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 1.0));
-                    scene.ui.get_component_mut(scene.ui.main_canvas_id)?.add_child(scene.state.ui.score_label_id);
+                    scene.ui.components.get_mut(scene.ui.main_canvas_id)?.add_child(scene.state.ui.score_label_id);
 
                     scene.state.ui.best_score_label_id = scene.ui.components.store(Box::new(Label::new(&mut app.renderer, font_id)?));
-                    let best_score_label = scene.ui.get_component_and_cast_mut::<Label>(scene.state.ui.best_score_label_id)?;
+                    let best_score_label = scene.ui.components.get_and_cast_mut::<Label>(scene.state.ui.best_score_label_id)?;
                     best_score_label.position = ComponentPosition::RelativeToParent(Vec2::new(0.5, 0.0));
                     best_score_label.anchor = Vec2::new(1.0, 0.5);
                     best_score_label.offset = Vec2::new(250.0, 50.0);
@@ -58,10 +58,10 @@ impl System<GlobalAppData, GameScene, Message> for UiSystem {
                     best_score_label.shadow_enabled = true;
                     best_score_label.shadow_offset = Vec2::new(1.0, -1.0);
                     best_score_label.shadow_color = Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 1.0));
-                    scene.ui.get_component_mut(scene.ui.main_canvas_id)?.add_child(scene.state.ui.best_score_label_id);
+                    scene.ui.components.get_mut(scene.ui.main_canvas_id)?.add_child(scene.state.ui.best_score_label_id);
 
                     scene.state.ui.clock_label_id = scene.ui.components.store(Box::new(Label::new(&mut app.renderer, font_id)?));
-                    let clock_label = scene.ui.get_component_and_cast_mut::<Label>(scene.state.ui.clock_label_id)?;
+                    let clock_label = scene.ui.components.get_and_cast_mut::<Label>(scene.state.ui.clock_label_id)?;
                     clock_label.position = ComponentPosition::RelativeToParent(Vec2::new(0.5, 0.0));
                     clock_label.anchor = Vec2::new(0.5, 0.5);
                     clock_label.offset = Vec2::new(0.0, 50.0);
@@ -69,7 +69,7 @@ impl System<GlobalAppData, GameScene, Message> for UiSystem {
                     clock_label.shadow_enabled = true;
                     clock_label.shadow_offset = Vec2::new(1.0, -1.0);
                     clock_label.shadow_color = Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 1.0));
-                    scene.ui.get_component_mut(scene.ui.main_canvas_id)?.add_child(scene.state.ui.clock_label_id);
+                    scene.ui.components.get_mut(scene.ui.main_canvas_id)?.add_child(scene.state.ui.clock_label_id);
                 }
                 Message::FoodEaten => {
                     update_score = true;
@@ -82,11 +82,11 @@ impl System<GlobalAppData, GameScene, Message> for UiSystem {
         }
 
         if update_score {
-            let score_label = scene.ui.get_component_and_cast_mut::<Label>(scene.state.ui.score_label_id)?;
+            let score_label = scene.ui.components.get_and_cast_mut::<Label>(scene.state.ui.score_label_id)?;
             score_label.label_text = format!("SCORE: {}", scene.state.game.score).to_string();
             score_label.dirty = true;
 
-            let best_score_label = scene.ui.get_component_and_cast_mut::<Label>(scene.state.ui.best_score_label_id)?;
+            let best_score_label = scene.ui.components.get_and_cast_mut::<Label>(scene.state.ui.best_score_label_id)?;
             best_score_label.label_text = format!("BEST SCORE: {}", scene.state.game.best_score).to_string();
             best_score_label.dirty = true;
         }
@@ -94,7 +94,7 @@ impl System<GlobalAppData, GameScene, Message> for UiSystem {
         if !scene.state.game.snake_killed {
             let time_since_game_start = scene.state.game.game_start_time.elapsed().unwrap().as_secs();
             let clock = format!("{:02}:{:02}", time_since_game_start / 60, time_since_game_start % 60);
-            let clock_label = scene.ui.get_component_and_cast_mut::<Label>(scene.state.ui.clock_label_id)?;
+            let clock_label = scene.ui.components.get_and_cast_mut::<Label>(scene.state.ui.clock_label_id)?;
 
             if clock_label.label_text != clock {
                 clock_label.label_text = clock;

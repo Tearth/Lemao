@@ -41,13 +41,13 @@ pub fn main() -> Result<(), String> {
     animation.update();
 
     let description_text_id = ui.components.store(Box::new(Label::new(&mut renderer, font_id)?));
-    let description_text = ui.get_component_and_cast_mut::<Label>(description_text_id)?;
+    let description_text = ui.components.get_and_cast_mut::<Label>(description_text_id)?;
     description_text.label_text = DESCRIPTION.to_string();
     description_text.position = ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0));
     description_text.offset = Vec2::new(5.0, 0.0);
     description_text.anchor = Vec2::new(0.0, 1.0);
     description_text.label_line_height = 20;
-    ui.get_component_mut(ui.main_canvas_id)?.add_child(description_text_id);
+    ui.components.get_mut(ui.main_canvas_id)?.add_child(description_text_id);
 
     let mut sleep_duration = 10;
     let mut is_running = true;

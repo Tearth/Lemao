@@ -41,12 +41,12 @@ pub fn main() -> Result<(), String> {
     let font_id = renderer.fonts.store(Font::new(&renderer, &bff::load("./assets/inconsolata.bff")?)?);
 
     let fps_text_id = ui.components.store(Box::new(Label::new(&mut renderer, font_id)?));
-    let fps_text = ui.get_component_and_cast_mut::<Label>(fps_text_id)?;
+    let fps_text = ui.components.get_and_cast_mut::<Label>(fps_text_id)?;
     fps_text.label_text = "FPS:0".to_string();
     fps_text.position = ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0));
     fps_text.offset = Vec2::new(5.0, 0.0);
     fps_text.anchor = Vec2::new(0.0, 1.0);
-    ui.get_component_mut(ui.main_canvas_id)?.add_child(fps_text_id);
+    ui.components.get_mut(ui.main_canvas_id)?.add_child(fps_text_id);
 
     let mut cells = Vec::new();
 
@@ -108,7 +108,7 @@ pub fn main() -> Result<(), String> {
         }
 
         if now.elapsed().as_millis() >= 1000 {
-            let fps_text = ui.get_component_and_cast_mut::<Label>(fps_text_id)?;
+            let fps_text = ui.components.get_and_cast_mut::<Label>(fps_text_id)?;
             fps_text.label_text = format!("FPS:{frames}");
             fps_text.dirty = true;
 

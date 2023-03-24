@@ -41,22 +41,22 @@ pub fn main() -> Result<(), String> {
     let chopin_sound_id = audio.create_sound(chopin_sample_id)?;
 
     let description_text_id = ui.components.store(Box::new(Label::new(&mut renderer, font_id)?));
-    let description_text = ui.get_component_and_cast_mut::<Label>(description_text_id)?;
+    let description_text = ui.components.get_and_cast_mut::<Label>(description_text_id)?;
     description_text.label_text = DESCRIPTION.to_string();
     description_text.position = ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0));
     description_text.offset = Vec2::new(5.0, 0.0);
     description_text.anchor = Vec2::new(0.0, 1.0);
     description_text.label_line_height = 20;
-    ui.get_component_mut(ui.main_canvas_id)?.add_child(description_text_id);
+    ui.components.get_mut(ui.main_canvas_id)?.add_child(description_text_id);
 
     let status_text_id = ui.components.store(Box::new(Label::new(&mut renderer, font_id)?));
-    let status_text = ui.get_component_and_cast_mut::<Label>(status_text_id)?;
+    let status_text = ui.components.get_and_cast_mut::<Label>(status_text_id)?;
     status_text.label_text = "Status: stopped".to_string();
     status_text.position = ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0));
     status_text.offset = Vec2::new(5.0, -200.0);
     status_text.anchor = Vec2::new(0.0, 1.0);
     status_text.label_line_height = 20;
-    ui.get_component_mut(ui.main_canvas_id)?.add_child(status_text_id);
+    ui.components.get_mut(ui.main_canvas_id)?.add_child(status_text_id);
 
     let chopin_sound = audio.sounds.get_mut(chopin_sound_id)?;
     let mut is_running = true;
@@ -82,7 +82,7 @@ pub fn main() -> Result<(), String> {
             ui.process_window_event(&mut renderer, &event)?;
         }
 
-        let status_text = ui.get_component_and_cast_mut::<Label>(status_text_id)?;
+        let status_text = ui.components.get_and_cast_mut::<Label>(status_text_id)?;
         if chopin_sound.is_playing()? {
             status_text.label_text = "Status: playing".to_string();
             status_text.dirty = true;
