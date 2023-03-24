@@ -40,7 +40,7 @@ pub fn main() -> Result<(), String> {
     let cell_texture_id = renderer.textures.store(Texture::new(&renderer, &bmp::load("./assets/cell.bmp")?)?);
     let font_id = renderer.fonts.store(Font::new(&renderer, &bff::load("./assets/inconsolata.bff")?)?);
 
-    let fps_text_id = ui.create_label(&mut renderer, font_id)?;
+    let fps_text_id = ui.components.store(Box::new(Label::new(&mut renderer, font_id)?));
     let fps_text = ui.get_component_and_cast_mut::<Label>(fps_text_id)?;
     fps_text.label_text = "FPS:0".to_string();
     fps_text.position = ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0));

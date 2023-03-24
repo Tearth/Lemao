@@ -32,7 +32,7 @@ impl Scene<GlobalAppData> for FirstScene {
     fn on_init(&mut self, app: &mut Application<GlobalAppData>) -> Result<(), String> {
         let font_id = app.renderer.fonts.store(Font::new(&app.renderer, &bff::load("./assets/inconsolata.bff")?)?);
 
-        self.description_text_id = self.ui.create_label(&mut app.renderer, font_id)?;
+        self.description_text_id = self.ui.components.store(Box::new(Label::new(&mut app.renderer, font_id)?));
         let description_text = self.ui.get_component_and_cast_mut::<Label>(self.description_text_id)?;
         description_text.label_text = DESCRIPTION.to_string();
         description_text.position = ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0));
@@ -44,11 +44,6 @@ impl Scene<GlobalAppData> for FirstScene {
     }
 
     fn on_activation(&mut self, app: &mut Application<GlobalAppData>) -> Result<(), String> {
-        let size = app.window.get_size();
-
-        app.renderer.set_viewport_size(size)?;
-        self.ui.process_window_event(&mut app.renderer, &InputEvent::WindowSizeChanged(size))?;
-
         Ok(())
     }
 

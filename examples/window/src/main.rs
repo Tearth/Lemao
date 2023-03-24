@@ -37,7 +37,7 @@ pub fn main() -> Result<(), String> {
 
     let font_id = renderer.fonts.store(Font::new(&renderer, &bff::load("./assets/inconsolata.bff")?)?);
 
-    let description_text_id = ui.create_label(&mut renderer, font_id)?;
+    let description_text_id = ui.components.store(Box::new(Label::new(&mut renderer, font_id)?));
     let description_text = ui.get_component_and_cast_mut::<Label>(description_text_id)?;
     description_text.label_text = DESCRIPTION.to_string();
     description_text.position = ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0));
@@ -46,7 +46,7 @@ pub fn main() -> Result<(), String> {
     description_text.label_line_height = 20;
     ui.get_component_mut(ui.main_canvas_id)?.add_child(description_text_id);
 
-    let left_top_text_id = ui.create_label(&mut renderer, font_id)?;
+    let left_top_text_id = ui.components.store(Box::new(Label::new(&mut renderer, font_id)?));
     let left_top_text = ui.get_component_and_cast_mut::<Label>(left_top_text_id)?;
     left_top_text.label_text = "Left top".to_string();
     left_top_text.position = ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0));
@@ -54,7 +54,7 @@ pub fn main() -> Result<(), String> {
     left_top_text.anchor = Vec2::new(0.0, 1.0);
     ui.get_component_mut(ui.main_canvas_id)?.add_child(left_top_text_id);
 
-    let right_top_text_id = ui.create_label(&mut renderer, font_id)?;
+    let right_top_text_id = ui.components.store(Box::new(Label::new(&mut renderer, font_id)?));
     let right_top_text = ui.get_component_and_cast_mut::<Label>(right_top_text_id)?;
     right_top_text.label_text = "Right top".to_string();
     right_top_text.position = ComponentPosition::RelativeToParent(Vec2::new(1.0, 1.0));
@@ -62,7 +62,7 @@ pub fn main() -> Result<(), String> {
     right_top_text.anchor = Vec2::new(1.0, 1.0);
     ui.get_component_mut(ui.main_canvas_id)?.add_child(right_top_text_id);
 
-    let left_bottom_text_id = ui.create_label(&mut renderer, font_id)?;
+    let left_bottom_text_id = ui.components.store(Box::new(Label::new(&mut renderer, font_id)?));
     let left_bottom_text = ui.get_component_and_cast_mut::<Label>(left_bottom_text_id)?;
     left_bottom_text.label_text = "Left bottom".to_string();
     left_bottom_text.position = ComponentPosition::RelativeToParent(Vec2::new(0.0, 0.0));
@@ -70,7 +70,7 @@ pub fn main() -> Result<(), String> {
     left_bottom_text.anchor = Vec2::new(0.0, 0.0);
     ui.get_component_mut(ui.main_canvas_id)?.add_child(left_bottom_text_id);
 
-    let right_bottom_text_id = ui.create_label(&mut renderer, font_id)?;
+    let right_bottom_text_id = ui.components.store(Box::new(Label::new(&mut renderer, font_id)?));
     let right_bottom_text = ui.get_component_and_cast_mut::<Label>(right_bottom_text_id)?;
     right_bottom_text.label_text = "Right bottom".to_string();
     right_bottom_text.position = ComponentPosition::RelativeToParent(Vec2::new(1.0, 0.0));
@@ -78,7 +78,7 @@ pub fn main() -> Result<(), String> {
     right_bottom_text.anchor = Vec2::new(1.0, 0.0);
     ui.get_component_mut(ui.main_canvas_id)?.add_child(right_bottom_text_id);
 
-    let window_status_text_id = ui.create_label(&mut renderer, font_id)?;
+    let window_status_text_id = ui.components.store(Box::new(Label::new(&mut renderer, font_id)?));
     let window_status_text = ui.get_component_and_cast_mut::<Label>(window_status_text_id)?;
     window_status_text.position = ComponentPosition::RelativeToParent(Vec2::new(0.0, 1.0));
     window_status_text.offset = Vec2::new(5.0, -120.0);

@@ -18,7 +18,7 @@ use lemao_core::renderer::textures::Texture;
 use std::any::Any;
 
 pub struct Checkbox {
-    pub(crate) id: usize,
+    pub id: usize,
 
     // Common properties
     pub position: ComponentPosition,
@@ -193,51 +193,6 @@ impl Component for Checkbox {
     fn set_size(&mut self, _size: ComponentSize) {
         // Can't be set explicitly
         // self.size = size;
-    }
-
-    fn get_min_size(&self) -> Vec2 {
-        self.min_size
-    }
-
-    fn set_min_size(&mut self, _min_size: Vec2) {
-        // Can't be set explicitly
-        // self.min_size = min_size;
-    }
-
-    fn get_max_size(&self) -> Vec2 {
-        self.max_size
-    }
-
-    fn set_max_size(&mut self, _max_size: Vec2) {
-        // Can't be set explicitly
-        // self.max_size = max_size;
-    }
-
-    fn get_anchor(&self) -> Vec2 {
-        self.anchor
-    }
-
-    fn set_anchor(&mut self, anchor: Vec2) {
-        self.anchor = anchor;
-        self.dirty = true;
-    }
-
-    fn get_margin(&self) -> ComponentMargin {
-        self.margin
-    }
-
-    fn set_margin(&mut self, margin: ComponentMargin) {
-        self.margin = margin;
-        self.dirty = true;
-    }
-
-    fn get_offset(&self) -> Vec2 {
-        self.offset
-    }
-
-    fn set_offset(&mut self, offset: Vec2) {
-        self.offset = offset;
-        self.dirty = true;
     }
 
     fn get_scroll_offset(&self) -> Vec2 {

@@ -38,7 +38,7 @@ impl System<GlobalAppData, GameScene, Message> for UiSystem {
                 Message::Init => {
                     let font_id = app.renderer.fonts.get_by_name("pixeled")?.id;
 
-                    scene.state.ui.score_label_id = scene.ui.create_label(&mut app.renderer, font_id)?;
+                    scene.state.ui.score_label_id = scene.ui.components.store(Box::new(Label::new(&mut app.renderer, font_id)?));
                     let score_label = scene.ui.get_component_and_cast_mut::<Label>(scene.state.ui.score_label_id)?;
                     score_label.position = ComponentPosition::RelativeToParent(Vec2::new(0.5, 0.0));
                     score_label.anchor = Vec2::new(0.0, 0.5);
@@ -49,7 +49,7 @@ impl System<GlobalAppData, GameScene, Message> for UiSystem {
                     score_label.shadow_color = Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 1.0));
                     scene.ui.get_component_mut(scene.ui.main_canvas_id)?.add_child(scene.state.ui.score_label_id);
 
-                    scene.state.ui.best_score_label_id = scene.ui.create_label(&mut app.renderer, font_id)?;
+                    scene.state.ui.best_score_label_id = scene.ui.components.store(Box::new(Label::new(&mut app.renderer, font_id)?));
                     let best_score_label = scene.ui.get_component_and_cast_mut::<Label>(scene.state.ui.best_score_label_id)?;
                     best_score_label.position = ComponentPosition::RelativeToParent(Vec2::new(0.5, 0.0));
                     best_score_label.anchor = Vec2::new(1.0, 0.5);
@@ -60,7 +60,7 @@ impl System<GlobalAppData, GameScene, Message> for UiSystem {
                     best_score_label.shadow_color = Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 1.0));
                     scene.ui.get_component_mut(scene.ui.main_canvas_id)?.add_child(scene.state.ui.best_score_label_id);
 
-                    scene.state.ui.clock_label_id = scene.ui.create_label(&mut app.renderer, font_id)?;
+                    scene.state.ui.clock_label_id = scene.ui.components.store(Box::new(Label::new(&mut app.renderer, font_id)?));
                     let clock_label = scene.ui.get_component_and_cast_mut::<Label>(scene.state.ui.clock_label_id)?;
                     clock_label.position = ComponentPosition::RelativeToParent(Vec2::new(0.5, 0.0));
                     clock_label.anchor = Vec2::new(0.5, 0.5);

@@ -30,7 +30,7 @@ pub struct UiContext {
     pub debug_frame: Frame,
     pub debug: bool,
 
-    components: UiStorage,
+    pub components: UiStorage,
     events: VecDeque<UiEvent>,
 }
 
@@ -48,7 +48,7 @@ impl UiContext {
             components: Default::default(),
             events: Default::default(),
         };
-        ui.main_canvas_id = ui.create_canvas(renderer)?;
+        ui.main_canvas_id = ui.components.store(Box::new(Canvas::new()?));
 
         let main_canvas = ui.get_component_mut(ui.main_canvas_id)?;
         main_canvas.set_size(ComponentSize::Absolute(renderer.viewport_size));
@@ -85,62 +85,6 @@ impl UiContext {
         self.events.pop_front()
     }
 
-    pub fn create_button(&mut self, renderer: &mut RendererContext, shape: ComponentShape, label_font_id: usize) -> Result<usize, String> {
-        let button = Box::new(Button::new(renderer, shape, label_font_id)?);
-        Ok(self.components.store(button))
-    }
-
-    pub fn create_canvas(&mut self, _renderer: &mut RendererContext) -> Result<usize, String> {
-        let canvas = Box::new(Canvas::new()?);
-        Ok(self.components.store(canvas))
-    }
-
-    pub fn create_checkbox(
-        &mut self,
-        renderer: &mut RendererContext,
-        label_font_id: usize,
-        tick_on_texture_id: usize,
-        tick_off_texture_id: usize,
-    ) -> Result<usize, String> {
-        let checkbox = Box::new(Checkbox::new(renderer, label_font_id, tick_on_texture_id, tick_off_texture_id)?);
-        Ok(self.components.store(checkbox))
-    }
-
-    pub fn create_label(&mut self, renderer: &mut RendererContext, label_font_id: usize) -> Result<usize, String> {
-        let label = Box::new(Label::new(renderer, label_font_id)?);
-        Ok(self.components.store(label))
-    }
-
-    pub fn create_panel(&mut self, renderer: &mut RendererContext, shape: ComponentShape) -> Result<usize, String> {
-        let panel = Box::new(Panel::new(renderer, shape)?);
-        Ok(self.components.store(panel))
-    }
-
-    pub fn create_progressbar(&mut self, renderer: &mut RendererContext, label_font_id: usize) -> Result<usize, String> {
-        let progressbar = Box::new(ProgressBar::new(renderer, label_font_id)?);
-        Ok(self.components.store(progressbar))
-    }
-
-    pub fn create_scrollbox(&mut self, renderer: &mut RendererContext) -> Result<usize, String> {
-        let scrollbox = Box::new(Scrollbox::new(renderer)?);
-        Ok(self.components.store(scrollbox))
-    }
-
-    pub fn create_slider(&mut self, renderer: &mut RendererContext, selector_shape: ComponentShape) -> Result<usize, String> {
-        let slider = Box::new(Slider::new(renderer, selector_shape)?);
-        Ok(self.components.store(slider))
-    }
-
-    pub fn create_textbox(&mut self, renderer: &mut RendererContext, label_font_id: usize) -> Result<usize, String> {
-        let textbox = Box::new(TextBox::new(renderer, label_font_id)?);
-        Ok(self.components.store(textbox))
-    }
-
-    pub fn create_wire(&mut self, renderer: &mut RendererContext) -> Result<usize, String> {
-        let wire = Box::new(Wire::new(renderer)?);
-        Ok(self.components.store(wire))
-    }
-
     pub fn get_component(&self, component_id: usize) -> Result<&dyn Component, String> {
         self.components.get(component_id)?.as_component().ok_or_else(|| format!("Storage item {} is not drawable", component_id))
     }
@@ -155,10 +99,6 @@ impl UiContext {
 
     pub fn get_component_and_cast_mut<T: 'static>(&mut self, component_id: usize) -> Result<&mut T, String> {
         self.get_component_mut(component_id)?.as_any_mut().downcast_mut::<T>().ok_or_else(|| format!("Component {} cannot be downcasted", component_id))
-    }
-
-    pub fn remove_component(&mut self, component_id: usize) -> Result<(), String> {
-        self.components.remove(component_id)
     }
 
     pub fn begin_scrollbox(&self, scrollbox_id: usize, renderer: &RendererContext) -> Result<(), String> {
