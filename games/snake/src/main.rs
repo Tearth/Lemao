@@ -1,13 +1,14 @@
-#![allow(clippy::single_match)]
-
 use lemao_core::lemao_common_platform::window::WindowStyle;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_framework::app::Application;
-use scenes::game::GameScene;
-use scenes::menu::MenuScene;
+use scenes::game::scene::GameScene;
+use scenes::menu::scene::MenuScene;
+use state::global::GlobalAppData;
 
 pub mod scenes;
 pub mod state;
+
+type GameApp = Application<GlobalAppData>;
 
 #[no_mangle]
 #[cfg(windows)]

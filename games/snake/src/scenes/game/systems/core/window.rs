@@ -1,13 +1,13 @@
-use std::any::TypeId;
-
 use crate::scenes::game::messages::Message;
-use crate::scenes::game::GameScene;
+use crate::scenes::game::scene::GameScene;
+use crate::scenes::game::scene::GameWorld;
 use crate::state::global::GlobalAppData;
+use crate::GameApp;
 use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_math::vec2::Vec2;
-use lemao_framework::app::Application;
-use lemao_framework::ecs::systems::{System, SystemStage};
-use lemao_framework::ecs::world::World;
+use lemao_framework::ecs::systems::System;
+use lemao_framework::ecs::systems::SystemStage;
+use std::any::TypeId;
 
 #[derive(Default)]
 pub struct WindowSystem {}
@@ -21,15 +21,10 @@ impl System<GlobalAppData, GameScene, Message> for WindowSystem {
         TypeId::of::<WindowSystem>()
     }
 
-    fn update(
-        &mut self,
-        app: &mut Application<GlobalAppData>,
-        _scene: &mut GameScene,
-        world: &mut World<GlobalAppData, GameScene, Message>,
-    ) -> Result<(), String> {
+    fn update(&mut self, app: &mut GameApp, _scene: &mut GameScene, world: &mut GameWorld) -> Result<(), String> {
         while let Some(message) = world.messages.poll_message::<Self>() {
-            match message {
-                Message::InputEvent(event) => match event {
+            if let Message::InputEvent(event) = message {
+                match event {
                     InputEvent::WindowSizeChanged(size) => {
                         app.renderer.set_viewport_size(size)?;
 
@@ -45,8 +40,7 @@ impl System<GlobalAppData, GameScene, Message> for WindowSystem {
                         app.close();
                     }
                     _ => {}
-                },
-                _ => {}
+                }
             }
         }
 

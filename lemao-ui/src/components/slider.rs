@@ -200,8 +200,7 @@ impl Slider {
             let event_mask_left_bottom = event_mask.position;
             let event_mask_right_top = event_mask.position + event_mask.size;
 
-            if point.x < event_mask_left_bottom.x || point.y < event_mask_left_bottom.y || point.x > event_mask_right_top.x || point.y > event_mask_right_top.y
-            {
+            if point.x < event_mask_left_bottom.x || point.y < event_mask_left_bottom.y || point.x > event_mask_right_top.x || point.y > event_mask_right_top.y {
                 return false;
             }
         }
@@ -223,8 +222,7 @@ impl Slider {
             let event_mask_left_bottom = event_mask.position;
             let event_mask_right_top = event_mask.position + event_mask.size;
 
-            if point.x < event_mask_left_bottom.x || point.y < event_mask_left_bottom.y || point.x > event_mask_right_top.x || point.y > event_mask_right_top.y
-            {
+            if point.x < event_mask_left_bottom.x || point.y < event_mask_left_bottom.y || point.x > event_mask_right_top.x || point.y > event_mask_right_top.y {
                 return false;
             }
         }

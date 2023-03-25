@@ -1,17 +1,17 @@
-use std::any::TypeId;
-
 use crate::scenes::game::messages::Message;
-use crate::scenes::game::GameScene;
+use crate::scenes::game::scene::{GameScene, GameWorld};
 use crate::state::global::GlobalAppData;
-use lemao_core::lemao_common_platform::input::{InputEvent, Key};
+use crate::GameApp;
+use lemao_core::lemao_common_platform::input::InputEvent;
+use lemao_core::lemao_common_platform::input::Key;
 use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_core::renderer::drawable::Color;
-use lemao_framework::app::Application;
-use lemao_framework::ecs::systems::{System, SystemStage};
-use lemao_framework::ecs::world::World;
+use lemao_framework::ecs::systems::System;
+use lemao_framework::ecs::systems::SystemStage;
 use lemao_ui::components::label::Label;
 use lemao_ui::components::ComponentPosition;
+use std::any::TypeId;
 
 #[derive(Default)]
 pub struct UiLogicSystem {}
@@ -25,12 +25,7 @@ impl System<GlobalAppData, GameScene, Message> for UiLogicSystem {
         TypeId::of::<UiLogicSystem>()
     }
 
-    fn update(
-        &mut self,
-        app: &mut Application<GlobalAppData>,
-        scene: &mut GameScene,
-        world: &mut World<GlobalAppData, GameScene, Message>,
-    ) -> Result<(), String> {
+    fn update(&mut self, app: &mut GameApp, scene: &mut GameScene, world: &mut GameWorld) -> Result<(), String> {
         let mut update_score = false;
 
         while let Some(message) = world.messages.poll_message::<Self>() {
@@ -74,11 +69,8 @@ impl System<GlobalAppData, GameScene, Message> for UiLogicSystem {
                     return Ok(());
                 }
                 Message::InputEvent(event) => {
-                    match event {
-                        InputEvent::KeyPressed(Key::Escape) => {
-                            app.switch_to_scene("Menu");
-                        }
-                        _ => {}
+                    if let InputEvent::KeyPressed(Key::Escape) = event {
+                        app.switch_to_scene("Menu");
                     }
 
                     scene.ui.process_window_event(&mut app.renderer, &event)?

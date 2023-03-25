@@ -1,8 +1,6 @@
-use super::{System, SystemStage};
-use std::{
-    any::TypeId,
-    slice::{Iter, IterMut},
-};
+use super::System;
+use std::slice::Iter;
+use std::slice::IterMut;
 
 #[derive(Default)]
 pub struct SystemList<G, S, M> {

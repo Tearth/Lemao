@@ -1,28 +1,29 @@
+use super::body::BodySystem;
+use super::*;
+use crate::scenes::game::components::body::BodyComponent;
+use crate::scenes::game::components::body::BodyOrientation;
+use crate::scenes::game::components::food::FoodComponent;
+use crate::scenes::game::components::head::HeadComponent;
+use crate::scenes::game::components::head::HeadDirection;
+use crate::scenes::game::components::position::PositionComponent;
+use crate::scenes::game::components::sprite::SpriteComponent;
+use crate::scenes::game::messages::Message;
+use crate::scenes::game::scene::{GameScene, GameWorld};
+use crate::scenes::game::systems::ui::logic::UiLogicSystem;
+use crate::scenes::game::utils::Coordinates;
+use crate::state::global::GlobalAppData;
+use crate::GameApp;
+use lemao_core::lemao_common_platform::input::InputEvent;
+use lemao_core::lemao_common_platform::input::Key;
+use lemao_core::lemao_math::vec2::Vec2;
+use lemao_framework::ecs::commands::kill::KillCommand;
+use lemao_framework::ecs::commands::spawn::SpawnCommand;
+use lemao_framework::ecs::systems::System;
+use lemao_framework::ecs::systems::SystemStage;
 use std::any::TypeId;
 use std::cmp;
 use std::collections::HashMap;
 use std::time::SystemTime;
-
-use crate::scenes::game::components::body::{BodyComponent, BodyOrientation};
-use crate::scenes::game::components::food::FoodComponent;
-use crate::scenes::game::components::head::{HeadComponent, HeadDirection};
-use crate::scenes::game::components::position::PositionComponent;
-use crate::scenes::game::components::sprite::SpriteComponent;
-use crate::scenes::game::messages::Message;
-use crate::scenes::game::utils::Coordinates;
-use crate::scenes::game::GameScene;
-use crate::state::global::GlobalAppData;
-use lemao_core::lemao_common_platform::input::{InputEvent, Key};
-use lemao_core::lemao_math::vec2::Vec2;
-use lemao_framework::app::Application;
-use lemao_framework::ecs::commands::kill::KillCommand;
-use lemao_framework::ecs::commands::spawn::SpawnCommand;
-use lemao_framework::ecs::systems::{System, SystemStage};
-use lemao_framework::ecs::world::World;
-
-use super::body::BodySystem;
-use super::ui_logic::UiLogicSystem;
-use super::LAYER_SNAKE;
 
 pub struct HeadSystem {
     orientation_map: HashMap<u8, BodyOrientation>,
@@ -37,12 +38,7 @@ impl System<GlobalAppData, GameScene, Message> for HeadSystem {
         TypeId::of::<HeadSystem>()
     }
 
-    fn update(
-        &mut self,
-        app: &mut Application<GlobalAppData>,
-        scene: &mut GameScene,
-        world: &mut World<GlobalAppData, GameScene, Message>,
-    ) -> Result<(), String> {
+    fn update(&mut self, app: &mut GameApp, scene: &mut GameScene, world: &mut GameWorld) -> Result<(), String> {
         while let Some(message) = world.messages.poll_message::<Self>() {
             match message {
                 Message::Init => {
@@ -63,33 +59,31 @@ impl System<GlobalAppData, GameScene, Message> for HeadSystem {
 
                     return Ok(());
                 }
-                Message::InputEvent(event) => {
-                    if let InputEvent::KeyPressed(key) = event {
-                        let head = world.components.get_and_cast_mut::<HeadComponent>()?.get_mut_first()?;
+                Message::InputEvent(InputEvent::KeyPressed(key)) => {
+                    let head = world.components.get_and_cast_mut::<HeadComponent>()?.get_mut_first()?;
 
-                        match key {
-                            Key::KeyW => {
-                                if head.direction != HeadDirection::Down {
-                                    head.next_direction = HeadDirection::Up
-                                }
+                    match key {
+                        Key::KeyW => {
+                            if head.direction != HeadDirection::Down {
+                                head.next_direction = HeadDirection::Up
                             }
-                            Key::KeyS => {
-                                if head.direction != HeadDirection::Up {
-                                    head.next_direction = HeadDirection::Down
-                                }
-                            }
-                            Key::KeyA => {
-                                if head.direction != HeadDirection::Right {
-                                    head.next_direction = HeadDirection::Left
-                                }
-                            }
-                            Key::KeyD => {
-                                if head.direction != HeadDirection::Left {
-                                    head.next_direction = HeadDirection::Right
-                                }
-                            }
-                            _ => {}
                         }
+                        Key::KeyS => {
+                            if head.direction != HeadDirection::Up {
+                                head.next_direction = HeadDirection::Down
+                            }
+                        }
+                        Key::KeyA => {
+                            if head.direction != HeadDirection::Right {
+                                head.next_direction = HeadDirection::Left
+                            }
+                        }
+                        Key::KeyD => {
+                            if head.direction != HeadDirection::Left {
+                                head.next_direction = HeadDirection::Right
+                            }
+                        }
+                        _ => {}
                     }
                 }
                 Message::GameTick => {
@@ -227,7 +221,7 @@ impl System<GlobalAppData, GameScene, Message> for HeadSystem {
 }
 
 impl HeadSystem {
-    fn get_head_default_position(&self, app: &mut Application<GlobalAppData>) -> Coordinates {
+    fn get_head_default_position(&self, app: &mut GameApp) -> Coordinates {
         Coordinates::new(app.global_data.board_height / 2, app.global_data.board_width / 2)
     }
 }

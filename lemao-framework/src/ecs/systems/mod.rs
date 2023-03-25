@@ -2,7 +2,6 @@ use std::any::TypeId;
 
 use super::world::World;
 use crate::app::Application;
-use lemao_core::lemao_common_platform::input::InputEvent;
 
 pub mod list;
 
@@ -11,9 +10,11 @@ pub enum SystemStage {
     Initialization,
     Input,
     GameLogic,
-    GameRendering,
     UiLogic,
+    FrameBegin,
+    GameRendering,
     UiRendering,
+    FrameEnd,
 }
 
 pub trait System<G, S, M>

@@ -5,7 +5,6 @@ use super::entities::list::EntityList;
 use super::systems::list::SystemList;
 use super::systems::SystemStage;
 use crate::app::Application;
-use lemao_core::lemao_common_platform::input::InputEvent;
 use std::fmt::Debug;
 use std::sync::Arc;
 use std::sync::RwLock;
@@ -68,18 +67,28 @@ where
             first_iteration = false;
         }
 
-        // Game rendering stage
-        for system in &mut systems.iter_mut().filter(|system| system.get_stage() == SystemStage::GameRendering) {
-            system.update(app, scene, self)?;
-        }
-
         // UI logic stage
         for system in &mut systems.iter_mut().filter(|system| system.get_stage() == SystemStage::UiLogic) {
             system.update(app, scene, self)?;
         }
 
+        // Frame begin stage
+        for system in &mut systems.iter_mut().filter(|system| system.get_stage() == SystemStage::FrameBegin) {
+            system.update(app, scene, self)?;
+        }
+
+        // Game rendering stage
+        for system in &mut systems.iter_mut().filter(|system| system.get_stage() == SystemStage::GameRendering) {
+            system.update(app, scene, self)?;
+        }
+
         // UI rendering stage
         for system in &mut systems.iter_mut().filter(|system| system.get_stage() == SystemStage::UiRendering) {
+            system.update(app, scene, self)?;
+        }
+
+        // Frame end stage
+        for system in &mut systems.iter_mut().filter(|system| system.get_stage() == SystemStage::FrameEnd) {
             system.update(app, scene, self)?;
         }
 

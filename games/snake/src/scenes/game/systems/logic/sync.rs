@@ -2,12 +2,13 @@ use super::body::BodySystem;
 use super::food::FoodSystem;
 use super::head::HeadSystem;
 use crate::scenes::game::messages::Message;
-use crate::scenes::game::GameScene;
+use crate::scenes::game::scene::GameScene;
+use crate::scenes::game::scene::GameWorld;
 use crate::state::global::GlobalAppData;
-use lemao_core::lemao_common_platform::input::{InputEvent, Key};
-use lemao_framework::app::Application;
-use lemao_framework::ecs::systems::{System, SystemStage};
-use lemao_framework::ecs::world::World;
+use crate::GameApp;
+use lemao_core::lemao_common_platform::input::Key;
+use lemao_framework::ecs::systems::System;
+use lemao_framework::ecs::systems::SystemStage;
 use std::any::TypeId;
 use std::time::SystemTime;
 
@@ -23,12 +24,7 @@ impl System<GlobalAppData, GameScene, Message> for SyncSystem {
         TypeId::of::<SyncSystem>()
     }
 
-    fn update(
-        &mut self,
-        app: &mut Application<GlobalAppData>,
-        scene: &mut GameScene,
-        world: &mut World<GlobalAppData, GameScene, Message>,
-    ) -> Result<(), String> {
+    fn update(&mut self, app: &mut GameApp, scene: &mut GameScene, world: &mut GameWorld) -> Result<(), String> {
         let mut tick = scene.state.game.tick_length;
         if app.window.is_key_pressed(Key::Space) {
             tick /= 3;

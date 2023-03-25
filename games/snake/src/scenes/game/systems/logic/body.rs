@@ -1,18 +1,17 @@
-use std::any::TypeId;
-use std::cmp;
-
-use crate::scenes::game::components::body::{BodyComponent, BodyOrientation};
+use crate::scenes::game::components::body::BodyComponent;
+use crate::scenes::game::components::body::BodyOrientation;
 use crate::scenes::game::components::head::HeadDirection;
 use crate::scenes::game::components::position::PositionComponent;
 use crate::scenes::game::components::sprite::SpriteComponent;
 use crate::scenes::game::messages::Message;
-use crate::scenes::game::GameScene;
+use crate::scenes::game::scene::{GameScene, GameWorld};
 use crate::state::global::GlobalAppData;
-use lemao_core::lemao_common_platform::input::InputEvent;
-use lemao_framework::app::Application;
+use crate::GameApp;
 use lemao_framework::ecs::commands::kill::KillCommand;
-use lemao_framework::ecs::systems::{System, SystemStage};
-use lemao_framework::ecs::world::World;
+use lemao_framework::ecs::systems::System;
+use lemao_framework::ecs::systems::SystemStage;
+use std::any::TypeId;
+use std::cmp;
 
 #[derive(Default)]
 pub struct BodySystem {}
@@ -26,12 +25,7 @@ impl System<GlobalAppData, GameScene, Message> for BodySystem {
         TypeId::of::<BodySystem>()
     }
 
-    fn update(
-        &mut self,
-        _app: &mut Application<GlobalAppData>,
-        scene: &mut GameScene,
-        world: &mut World<GlobalAppData, GameScene, Message>,
-    ) -> Result<(), String> {
+    fn update(&mut self, _app: &mut GameApp, scene: &mut GameScene, world: &mut GameWorld) -> Result<(), String> {
         let mut tick = false;
 
         while let Some(message) = world.messages.poll_message::<Self>() {

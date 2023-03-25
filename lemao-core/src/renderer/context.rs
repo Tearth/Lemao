@@ -126,12 +126,7 @@ impl RendererContext {
             vec![Vec3::new(0.0, 0.0, 0.0), Vec3::new(1.0, 0.0, 0.0), Vec3::new(1.0, 1.0, 0.0), Vec3::new(0.0, 1.0, 0.0)],
             vec![0, 1, 2, 0, 2, 3],
             vec![Vec2::new(0.0, 0.0), Vec2::new(1.0, 0.0), Vec2::new(1.0, 1.0), Vec2::new(0.0, 1.0)],
-            vec![
-                SolidColor::new(1.0, 1.0, 1.0, 1.0),
-                SolidColor::new(1.0, 1.0, 1.0, 1.0),
-                SolidColor::new(1.0, 1.0, 1.0, 1.0),
-                SolidColor::new(1.0, 1.0, 1.0, 1.0),
-            ],
+            vec![SolidColor::new(1.0, 1.0, 1.0, 1.0), SolidColor::new(1.0, 1.0, 1.0, 1.0), SolidColor::new(1.0, 1.0, 1.0, 1.0), SolidColor::new(1.0, 1.0, 1.0, 1.0)],
         );
         self.default_sprite_shape_id = self.shapes.store(sprite_shape);
 
@@ -140,12 +135,7 @@ impl RendererContext {
             vec![Vec3::new(-0.5, 0.0, 0.0), Vec3::new(0.5, 0.0, 0.0), Vec3::new(0.5, 1.0, 0.0), Vec3::new(-0.5, 1.0, 0.0)],
             vec![0, 1, 2, 0, 2, 3],
             vec![Vec2::new(0.0, 0.0), Vec2::new(1.0, 0.0), Vec2::new(1.0, 1.0), Vec2::new(0.0, 1.0)],
-            vec![
-                SolidColor::new(1.0, 1.0, 1.0, 1.0),
-                SolidColor::new(1.0, 1.0, 1.0, 1.0),
-                SolidColor::new(1.0, 1.0, 1.0, 1.0),
-                SolidColor::new(1.0, 1.0, 1.0, 1.0),
-            ],
+            vec![SolidColor::new(1.0, 1.0, 1.0, 1.0), SolidColor::new(1.0, 1.0, 1.0, 1.0), SolidColor::new(1.0, 1.0, 1.0, 1.0), SolidColor::new(1.0, 1.0, 1.0, 1.0)],
         );
         self.default_line_shape_id = self.shapes.store(line_shape);
 
@@ -154,12 +144,7 @@ impl RendererContext {
             vec![Vec3::new(0.0, 0.0, 0.0), Vec3::new(1.0, 0.0, 0.0), Vec3::new(1.0, 1.0, 0.0), Vec3::new(0.0, 1.0, 0.0)],
             vec![0, 1, 2, 0, 2, 3],
             vec![Vec2::new(0.0, 0.0), Vec2::new(1.0, 0.0), Vec2::new(1.0, 1.0), Vec2::new(0.0, 1.0)],
-            vec![
-                SolidColor::new(1.0, 1.0, 1.0, 1.0),
-                SolidColor::new(1.0, 1.0, 1.0, 1.0),
-                SolidColor::new(1.0, 1.0, 1.0, 1.0),
-                SolidColor::new(1.0, 1.0, 1.0, 1.0),
-            ],
+            vec![SolidColor::new(1.0, 1.0, 1.0, 1.0), SolidColor::new(1.0, 1.0, 1.0, 1.0), SolidColor::new(1.0, 1.0, 1.0, 1.0), SolidColor::new(1.0, 1.0, 1.0, 1.0)],
         );
         self.default_rectangle_shape_id = self.shapes.store(rectangle_shape);
 
