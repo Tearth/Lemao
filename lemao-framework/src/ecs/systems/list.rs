@@ -1,6 +1,8 @@
-use super::System;
-use std::slice::Iter;
-use std::slice::IterMut;
+use super::{System, SystemStage};
+use std::{
+    any::TypeId,
+    slice::{Iter, IterMut},
+};
 
 #[derive(Default)]
 pub struct SystemList<G, S, M> {
@@ -12,7 +14,10 @@ impl<G, S, M> SystemList<G, S, M> {
         Self { data: Default::default() }
     }
 
-    pub fn store(&mut self, item: Box<dyn System<G, S, M>>) -> Result<(), String> {
+    pub fn store<T>(&mut self, item: Box<dyn System<G, S, M>>) -> Result<(), String>
+    where
+        T: 'static,
+    {
         self.data.push(item);
         Ok(())
     }

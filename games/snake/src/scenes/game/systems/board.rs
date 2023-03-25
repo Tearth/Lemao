@@ -1,3 +1,5 @@
+use std::any::TypeId;
+
 use crate::scenes::game::components::cell::CellComponent;
 use crate::scenes::game::components::obstacle::ObstacleComponent;
 use crate::scenes::game::components::position::PositionComponent;
@@ -10,7 +12,7 @@ use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_framework::app::Application;
 use lemao_framework::ecs::commands::spawn::SpawnCommand;
-use lemao_framework::ecs::systems::System;
+use lemao_framework::ecs::systems::{System, SystemStage};
 use lemao_framework::ecs::world::World;
 
 use super::LAYER_BOARD;
@@ -19,12 +21,19 @@ use super::LAYER_BOARD;
 pub struct BoardSystem {}
 
 impl System<GlobalAppData, GameScene, Message> for BoardSystem {
+    fn get_stage(&self) -> SystemStage {
+        SystemStage::GameLogic
+    }
+
+    fn get_type(&self) -> TypeId {
+        TypeId::of::<BoardSystem>()
+    }
+
     fn update(
         &mut self,
         app: &mut Application<GlobalAppData>,
         _scene: &mut GameScene,
         world: &mut World<GlobalAppData, GameScene, Message>,
-        _input: &[InputEvent],
     ) -> Result<(), String> {
         while let Some(message) = world.messages.poll_message::<Self>() {
             match message {
@@ -51,6 +60,8 @@ impl System<GlobalAppData, GameScene, Message> for BoardSystem {
                             world.commands.send(SpawnCommand::new(cell_id, SpriteComponent::new(cell_id, rectangle, LAYER_BOARD)));
                         }
                     }
+
+                    return Ok(());
                 }
                 _ => {}
             }

@@ -1,3 +1,4 @@
+use std::any::TypeId;
 use std::time::SystemTime;
 
 use crate::scenes::game::components::position::PositionComponent;
@@ -8,19 +9,26 @@ use crate::state::global::GlobalAppData;
 use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_math::vec2::Vec2;
 use lemao_framework::app::Application;
-use lemao_framework::ecs::systems::System;
+use lemao_framework::ecs::systems::{System, SystemStage};
 use lemao_framework::ecs::world::World;
 
 #[derive(Default)]
 pub struct RendererSystem {}
 
 impl System<GlobalAppData, GameScene, Message> for RendererSystem {
+    fn get_stage(&self) -> SystemStage {
+        SystemStage::GameRendering
+    }
+
+    fn get_type(&self) -> TypeId {
+        TypeId::of::<RendererSystem>()
+    }
+
     fn update(
         &mut self,
         app: &mut Application<GlobalAppData>,
         _scene: &mut GameScene,
         world: &mut World<GlobalAppData, GameScene, Message>,
-        _input: &[InputEvent],
     ) -> Result<(), String> {
         let (sprites, positions) = world.components.get_and_cast_mut_2::<SpriteComponent, PositionComponent>();
         let mut layers = Vec::new();

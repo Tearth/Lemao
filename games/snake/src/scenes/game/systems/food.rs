@@ -13,8 +13,9 @@ use lemao_core::utils::rand;
 use lemao_framework::app::Application;
 use lemao_framework::ecs::commands::kill::KillCommand;
 use lemao_framework::ecs::commands::spawn::SpawnCommand;
-use lemao_framework::ecs::systems::System;
+use lemao_framework::ecs::systems::{System, SystemStage};
 use lemao_framework::ecs::world::World;
+use std::any::TypeId;
 use std::time::SystemTime;
 
 use super::LAYER_FOOD;
@@ -23,12 +24,19 @@ use super::LAYER_FOOD;
 pub struct FoodSystem {}
 
 impl System<GlobalAppData, GameScene, Message> for FoodSystem {
+    fn get_stage(&self) -> SystemStage {
+        SystemStage::GameLogic
+    }
+
+    fn get_type(&self) -> TypeId {
+        TypeId::of::<FoodSystem>()
+    }
+
     fn update(
         &mut self,
         app: &mut Application<GlobalAppData>,
         scene: &mut GameScene,
         world: &mut World<GlobalAppData, GameScene, Message>,
-        _input: &[InputEvent],
     ) -> Result<(), String> {
         while let Some(message) = world.messages.poll_message::<Self>() {
             match message {

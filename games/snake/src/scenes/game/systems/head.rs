@@ -1,3 +1,4 @@
+use std::any::TypeId;
 use std::cmp;
 use std::collections::HashMap;
 use std::time::SystemTime;
@@ -16,11 +17,11 @@ use lemao_core::lemao_math::vec2::Vec2;
 use lemao_framework::app::Application;
 use lemao_framework::ecs::commands::kill::KillCommand;
 use lemao_framework::ecs::commands::spawn::SpawnCommand;
-use lemao_framework::ecs::systems::System;
+use lemao_framework::ecs::systems::{System, SystemStage};
 use lemao_framework::ecs::world::World;
 
 use super::body::BodySystem;
-use super::ui::UiSystem;
+use super::ui_logic::UiLogicSystem;
 use super::LAYER_SNAKE;
 
 pub struct HeadSystem {
@@ -28,43 +29,20 @@ pub struct HeadSystem {
 }
 
 impl System<GlobalAppData, GameScene, Message> for HeadSystem {
+    fn get_stage(&self) -> SystemStage {
+        SystemStage::GameLogic
+    }
+
+    fn get_type(&self) -> TypeId {
+        TypeId::of::<HeadSystem>()
+    }
+
     fn update(
         &mut self,
         app: &mut Application<GlobalAppData>,
         scene: &mut GameScene,
         world: &mut World<GlobalAppData, GameScene, Message>,
-        input: &[InputEvent],
     ) -> Result<(), String> {
-        for event in input {
-            if let InputEvent::KeyPressed(key) = event {
-                let head = world.components.get_and_cast_mut::<HeadComponent>()?.get_mut_first()?;
-
-                match key {
-                    Key::KeyW => {
-                        if head.direction != HeadDirection::Down {
-                            head.next_direction = HeadDirection::Up
-                        }
-                    }
-                    Key::KeyS => {
-                        if head.direction != HeadDirection::Up {
-                            head.next_direction = HeadDirection::Down
-                        }
-                    }
-                    Key::KeyA => {
-                        if head.direction != HeadDirection::Right {
-                            head.next_direction = HeadDirection::Left
-                        }
-                    }
-                    Key::KeyD => {
-                        if head.direction != HeadDirection::Left {
-                            head.next_direction = HeadDirection::Right
-                        }
-                    }
-                    _ => {}
-                }
-            }
-        }
-
         while let Some(message) = world.messages.poll_message::<Self>() {
             match message {
                 Message::Init => {
@@ -82,6 +60,37 @@ impl System<GlobalAppData, GameScene, Message> for HeadSystem {
 
                     scene.state.game.lifetime = app.global_data.initial_lifetime;
                     scene.state.game.tick_length = app.global_data.initial_tick_length;
+
+                    return Ok(());
+                }
+                Message::InputEvent(event) => {
+                    if let InputEvent::KeyPressed(key) = event {
+                        let head = world.components.get_and_cast_mut::<HeadComponent>()?.get_mut_first()?;
+
+                        match key {
+                            Key::KeyW => {
+                                if head.direction != HeadDirection::Down {
+                                    head.next_direction = HeadDirection::Up
+                                }
+                            }
+                            Key::KeyS => {
+                                if head.direction != HeadDirection::Up {
+                                    head.next_direction = HeadDirection::Down
+                                }
+                            }
+                            Key::KeyA => {
+                                if head.direction != HeadDirection::Right {
+                                    head.next_direction = HeadDirection::Left
+                                }
+                            }
+                            Key::KeyD => {
+                                if head.direction != HeadDirection::Left {
+                                    head.next_direction = HeadDirection::Right
+                                }
+                            }
+                            _ => {}
+                        }
+                    }
                 }
                 Message::GameTick => {
                     if !scene.state.game.snake_killed {
@@ -152,7 +161,7 @@ impl System<GlobalAppData, GameScene, Message> for HeadSystem {
                                     scene.state.game.score += 1;
 
                                     world.commands.send(KillCommand::new(food_position.entity_id));
-                                    world.messages.send_to_2::<BodySystem, UiSystem>(Message::FoodEaten)?;
+                                    world.messages.send_to_2::<BodySystem, UiLogicSystem>(Message::FoodEaten)?;
                                 }
                             }
 
@@ -210,7 +219,7 @@ impl System<GlobalAppData, GameScene, Message> for HeadSystem {
             scene.state.game.tick_length = app.global_data.initial_tick_length;
             scene.state.game.game_start_time = SystemTime::now();
 
-            world.messages.send_to_3::<HeadSystem, BodySystem, UiSystem>(Message::ResetSnake)?;
+            world.messages.send_to_3::<HeadSystem, BodySystem, UiLogicSystem>(Message::ResetSnake)?;
         }
 
         Ok(())

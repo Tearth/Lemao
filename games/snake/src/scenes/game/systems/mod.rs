@@ -3,9 +3,11 @@ pub mod body;
 pub mod food;
 pub mod head;
 pub mod init;
+pub mod input;
 pub mod renderer;
 pub mod sync;
-pub mod ui;
+pub mod ui_logic;
+pub mod ui_rendering;
 pub mod window;
 
 pub const LAYER_SNAKE: u8 = 0;

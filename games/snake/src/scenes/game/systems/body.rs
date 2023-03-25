@@ -1,3 +1,4 @@
+use std::any::TypeId;
 use std::cmp;
 
 use crate::scenes::game::components::body::{BodyComponent, BodyOrientation};
@@ -10,19 +11,26 @@ use crate::state::global::GlobalAppData;
 use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_framework::app::Application;
 use lemao_framework::ecs::commands::kill::KillCommand;
-use lemao_framework::ecs::systems::System;
+use lemao_framework::ecs::systems::{System, SystemStage};
 use lemao_framework::ecs::world::World;
 
 #[derive(Default)]
 pub struct BodySystem {}
 
 impl System<GlobalAppData, GameScene, Message> for BodySystem {
+    fn get_stage(&self) -> SystemStage {
+        SystemStage::GameLogic
+    }
+
+    fn get_type(&self) -> TypeId {
+        TypeId::of::<BodySystem>()
+    }
+
     fn update(
         &mut self,
         _app: &mut Application<GlobalAppData>,
         scene: &mut GameScene,
         world: &mut World<GlobalAppData, GameScene, Message>,
-        _input: &[InputEvent],
     ) -> Result<(), String> {
         let mut tick = false;
 

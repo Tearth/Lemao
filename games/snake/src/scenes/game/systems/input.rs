@@ -9,23 +9,27 @@ use lemao_framework::ecs::systems::{System, SystemStage};
 use lemao_framework::ecs::world::World;
 
 #[derive(Default)]
-pub struct InitSystem {}
+pub struct InputSystem {}
 
-impl System<GlobalAppData, GameScene, Message> for InitSystem {
+impl System<GlobalAppData, GameScene, Message> for InputSystem {
     fn get_stage(&self) -> SystemStage {
-        SystemStage::Initialization
+        SystemStage::Input
     }
 
     fn get_type(&self) -> TypeId {
-        TypeId::of::<InitSystem>()
+        TypeId::of::<InputSystem>()
     }
 
     fn update(
         &mut self,
-        _app: &mut Application<GlobalAppData>,
+        app: &mut Application<GlobalAppData>,
         _scene: &mut GameScene,
         world: &mut World<GlobalAppData, GameScene, Message>,
     ) -> Result<(), String> {
-        world.messages.broadcast(Message::Init)
+        while let Some(event) = app.window.poll_event() {
+            world.messages.broadcast(Message::InputEvent(event))?;
+        }
+
+        Ok(())
     }
 }

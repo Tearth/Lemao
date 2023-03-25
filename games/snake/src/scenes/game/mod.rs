@@ -14,9 +14,11 @@ use self::systems::body::BodySystem;
 use self::systems::food::FoodSystem;
 use self::systems::head::HeadSystem;
 use self::systems::init::InitSystem;
+use self::systems::input::InputSystem;
 use self::systems::renderer::RendererSystem;
 use self::systems::sync::SyncSystem;
-use self::systems::ui::UiSystem;
+use self::systems::ui_logic::UiLogicSystem;
+use self::systems::ui_rendering::UiRenderingSystem;
 use self::systems::window::WindowSystem;
 use lemao_core::lemao_math::color::SolidColor;
 use lemao_framework::app::Application;
@@ -67,22 +69,24 @@ impl Scene<GlobalAppData> for GameScene {
         world.components.store::<PositionComponent>(Box::<ComponentList<PositionComponent>>::default())?;
         world.components.store::<SpriteComponent>(Box::<ComponentList<SpriteComponent>>::default())?;
 
-        world.systems.write().unwrap().store(Box::<BodySystem>::default())?;
-        world.systems.write().unwrap().store(Box::<HeadSystem>::default())?;
-        world.systems.write().unwrap().store(Box::<FoodSystem>::default())?;
-        world.systems.write().unwrap().store(Box::<RendererSystem>::default())?;
-        world.systems.write().unwrap().store(Box::<SyncSystem>::default())?;
-        world.systems.write().unwrap().store(Box::<WindowSystem>::default())?;
-        world.systems.write().unwrap().store(Box::<BoardSystem>::default())?;
-        world.systems.write().unwrap().store(Box::<UiSystem>::default())?;
+        world.systems.write().unwrap().store::<InitSystem>(Box::<InitSystem>::default())?;
+        world.systems.write().unwrap().store::<InputSystem>(Box::<InputSystem>::default())?;
+        world.systems.write().unwrap().store::<BodySystem>(Box::<BodySystem>::default())?;
+        world.systems.write().unwrap().store::<HeadSystem>(Box::<HeadSystem>::default())?;
+        world.systems.write().unwrap().store::<FoodSystem>(Box::<FoodSystem>::default())?;
+        world.systems.write().unwrap().store::<RendererSystem>(Box::<RendererSystem>::default())?;
+        world.systems.write().unwrap().store::<SyncSystem>(Box::<SyncSystem>::default())?;
+        world.systems.write().unwrap().store::<WindowSystem>(Box::<WindowSystem>::default())?;
+        world.systems.write().unwrap().store::<BoardSystem>(Box::<BoardSystem>::default())?;
+        world.systems.write().unwrap().store::<UiLogicSystem>(Box::<UiLogicSystem>::default())?;
+        world.systems.write().unwrap().store::<UiRenderingSystem>(Box::<UiRenderingSystem>::default())?;
 
         world.messages.register_receiver::<BodySystem>()?;
         world.messages.register_receiver::<HeadSystem>()?;
         world.messages.register_receiver::<FoodSystem>()?;
         world.messages.register_receiver::<BoardSystem>()?;
-        world.messages.register_receiver::<UiSystem>()?;
-
-        InitSystem::default().update(app, self, &mut world, &Vec::new())?;
+        world.messages.register_receiver::<UiLogicSystem>()?;
+        world.messages.register_receiver::<WindowSystem>()?;
 
         Ok(())
     }
@@ -92,15 +96,10 @@ impl Scene<GlobalAppData> for GameScene {
     }
 
     fn on_tick(&mut self, app: &mut Application<GlobalAppData>) -> Result<(), String> {
-        let mut events = Vec::new();
-        while let Some(event) = app.window.poll_event() {
-            events.push(event);
-        }
-
         app.renderer.clear(SolidColor::new_rgb(210, 150, 100, 255));
 
         let world = self.world.clone();
-        world.write().unwrap().update(app, self, &events)?;
+        world.write().unwrap().update(app, self)?;
 
         app.window.swap_buffers();
         Ok(())

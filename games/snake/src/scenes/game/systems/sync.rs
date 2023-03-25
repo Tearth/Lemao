@@ -6,20 +6,28 @@ use crate::scenes::game::GameScene;
 use crate::state::global::GlobalAppData;
 use lemao_core::lemao_common_platform::input::{InputEvent, Key};
 use lemao_framework::app::Application;
-use lemao_framework::ecs::systems::System;
+use lemao_framework::ecs::systems::{System, SystemStage};
 use lemao_framework::ecs::world::World;
+use std::any::TypeId;
 use std::time::SystemTime;
 
 #[derive(Default)]
 pub struct SyncSystem {}
 
 impl System<GlobalAppData, GameScene, Message> for SyncSystem {
+    fn get_stage(&self) -> SystemStage {
+        SystemStage::GameLogic
+    }
+
+    fn get_type(&self) -> TypeId {
+        TypeId::of::<SyncSystem>()
+    }
+
     fn update(
         &mut self,
         app: &mut Application<GlobalAppData>,
         scene: &mut GameScene,
         world: &mut World<GlobalAppData, GameScene, Message>,
-        _input: &[InputEvent],
     ) -> Result<(), String> {
         let mut tick = scene.state.game.tick_length;
         if app.window.is_key_pressed(Key::Space) {
