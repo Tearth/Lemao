@@ -39,7 +39,7 @@ impl System<GlobalAppData, GameScene, Message> for FoodSystem {
                         || scene.state.game.food_last_refresh_time.elapsed().unwrap().as_millis() >= app.global_data.food_refresh_interval as u128
                     {
                         for body in foods.iter_mut() {
-                            world.commands.send(Box::new(KillCommand::new(body.entity_id)));
+                            world.commands.send(KillCommand::new(body.entity_id));
                         }
 
                         let (heads, bodies, positions) = world.components.get_and_cast_mut_3::<HeadComponent, BodyComponent, PositionComponent>();
@@ -67,11 +67,9 @@ impl System<GlobalAppData, GameScene, Message> for FoodSystem {
                             food_rectangle.anchor = Vec2::new(0.5, 0.5);
                             food_rectangle.update();
 
-                            world.commands.send(Box::new(SpawnCommand::new(food_id, FoodComponent::new(food_id))));
-                            world
-                                .commands
-                                .send(Box::new(SpawnCommand::new(food_id, PositionComponent::new(food_id, Coordinates::new(position.0, position.1)))));
-                            world.commands.send(Box::new(SpawnCommand::new(food_id, SpriteComponent::new(food_id, food_rectangle, LAYER_FOOD))));
+                            world.commands.send(SpawnCommand::new(food_id, FoodComponent::new(food_id)));
+                            world.commands.send(SpawnCommand::new(food_id, PositionComponent::new(food_id, Coordinates::new(position.0, position.1))));
+                            world.commands.send(SpawnCommand::new(food_id, SpriteComponent::new(food_id, food_rectangle, LAYER_FOOD)));
                         }
 
                         scene.state.game.food_last_refresh_time = SystemTime::now();

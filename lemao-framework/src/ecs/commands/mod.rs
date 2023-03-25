@@ -20,8 +20,11 @@ impl<G, S, M> CommandBus<G, S, M> {
         Self { queue: Default::default() }
     }
 
-    pub fn send(&mut self, command: Box<dyn Command<G, S, M>>) {
-        self.queue.push_back(command);
+    pub fn send<T>(&mut self, command: T)
+    where
+        T: Command<G, S, M> + 'static,
+    {
+        self.queue.push_back(Box::new(command));
     }
 
     pub fn poll_message(&mut self) -> Option<Box<dyn Command<G, S, M>>> {

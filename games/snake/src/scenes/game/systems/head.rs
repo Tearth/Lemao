@@ -23,8 +23,9 @@ use super::body::BodySystem;
 use super::ui::UiSystem;
 use super::LAYER_SNAKE;
 
-#[derive(Default)]
-pub struct HeadSystem {}
+pub struct HeadSystem {
+    orientation_map: HashMap<u8, BodyOrientation>,
+}
 
 impl System<GlobalAppData, GameScene, Message> for HeadSystem {
     fn update(
@@ -36,8 +37,7 @@ impl System<GlobalAppData, GameScene, Message> for HeadSystem {
     ) -> Result<(), String> {
         for event in input {
             if let InputEvent::KeyPressed(key) = event {
-                let heads = world.components.get_and_cast_mut::<HeadComponent>()?;
-                let head = heads.iter_mut().next().unwrap();
+                let head = world.components.get_and_cast_mut::<HeadComponent>()?.get_mut_first()?;
 
                 match key {
                     Key::KeyW => {
@@ -76,9 +76,9 @@ impl System<GlobalAppData, GameScene, Message> for HeadSystem {
                     head_rectangle.update();
 
                     let head_coordinates = self.get_head_default_position(app);
-                    world.commands.send(Box::new(SpawnCommand::new(head_id, HeadComponent::new(head_id, HeadDirection::Right))));
-                    world.commands.send(Box::new(SpawnCommand::new(head_id, PositionComponent::new(head_id, head_coordinates))));
-                    world.commands.send(Box::new(SpawnCommand::new(head_id, SpriteComponent::new(head_id, head_rectangle, LAYER_SNAKE))));
+                    world.commands.send(SpawnCommand::new(head_id, HeadComponent::new(head_id, HeadDirection::Right)));
+                    world.commands.send(SpawnCommand::new(head_id, PositionComponent::new(head_id, head_coordinates)));
+                    world.commands.send(SpawnCommand::new(head_id, SpriteComponent::new(head_id, head_rectangle, LAYER_SNAKE)));
 
                     scene.state.game.lifetime = app.global_data.initial_lifetime;
                     scene.state.game.tick_length = app.global_data.initial_tick_length;
@@ -148,36 +148,16 @@ impl System<GlobalAppData, GameScene, Message> for HeadSystem {
                                 let food_position = positions.get(food.entity_id)?;
                                 if food_position.coordinates == new_coordinates {
                                     scene.state.game.lifetime += 1;
-                                    scene.state.game.tick_length = (scene.state.game.tick_length as f32 * 0.8) as u32;
+                                    scene.state.game.tick_length = (scene.state.game.tick_length as f32 * 0.95) as u32;
                                     scene.state.game.score += 1;
 
-                                    for body in bodies.iter_mut() {
-                                        body.lifetime += 1;
-                                    }
-
-                                    world.commands.send(Box::new(KillCommand::new(food_position.entity_id)));
-                                    world.messages.send_to_1::<UiSystem>(Message::FoodEaten)?;
+                                    world.commands.send(KillCommand::new(food_position.entity_id));
+                                    world.messages.send_to_2::<BodySystem, UiSystem>(Message::FoodEaten)?;
                                 }
                             }
 
-                            let mut map = HashMap::new();
-
-                            map.insert((8 << HeadDirection::Up as u8) | (1 << HeadDirection::Up as u8), BodyOrientation::TopBottom);
-                            map.insert((8 << HeadDirection::Down as u8) | (1 << HeadDirection::Down as u8), BodyOrientation::TopBottom);
-                            map.insert((8 << HeadDirection::Right as u8) | (1 << HeadDirection::Right as u8), BodyOrientation::RightLeft);
-                            map.insert((8 << HeadDirection::Left as u8) | (1 << HeadDirection::Left as u8), BodyOrientation::RightLeft);
-
-                            map.insert((8 << HeadDirection::Right as u8) | (1 << HeadDirection::Down as u8), BodyOrientation::LeftBottom);
-                            map.insert((8 << HeadDirection::Left as u8) | (1 << HeadDirection::Down as u8), BodyOrientation::RightBottom);
-                            map.insert((8 << HeadDirection::Right as u8) | (1 << HeadDirection::Up as u8), BodyOrientation::LeftTop);
-                            map.insert((8 << HeadDirection::Left as u8) | (1 << HeadDirection::Up as u8), BodyOrientation::RightTop);
-                            map.insert((8 << HeadDirection::Up as u8) | (1 << HeadDirection::Right as u8), BodyOrientation::RightBottom);
-                            map.insert((8 << HeadDirection::Up as u8) | (1 << HeadDirection::Left as u8), BodyOrientation::LeftBottom);
-                            map.insert((8 << HeadDirection::Down as u8) | (1 << HeadDirection::Right as u8), BodyOrientation::RightTop);
-                            map.insert((8 << HeadDirection::Down as u8) | (1 << HeadDirection::Left as u8), BodyOrientation::LeftTop);
-
                             let key = (8 << last_direction as u8) | (1 << head.direction as u8);
-                            let body_orientation = map.get(&key).unwrap();
+                            let body_orientation = self.orientation_map.get(&key).unwrap();
 
                             let body_id = world.entities.create();
                             let mut body_rectangle = app.renderer.create_tilemap(app.renderer.textures.get_by_name("body")?.id)?;
@@ -186,12 +166,11 @@ impl System<GlobalAppData, GameScene, Message> for HeadSystem {
                             body_rectangle.frame = *body_orientation as u32;
                             body_rectangle.update();
 
-                            world.commands.send(Box::new(SpawnCommand::new(
-                                body_id,
-                                BodyComponent::new(body_id, scene.state.game.lifetime, *body_orientation, head.direction),
-                            )));
-                            world.commands.send(Box::new(SpawnCommand::new(body_id, PositionComponent::new(body_id, last_coordinates))));
-                            world.commands.send(Box::new(SpawnCommand::new(body_id, SpriteComponent::new(body_id, body_rectangle, LAYER_SNAKE))));
+                            world
+                                .commands
+                                .send(SpawnCommand::new(body_id, BodyComponent::new(body_id, scene.state.game.lifetime, *body_orientation, head.direction)));
+                            world.commands.send(SpawnCommand::new(body_id, PositionComponent::new(body_id, last_coordinates)));
+                            world.commands.send(SpawnCommand::new(body_id, SpriteComponent::new(body_id, body_rectangle, LAYER_SNAKE)));
                         }
                     }
                 }
@@ -241,5 +220,27 @@ impl System<GlobalAppData, GameScene, Message> for HeadSystem {
 impl HeadSystem {
     fn get_head_default_position(&self, app: &mut Application<GlobalAppData>) -> Coordinates {
         Coordinates::new(app.global_data.board_height / 2, app.global_data.board_width / 2)
+    }
+}
+
+impl Default for HeadSystem {
+    fn default() -> Self {
+        let mut orientation_map = HashMap::new();
+
+        orientation_map.insert((8 << HeadDirection::Up as u8) | (1 << HeadDirection::Up as u8), BodyOrientation::TopBottom);
+        orientation_map.insert((8 << HeadDirection::Down as u8) | (1 << HeadDirection::Down as u8), BodyOrientation::TopBottom);
+        orientation_map.insert((8 << HeadDirection::Right as u8) | (1 << HeadDirection::Right as u8), BodyOrientation::RightLeft);
+        orientation_map.insert((8 << HeadDirection::Left as u8) | (1 << HeadDirection::Left as u8), BodyOrientation::RightLeft);
+
+        orientation_map.insert((8 << HeadDirection::Right as u8) | (1 << HeadDirection::Down as u8), BodyOrientation::LeftBottom);
+        orientation_map.insert((8 << HeadDirection::Left as u8) | (1 << HeadDirection::Down as u8), BodyOrientation::RightBottom);
+        orientation_map.insert((8 << HeadDirection::Right as u8) | (1 << HeadDirection::Up as u8), BodyOrientation::LeftTop);
+        orientation_map.insert((8 << HeadDirection::Left as u8) | (1 << HeadDirection::Up as u8), BodyOrientation::RightTop);
+        orientation_map.insert((8 << HeadDirection::Up as u8) | (1 << HeadDirection::Right as u8), BodyOrientation::RightBottom);
+        orientation_map.insert((8 << HeadDirection::Up as u8) | (1 << HeadDirection::Left as u8), BodyOrientation::LeftBottom);
+        orientation_map.insert((8 << HeadDirection::Down as u8) | (1 << HeadDirection::Right as u8), BodyOrientation::RightTop);
+        orientation_map.insert((8 << HeadDirection::Down as u8) | (1 << HeadDirection::Left as u8), BodyOrientation::LeftTop);
+
+        Self { orientation_map }
     }
 }

@@ -1,3 +1,5 @@
+use std::cmp;
+
 use crate::scenes::game::components::body::{BodyComponent, BodyOrientation};
 use crate::scenes::game::components::head::HeadDirection;
 use crate::scenes::game::components::position::PositionComponent;
@@ -22,31 +24,17 @@ impl System<GlobalAppData, GameScene, Message> for BodySystem {
         world: &mut World<GlobalAppData, GameScene, Message>,
         _input: &[InputEvent],
     ) -> Result<(), String> {
+        let mut tick = false;
+
         while let Some(message) = world.messages.poll_message::<Self>() {
             match message {
                 Message::GameTick => {
-                    if !scene.state.game.snake_killed {
-                        let (bodies, positions, sprites) = world.components.get_and_cast_mut_3::<BodyComponent, PositionComponent, SpriteComponent>();
-                        let mut body_positions = Vec::new();
-
-                        for body in bodies.iter_mut().filter(|b| !b.killed) {
-                            body.lifetime -= 1;
-
-                            if body.lifetime == 0 {
-                                world.commands.send(Box::new(KillCommand::new(body.entity_id)));
-                            } else if body.lifetime == 1 {
-                                let sprite = sprites.get_mut(body.entity_id)?;
-                                sprite.tilemap.frame = match body.direction {
-                                    HeadDirection::Up => BodyOrientation::BottomEnd,
-                                    HeadDirection::Down => BodyOrientation::TopEnd,
-                                    HeadDirection::Right => BodyOrientation::LeftEnd,
-                                    HeadDirection::Left => BodyOrientation::RightEnd,
-                                } as u32;
-                                sprite.tilemap.update();
-                            } else {
-                                body_positions.push((body.entity_id, positions.get(body.entity_id)?.coordinates))
-                            }
-                        }
+                    tick = true;
+                }
+                Message::FoodEaten => {
+                    let bodies = world.components.get_and_cast_mut::<BodyComponent>()?;
+                    for body in bodies.iter_mut() {
+                        body.lifetime = cmp::min(body.lifetime + 1, scene.state.game.lifetime);
                     }
                 }
                 Message::KillSnake => {
@@ -64,10 +52,34 @@ impl System<GlobalAppData, GameScene, Message> for BodySystem {
                 Message::ResetSnake => {
                     let bodies = world.components.get_and_cast_mut::<BodyComponent>()?;
                     for body in bodies.iter() {
-                        world.commands.send(Box::new(KillCommand::new(body.entity_id)));
+                        world.commands.send(KillCommand::new(body.entity_id));
                     }
                 }
                 _ => {}
+            }
+        }
+
+        if tick && !scene.state.game.snake_killed {
+            let (bodies, positions, sprites) = world.components.get_and_cast_mut_3::<BodyComponent, PositionComponent, SpriteComponent>();
+            let mut body_positions = Vec::new();
+
+            for body in bodies.iter_mut().filter(|b| !b.killed) {
+                body.lifetime -= 1;
+
+                if body.lifetime == 0 {
+                    world.commands.send(KillCommand::new(body.entity_id));
+                } else if body.lifetime == 1 {
+                    let sprite = sprites.get_mut(body.entity_id)?;
+                    sprite.tilemap.frame = match body.direction {
+                        HeadDirection::Up => BodyOrientation::BottomEnd,
+                        HeadDirection::Down => BodyOrientation::TopEnd,
+                        HeadDirection::Right => BodyOrientation::LeftEnd,
+                        HeadDirection::Left => BodyOrientation::RightEnd,
+                    } as u32;
+                    sprite.tilemap.update();
+                } else {
+                    body_positions.push((body.entity_id, positions.get(body.entity_id)?.coordinates))
+                }
             }
         }
 

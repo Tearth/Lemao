@@ -40,15 +40,15 @@ impl System<GlobalAppData, GameScene, Message> for BoardSystem {
                             rectangle.anchor = Vec2::new(0.5, 0.5);
 
                             if row == 0 || row == app.global_data.board_height - 1 || col == 0 || col == app.global_data.board_width - 1 {
-                                world.commands.send(Box::new(SpawnCommand::new(cell_id, ObstacleComponent::new(cell_id))));
+                                world.commands.send(SpawnCommand::new(cell_id, ObstacleComponent::new(cell_id)));
                             } else {
-                                world.commands.send(Box::new(SpawnCommand::new(cell_id, CellComponent::new(cell_id))));
+                                world.commands.send(SpawnCommand::new(cell_id, CellComponent::new(cell_id)));
                             }
 
                             rectangle.update();
 
-                            world.commands.send(Box::new(SpawnCommand::new(cell_id, PositionComponent::new(cell_id, Coordinates::new(row, col)))));
-                            world.commands.send(Box::new(SpawnCommand::new(cell_id, SpriteComponent::new(cell_id, rectangle, LAYER_BOARD))));
+                            world.commands.send(SpawnCommand::new(cell_id, PositionComponent::new(cell_id, Coordinates::new(row, col))));
+                            world.commands.send(SpawnCommand::new(cell_id, SpriteComponent::new(cell_id, rectangle, LAYER_BOARD)));
                         }
                     }
                 }
