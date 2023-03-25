@@ -76,8 +76,12 @@ impl ComponentManager {
         C1: Component + 'static,
         C2: Component + 'static,
     {
-        let [a, b] = self.data.get_many_mut([&TypeId::of::<C1>(), &TypeId::of::<C2>()]).unwrap();
-        (a.as_any_mut().downcast_mut::<ComponentList<C1>>().unwrap(), b.as_any_mut().downcast_mut::<ComponentList<C2>>().unwrap())
+        unsafe {
+            let a = self.data.get_mut(&TypeId::of::<C1>()).unwrap() as *mut _ as *mut Box<dyn ComponentListTrait>;
+            let b = self.data.get_mut(&TypeId::of::<C2>()).unwrap() as *mut _ as *mut Box<dyn ComponentListTrait>;
+
+            ((*a).as_any_mut().downcast_mut::<ComponentList<C1>>().unwrap(), (*b).as_any_mut().downcast_mut::<ComponentList<C2>>().unwrap())
+        }
     }
 
     pub fn get_and_cast_mut_3<C1, C2, C3>(&mut self) -> (&mut ComponentList<C1>, &mut ComponentList<C2>, &mut ComponentList<C3>)
@@ -86,12 +90,17 @@ impl ComponentManager {
         C2: Component + 'static,
         C3: Component + 'static,
     {
-        let [a, b, c] = self.data.get_many_mut([&TypeId::of::<C1>(), &TypeId::of::<C2>(), &TypeId::of::<C3>()]).unwrap();
-        (
-            a.as_any_mut().downcast_mut::<ComponentList<C1>>().unwrap(),
-            b.as_any_mut().downcast_mut::<ComponentList<C2>>().unwrap(),
-            c.as_any_mut().downcast_mut::<ComponentList<C3>>().unwrap(),
-        )
+        unsafe {
+            let a = self.data.get_mut(&TypeId::of::<C1>()).unwrap() as *mut _ as *mut Box<dyn ComponentListTrait>;
+            let b = self.data.get_mut(&TypeId::of::<C2>()).unwrap() as *mut _ as *mut Box<dyn ComponentListTrait>;
+            let c = self.data.get_mut(&TypeId::of::<C3>()).unwrap() as *mut _ as *mut Box<dyn ComponentListTrait>;
+
+            (
+                (*a).as_any_mut().downcast_mut::<ComponentList<C1>>().unwrap(),
+                (*b).as_any_mut().downcast_mut::<ComponentList<C2>>().unwrap(),
+                (*c).as_any_mut().downcast_mut::<ComponentList<C3>>().unwrap(),
+            )
+        }
     }
 
     pub fn get_and_cast_mut_4<C1, C2, C3, C4>(&mut self) -> (&mut ComponentList<C1>, &mut ComponentList<C2>, &mut ComponentList<C3>, &mut ComponentList<C4>)
@@ -101,13 +110,19 @@ impl ComponentManager {
         C3: Component + 'static,
         C4: Component + 'static,
     {
-        let [a, b, c, d] = self.data.get_many_mut([&TypeId::of::<C1>(), &TypeId::of::<C2>(), &TypeId::of::<C3>(), &TypeId::of::<C4>()]).unwrap();
-        (
-            a.as_any_mut().downcast_mut::<ComponentList<C1>>().unwrap(),
-            b.as_any_mut().downcast_mut::<ComponentList<C2>>().unwrap(),
-            c.as_any_mut().downcast_mut::<ComponentList<C3>>().unwrap(),
-            d.as_any_mut().downcast_mut::<ComponentList<C4>>().unwrap(),
-        )
+        unsafe {
+            let a = self.data.get_mut(&TypeId::of::<C1>()).unwrap() as *mut _ as *mut Box<dyn ComponentListTrait>;
+            let b = self.data.get_mut(&TypeId::of::<C2>()).unwrap() as *mut _ as *mut Box<dyn ComponentListTrait>;
+            let c = self.data.get_mut(&TypeId::of::<C3>()).unwrap() as *mut _ as *mut Box<dyn ComponentListTrait>;
+            let d = self.data.get_mut(&TypeId::of::<C4>()).unwrap() as *mut _ as *mut Box<dyn ComponentListTrait>;
+
+            (
+                (*a).as_any_mut().downcast_mut::<ComponentList<C1>>().unwrap(),
+                (*b).as_any_mut().downcast_mut::<ComponentList<C2>>().unwrap(),
+                (*c).as_any_mut().downcast_mut::<ComponentList<C3>>().unwrap(),
+                (*d).as_any_mut().downcast_mut::<ComponentList<C4>>().unwrap(),
+            )
+        }
     }
 
     #[allow(clippy::type_complexity)]
@@ -121,15 +136,21 @@ impl ComponentManager {
         C4: Component + 'static,
         C5: Component + 'static,
     {
-        let [a, b, c, d, e] =
-            self.data.get_many_mut([&TypeId::of::<C1>(), &TypeId::of::<C2>(), &TypeId::of::<C3>(), &TypeId::of::<C4>(), &TypeId::of::<C5>()]).unwrap();
-        (
-            a.as_any_mut().downcast_mut::<ComponentList<C1>>().unwrap(),
-            b.as_any_mut().downcast_mut::<ComponentList<C2>>().unwrap(),
-            c.as_any_mut().downcast_mut::<ComponentList<C3>>().unwrap(),
-            d.as_any_mut().downcast_mut::<ComponentList<C4>>().unwrap(),
-            e.as_any_mut().downcast_mut::<ComponentList<C5>>().unwrap(),
-        )
+        unsafe {
+            let a = self.data.get_mut(&TypeId::of::<C1>()).unwrap() as *mut _ as *mut Box<dyn ComponentListTrait>;
+            let b = self.data.get_mut(&TypeId::of::<C2>()).unwrap() as *mut _ as *mut Box<dyn ComponentListTrait>;
+            let c = self.data.get_mut(&TypeId::of::<C3>()).unwrap() as *mut _ as *mut Box<dyn ComponentListTrait>;
+            let d = self.data.get_mut(&TypeId::of::<C4>()).unwrap() as *mut _ as *mut Box<dyn ComponentListTrait>;
+            let e = self.data.get_mut(&TypeId::of::<C5>()).unwrap() as *mut _ as *mut Box<dyn ComponentListTrait>;
+
+            (
+                (*a).as_any_mut().downcast_mut::<ComponentList<C1>>().unwrap(),
+                (*b).as_any_mut().downcast_mut::<ComponentList<C2>>().unwrap(),
+                (*c).as_any_mut().downcast_mut::<ComponentList<C3>>().unwrap(),
+                (*d).as_any_mut().downcast_mut::<ComponentList<C4>>().unwrap(),
+                (*e).as_any_mut().downcast_mut::<ComponentList<C5>>().unwrap(),
+            )
+        }
     }
 
     pub fn iter(&self) -> Values<TypeId, Box<dyn ComponentListTrait>> {
