@@ -1,16 +1,15 @@
+use super::Entity;
 use std::collections::VecDeque;
 use std::slice::Iter;
 use std::slice::IterMut;
 
-use super::Entity;
-
 #[derive(Default)]
-pub struct EntityManager {
+pub struct EntityList {
     data: Vec<Option<Entity>>,
     removed_ids: VecDeque<usize>,
 }
 
-impl EntityManager {
+impl EntityList {
     pub fn create(&mut self) -> usize {
         let id = self.get_new_id();
         self.data[id] = Some(Default::default());

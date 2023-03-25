@@ -43,7 +43,7 @@ pub struct GameScene {
 
 impl GameScene {
     pub fn new(app: &mut Application<GlobalAppData>) -> Self {
-        Self { ui: UiContext::new(&mut app.renderer).unwrap(), world: Arc::new(RwLock::new(World::new())), state: Default::default() }
+        Self { ui: UiContext::new(&mut app.renderer).unwrap(), world: Arc::new(RwLock::new(World::default())), state: Default::default() }
     }
 }
 
@@ -53,19 +53,19 @@ impl Scene<GlobalAppData> for GameScene {
     }
 
     fn on_activation(&mut self, app: &mut Application<GlobalAppData>) -> Result<(), String> {
-        self.world = Arc::new(RwLock::new(World::new()));
+        self.world = Arc::new(RwLock::new(World::default()));
         self.state = Default::default();
 
         let world = self.world.clone();
         let mut world = world.write().unwrap();
 
-        world.components.store::<BodyComponent>(Box::new(ComponentList::<BodyComponent>::new()))?;
-        world.components.store::<CellComponent>(Box::new(ComponentList::<CellComponent>::new()))?;
-        world.components.store::<FoodComponent>(Box::new(ComponentList::<FoodComponent>::new()))?;
-        world.components.store::<HeadComponent>(Box::new(ComponentList::<HeadComponent>::new()))?;
-        world.components.store::<ObstacleComponent>(Box::new(ComponentList::<ObstacleComponent>::new()))?;
-        world.components.store::<PositionComponent>(Box::new(ComponentList::<PositionComponent>::new()))?;
-        world.components.store::<SpriteComponent>(Box::new(ComponentList::<SpriteComponent>::new()))?;
+        world.components.store::<BodyComponent>(Box::<ComponentList<BodyComponent>>::default())?;
+        world.components.store::<CellComponent>(Box::<ComponentList<CellComponent>>::default())?;
+        world.components.store::<FoodComponent>(Box::<ComponentList<FoodComponent>>::default())?;
+        world.components.store::<HeadComponent>(Box::<ComponentList<HeadComponent>>::default())?;
+        world.components.store::<ObstacleComponent>(Box::<ComponentList<ObstacleComponent>>::default())?;
+        world.components.store::<PositionComponent>(Box::<ComponentList<PositionComponent>>::default())?;
+        world.components.store::<SpriteComponent>(Box::<ComponentList<SpriteComponent>>::default())?;
 
         world.systems.write().unwrap().store(Box::<BodySystem>::default())?;
         world.systems.write().unwrap().store(Box::<HeadSystem>::default())?;

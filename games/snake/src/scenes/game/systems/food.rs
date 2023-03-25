@@ -33,7 +33,7 @@ impl System<GlobalAppData, GameScene, Message> for FoodSystem {
         while let Some(message) = world.messages.poll_message::<Self>() {
             match message {
                 Message::GameTick => {
-                    let foods = world.components.get_many_mut_1::<FoodComponent>();
+                    let foods = world.components.get_and_cast_mut::<FoodComponent>()?;
 
                     if foods.is_empty()
                         || scene.state.game.food_last_refresh_time.elapsed().unwrap().as_millis() >= app.global_data.food_refresh_interval as u128
@@ -42,7 +42,7 @@ impl System<GlobalAppData, GameScene, Message> for FoodSystem {
                             world.commands.send(Box::new(KillCommand::new(body.entity_id)));
                         }
 
-                        let (heads, bodies, positions) = world.components.get_many_mut_3::<HeadComponent, BodyComponent, PositionComponent>();
+                        let (heads, bodies, positions) = world.components.get_and_cast_mut_3::<HeadComponent, BodyComponent, PositionComponent>();
 
                         let mut forbidden_positions = heads.iter().map(|h| positions.get(h.entity_id).unwrap()).collect::<Vec<&PositionComponent>>();
                         forbidden_positions.extend(bodies.iter().map(|h| positions.get(h.entity_id).unwrap()));

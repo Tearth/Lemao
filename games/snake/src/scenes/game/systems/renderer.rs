@@ -22,7 +22,7 @@ impl System<GlobalAppData, GameScene, Message> for RendererSystem {
         world: &mut World<GlobalAppData, GameScene, Message>,
         _input: &[InputEvent],
     ) -> Result<(), String> {
-        let (sprites, positions) = world.components.get_many_mut_2::<SpriteComponent, PositionComponent>();
+        let (sprites, positions) = world.components.get_and_cast_mut_2::<SpriteComponent, PositionComponent>();
         let mut layers = Vec::new();
 
         for sprite in sprites.iter_mut() {
@@ -52,7 +52,7 @@ impl System<GlobalAppData, GameScene, Message> for RendererSystem {
 
         for layer in layers.iter().rev() {
             for entity_id in layer {
-                app.renderer.draw(&mut world.components.get_many_mut_1::<SpriteComponent>().get_mut(*entity_id)?.tilemap)?;
+                app.renderer.draw(&mut world.components.get_and_cast_mut::<SpriteComponent>()?.get_mut(*entity_id)?.tilemap)?;
             }
         }
 

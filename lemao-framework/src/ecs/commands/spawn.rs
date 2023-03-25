@@ -1,10 +1,8 @@
-use crate::ecs::{
-    components::{list::ComponentList, Component},
-    world::World,
-};
-
 use super::Command;
+use crate::ecs::components::Component;
+use crate::ecs::world::World;
 
+#[derive(Copy, Clone, Debug)]
 pub struct SpawnCommand<C>
 where
     C: Component + 'static,
@@ -30,6 +28,6 @@ where
     where
         M: Copy,
     {
-        world.components.get_mut::<C>()?.as_any_mut().downcast_mut::<ComponentList<C>>().unwrap().store(self.entity_id, self.data)
+        world.components.get_and_cast_mut::<C>()?.store(self.entity_id, self.data)
     }
 }

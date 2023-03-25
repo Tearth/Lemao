@@ -26,7 +26,7 @@ impl System<GlobalAppData, GameScene, Message> for BodySystem {
             match message {
                 Message::GameTick => {
                     if !scene.state.game.snake_killed {
-                        let (bodies, positions, sprites) = world.components.get_many_mut_3::<BodyComponent, PositionComponent, SpriteComponent>();
+                        let (bodies, positions, sprites) = world.components.get_and_cast_mut_3::<BodyComponent, PositionComponent, SpriteComponent>();
                         let mut body_positions = Vec::new();
 
                         for body in bodies.iter_mut().filter(|b| !b.killed) {
@@ -50,7 +50,7 @@ impl System<GlobalAppData, GameScene, Message> for BodySystem {
                     }
                 }
                 Message::KillSnake => {
-                    let (bodies, sprites) = world.components.get_many_mut_2::<BodyComponent, SpriteComponent>();
+                    let (bodies, sprites) = world.components.get_and_cast_mut_2::<BodyComponent, SpriteComponent>();
 
                     for body in bodies.iter_mut() {
                         body.killed = true;
@@ -62,7 +62,7 @@ impl System<GlobalAppData, GameScene, Message> for BodySystem {
                     }
                 }
                 Message::ResetSnake => {
-                    let bodies = world.components.get_many_mut_1::<BodyComponent>();
+                    let bodies = world.components.get_and_cast_mut::<BodyComponent>()?;
                     for body in bodies.iter() {
                         world.commands.send(Box::new(KillCommand::new(body.entity_id)));
                     }

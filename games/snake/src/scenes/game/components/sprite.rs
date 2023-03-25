@@ -20,7 +20,7 @@ impl SpriteComponent {
 }
 
 impl Component for SpriteComponent {
-    fn get_entity(&self) -> usize {
+    fn get_entity_id(&self) -> usize {
         self.entity_id
     }
 

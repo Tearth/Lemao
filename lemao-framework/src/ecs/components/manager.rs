@@ -1,11 +1,10 @@
+use super::list::ComponentList;
+use super::list::ComponentListTrait;
+use super::Component;
 use std::any::TypeId;
 use std::collections::hash_map::Values;
 use std::collections::hash_map::ValuesMut;
 use std::collections::HashMap;
-
-use super::list::ComponentList;
-use super::list::ComponentListTrait;
-use super::Component;
 
 #[derive(Default)]
 pub struct ComponentManager {
@@ -38,7 +37,17 @@ impl ComponentManager {
     {
         match self.data.get(&TypeId::of::<C>()) {
             Some(item) => Ok(item.as_ref()),
-            _ => Err(format!("Storage item {} not found", 0)),
+            _ => Err(format!("Component list {} not found", 0)),
+        }
+    }
+
+    pub fn get_and_cast<C>(&self) -> Result<&ComponentList<C>, String>
+    where
+        C: Component + 'static,
+    {
+        match self.data.get(&TypeId::of::<C>()) {
+            Some(item) => Ok(item.as_any().downcast_ref::<ComponentList<C>>().unwrap()),
+            _ => Err(format!("Component list {} not found", 0)),
         }
     }
 
@@ -48,19 +57,21 @@ impl ComponentManager {
     {
         match self.data.get_mut(&TypeId::of::<C>()) {
             Some(item) => Ok(item),
-            _ => Err(format!("Storage item {} not found", 0)),
+            _ => Err(format!("Component list {} not found", 0)),
         }
     }
 
-    pub fn get_many_mut_1<C1>(&mut self) -> &mut ComponentList<C1>
+    pub fn get_and_cast_mut<C>(&mut self) -> Result<&mut ComponentList<C>, String>
     where
-        C1: Component + 'static,
+        C: Component + 'static,
     {
-        let a = self.data.get_mut(&TypeId::of::<C1>()).unwrap();
-        a.as_any_mut().downcast_mut::<ComponentList<C1>>().unwrap()
+        match self.data.get_mut(&TypeId::of::<C>()) {
+            Some(item) => Ok(item.as_any_mut().downcast_mut::<ComponentList<C>>().unwrap()),
+            _ => Err(format!("Component list {} not found", 0)),
+        }
     }
 
-    pub fn get_many_mut_2<C1, C2>(&mut self) -> (&mut ComponentList<C1>, &mut ComponentList<C2>)
+    pub fn get_and_cast_mut_2<C1, C2>(&mut self) -> (&mut ComponentList<C1>, &mut ComponentList<C2>)
     where
         C1: Component + 'static,
         C2: Component + 'static,
@@ -69,7 +80,7 @@ impl ComponentManager {
         (a.as_any_mut().downcast_mut::<ComponentList<C1>>().unwrap(), b.as_any_mut().downcast_mut::<ComponentList<C2>>().unwrap())
     }
 
-    pub fn get_many_mut_3<C1, C2, C3>(&mut self) -> (&mut ComponentList<C1>, &mut ComponentList<C2>, &mut ComponentList<C3>)
+    pub fn get_and_cast_mut_3<C1, C2, C3>(&mut self) -> (&mut ComponentList<C1>, &mut ComponentList<C2>, &mut ComponentList<C3>)
     where
         C1: Component + 'static,
         C2: Component + 'static,
@@ -83,7 +94,7 @@ impl ComponentManager {
         )
     }
 
-    pub fn get_many_mut_4<C1, C2, C3, C4>(&mut self) -> (&mut ComponentList<C1>, &mut ComponentList<C2>, &mut ComponentList<C3>, &mut ComponentList<C4>)
+    pub fn get_and_cast_mut_4<C1, C2, C3, C4>(&mut self) -> (&mut ComponentList<C1>, &mut ComponentList<C2>, &mut ComponentList<C3>, &mut ComponentList<C4>)
     where
         C1: Component + 'static,
         C2: Component + 'static,
@@ -100,7 +111,7 @@ impl ComponentManager {
     }
 
     #[allow(clippy::type_complexity)]
-    pub fn get_many_mut_5<C1, C2, C3, C4, C5>(
+    pub fn get_and_cast_mut_5<C1, C2, C3, C4, C5>(
         &mut self,
     ) -> (&mut ComponentList<C1>, &mut ComponentList<C2>, &mut ComponentList<C3>, &mut ComponentList<C4>, &mut ComponentList<C5>)
     where

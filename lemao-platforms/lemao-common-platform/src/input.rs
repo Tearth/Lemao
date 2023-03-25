@@ -1,6 +1,6 @@
 use lemao_math::vec2::Vec2;
 
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub enum InputEvent {
     Unknown,
     WindowMoved(Vec2),
@@ -15,7 +15,7 @@ pub enum InputEvent {
     MouseWheelRotated(MouseWheelDirection, Vec2),
 }
 
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub enum Key {
     Unknown,
     Enter,
@@ -77,7 +77,7 @@ pub enum Key {
     Num9,
 }
 
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub enum MouseButton {
     Left,
     Middle,
@@ -85,7 +85,7 @@ pub enum MouseButton {
     Unknown,
 }
 
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub enum MouseWheelDirection {
     Up,
     Down,

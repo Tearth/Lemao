@@ -1,8 +1,7 @@
+use super::Command;
 use crate::ecs::world::World;
 
-use super::Command;
-
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub struct KillCommand {
     entity_id: usize,
 }

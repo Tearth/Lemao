@@ -36,7 +36,7 @@ impl System<GlobalAppData, GameScene, Message> for HeadSystem {
     ) -> Result<(), String> {
         for event in input {
             if let InputEvent::KeyPressed(key) = event {
-                let heads = world.components.get_many_mut_1::<HeadComponent>();
+                let heads = world.components.get_and_cast_mut::<HeadComponent>()?;
                 let head = heads.iter_mut().next().unwrap();
 
                 match key {
@@ -86,7 +86,7 @@ impl System<GlobalAppData, GameScene, Message> for HeadSystem {
                 Message::GameTick => {
                     if !scene.state.game.snake_killed {
                         let (heads, bodies, foods, positions, sprites) =
-                            world.components.get_many_mut_5::<HeadComponent, BodyComponent, FoodComponent, PositionComponent, SpriteComponent>();
+                            world.components.get_and_cast_mut_5::<HeadComponent, BodyComponent, FoodComponent, PositionComponent, SpriteComponent>();
                         let head = heads.iter_mut().next().unwrap();
 
                         let position = positions.get_mut(head.entity_id)?;
@@ -196,7 +196,7 @@ impl System<GlobalAppData, GameScene, Message> for HeadSystem {
                     }
                 }
                 Message::KillSnake => {
-                    let (heads, sprites) = world.components.get_many_mut_2::<HeadComponent, SpriteComponent>();
+                    let (heads, sprites) = world.components.get_and_cast_mut_2::<HeadComponent, SpriteComponent>();
                     let head = heads.iter_mut().next().unwrap();
                     let sprite = sprites.get_mut(head.entity_id)?;
 
@@ -205,7 +205,7 @@ impl System<GlobalAppData, GameScene, Message> for HeadSystem {
                     sprite.blinking_last_change_time = scene.state.game.snake_killed_time;
                 }
                 Message::ResetSnake => {
-                    let (heads, positions, sprites) = world.components.get_many_mut_3::<HeadComponent, PositionComponent, SpriteComponent>();
+                    let (heads, positions, sprites) = world.components.get_and_cast_mut_3::<HeadComponent, PositionComponent, SpriteComponent>();
                     let head = heads.iter_mut().next().unwrap();
 
                     head.direction = HeadDirection::Right;
