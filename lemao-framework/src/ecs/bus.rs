@@ -1,4 +1,6 @@
 use std::any::TypeId;
+use std::collections::hash_map::Iter;
+use std::collections::hash_map::IterMut;
 use std::collections::HashMap;
 use std::collections::VecDeque;
 use std::fmt::Debug;
@@ -7,7 +9,7 @@ const MAX_EVENTS_PER_QUEUE: usize = 100;
 
 #[derive(Default)]
 pub struct MessageBus<M> {
-    pub queues: HashMap<TypeId, VecDeque<M>>,
+    queues: HashMap<TypeId, VecDeque<M>>,
 }
 
 impl<M> MessageBus<M>
@@ -96,6 +98,20 @@ where
         Ok(())
     }
 
+    pub fn is_empty<R>(&self) -> bool
+    where
+        R: 'static,
+    {
+        self.is_empty_by_type(TypeId::of::<R>())
+    }
+
+    pub fn is_empty_by_type(&self, r#type: TypeId) -> bool {
+        match self.queues.get(&r#type) {
+            Some(queue) => queue.is_empty(),
+            None => true,
+        }
+    }
+
     pub fn poll_message<R>(&mut self) -> Option<M>
     where
         R: 'static,
@@ -104,5 +120,13 @@ where
             Some(queue) => queue.pop_front(),
             None => None,
         }
+    }
+
+    pub fn iter(&self) -> Iter<TypeId, VecDeque<M>> {
+        self.queues.iter()
+    }
+
+    pub fn iter_mut(&mut self) -> IterMut<TypeId, VecDeque<M>> {
+        self.queues.iter_mut()
     }
 }
