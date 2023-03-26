@@ -1,4 +1,5 @@
-use std::collections::{HashMap, VecDeque};
+use std::collections::HashMap;
+use std::collections::VecDeque;
 
 pub struct Storage<T> {
     data: Vec<Option<T>>,
@@ -101,6 +102,14 @@ where
         self.id_to_name_hashmap.remove(&id);
 
         Ok(())
+    }
+
+    pub fn iter(&self) -> impl Iterator<Item = &T> {
+        self.data.iter().filter_map(|p| p.as_ref())
+    }
+
+    pub fn iter_mut(&mut self) -> impl Iterator<Item = &mut T> {
+        self.data.iter_mut().filter_map(|p| p.as_mut())
     }
 
     fn get_new_id(&mut self) -> usize {

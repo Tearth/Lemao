@@ -100,7 +100,11 @@ impl Scene<GlobalAppData> for GameScene {
         Ok(())
     }
 
-    fn on_deactivation(&mut self, _app: &mut GameApp) -> Result<(), String> {
+    fn on_deactivation(&mut self, app: &mut GameApp) -> Result<(), String> {
+        for sound in app.audio.sounds.iter_mut() {
+            sound.stop()?;
+        }
+
         Ok(())
     }
 
