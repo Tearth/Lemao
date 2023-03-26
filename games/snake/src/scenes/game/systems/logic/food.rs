@@ -28,7 +28,7 @@ impl System<GlobalAppData, GameScene, Message> for FoodSystem {
     }
 
     fn get_type(&self) -> TypeId {
-        TypeId::of::<FoodSystem>()
+        TypeId::of::<Self>()
     }
 
     fn update(&mut self, app: &mut GameApp, scene: &mut GameScene, world: &mut GameWorld) -> Result<(), String> {

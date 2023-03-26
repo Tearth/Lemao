@@ -22,7 +22,7 @@ impl System<GlobalAppData, GameScene, Message> for BodySystem {
     }
 
     fn get_type(&self) -> TypeId {
-        TypeId::of::<BodySystem>()
+        TypeId::of::<Self>()
     }
 
     fn update(&mut self, _app: &mut GameApp, scene: &mut GameScene, world: &mut GameWorld) -> Result<(), String> {

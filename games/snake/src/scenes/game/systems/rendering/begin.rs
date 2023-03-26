@@ -17,7 +17,7 @@ impl System<GlobalAppData, GameScene, Message> for FrameBeginSystem {
     }
 
     fn get_type(&self) -> TypeId {
-        TypeId::of::<FrameBeginSystem>()
+        TypeId::of::<Self>()
     }
 
     fn update(&mut self, app: &mut GameApp, _scene: &mut GameScene, _world: &mut GameWorld) -> Result<(), String> {

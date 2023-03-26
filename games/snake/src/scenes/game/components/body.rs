@@ -10,7 +10,7 @@ pub struct BodyComponent {
     pub killed: bool,
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub enum BodyOrientation {
     TopBottom,
     RightLeft,

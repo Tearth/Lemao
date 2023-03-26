@@ -6,7 +6,7 @@ use super::components::obstacle::ObstacleComponent;
 use super::components::position::PositionComponent;
 use super::components::sprite::SpriteComponent;
 use super::messages::Message;
-use super::state::scene::SceneState;
+use super::state::SceneState;
 use super::systems::audio::player::AudioPlayerSystem;
 use super::systems::core::input::InputSystem;
 use super::systems::core::window::WindowSystem;

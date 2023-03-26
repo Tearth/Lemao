@@ -20,7 +20,7 @@ impl System<GlobalAppData, GameScene, Message> for RendererSystem {
     }
 
     fn get_type(&self) -> TypeId {
-        TypeId::of::<RendererSystem>()
+        TypeId::of::<Self>()
     }
 
     fn update(&mut self, app: &mut GameApp, _scene: &mut GameScene, world: &mut GameWorld) -> Result<(), String> {

@@ -16,7 +16,7 @@ impl System<GlobalAppData, GameScene, Message> for AudioPlayerSystem {
     }
 
     fn get_type(&self) -> TypeId {
-        TypeId::of::<AudioPlayerSystem>()
+        TypeId::of::<Self>()
     }
 
     fn update(&mut self, app: &mut GameApp, _scene: &mut GameScene, world: &mut GameWorld) -> Result<(), String> {

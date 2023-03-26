@@ -16,7 +16,7 @@ impl System<GlobalAppData, GameScene, Message> for UiRenderingSystem {
     }
 
     fn get_type(&self) -> TypeId {
-        TypeId::of::<UiRenderingSystem>()
+        TypeId::of::<Self>()
     }
 
     fn update(&mut self, app: &mut GameApp, scene: &mut GameScene, _world: &mut GameWorld) -> Result<(), String> {

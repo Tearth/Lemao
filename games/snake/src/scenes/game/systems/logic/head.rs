@@ -36,7 +36,7 @@ impl System<GlobalAppData, GameScene, Message> for HeadSystem {
     }
 
     fn get_type(&self) -> TypeId {
-        TypeId::of::<HeadSystem>()
+        TypeId::of::<Self>()
     }
 
     fn update(&mut self, app: &mut GameApp, scene: &mut GameScene, world: &mut GameWorld) -> Result<(), String> {

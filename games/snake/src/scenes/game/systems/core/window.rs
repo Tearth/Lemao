@@ -18,7 +18,7 @@ impl System<GlobalAppData, GameScene, Message> for WindowSystem {
     }
 
     fn get_type(&self) -> TypeId {
-        TypeId::of::<WindowSystem>()
+        TypeId::of::<Self>()
     }
 
     fn update(&mut self, app: &mut GameApp, _scene: &mut GameScene, world: &mut GameWorld) -> Result<(), String> {

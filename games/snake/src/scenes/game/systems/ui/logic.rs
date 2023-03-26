@@ -22,7 +22,7 @@ impl System<GlobalAppData, GameScene, Message> for UiLogicSystem {
     }
 
     fn get_type(&self) -> TypeId {
-        TypeId::of::<UiLogicSystem>()
+        TypeId::of::<Self>()
     }
 
     fn update(&mut self, app: &mut GameApp, scene: &mut GameScene, world: &mut GameWorld) -> Result<(), String> {

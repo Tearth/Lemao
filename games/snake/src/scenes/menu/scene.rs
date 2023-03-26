@@ -92,7 +92,7 @@ impl Scene<GlobalAppData> for MenuScene {
         Ok(())
     }
 
-    fn on_activation(&mut self, app: &mut GameApp) -> Result<(), String> {
+    fn on_activation(&mut self, _app: &mut GameApp) -> Result<(), String> {
         Ok(())
     }
 
