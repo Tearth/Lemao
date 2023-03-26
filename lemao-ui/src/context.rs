@@ -28,7 +28,7 @@ pub struct UiContext {
 impl UiContext {
     pub fn new(renderer: &mut RendererContext) -> Result<Self, String> {
         let main_camera = renderer.cameras.get(renderer.active_camera_id)?;
-        let ui_camera_id = renderer.cameras.store(Camera::new(main_camera.position, main_camera.size));
+        let ui_camera_id = renderer.cameras.store(Camera::new(Default::default(), main_camera.size));
 
         let mut ui = Self {
             main_canvas_id: 0,

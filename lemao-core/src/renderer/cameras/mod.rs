@@ -1,8 +1,7 @@
+use crate::utils::storage::StorageItem;
 use lemao_math::mat4x4::Mat4x4;
 use lemao_math::vec2::Vec2;
 use lemao_math::vec3::Vec3;
-
-use crate::utils::storage::StorageItem;
 
 pub struct Camera {
     pub id: usize,

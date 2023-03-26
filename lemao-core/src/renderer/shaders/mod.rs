@@ -1,7 +1,6 @@
-use crate::utils::storage::StorageItem;
-
 use super::context::RendererContext;
 use super::drawable::Color;
+use crate::utils::storage::StorageItem;
 use lemao_opengl::bindings::opengl;
 use lemao_opengl::pointers::OpenGLPointers;
 use std::collections::HashMap;

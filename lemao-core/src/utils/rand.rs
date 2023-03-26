@@ -1,8 +1,7 @@
+use crate::utils::time;
 use std::cell::Cell;
 use std::ops::Bound;
 use std::ops::RangeBounds;
-
-use crate::utils::time;
 
 pub struct RandState {
     pub seed: Cell<u64>,

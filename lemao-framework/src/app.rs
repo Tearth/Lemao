@@ -83,15 +83,18 @@ where
 
     pub fn run(mut self) -> Result<(), String> {
         let mut dt_timestamp = SystemTime::now();
+        let mut first_iteration = true;
         self.current_scene = self.default_scene.clone();
 
         while self.running {
             let scene_storage = self.scenes.clone();
             let mut scene_storage_lock = scene_storage.write().unwrap();
 
-            if self.current_scene != self.pending_scene {
-                let current_scene = scene_storage_lock.get_mut(&self.current_scene)?;
-                current_scene.on_deactivation(&mut self)?;
+            if first_iteration || self.current_scene != self.pending_scene {
+                if self.current_scene != self.pending_scene {
+                    let current_scene = scene_storage_lock.get_mut(&self.current_scene)?;
+                    current_scene.on_deactivation(&mut self)?;
+                }
 
                 let scene = scene_storage_lock.get_mut(&self.pending_scene)?;
                 scene.on_activation(&mut self)?;
@@ -112,6 +115,8 @@ where
             } else {
                 self.fps_frames += 1;
             }
+
+            first_iteration = false;
         }
 
         Ok(())

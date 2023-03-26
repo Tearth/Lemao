@@ -2,7 +2,6 @@ use crate::bindings::x11;
 use lemao_common_platform::renderer::RendererPlatformSpecific;
 use lemao_opengl::bindings::glx::{self, __GLXcontextRec};
 use lemao_opengl::pointers::OpenGLPointers;
-use std::rc::Rc;
 use std::{mem, ptr};
 
 pub struct LinuxX11Renderer {
