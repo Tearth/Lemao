@@ -10,6 +10,7 @@ pub enum SystemStage {
     Initialization,
     Input,
     GameLogic,
+    AudioPlayer,
     UiLogic,
     FrameBegin,
     GameRendering,

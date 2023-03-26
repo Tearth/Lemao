@@ -1,3 +1,4 @@
+pub mod audio;
 pub mod core;
 pub mod logic;
 pub mod rendering;

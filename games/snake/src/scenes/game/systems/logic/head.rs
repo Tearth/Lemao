@@ -9,6 +9,7 @@ use crate::scenes::game::components::position::PositionComponent;
 use crate::scenes::game::components::sprite::SpriteComponent;
 use crate::scenes::game::messages::Message;
 use crate::scenes::game::scene::{GameScene, GameWorld};
+use crate::scenes::game::systems::audio::player::AudioPlayerSystem;
 use crate::scenes::game::systems::ui::logic::UiLogicSystem;
 use crate::scenes::game::utils::Coordinates;
 use crate::state::global::GlobalAppData;
@@ -140,7 +141,7 @@ impl System<GlobalAppData, GameScene, Message> for HeadSystem {
                             scene.state.game.snake_killed = true;
                             scene.state.game.snake_killed_time = SystemTime::now();
 
-                            world.messages.send_to_2::<HeadSystem, BodySystem>(Message::KillSnake)?;
+                            world.messages.send_to_3::<HeadSystem, BodySystem, AudioPlayerSystem>(Message::KillSnake)?;
                         } else {
                             let position = positions.get_mut(head.entity_id)?;
 
@@ -155,7 +156,7 @@ impl System<GlobalAppData, GameScene, Message> for HeadSystem {
                                     scene.state.game.score += 1;
 
                                     world.commands.send(KillCommand::new(food_position.entity_id));
-                                    world.messages.send_to_2::<BodySystem, UiLogicSystem>(Message::FoodEaten)?;
+                                    world.messages.send_to_3::<BodySystem, UiLogicSystem, AudioPlayerSystem>(Message::FoodEaten)?;
                                 }
                             }
 

@@ -7,6 +7,7 @@ use super::components::position::PositionComponent;
 use super::components::sprite::SpriteComponent;
 use super::messages::Message;
 use super::state::scene::SceneState;
+use super::systems::audio::player::AudioPlayerSystem;
 use super::systems::core::input::InputSystem;
 use super::systems::core::window::WindowSystem;
 use super::systems::logic::board::BoardSystem;
@@ -76,19 +77,23 @@ impl Scene<GlobalAppData> for GameScene {
         world.systems.write().unwrap().store::<SyncSystem>(Box::<SyncSystem>::default())?;
         world.systems.write().unwrap().store::<BoardSystem>(Box::<BoardSystem>::default())?;
 
-        // Rendering
-        world.systems.write().unwrap().store::<FrameBeginSystem>(Box::<FrameBeginSystem>::default())?;
-        world.systems.write().unwrap().store::<RendererSystem>(Box::<RendererSystem>::default())?;
-        world.systems.write().unwrap().store::<FrameEndSystem>(Box::<FrameEndSystem>::default())?;
+        // Audio
+        world.systems.write().unwrap().store::<AudioPlayerSystem>(Box::<AudioPlayerSystem>::default())?;
 
         // UI
         world.systems.write().unwrap().store::<UiLogicSystem>(Box::<UiLogicSystem>::default())?;
         world.systems.write().unwrap().store::<UiRenderingSystem>(Box::<UiRenderingSystem>::default())?;
 
-        world.messages.register_receiver::<BodySystem>()?;
-        world.messages.register_receiver::<HeadSystem>()?;
-        world.messages.register_receiver::<FoodSystem>()?;
+        // Rendering
+        world.systems.write().unwrap().store::<FrameBeginSystem>(Box::<FrameBeginSystem>::default())?;
+        world.systems.write().unwrap().store::<RendererSystem>(Box::<RendererSystem>::default())?;
+        world.systems.write().unwrap().store::<FrameEndSystem>(Box::<FrameEndSystem>::default())?;
+
+        world.messages.register_receiver::<AudioPlayerSystem>()?;
         world.messages.register_receiver::<BoardSystem>()?;
+        world.messages.register_receiver::<BodySystem>()?;
+        world.messages.register_receiver::<FoodSystem>()?;
+        world.messages.register_receiver::<HeadSystem>()?;
         world.messages.register_receiver::<UiLogicSystem>()?;
         world.messages.register_receiver::<WindowSystem>()?;
 

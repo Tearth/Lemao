@@ -1,3 +1,5 @@
+use lemao_core::audio::samples::wav;
+use lemao_core::audio::samples::RawSound;
 use lemao_core::renderer::fonts::bff;
 use lemao_core::renderer::fonts::RawFont;
 use lemao_core::renderer::textures::bmp;
@@ -13,6 +15,7 @@ use std::thread;
 pub struct AssetsLoader {
     pub textures: Arc<RwLock<Vec<Asset<RawTexture>>>>,
     pub fonts: Arc<RwLock<Vec<Asset<RawFont>>>>,
+    pub samples: Arc<RwLock<Vec<Asset<RawSound>>>>,
     pub queue: Arc<RwLock<VecDeque<String>>>,
 
     pub status: Arc<RwLock<String>>,
@@ -42,6 +45,7 @@ impl AssetsLoader {
         let queue = self.queue.clone();
         let textures = self.textures.clone();
         let fonts = self.fonts.clone();
+        let samples = self.samples.clone();
         let status = self.status.clone();
         let loaded_assets = self.loaded_assets.clone();
 
@@ -60,6 +64,9 @@ impl AssetsLoader {
                     }
                     "bff" => {
                         fonts.write().unwrap().push(Asset::new(name.to_str().unwrap().to_string(), bff::load(&asset_to_load)?));
+                    }
+                    "wav" => {
+                        samples.write().unwrap().push(Asset::new(name.to_str().unwrap().to_string(), wav::load(&asset_to_load)?));
                     }
                     _ => return Err("Unsupported extension".to_string()),
                 };
@@ -87,7 +94,7 @@ impl AssetsLoader {
     }
 
     fn is_extension_allowed(&self, extension: &OsStr) -> bool {
-        let allowed_extension = ["bmp", "bff"];
+        let allowed_extension = ["bmp", "bff", "wav"];
         allowed_extension.contains(&extension.to_str().unwrap())
     }
 }

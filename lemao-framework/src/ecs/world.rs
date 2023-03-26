@@ -67,6 +67,11 @@ where
             first_iteration = false;
         }
 
+        // Audio player stage
+        for system in &mut systems.iter_mut().filter(|system| system.get_stage() == SystemStage::AudioPlayer) {
+            system.update(app, scene, self)?;
+        }
+
         // UI logic stage
         for system in &mut systems.iter_mut().filter(|system| system.get_stage() == SystemStage::UiLogic) {
             system.update(app, scene, self)?;

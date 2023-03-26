@@ -1,5 +1,3 @@
-use super::samples::wav;
-use super::samples::Sample;
 use super::sounds::Sound;
 use crate::utils::storage::Storage;
 use lemao_openal::bindings::openal;
@@ -9,7 +7,6 @@ pub struct AudioContext {
     device: *mut openal::ALCdevice_struct,
     context: *mut openal::ALCcontext_struct,
 
-    pub samples: Storage<Sample>,
     pub sounds: Storage<Sound>,
 }
 
@@ -37,18 +34,8 @@ impl AudioContext {
                 return Err(format!("Error while making context as current: {}", error));
             }
 
-            Ok(Self { device: device_id, context: context_id, samples: Default::default(), sounds: Default::default() })
+            Ok(Self { device: device_id, context: context_id, sounds: Default::default() })
         }
-    }
-
-    pub fn create_sample(&mut self, path: &str) -> Result<usize, String> {
-        let sample = Sample::new(self, &wav::load(path)?)?;
-        Ok(self.samples.store(sample))
-    }
-
-    pub fn create_sound(&mut self, sample_id: usize) -> Result<usize, String> {
-        let sample = self.samples.get(sample_id)?;
-        Ok(self.sounds.store(Sound::new(sample)?))
     }
 }
 

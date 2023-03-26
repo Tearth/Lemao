@@ -1,4 +1,5 @@
 use crate::utils::storage::SceneStorage;
+use lemao_core::audio::context::AudioContext;
 use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_common_platform::window::WindowStyle;
 use lemao_core::renderer::context::RendererContext;
@@ -11,6 +12,7 @@ use std::time::SystemTime;
 pub struct Application<G> {
     pub window: WindowContext,
     pub renderer: RendererContext,
+    pub audio: AudioContext,
     pub global_data: G,
 
     pub running: bool,
@@ -47,6 +49,7 @@ where
         Ok(Self {
             window,
             renderer,
+            audio: AudioContext::new()?,
             global_data: Default::default(),
 
             running: true,

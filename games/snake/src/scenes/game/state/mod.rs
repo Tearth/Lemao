@@ -1,5 +1,6 @@
 use std::time::SystemTime;
 
+pub mod audio;
 pub mod scene;
 pub mod ui;
 
