@@ -1,5 +1,6 @@
 use lemao_core::audio::context::AudioContext;
 use lemao_core::audio::samples::wav;
+use lemao_core::audio::samples::Sample;
 use lemao_core::audio::sounds::Sound;
 use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_common_platform::input::Key;
@@ -37,7 +38,8 @@ pub fn main() -> Result<(), String> {
     renderer.set_swap_interval(1);
 
     let font_id = renderer.fonts.store(Font::new(&renderer, &bff::load("./assets/inconsolata.bff")?)?);
-    let chopin_sound_id = audio.sounds.store(Sound::new(&wav::load("./assets/chopin.wav")?)?);
+    let chopin_sample_id = audio.samples.store(Sample::new(&audio, &wav::load("./assets/chopin.wav")?)?);
+    let chopin_sound_id = audio.sounds.store(Sound::new(audio.samples.get(chopin_sample_id)?)?);
 
     let description_text_id = ui.components.store(Label::new(&mut renderer, font_id)?);
     let description_text = ui.components.get_and_cast_mut::<Label>(description_text_id)?;

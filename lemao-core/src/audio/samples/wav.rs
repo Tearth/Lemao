@@ -3,7 +3,7 @@ use crate::utils::binary;
 use std::fs::File;
 use std::io::Read;
 
-pub fn load(path: &str) -> Result<RawSound, String> {
+pub fn load(path: &str) -> Result<RawSample, String> {
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     // WAV specification: https://sites.google.com/site/musicgapi/technical-documents/wav-file-format //
     ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -75,5 +75,5 @@ pub fn load(path: &str) -> Result<RawSound, String> {
         }
     }
 
-    Ok(RawSound::new(channels_count, frequency, bits_per_sample, data.to_vec()))
+    Ok(RawSample::new(channels_count, frequency, bits_per_sample, data.to_vec()))
 }

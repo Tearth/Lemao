@@ -1,5 +1,5 @@
 use lemao_core::audio::samples::wav;
-use lemao_core::audio::samples::RawSound;
+use lemao_core::audio::samples::RawSample;
 use lemao_core::renderer::fonts::bff;
 use lemao_core::renderer::fonts::RawFont;
 use lemao_core::renderer::textures::bmp;
@@ -15,7 +15,7 @@ use std::thread;
 pub struct AssetsLoader {
     pub textures: Arc<RwLock<Vec<Asset<RawTexture>>>>,
     pub fonts: Arc<RwLock<Vec<Asset<RawFont>>>>,
-    pub samples: Arc<RwLock<Vec<Asset<RawSound>>>>,
+    pub samples: Arc<RwLock<Vec<Asset<RawSample>>>>,
     pub queue: Arc<RwLock<VecDeque<String>>>,
 
     pub status: Arc<RwLock<String>>,

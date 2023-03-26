@@ -1,48 +1,35 @@
-use super::samples::RawSound;
+use super::samples::Sample;
 use crate::utils::storage::StorageItem;
 use lemao_openal::bindings::openal;
-use std::ffi::c_void;
 
 pub struct Sound {
     pub id: usize,
     pub name: Option<String>,
-    pub(crate) buffer_id: u32,
+    pub(crate) sample_id: usize,
     pub(crate) source_id: u32,
 }
 
 impl Sound {
-    pub fn new(raw: &RawSound) -> Result<Self, String> {
-        let mut sound = Sound { id: 0, name: None, buffer_id: 0, source_id: 0 };
-
-        unsafe {
-            let format = match raw.channels_count {
-                1 => match raw.bits_per_sample {
-                    8 => openal::AL_FORMAT_MONO8,
-                    16 => openal::AL_FORMAT_MONO16,
-                    _ => return Err(format!("{} bits per sample not supported", raw.bits_per_sample)),
-                },
-                2 => match raw.bits_per_sample {
-                    8 => openal::AL_FORMAT_STEREO8,
-                    16 => openal::AL_FORMAT_STEREO16,
-                    _ => return Err(format!("{} bits per sample not supported", raw.bits_per_sample)),
-                },
-                _ => return Err(format!("{} channels not supported", raw.channels_count)),
-            };
-
-            openal::alGenBuffers(1, &mut sound.buffer_id);
-            openal::alBufferData(sound.buffer_id, format as i32, raw.data.as_ptr() as *const c_void, raw.data.len() as i32, raw.frequency as i32);
-
-            let error = openal::alGetError();
-            if error != openal::AL_NO_ERROR as i32 {
-                return Err(format!("OpenAL error, code {}", error));
-            }
-
-            openal::alGenSources(1, &mut sound.source_id);
-            openal::alSourcei(sound.source_id, openal::AL_BUFFER as i32, sound.buffer_id as i32);
-            sound.check_al_error()?;
-        }
+    pub fn new(sample: &Sample) -> Result<Self, String> {
+        let mut sound = Sound { id: 0, name: None, sample_id: 0, source_id: 0 };
+        sound.set_sample(sample)?;
 
         Ok(sound)
+    }
+
+    pub fn set_sample(&mut self, sample: &Sample) -> Result<(), String> {
+        unsafe {
+            if self.source_id == 0 {
+                openal::alGenSources(1, &mut self.source_id);
+            }
+
+            openal::alSourcei(self.source_id, openal::AL_BUFFER as i32, sample.buffer_id as i32);
+
+            self.sample_id = sample.id;
+            self.check_al_error()?;
+
+            Ok(())
+        }
     }
 
     pub fn get_volume(&self) -> Result<f32, String> {

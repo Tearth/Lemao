@@ -1,7 +1,7 @@
 use super::state::MenuState;
 use crate::state::global::GlobalAppData;
 use crate::GameApp;
-use lemao_core::audio::sounds::Sound;
+use lemao_core::audio::samples::Sample;
 use lemao_core::lemao_common_platform::input::InputEvent;
 use lemao_core::lemao_math::color::SolidColor;
 use lemao_core::lemao_math::vec2::Vec2;
@@ -50,7 +50,7 @@ impl Scene<GlobalAppData> for MenuScene {
         }
 
         for sample in assets_loader.samples.read().unwrap().iter() {
-            app.audio.sounds.store_with_name(&sample.name, Sound::new(&sample.data)?)?;
+            app.audio.samples.store_with_name(&sample.name, Sample::new(&app.audio, &sample.data)?)?;
         }
 
         let font_id = app.renderer.fonts.get_by_name("pixeled")?.id;
