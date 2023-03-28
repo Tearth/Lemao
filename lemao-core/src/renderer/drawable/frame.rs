@@ -12,6 +12,7 @@ use std::ops::{Add, Sub};
 use std::ptr;
 use std::rc::Rc;
 
+#[derive(Debug)]
 pub struct Frame {
     pub(crate) vao_gl_id: u32,
     pub(crate) vbo_gl_id: u32,
@@ -208,7 +209,10 @@ impl Frame {
             if self.corner_rounding.right_bottom > 0.0 {
                 self.get_corner(
                     Vec2::new(self.size.x - self.corner_rounding.right_bottom, self.corner_rounding.right_bottom),
-                    Vec2::new(self.size.x - self.thickness.right - self.corner_rounding.right_bottom, self.thickness.bottom + self.corner_rounding.right_bottom),
+                    Vec2::new(
+                        self.size.x - self.thickness.right - self.corner_rounding.right_bottom,
+                        self.thickness.bottom + self.corner_rounding.right_bottom,
+                    ),
                     self.corner_rounding.right_bottom,
                     std::f32::consts::PI * 1.5,
                     std::f32::consts::PI * 2.0,

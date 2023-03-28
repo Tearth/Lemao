@@ -10,6 +10,7 @@ use lemao_opengl::pointers::OpenGLPointers;
 use std::ptr;
 use std::rc::Rc;
 
+#[derive(Debug)]
 pub struct Line {
     pub(crate) shape_id: usize,
     pub(crate) shape_vao_gl_id: u32,

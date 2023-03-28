@@ -4,7 +4,6 @@ use crate::scenes::game::components::body::BodyComponent;
 use crate::scenes::game::components::body::BodyOrientation;
 use crate::scenes::game::components::food::FoodComponent;
 use crate::scenes::game::components::head::HeadComponent;
-use crate::scenes::game::components::head::HeadDirection;
 use crate::scenes::game::components::position::PositionComponent;
 use crate::scenes::game::components::sprite::SpriteComponent;
 use crate::scenes::game::messages::Message;
@@ -12,6 +11,7 @@ use crate::scenes::game::scene::{GameScene, GameWorld};
 use crate::scenes::game::systems::audio::player::AudioPlayerSystem;
 use crate::scenes::game::systems::ui::logic::UiLogicSystem;
 use crate::scenes::game::utils::Coordinates;
+use crate::scenes::game::utils::Direction;
 use crate::state::global::GlobalAppData;
 use crate::GameApp;
 use lemao_core::lemao_common_platform::input::InputEvent;
@@ -47,12 +47,11 @@ impl System<GlobalAppData, GameScene, Message> for HeadSystem {
                     let mut head_rectangle = app.renderer.create_tilemap(app.renderer.textures.get_by_name("head")?.id)?;
                     head_rectangle.size = app.global_data.cell_size;
                     head_rectangle.anchor = Vec2::new(0.5, 0.5);
-                    head_rectangle.rotation = 0.25 * 2.0 * std::f32::consts::PI;
                     head_rectangle.update();
 
                     let head_coordinates = self.get_head_default_position(app);
-                    world.commands.send(SpawnCommand::new(head_id, HeadComponent::new(head_id, HeadDirection::Right)));
-                    world.commands.send(SpawnCommand::new(head_id, PositionComponent::new(head_id, head_coordinates)));
+                    world.commands.send(SpawnCommand::new(head_id, HeadComponent::new(head_id, Direction::Right)));
+                    world.commands.send(SpawnCommand::new(head_id, PositionComponent::new(head_id, head_coordinates, Some(Direction::Right))));
                     world.commands.send(SpawnCommand::new(head_id, SpriteComponent::new(head_id, head_rectangle, LAYER_SNAKE)));
 
                     scene.state.game.lifetime = app.global_data.initial_lifetime;
@@ -65,23 +64,23 @@ impl System<GlobalAppData, GameScene, Message> for HeadSystem {
 
                     match key {
                         Key::KeyW => {
-                            if head.direction != HeadDirection::Down {
-                                head.next_direction = HeadDirection::Up
+                            if head.direction != Direction::Down {
+                                head.next_direction = Direction::Up
                             }
                         }
                         Key::KeyS => {
-                            if head.direction != HeadDirection::Up {
-                                head.next_direction = HeadDirection::Down
+                            if head.direction != Direction::Up {
+                                head.next_direction = Direction::Down
                             }
                         }
                         Key::KeyA => {
-                            if head.direction != HeadDirection::Right {
-                                head.next_direction = HeadDirection::Left
+                            if head.direction != Direction::Right {
+                                head.next_direction = Direction::Left
                             }
                         }
                         Key::KeyD => {
-                            if head.direction != HeadDirection::Left {
-                                head.next_direction = HeadDirection::Right
+                            if head.direction != Direction::Left {
+                                head.next_direction = Direction::Right
                             }
                         }
                         _ => {}
@@ -89,9 +88,9 @@ impl System<GlobalAppData, GameScene, Message> for HeadSystem {
                 }
                 Message::GameTick => {
                     if !scene.state.game.snake_killed {
-                        let (heads, bodies, foods, positions, sprites) =
-                            world.components.get_and_cast_mut_5::<HeadComponent, BodyComponent, FoodComponent, PositionComponent, SpriteComponent>();
-                        let head = heads.iter_mut().next().unwrap();
+                        let (heads, bodies, foods, positions) =
+                            world.components.get_and_cast_mut_4::<HeadComponent, BodyComponent, FoodComponent, PositionComponent>()?;
+                        let head = heads.get_mut_first()?;
 
                         let position = positions.get_mut(head.entity_id)?;
                         let last_coordinates = position.coordinates;
@@ -99,23 +98,16 @@ impl System<GlobalAppData, GameScene, Message> for HeadSystem {
                         let mut new_coordinates = last_coordinates;
 
                         if head.direction != head.next_direction {
-                            let sprite = sprites.get_mut(head.entity_id)?;
-
-                            match head.next_direction {
-                                HeadDirection::Up => sprite.tilemap.rotation = 0.50 * 2.0 * std::f32::consts::PI,
-                                HeadDirection::Down => sprite.tilemap.rotation = 0.00 * 2.0 * std::f32::consts::PI,
-                                HeadDirection::Right => sprite.tilemap.rotation = 0.25 * 2.0 * std::f32::consts::PI,
-                                HeadDirection::Left => sprite.tilemap.rotation = 0.75 * 2.0 * std::f32::consts::PI,
-                            }
+                            position.direction = Some(head.next_direction);
                         }
 
                         head.direction = head.next_direction;
 
                         match head.direction {
-                            HeadDirection::Up => new_coordinates.row += 1,
-                            HeadDirection::Down => new_coordinates.row -= 1,
-                            HeadDirection::Right => new_coordinates.col += 1,
-                            HeadDirection::Left => new_coordinates.col -= 1,
+                            Direction::Up => new_coordinates.row += 1,
+                            Direction::Down => new_coordinates.row -= 1,
+                            Direction::Right => new_coordinates.col += 1,
+                            Direction::Left => new_coordinates.col -= 1,
                         }
 
                         let mut collision = false;
@@ -144,7 +136,6 @@ impl System<GlobalAppData, GameScene, Message> for HeadSystem {
                             world.messages.send_to_3::<HeadSystem, BodySystem, AudioPlayerSystem>(Message::KillSnake)?;
                         } else {
                             let position = positions.get_mut(head.entity_id)?;
-
                             position.coordinates = new_coordinates;
                             position.changed = true;
 
@@ -173,14 +164,14 @@ impl System<GlobalAppData, GameScene, Message> for HeadSystem {
                             world
                                 .commands
                                 .send(SpawnCommand::new(body_id, BodyComponent::new(body_id, scene.state.game.lifetime, *body_orientation, head.direction)));
-                            world.commands.send(SpawnCommand::new(body_id, PositionComponent::new(body_id, last_coordinates)));
+                            world.commands.send(SpawnCommand::new(body_id, PositionComponent::new(body_id, last_coordinates, None)));
                             world.commands.send(SpawnCommand::new(body_id, SpriteComponent::new(body_id, body_rectangle, LAYER_SNAKE)));
                         }
                     }
                 }
                 Message::KillSnake => {
-                    let (heads, sprites) = world.components.get_and_cast_mut_2::<HeadComponent, SpriteComponent>();
-                    let head = heads.iter_mut().next().unwrap();
+                    let (heads, sprites) = world.components.get_and_cast_mut_2::<HeadComponent, SpriteComponent>()?;
+                    let head = heads.get_mut_first()?;
                     let sprite = sprites.get_mut(head.entity_id)?;
 
                     sprite.blinking = true;
@@ -188,19 +179,19 @@ impl System<GlobalAppData, GameScene, Message> for HeadSystem {
                     sprite.blinking_last_change_time = scene.state.game.snake_killed_time;
                 }
                 Message::ResetSnake => {
-                    let (heads, positions, sprites) = world.components.get_and_cast_mut_3::<HeadComponent, PositionComponent, SpriteComponent>();
-                    let head = heads.iter_mut().next().unwrap();
+                    let (heads, positions, sprites) = world.components.get_and_cast_mut_3::<HeadComponent, PositionComponent, SpriteComponent>()?;
+                    let head = heads.get_mut_first()?;
 
-                    head.direction = HeadDirection::Right;
-                    head.next_direction = HeadDirection::Right;
+                    head.direction = Direction::Right;
+                    head.next_direction = Direction::Right;
 
                     let head_position = positions.get_mut(head.entity_id)?;
                     head_position.coordinates = self.get_head_default_position(app);
+                    head_position.direction = Some(Direction::Right);
                     head_position.changed = true;
 
                     let sprite = sprites.get_mut(head.entity_id)?;
                     sprite.blinking = false;
-                    sprite.tilemap.rotation = 0.25 * 2.0 * std::f32::consts::PI;
                 }
                 _ => {}
             }
@@ -231,19 +222,19 @@ impl Default for HeadSystem {
     fn default() -> Self {
         let mut orientation_map = HashMap::new();
 
-        orientation_map.insert((8 << HeadDirection::Up as u8) | (1 << HeadDirection::Up as u8), BodyOrientation::TopBottom);
-        orientation_map.insert((8 << HeadDirection::Down as u8) | (1 << HeadDirection::Down as u8), BodyOrientation::TopBottom);
-        orientation_map.insert((8 << HeadDirection::Right as u8) | (1 << HeadDirection::Right as u8), BodyOrientation::RightLeft);
-        orientation_map.insert((8 << HeadDirection::Left as u8) | (1 << HeadDirection::Left as u8), BodyOrientation::RightLeft);
+        orientation_map.insert((8 << Direction::Up as u8) | (1 << Direction::Up as u8), BodyOrientation::TopBottom);
+        orientation_map.insert((8 << Direction::Down as u8) | (1 << Direction::Down as u8), BodyOrientation::TopBottom);
+        orientation_map.insert((8 << Direction::Right as u8) | (1 << Direction::Right as u8), BodyOrientation::RightLeft);
+        orientation_map.insert((8 << Direction::Left as u8) | (1 << Direction::Left as u8), BodyOrientation::RightLeft);
 
-        orientation_map.insert((8 << HeadDirection::Right as u8) | (1 << HeadDirection::Down as u8), BodyOrientation::LeftBottom);
-        orientation_map.insert((8 << HeadDirection::Left as u8) | (1 << HeadDirection::Down as u8), BodyOrientation::RightBottom);
-        orientation_map.insert((8 << HeadDirection::Right as u8) | (1 << HeadDirection::Up as u8), BodyOrientation::LeftTop);
-        orientation_map.insert((8 << HeadDirection::Left as u8) | (1 << HeadDirection::Up as u8), BodyOrientation::RightTop);
-        orientation_map.insert((8 << HeadDirection::Up as u8) | (1 << HeadDirection::Right as u8), BodyOrientation::RightBottom);
-        orientation_map.insert((8 << HeadDirection::Up as u8) | (1 << HeadDirection::Left as u8), BodyOrientation::LeftBottom);
-        orientation_map.insert((8 << HeadDirection::Down as u8) | (1 << HeadDirection::Right as u8), BodyOrientation::RightTop);
-        orientation_map.insert((8 << HeadDirection::Down as u8) | (1 << HeadDirection::Left as u8), BodyOrientation::LeftTop);
+        orientation_map.insert((8 << Direction::Right as u8) | (1 << Direction::Down as u8), BodyOrientation::LeftBottom);
+        orientation_map.insert((8 << Direction::Left as u8) | (1 << Direction::Down as u8), BodyOrientation::RightBottom);
+        orientation_map.insert((8 << Direction::Right as u8) | (1 << Direction::Up as u8), BodyOrientation::LeftTop);
+        orientation_map.insert((8 << Direction::Left as u8) | (1 << Direction::Up as u8), BodyOrientation::RightTop);
+        orientation_map.insert((8 << Direction::Up as u8) | (1 << Direction::Right as u8), BodyOrientation::RightBottom);
+        orientation_map.insert((8 << Direction::Up as u8) | (1 << Direction::Left as u8), BodyOrientation::LeftBottom);
+        orientation_map.insert((8 << Direction::Down as u8) | (1 << Direction::Right as u8), BodyOrientation::RightTop);
+        orientation_map.insert((8 << Direction::Down as u8) | (1 << Direction::Left as u8), BodyOrientation::LeftTop);
 
         Self { orientation_map }
     }

@@ -12,13 +12,13 @@ pub mod rectangle;
 pub mod text;
 pub mod tilemap;
 
-#[derive(Clone, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum Color {
     SolidColor(SolidColor),
     Gradient(Gradient),
 }
 
-#[derive(Copy, Clone, Default, PartialEq)]
+#[derive(Copy, Clone, Debug, Default, PartialEq)]
 pub struct CornerRounding {
     pub left_bottom: f32,
     pub right_bottom: f32,
@@ -26,7 +26,7 @@ pub struct CornerRounding {
     pub left_top: f32,
 }
 
-#[derive(Copy, Clone, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub enum DrawableEnum {
     Circle,
     Disc,

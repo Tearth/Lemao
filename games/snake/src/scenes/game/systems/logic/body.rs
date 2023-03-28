@@ -1,10 +1,9 @@
 use crate::scenes::game::components::body::BodyComponent;
 use crate::scenes::game::components::body::BodyOrientation;
-use crate::scenes::game::components::head::HeadDirection;
-use crate::scenes::game::components::position::PositionComponent;
 use crate::scenes::game::components::sprite::SpriteComponent;
 use crate::scenes::game::messages::Message;
 use crate::scenes::game::scene::{GameScene, GameWorld};
+use crate::scenes::game::utils::Direction;
 use crate::state::global::GlobalAppData;
 use crate::GameApp;
 use lemao_framework::ecs::commands::kill::KillCommand;
@@ -40,7 +39,7 @@ impl System<GlobalAppData, GameScene, Message> for BodySystem {
                     }
                 }
                 Message::KillSnake => {
-                    let (bodies, sprites) = world.components.get_and_cast_mut_2::<BodyComponent, SpriteComponent>();
+                    let (bodies, sprites) = world.components.get_and_cast_mut_2::<BodyComponent, SpriteComponent>()?;
 
                     for body in bodies.iter_mut() {
                         body.killed = true;
@@ -62,8 +61,7 @@ impl System<GlobalAppData, GameScene, Message> for BodySystem {
         }
 
         if tick && !scene.state.game.snake_killed {
-            let (bodies, positions, sprites) = world.components.get_and_cast_mut_3::<BodyComponent, PositionComponent, SpriteComponent>();
-            let mut body_positions = Vec::new();
+            let (bodies, sprites) = world.components.get_and_cast_mut_2::<BodyComponent, SpriteComponent>()?;
 
             for body in bodies.iter_mut().filter(|b| !b.killed) {
                 body.lifetime -= 1;
@@ -73,14 +71,12 @@ impl System<GlobalAppData, GameScene, Message> for BodySystem {
                 } else if body.lifetime == 1 {
                     let sprite = sprites.get_mut(body.entity_id)?;
                     sprite.tilemap.frame = match body.direction {
-                        HeadDirection::Up => BodyOrientation::BottomEnd,
-                        HeadDirection::Down => BodyOrientation::TopEnd,
-                        HeadDirection::Right => BodyOrientation::LeftEnd,
-                        HeadDirection::Left => BodyOrientation::RightEnd,
+                        Direction::Up => BodyOrientation::BottomEnd,
+                        Direction::Down => BodyOrientation::TopEnd,
+                        Direction::Right => BodyOrientation::LeftEnd,
+                        Direction::Left => BodyOrientation::RightEnd,
                     } as u32;
                     sprite.tilemap.update();
-                } else {
-                    body_positions.push((body.entity_id, positions.get(body.entity_id)?.coordinates))
                 }
             }
         }

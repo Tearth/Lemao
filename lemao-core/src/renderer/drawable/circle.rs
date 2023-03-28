@@ -11,6 +11,7 @@ use std::mem;
 use std::ptr;
 use std::rc::Rc;
 
+#[derive(Debug)]
 pub struct Circle {
     pub(crate) vao_gl_id: u32,
     pub(crate) vbo_gl_id: u32,

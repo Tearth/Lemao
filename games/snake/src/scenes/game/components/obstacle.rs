@@ -1,5 +1,6 @@
 use lemao_framework::ecs::components::Component;
 
+#[derive(Copy, Clone, Debug)]
 pub struct ObstacleComponent {
     pub entity_id: usize,
 }

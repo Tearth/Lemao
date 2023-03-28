@@ -1,21 +1,15 @@
+use crate::scenes::game::utils::Direction;
 use lemao_framework::ecs::components::Component;
 
+#[derive(Copy, Clone, Debug)]
 pub struct HeadComponent {
     pub entity_id: usize,
-    pub direction: HeadDirection,
-    pub next_direction: HeadDirection,
-}
-
-#[derive(Copy, Clone, PartialEq)]
-pub enum HeadDirection {
-    Up,
-    Down,
-    Right,
-    Left,
+    pub direction: Direction,
+    pub next_direction: Direction,
 }
 
 impl HeadComponent {
-    pub fn new(entity_id: usize, direction: HeadDirection) -> Self {
+    pub fn new(entity_id: usize, direction: Direction) -> Self {
         Self { entity_id, direction, next_direction: direction }
     }
 }

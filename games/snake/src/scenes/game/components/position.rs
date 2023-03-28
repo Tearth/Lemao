@@ -1,16 +1,17 @@
+use crate::scenes::game::utils::{Coordinates, Direction};
 use lemao_framework::ecs::components::Component;
 
-use crate::scenes::game::utils::Coordinates;
-
+#[derive(Copy, Clone, Debug)]
 pub struct PositionComponent {
     pub entity_id: usize,
     pub coordinates: Coordinates,
+    pub direction: Option<Direction>,
     pub changed: bool,
 }
 
 impl PositionComponent {
-    pub fn new(entity_id: usize, coordinates: Coordinates) -> Self {
-        Self { entity_id, coordinates, changed: true }
+    pub fn new(entity_id: usize, coordinates: Coordinates, direction: Option<Direction>) -> Self {
+        Self { entity_id, coordinates, direction, changed: true }
     }
 }
 

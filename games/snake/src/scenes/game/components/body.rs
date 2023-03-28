@@ -1,12 +1,12 @@
+use crate::scenes::game::utils::Direction;
 use lemao_framework::ecs::components::Component;
 
-use super::head::HeadDirection;
-
+#[derive(Copy, Clone, Debug)]
 pub struct BodyComponent {
     pub entity_id: usize,
     pub lifetime: u32,
     pub orientation: BodyOrientation,
-    pub direction: HeadDirection,
+    pub direction: Direction,
     pub killed: bool,
 }
 
@@ -25,7 +25,7 @@ pub enum BodyOrientation {
 }
 
 impl BodyComponent {
-    pub fn new(entity_id: usize, lifetime: u32, orientation: BodyOrientation, direction: HeadDirection) -> Self {
+    pub fn new(entity_id: usize, lifetime: u32, orientation: BodyOrientation, direction: Direction) -> Self {
         Self { entity_id, lifetime, orientation, direction, killed: false }
     }
 }

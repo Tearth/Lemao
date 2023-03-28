@@ -11,6 +11,7 @@ use std::ffi::c_void;
 use std::rc::Rc;
 use std::{mem, ptr};
 
+#[derive(Debug)]
 pub struct Rectangle {
     pub(crate) shape_id: usize,
     pub(crate) shape_vao_gl_id: u32,

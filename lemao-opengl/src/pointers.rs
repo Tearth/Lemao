@@ -3,6 +3,7 @@ use std::ffi::CString;
 use std::mem;
 
 #[allow(non_snake_case)]
+#[derive(Debug)]
 pub struct OpenGLPointers {
     pub glAttachShader: opengl::PFNGLATTACHSHADERPROC,
     pub glBindBuffer: opengl::PFNGLBINDBUFFERPROC,

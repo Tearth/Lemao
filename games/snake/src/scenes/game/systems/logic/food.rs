@@ -41,7 +41,7 @@ impl System<GlobalAppData, GameScene, Message> for FoodSystem {
                         world.commands.send(KillCommand::new(body.entity_id));
                     }
 
-                    let (heads, bodies, positions) = world.components.get_and_cast_mut_3::<HeadComponent, BodyComponent, PositionComponent>();
+                    let (heads, bodies, positions) = world.components.get_and_cast_mut_3::<HeadComponent, BodyComponent, PositionComponent>()?;
 
                     let mut forbidden_positions = heads.iter().map(|h| positions.get(h.entity_id).unwrap()).collect::<Vec<&PositionComponent>>();
                     forbidden_positions.extend(bodies.iter().map(|h| positions.get(h.entity_id).unwrap()));
@@ -67,7 +67,7 @@ impl System<GlobalAppData, GameScene, Message> for FoodSystem {
                         food_rectangle.update();
 
                         world.commands.send(SpawnCommand::new(food_id, FoodComponent::new(food_id)));
-                        world.commands.send(SpawnCommand::new(food_id, PositionComponent::new(food_id, Coordinates::new(position.0, position.1))));
+                        world.commands.send(SpawnCommand::new(food_id, PositionComponent::new(food_id, Coordinates::new(position.0, position.1), None)));
                         world.commands.send(SpawnCommand::new(food_id, SpriteComponent::new(food_id, food_rectangle, LAYER_FOOD)));
                     }
 

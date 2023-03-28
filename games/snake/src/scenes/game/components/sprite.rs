@@ -3,6 +3,7 @@ use std::time::SystemTime;
 use lemao_core::renderer::drawable::tilemap::Tilemap;
 use lemao_framework::ecs::components::Component;
 
+#[derive(Debug)]
 pub struct SpriteComponent {
     pub entity_id: usize,
     pub tilemap: Tilemap,

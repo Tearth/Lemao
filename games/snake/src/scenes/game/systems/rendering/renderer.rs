@@ -3,6 +3,7 @@ use crate::scenes::game::components::sprite::SpriteComponent;
 use crate::scenes::game::messages::Message;
 use crate::scenes::game::scene::GameScene;
 use crate::scenes::game::scene::GameWorld;
+use crate::scenes::game::utils::Direction;
 use crate::state::global::GlobalAppData;
 use crate::GameApp;
 use lemao_core::lemao_math::vec2::Vec2;
@@ -24,7 +25,7 @@ impl System<GlobalAppData, GameScene, Message> for RendererSystem {
     }
 
     fn update(&mut self, app: &mut GameApp, _scene: &mut GameScene, world: &mut GameWorld) -> Result<(), String> {
-        let (sprites, positions) = world.components.get_and_cast_mut_2::<SpriteComponent, PositionComponent>();
+        let (sprites, positions) = world.components.get_and_cast_mut_2::<SpriteComponent, PositionComponent>()?;
         let mut layers = Vec::new();
 
         for sprite in sprites.iter_mut() {
@@ -32,6 +33,13 @@ impl System<GlobalAppData, GameScene, Message> for RendererSystem {
             if position.changed {
                 sprite.tilemap.position = Vec2::new(position.coordinates.col as f32, position.coordinates.row as f32) * app.global_data.cell_size;
                 sprite.tilemap.position = sprite.tilemap.position.floor();
+                sprite.tilemap.rotation = match position.direction {
+                    Some(Direction::Up) => 0.50 * 2.0 * std::f32::consts::PI,
+                    Some(Direction::Down) => 0.00 * 2.0 * std::f32::consts::PI,
+                    Some(Direction::Right) => 0.25 * 2.0 * std::f32::consts::PI,
+                    Some(Direction::Left) => 0.75 * 2.0 * std::f32::consts::PI,
+                    _ => 0.0,
+                };
                 position.changed = false;
             }
 

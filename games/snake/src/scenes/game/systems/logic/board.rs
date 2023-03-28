@@ -48,7 +48,7 @@ impl System<GlobalAppData, GameScene, Message> for BoardSystem {
 
                         rectangle.update();
 
-                        world.commands.send(SpawnCommand::new(cell_id, PositionComponent::new(cell_id, Coordinates::new(row, col))));
+                        world.commands.send(SpawnCommand::new(cell_id, PositionComponent::new(cell_id, Coordinates::new(row, col), None)));
                         world.commands.send(SpawnCommand::new(cell_id, SpriteComponent::new(cell_id, rectangle, LAYER_BOARD)));
                     }
                 }

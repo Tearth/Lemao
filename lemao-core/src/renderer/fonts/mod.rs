@@ -9,6 +9,7 @@ use std::rc::Rc;
 
 pub mod bff;
 
+#[derive(Clone, Debug, Default, PartialEq)]
 pub struct RawFont {
     pub size: Vec2,
     pub cell_size: Vec2,
