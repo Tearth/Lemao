@@ -6,6 +6,10 @@ use std::collections::hash_map::Values;
 use std::collections::hash_map::ValuesMut;
 use std::collections::HashMap;
 
+type ComponentTuple2<'a, C1, C2> = (&'a mut ComponentList<C1>, &'a mut ComponentList<C2>);
+type ComponentTuple3<'a, C1, C2, C3> = (&'a mut ComponentList<C1>, &'a mut ComponentList<C2>, &'a mut ComponentList<C3>);
+type ComponentTuple4<'a, C1, C2, C3, C4> = (&'a mut ComponentList<C1>, &'a mut ComponentList<C2>, &'a mut ComponentList<C3>, &'a mut ComponentList<C4>);
+
 #[derive(Default)]
 pub struct ComponentManager {
     data: HashMap<TypeId, Box<dyn ComponentListTrait>>,
@@ -71,7 +75,7 @@ impl ComponentManager {
         }
     }
 
-    pub fn get_and_cast_mut_2<C1, C2>(&mut self) -> Result<(&mut ComponentList<C1>, &mut ComponentList<C2>), String>
+    pub fn get_and_cast_mut_2<C1, C2>(&mut self) -> Result<ComponentTuple2<C1, C2>, String>
     where
         C1: Component + 'static,
         C2: Component + 'static,
@@ -84,8 +88,7 @@ impl ComponentManager {
         }
     }
 
-    #[allow(clippy::type_complexity)]
-    pub fn get_and_cast_mut_3<C1, C2, C3>(&mut self) -> Result<(&mut ComponentList<C1>, &mut ComponentList<C2>, &mut ComponentList<C3>), String>
+    pub fn get_and_cast_mut_3<C1, C2, C3>(&mut self) -> Result<ComponentTuple3<C1, C2, C3>, String>
     where
         C1: Component + 'static,
         C2: Component + 'static,
@@ -104,10 +107,7 @@ impl ComponentManager {
         }
     }
 
-    #[allow(clippy::type_complexity)]
-    pub fn get_and_cast_mut_4<C1, C2, C3, C4>(
-        &mut self,
-    ) -> Result<(&mut ComponentList<C1>, &mut ComponentList<C2>, &mut ComponentList<C3>, &mut ComponentList<C4>), String>
+    pub fn get_and_cast_mut_4<C1, C2, C3, C4>(&mut self) -> Result<ComponentTuple4<C1, C2, C3, C4>, String>
     where
         C1: Component + 'static,
         C2: Component + 'static,
@@ -125,34 +125,6 @@ impl ComponentManager {
                 (*b).as_any_mut().downcast_mut::<ComponentList<C2>>().unwrap(),
                 (*c).as_any_mut().downcast_mut::<ComponentList<C3>>().unwrap(),
                 (*d).as_any_mut().downcast_mut::<ComponentList<C4>>().unwrap(),
-            ))
-        }
-    }
-
-    #[allow(clippy::type_complexity)]
-    pub fn get_and_cast_mut_5<C1, C2, C3, C4, C5>(
-        &mut self,
-    ) -> Result<(&mut ComponentList<C1>, &mut ComponentList<C2>, &mut ComponentList<C3>, &mut ComponentList<C4>, &mut ComponentList<C5>), String>
-    where
-        C1: Component + 'static,
-        C2: Component + 'static,
-        C3: Component + 'static,
-        C4: Component + 'static,
-        C5: Component + 'static,
-    {
-        unsafe {
-            let a = self.data.get_mut(&TypeId::of::<C1>()).unwrap() as *mut _ as *mut Box<dyn ComponentListTrait>;
-            let b = self.data.get_mut(&TypeId::of::<C2>()).unwrap() as *mut _ as *mut Box<dyn ComponentListTrait>;
-            let c = self.data.get_mut(&TypeId::of::<C3>()).unwrap() as *mut _ as *mut Box<dyn ComponentListTrait>;
-            let d = self.data.get_mut(&TypeId::of::<C4>()).unwrap() as *mut _ as *mut Box<dyn ComponentListTrait>;
-            let e = self.data.get_mut(&TypeId::of::<C5>()).unwrap() as *mut _ as *mut Box<dyn ComponentListTrait>;
-
-            Ok((
-                (*a).as_any_mut().downcast_mut::<ComponentList<C1>>().unwrap(),
-                (*b).as_any_mut().downcast_mut::<ComponentList<C2>>().unwrap(),
-                (*c).as_any_mut().downcast_mut::<ComponentList<C3>>().unwrap(),
-                (*d).as_any_mut().downcast_mut::<ComponentList<C4>>().unwrap(),
-                (*e).as_any_mut().downcast_mut::<ComponentList<C5>>().unwrap(),
             ))
         }
     }

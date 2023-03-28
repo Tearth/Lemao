@@ -6,7 +6,7 @@ pub mod audio;
 pub mod game;
 pub mod ui;
 
-#[derive(Default)]
+#[derive(Debug, Default)]
 pub struct SceneState {
     pub game: GameState,
     pub ui: UiState,

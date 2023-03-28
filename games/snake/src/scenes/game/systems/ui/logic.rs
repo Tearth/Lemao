@@ -1,5 +1,6 @@
 use crate::scenes::game::messages::Message;
-use crate::scenes::game::scene::{GameScene, GameWorld};
+use crate::scenes::game::scene::GameScene;
+use crate::scenes::game::scene::GameWorld;
 use crate::state::global::GlobalAppData;
 use crate::GameApp;
 use lemao_core::lemao_common_platform::input::InputEvent;

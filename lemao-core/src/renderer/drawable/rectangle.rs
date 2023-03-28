@@ -8,8 +8,9 @@ use lemao_math::vec3::Vec3;
 use lemao_opengl::bindings::opengl;
 use lemao_opengl::pointers::OpenGLPointers;
 use std::ffi::c_void;
+use std::mem;
+use std::ptr;
 use std::rc::Rc;
-use std::{mem, ptr};
 
 #[derive(Debug)]
 pub struct Rectangle {

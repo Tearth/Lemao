@@ -44,10 +44,10 @@ where
             system.update(app, scene, self)?;
         }
 
-        // Game logic stage
+        // Game logic stage (systems are executed until all event queues are empty)
         let mut first_iteration = true;
         loop {
-            let mut clear = !first_iteration;
+            let mut clear = true;
 
             for system in &mut systems.iter_mut().filter(|system| system.get_stage() == SystemStage::GameLogic) {
                 if first_iteration || !self.messages.is_empty_by_type(system.get_type()) {

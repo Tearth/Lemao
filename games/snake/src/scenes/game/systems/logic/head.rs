@@ -7,7 +7,8 @@ use crate::scenes::game::components::head::HeadComponent;
 use crate::scenes::game::components::position::PositionComponent;
 use crate::scenes::game::components::sprite::SpriteComponent;
 use crate::scenes::game::messages::Message;
-use crate::scenes::game::scene::{GameScene, GameWorld};
+use crate::scenes::game::scene::GameScene;
+use crate::scenes::game::scene::GameWorld;
 use crate::scenes::game::systems::audio::player::AudioPlayerSystem;
 use crate::scenes::game::systems::ui::logic::UiLogicSystem;
 use crate::scenes::game::utils::Coordinates;
@@ -87,86 +88,81 @@ impl System<GlobalAppData, GameScene, Message> for HeadSystem {
                     }
                 }
                 Message::GameTick => {
-                    if !scene.state.game.snake_killed {
-                        let (heads, bodies, foods, positions) =
-                            world.components.get_and_cast_mut_4::<HeadComponent, BodyComponent, FoodComponent, PositionComponent>()?;
-                        let head = heads.get_mut_first()?;
+                    if scene.state.game.snake_killed {
+                        continue;
+                    }
 
+                    let (heads, bodies, foods, positions) = world.components.get_and_cast_mut_4::<HeadComponent, BodyComponent, FoodComponent, PositionComponent>()?;
+                    let head = heads.get_mut_first()?;
+
+                    let position = positions.get_mut(head.entity_id)?;
+                    let last_coordinates = position.coordinates;
+                    let last_direction = head.direction;
+                    let mut new_coordinates = last_coordinates;
+
+                    if head.direction != head.next_direction {
+                        position.direction = Some(head.next_direction);
+                    }
+
+                    head.direction = head.next_direction;
+
+                    match head.direction {
+                        Direction::Up => new_coordinates.row += 1,
+                        Direction::Down => new_coordinates.row -= 1,
+                        Direction::Right => new_coordinates.col += 1,
+                        Direction::Left => new_coordinates.col -= 1,
+                    }
+
+                    let mut collision = false;
+                    let border_row = app.global_data.board_height - 1;
+                    let border_col = app.global_data.board_width - 1;
+
+                    if new_coordinates.row == 0 || new_coordinates.row == border_row || new_coordinates.col == 0 || new_coordinates.col == border_col {
+                        collision = true;
+                    } else {
+                        for body in bodies.iter().filter(|b| !b.killed) {
+                            let body_position = positions.get(body.entity_id)?;
+                            if body_position.coordinates == new_coordinates {
+                                collision = true;
+                            }
+                        }
+                    }
+
+                    if collision {
+                        scene.state.game.snake_killed = true;
+                        scene.state.game.snake_killed_time = SystemTime::now();
+
+                        world.messages.send_to_3::<HeadSystem, BodySystem, AudioPlayerSystem>(Message::KillSnake)?;
+                    } else {
                         let position = positions.get_mut(head.entity_id)?;
-                        let last_coordinates = position.coordinates;
-                        let last_direction = head.direction;
-                        let mut new_coordinates = last_coordinates;
+                        position.coordinates = new_coordinates;
+                        position.changed = true;
 
-                        if head.direction != head.next_direction {
-                            position.direction = Some(head.next_direction);
-                        }
+                        for food in foods.iter() {
+                            let food_position = positions.get(food.entity_id)?;
+                            if food_position.coordinates == new_coordinates {
+                                scene.state.game.lifetime += 1;
+                                scene.state.game.tick_length = (scene.state.game.tick_length as f32 * app.global_data.snake_acceleration) as u32;
+                                scene.state.game.score += 1;
 
-                        head.direction = head.next_direction;
-
-                        match head.direction {
-                            Direction::Up => new_coordinates.row += 1,
-                            Direction::Down => new_coordinates.row -= 1,
-                            Direction::Right => new_coordinates.col += 1,
-                            Direction::Left => new_coordinates.col -= 1,
-                        }
-
-                        let mut collision = false;
-
-                        if new_coordinates.row == 0
-                            || new_coordinates.row == app.global_data.board_height - 1
-                            || new_coordinates.col == 0
-                            || new_coordinates.col == app.global_data.board_width - 1
-                        {
-                            collision = true;
-                        }
-
-                        if !collision {
-                            for body in bodies.iter().filter(|b| !b.killed) {
-                                let body_position = positions.get(body.entity_id)?;
-                                if body_position.coordinates == new_coordinates {
-                                    collision = true;
-                                }
+                                world.commands.send(KillCommand::new(food_position.entity_id));
+                                world.messages.send_to_3::<BodySystem, UiLogicSystem, AudioPlayerSystem>(Message::FoodEaten)?;
                             }
                         }
 
-                        if collision {
-                            scene.state.game.snake_killed = true;
-                            scene.state.game.snake_killed_time = SystemTime::now();
+                        let key = (8 << last_direction as u8) | (1 << head.direction as u8);
+                        let body_orientation = self.orientation_map.get(&key).unwrap();
 
-                            world.messages.send_to_3::<HeadSystem, BodySystem, AudioPlayerSystem>(Message::KillSnake)?;
-                        } else {
-                            let position = positions.get_mut(head.entity_id)?;
-                            position.coordinates = new_coordinates;
-                            position.changed = true;
+                        let body_id = world.entities.create();
+                        let mut body_rectangle = app.renderer.create_tilemap(app.renderer.textures.get_by_name("body")?.id)?;
+                        body_rectangle.size = app.global_data.cell_size;
+                        body_rectangle.anchor = Vec2::new(0.5, 0.5);
+                        body_rectangle.frame = *body_orientation as u32;
+                        body_rectangle.update();
 
-                            for food in foods.iter() {
-                                let food_position = positions.get(food.entity_id)?;
-                                if food_position.coordinates == new_coordinates {
-                                    scene.state.game.lifetime += 1;
-                                    scene.state.game.tick_length = (scene.state.game.tick_length as f32 * 0.95) as u32;
-                                    scene.state.game.score += 1;
-
-                                    world.commands.send(KillCommand::new(food_position.entity_id));
-                                    world.messages.send_to_3::<BodySystem, UiLogicSystem, AudioPlayerSystem>(Message::FoodEaten)?;
-                                }
-                            }
-
-                            let key = (8 << last_direction as u8) | (1 << head.direction as u8);
-                            let body_orientation = self.orientation_map.get(&key).unwrap();
-
-                            let body_id = world.entities.create();
-                            let mut body_rectangle = app.renderer.create_tilemap(app.renderer.textures.get_by_name("body")?.id)?;
-                            body_rectangle.size = app.global_data.cell_size;
-                            body_rectangle.anchor = Vec2::new(0.5, 0.5);
-                            body_rectangle.frame = *body_orientation as u32;
-                            body_rectangle.update();
-
-                            world
-                                .commands
-                                .send(SpawnCommand::new(body_id, BodyComponent::new(body_id, scene.state.game.lifetime, *body_orientation, head.direction)));
-                            world.commands.send(SpawnCommand::new(body_id, PositionComponent::new(body_id, last_coordinates, None)));
-                            world.commands.send(SpawnCommand::new(body_id, SpriteComponent::new(body_id, body_rectangle, LAYER_SNAKE)));
-                        }
+                        world.commands.send(SpawnCommand::new(body_id, BodyComponent::new(body_id, scene.state.game.lifetime, *body_orientation, head.direction)));
+                        world.commands.send(SpawnCommand::new(body_id, PositionComponent::new(body_id, last_coordinates, None)));
+                        world.commands.send(SpawnCommand::new(body_id, SpriteComponent::new(body_id, body_rectangle, LAYER_SNAKE)));
                     }
                 }
                 Message::KillSnake => {

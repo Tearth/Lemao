@@ -27,7 +27,7 @@ impl System<GlobalAppData, GameScene, Message> for SyncSystem {
     fn update(&mut self, app: &mut GameApp, scene: &mut GameScene, world: &mut GameWorld) -> Result<(), String> {
         let mut tick = scene.state.game.tick_length;
         if app.window.is_key_pressed(Key::Space) {
-            tick /= 3;
+            tick /= app.global_data.space_acceleration;
         }
 
         if scene.state.game.time_of_last_tick.elapsed().unwrap().as_millis() >= tick as u128 {

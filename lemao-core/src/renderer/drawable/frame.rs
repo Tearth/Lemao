@@ -8,7 +8,8 @@ use lemao_opengl::bindings::opengl;
 use lemao_opengl::pointers::OpenGLPointers;
 use std::ffi::c_void;
 use std::mem;
-use std::ops::{Add, Sub};
+use std::ops::Add;
+use std::ops::Sub;
 use std::ptr;
 use std::rc::Rc;
 
@@ -209,10 +210,7 @@ impl Frame {
             if self.corner_rounding.right_bottom > 0.0 {
                 self.get_corner(
                     Vec2::new(self.size.x - self.corner_rounding.right_bottom, self.corner_rounding.right_bottom),
-                    Vec2::new(
-                        self.size.x - self.thickness.right - self.corner_rounding.right_bottom,
-                        self.thickness.bottom + self.corner_rounding.right_bottom,
-                    ),
+                    Vec2::new(self.size.x - self.thickness.right - self.corner_rounding.right_bottom, self.thickness.bottom + self.corner_rounding.right_bottom),
                     self.corner_rounding.right_bottom,
                     std::f32::consts::PI * 1.5,
                     std::f32::consts::PI * 2.0,
@@ -222,10 +220,7 @@ impl Frame {
             if self.corner_rounding.right_top > 0.0 {
                 self.get_corner(
                     Vec2::new(self.size.x - self.corner_rounding.right_top, self.size.y - self.corner_rounding.right_top),
-                    Vec2::new(
-                        self.size.x - self.thickness.right - self.corner_rounding.right_top,
-                        self.size.y - self.thickness.top - self.corner_rounding.right_top,
-                    ),
+                    Vec2::new(self.size.x - self.thickness.right - self.corner_rounding.right_top, self.size.y - self.thickness.top - self.corner_rounding.right_top),
                     self.corner_rounding.right_top,
                     std::f32::consts::PI * 0.0,
                     std::f32::consts::PI * 0.5,

@@ -1,5 +1,6 @@
 use std::time::SystemTime;
 
+#[derive(Debug)]
 pub struct GameState {
     pub score: u32,
     pub best_score: u32,

@@ -9,6 +9,9 @@ pub struct GlobalAppData {
 
     pub initial_tick_length: u32,
     pub initial_lifetime: u32,
+
+    pub snake_acceleration: f32,
+    pub space_acceleration: u32,
 }
 
 impl Default for GlobalAppData {
@@ -19,8 +22,12 @@ impl Default for GlobalAppData {
             cell_size: Vec2::new(24.0, 24.0),
             food_refresh_interval: 20000,
             food_refresh_amount: 30,
+
             initial_tick_length: 500,
             initial_lifetime: 3,
+
+            snake_acceleration: 0.99,
+            space_acceleration: 3,
         }
     }
 }

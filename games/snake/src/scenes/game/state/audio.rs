@@ -1,4 +1,4 @@
-#[derive(Default)]
+#[derive(Debug, Default)]
 pub struct AudioState {
     pub music_id: usize,
     pub click_id: usize,

@@ -1,4 +1,5 @@
-use crate::scenes::game::utils::{Coordinates, Direction};
+use crate::scenes::game::utils::Coordinates;
+use crate::scenes::game::utils::Direction;
 use lemao_framework::ecs::components::Component;
 
 #[derive(Copy, Clone, Debug)]
