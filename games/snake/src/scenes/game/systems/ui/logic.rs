@@ -67,6 +67,17 @@ impl System<GlobalAppData, GameScene, Message> for UiLogicSystem {
                     clock_label.shadow_color = Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 1.0));
                     scene.ui.components.get_mut(scene.ui.main_canvas_id)?.add_child(scene.state.ui.clock_label_id);
 
+                    scene.state.ui.instruction_label_id = scene.ui.components.store(Label::new(&mut app.renderer, font_id)?);
+                    let instruction_label = scene.ui.components.get_and_cast_mut::<Label>(scene.state.ui.instruction_label_id)?;
+                    instruction_label.position = ComponentPosition::RelativeToParent(Vec2::new(0.5, 0.0));
+                    instruction_label.anchor = Vec2::new(0.5, 0.5);
+                    instruction_label.offset = Vec2::new(0.0, 90.0);
+                    instruction_label.label_text = "WASD - SNAKE CONTROL        SPACE - ACCELERATION".to_string();
+                    instruction_label.shadow_enabled = true;
+                    instruction_label.shadow_offset = Vec2::new(1.0, -1.0);
+                    instruction_label.shadow_color = Color::SolidColor(SolidColor::new(0.0, 0.0, 0.0, 1.0));
+                    scene.ui.components.get_mut(scene.ui.main_canvas_id)?.add_child(scene.state.ui.instruction_label_id);
+
                     return Ok(());
                 }
                 Message::InputEvent(event) => {

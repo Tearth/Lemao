@@ -24,6 +24,7 @@ impl System<GlobalAppData, GameScene, Message> for UiRenderingSystem {
         scene.ui.draw(&mut app.renderer, scene.state.ui.score_label_id)?;
         scene.ui.draw(&mut app.renderer, scene.state.ui.best_score_label_id)?;
         scene.ui.draw(&mut app.renderer, scene.state.ui.clock_label_id)?;
+        scene.ui.draw(&mut app.renderer, scene.state.ui.instruction_label_id)?;
 
         Ok(())
     }
