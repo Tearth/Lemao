@@ -92,11 +92,13 @@ impl Scene<GlobalAppData> for MenuScene {
         Ok(())
     }
 
-    fn on_activation(&mut self, _app: &mut GameApp) -> Result<(), String> {
+    fn on_activation(&mut self, app: &mut GameApp) -> Result<(), String> {
+        app.window.set_cursor_visibility(true);
         Ok(())
     }
 
-    fn on_deactivation(&mut self, _app: &mut GameApp) -> Result<(), String> {
+    fn on_deactivation(&mut self, app: &mut GameApp) -> Result<(), String> {
+        app.window.set_cursor_visibility(false);
         Ok(())
     }
 

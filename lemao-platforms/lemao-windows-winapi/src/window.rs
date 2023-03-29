@@ -39,6 +39,8 @@ impl WindowWinAPI {
         unsafe {
             let timestamp = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis();
             let class_cstr = CString::new(format!("LemaoWindow_{}", timestamp)).unwrap();
+            let app_icon_cstr = CString::new("APP_ICON").unwrap();
+            let cursor_icon_cstr = CString::new("CURSOR_ICON").unwrap();
             let module_handle = winapi::GetModuleHandleA(ptr::null_mut());
 
             let wnd_class = winapi::WNDCLASS {
@@ -49,8 +51,8 @@ impl WindowWinAPI {
                 style: winapi::CS_OWNDC,
                 cbClsExtra: 0,
                 cbWndExtra: 0,
-                hIcon: winapi::LoadIconA(ptr::null_mut(), 32512 as *const i8),
-                hCursor: winapi::LoadCursorA(ptr::null_mut(), 32512 as *const i8),
+                hIcon: winapi::LoadImageA(module_handle, app_icon_cstr.as_ptr(), winapi::IMAGE_ICON, 0, 0, winapi::LR_DEFAULTSIZE) as *mut winapi::HICON__,
+                hCursor: winapi::LoadImageA(module_handle, cursor_icon_cstr.as_ptr(), winapi::IMAGE_ICON, 0, 0, winapi::LR_DEFAULTSIZE) as *mut winapi::HICON__,
                 lpszMenuName: ptr::null_mut(),
             };
 
