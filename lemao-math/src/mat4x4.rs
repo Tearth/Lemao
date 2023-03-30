@@ -91,28 +91,22 @@ impl Mul for Mat4x4 {
         // https://math.stackexchange.com/a/64639
         unsafe {
             let mut matrix = Mat4x4::default();
-            let row1 = x86_64::_mm_load_ps(self.as_ptr().add(0));
-            let row2 = x86_64::_mm_load_ps(self.as_ptr().add(4));
-            let row3 = x86_64::_mm_load_ps(self.as_ptr().add(8));
-            let row4 = x86_64::_mm_load_ps(self.as_ptr().add(12));
+            let col1 = x86_64::_mm_load_ps(self.as_ptr().add(0));
+            let col2 = x86_64::_mm_load_ps(self.as_ptr().add(4));
+            let col3 = x86_64::_mm_load_ps(self.as_ptr().add(8));
+            let col4 = x86_64::_mm_load_ps(self.as_ptr().add(12));
 
-            let col1 = x86_64::_mm_load_ps(rhs.as_ptr().add(0));
-            let col2 = x86_64::_mm_load_ps(rhs.as_ptr().add(4));
-            let col3 = x86_64::_mm_load_ps(rhs.as_ptr().add(8));
-            let col4 = x86_64::_mm_load_ps(rhs.as_ptr().add(12));
-
-            let cols = [col1, col2, col3, col4];
             for col in 0..4 {
-                let col_m128 = cols[col];
+                let col_m128 = x86_64::_mm_load_ps(rhs.as_ptr().add(col * 4));
                 let x_m128 = x86_64::_mm_shuffle_ps::<0x00>(col_m128, col_m128);
                 let y_m128 = x86_64::_mm_shuffle_ps::<0x55>(col_m128, col_m128);
                 let z_m128 = x86_64::_mm_shuffle_ps::<0xaa>(col_m128, col_m128);
                 let w_m128 = x86_64::_mm_shuffle_ps::<0xff>(col_m128, col_m128);
 
-                let r1 = x86_64::_mm_mul_ps(x_m128, row1);
-                let r2 = x86_64::_mm_add_ps(r1, x86_64::_mm_mul_ps(y_m128, row2));
-                let r3 = x86_64::_mm_add_ps(r2, x86_64::_mm_mul_ps(z_m128, row3));
-                let r4 = x86_64::_mm_add_ps(r3, x86_64::_mm_mul_ps(w_m128, row4));
+                let r1 = x86_64::_mm_mul_ps(x_m128, col1);
+                let r2 = x86_64::_mm_add_ps(r1, x86_64::_mm_mul_ps(y_m128, col2));
+                let r3 = x86_64::_mm_add_ps(r2, x86_64::_mm_mul_ps(z_m128, col3));
+                let r4 = x86_64::_mm_add_ps(r3, x86_64::_mm_mul_ps(w_m128, col4));
 
                 x86_64::_mm_store_ps(matrix.as_mut_ptr().add(col * 4), r4);
             }
