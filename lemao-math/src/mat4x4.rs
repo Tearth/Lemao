@@ -140,10 +140,10 @@ impl Mul<Vec4> for Mat4x4 {
     fn mul(self, rhs: Vec4) -> Self::Output {
         // https://math.stackexchange.com/a/64639
         unsafe {
-            let row1 = x86_64::_mm_load_ps(self.as_ptr().add(0));
-            let row2 = x86_64::_mm_load_ps(self.as_ptr().add(4));
-            let row3 = x86_64::_mm_load_ps(self.as_ptr().add(8));
-            let row4 = x86_64::_mm_load_ps(self.as_ptr().add(12));
+            let col1 = x86_64::_mm_load_ps(self.as_ptr().add(0));
+            let col2 = x86_64::_mm_load_ps(self.as_ptr().add(4));
+            let col3 = x86_64::_mm_load_ps(self.as_ptr().add(8));
+            let col4 = x86_64::_mm_load_ps(self.as_ptr().add(12));
 
             let rhs_m128 = x86_64::_mm_load_ps(rhs.as_ptr());
             let x_m128 = x86_64::_mm_shuffle_ps::<0x00>(rhs_m128, rhs_m128);
@@ -151,10 +151,10 @@ impl Mul<Vec4> for Mat4x4 {
             let z_m128 = x86_64::_mm_shuffle_ps::<0xaa>(rhs_m128, rhs_m128);
             let w_m128 = x86_64::_mm_shuffle_ps::<0xff>(rhs_m128, rhs_m128);
 
-            let r1 = x86_64::_mm_mul_ps(x_m128, row1);
-            let r2 = x86_64::_mm_add_ps(r1, x86_64::_mm_mul_ps(y_m128, row2));
-            let r3 = x86_64::_mm_add_ps(r2, x86_64::_mm_mul_ps(z_m128, row3));
-            let r4 = x86_64::_mm_add_ps(r3, x86_64::_mm_mul_ps(w_m128, row4));
+            let r1 = x86_64::_mm_mul_ps(x_m128, col1);
+            let r2 = x86_64::_mm_add_ps(r1, x86_64::_mm_mul_ps(y_m128, col2));
+            let r3 = x86_64::_mm_add_ps(r2, x86_64::_mm_mul_ps(z_m128, col3));
+            let r4 = x86_64::_mm_add_ps(r3, x86_64::_mm_mul_ps(w_m128, col4));
 
             mem::transmute(r4)
         }

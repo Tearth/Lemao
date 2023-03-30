@@ -6,6 +6,7 @@ members = [
     "lemao-math",
     "lemao-openal",
     "lemao-opengl",
+    "lemao-physics",
     "lemao-platforms/lemao-common-platform",
     "lemao-platforms/lemao-linux-x11",
     "lemao-platforms/lemao-windows-winapi",
@@ -20,6 +21,7 @@ members = [
     "examples/framework",
     "examples/line",
     "examples/paint",
+    "examples/physics",
     "examples/rectangle",
     "examples/transformation",
     "examples/ui",
@@ -27,3 +29,6 @@ members = [
     
     "games/snake",
 ]
+
+# [profile.release]
+# debug = true
