@@ -1,0 +1,9 @@
+[package]
+name = "physics"
+version = "1.0.0"
+edition = "2021"
+
+[dependencies]
+lemao-core = { path = "../../lemao-core" }
+lemao-physics = { path = "../../lemao-physics" }
+lemao-ui = { path = "../../lemao-ui" }
