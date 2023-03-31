@@ -11,8 +11,9 @@ pub struct PhysicsStorage {
 }
 
 impl PhysicsStorage {
-    pub fn store(&mut self, body: Body) -> Result<(), String> {
+    pub fn store(&mut self, mut body: Body) -> Result<(), String> {
         let body_id = self.get_new_id();
+        body.id = body_id;
         self.data.push(body);
 
         if body_id + 1 > self.id_lookup.len() {

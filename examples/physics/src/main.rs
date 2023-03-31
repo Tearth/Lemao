@@ -23,7 +23,7 @@ pub fn main() -> Result<(), String> {
     let window_position = Default::default();
     let window_size = Vec2::new(1366.0, 768.0);
 
-    let mut window = WindowContext::new("Line", WindowStyle::Window { position: window_position, size: window_size })?;
+    let mut window = WindowContext::new("Physics", WindowStyle::Window { position: window_position, size: window_size })?;
     let mut renderer = window.create_renderer()?;
     let mut physics = PhysicsContext::new(&mut renderer)?;
     let mut ui = UiContext::new(&mut renderer)?;
@@ -40,13 +40,23 @@ pub fn main() -> Result<(), String> {
     description_text.label_line_height = 20;
     ui.components.get_mut(ui.main_canvas_id)?.add_child(description_text_id);
 
-    physics.bodies.store(Body { position: window_size / 2.0, size: Vec2::new(100.0, 100.0) })?;
+    let world_center = window_size / 2.0 / physics.pixels_per_meter;
+    physics.bodies.store(Body { id: 0, position: world_center + Vec2::new(0.0, 1.0), size: Vec2::new(1.0, 1.0), mass: 1.0 })?;
+    physics.bodies.store(Body { id: 0, position: world_center + Vec2::new(-2.0, 1.0), size: Vec2::new(1.0, 1.0), mass: 1.0 })?;
+    physics.bodies.store(Body { id: 0, position: world_center + Vec2::new(-4.0, 1.0), size: Vec2::new(1.0, 1.0), mass: 1.0 })?;
+    physics.bodies.store(Body { id: 0, position: world_center + Vec2::new(2.0, 1.0), size: Vec2::new(1.0, 1.0), mass: 1.0 })?;
+    physics.bodies.store(Body { id: 0, position: world_center + Vec2::new(4.0, 1.0), size: Vec2::new(1.0, 1.0), mass: 1.0 })?;
+    physics.bodies.store(Body { id: 0, position: world_center + Vec2::new(-3.0, -1.0), size: Vec2::new(2.0, 2.0), mass: 10.0 })?;
+    physics.bodies.store(Body { id: 0, position: world_center + Vec2::new(3.0, -1.0), size: Vec2::new(2.0, 2.0), mass: 10.0 })?;
 
     let mut is_running = true;
     let mut dt_timestamp = SystemTime::now();
     while is_running {
         while let Some(event) = window.poll_event() {
             match event {
+                InputEvent::MouseMoved(cursor_position, _) => {
+                    physics.bodies.get_mut(0)?.position = cursor_position / physics.pixels_per_meter;
+                }
                 InputEvent::WindowSizeChanged(size) => {
                     renderer.set_viewport_size(size)?;
                 }
