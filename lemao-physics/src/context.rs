@@ -1,54 +1,33 @@
-use std::cmp;
-use std::f32::consts;
-
 use crate::body::BodyShape;
 use crate::storage::PhysicsStorage;
 use lemao_core::renderer::context::RendererContext;
 use lemao_core::renderer::drawable::circle::Circle;
 use lemao_core::renderer::drawable::frame::Frame;
+use lemao_core::renderer::drawable::line::Line;
 use lemao_core::renderer::drawable::Color;
 use lemao_math::color::SolidColor;
 use lemao_math::vec2::Vec2;
+use std::f32::consts;
 
 pub struct PhysicsContext {
     pub debug_box: Frame,
     pub debug_circle: Circle,
+    pub debug_line: Line,
     pub pixels_per_meter: f32,
     pub bodies: PhysicsStorage,
 }
 
 impl PhysicsContext {
     pub fn new(renderer: &mut RendererContext) -> Result<Self, String> {
-        let mut physics = Self { debug_circle: renderer.create_circle()?, debug_box: renderer.create_frame()?, pixels_per_meter: 100.0, bodies: Default::default() };
+        let physics = Self {
+            debug_circle: renderer.create_circle()?,
+            debug_box: renderer.create_frame()?,
+            debug_line: renderer.create_line()?,
+            pixels_per_meter: 100.0,
+            bodies: Default::default(),
+        };
 
         Ok(physics)
-    }
-
-    pub fn draw(&mut self, renderer: &mut RendererContext) -> Result<(), String> {
-        for body in self.bodies.iter() {
-            match body.shape {
-                BodyShape::Box => {
-                    self.debug_box.position = body.position * self.pixels_per_meter;
-                    self.debug_box.rotation = body.rotation;
-                    self.debug_box.size = body.size * self.pixels_per_meter;
-                    self.debug_box.anchor = Vec2::new(0.5, 0.5);
-                    self.debug_box.color = Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0));
-                    self.debug_box.update();
-                    renderer.draw(&mut self.debug_box)?;
-                }
-                BodyShape::Circle => {
-                    self.debug_circle.position = body.position * self.pixels_per_meter;
-                    self.debug_circle.rotation = body.rotation;
-                    self.debug_circle.size = body.size * self.pixels_per_meter;
-                    self.debug_circle.anchor = Vec2::new(0.5, 0.5);
-                    self.debug_circle.color = Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0));
-                    self.debug_circle.update();
-                    renderer.draw(&mut self.debug_circle)?;
-                }
-            }
-        }
-
-        Ok(())
     }
 
     pub fn update(&mut self, delta_time: f32) -> Result<(), String> {
@@ -81,17 +60,17 @@ impl PhysicsContext {
                     }
                 } else if b1.shape == BodyShape::Box && b2.shape == BodyShape::Box {
                     let b1_radius = b1.size.length() / 2.0;
-                    let b1_v1 = b1.position + b1_radius * Vec2::new(f32::cos(0.5 * consts::FRAC_PI_2 + b1.rotation), f32::sin(0.5 * consts::FRAC_PI_2 + b1.rotation));
-                    let b1_v2 = b1.position + b1_radius * Vec2::new(f32::cos(1.5 * consts::FRAC_PI_2 + b1.rotation), f32::sin(1.5 * consts::FRAC_PI_2 + b1.rotation));
-                    let b1_v3 = b1.position + b1_radius * Vec2::new(f32::cos(2.5 * consts::FRAC_PI_2 + b1.rotation), f32::sin(2.5 * consts::FRAC_PI_2 + b1.rotation));
-                    let b1_v4 = b1.position + b1_radius * Vec2::new(f32::cos(3.5 * consts::FRAC_PI_2 + b1.rotation), f32::sin(3.5 * consts::FRAC_PI_2 + b1.rotation));
+                    let b1_v1 = b1.position + b1_radius * Vec2::new_from_angle(0.5 * consts::FRAC_PI_2 + b1.rotation);
+                    let b1_v2 = b1.position + b1_radius * Vec2::new_from_angle(1.5 * consts::FRAC_PI_2 + b1.rotation);
+                    let b1_v3 = b1.position + b1_radius * Vec2::new_from_angle(2.5 * consts::FRAC_PI_2 + b1.rotation);
+                    let b1_v4 = b1.position + b1_radius * Vec2::new_from_angle(3.5 * consts::FRAC_PI_2 + b1.rotation);
                     let b1_vertices = [b1_v1, b1_v2, b1_v3, b1_v4];
 
                     let b2_radius = b2.size.length() / 2.0;
-                    let b2_v1 = b2.position + b2_radius * Vec2::new(f32::cos(0.5 * consts::FRAC_PI_2 + b2.rotation), f32::sin(0.5 * consts::FRAC_PI_2 + b2.rotation));
-                    let b2_v2 = b2.position + b2_radius * Vec2::new(f32::cos(1.5 * consts::FRAC_PI_2 + b2.rotation), f32::sin(1.5 * consts::FRAC_PI_2 + b2.rotation));
-                    let b2_v3 = b2.position + b2_radius * Vec2::new(f32::cos(2.5 * consts::FRAC_PI_2 + b2.rotation), f32::sin(2.5 * consts::FRAC_PI_2 + b2.rotation));
-                    let b2_v4 = b2.position + b2_radius * Vec2::new(f32::cos(3.5 * consts::FRAC_PI_2 + b2.rotation), f32::sin(3.5 * consts::FRAC_PI_2 + b2.rotation));
+                    let b2_v1 = b2.position + b2_radius * Vec2::new_from_angle(0.5 * consts::FRAC_PI_2 + b2.rotation);
+                    let b2_v2 = b2.position + b2_radius * Vec2::new_from_angle(1.5 * consts::FRAC_PI_2 + b2.rotation);
+                    let b2_v3 = b2.position + b2_radius * Vec2::new_from_angle(2.5 * consts::FRAC_PI_2 + b2.rotation);
+                    let b2_v4 = b2.position + b2_radius * Vec2::new_from_angle(3.5 * consts::FRAC_PI_2 + b2.rotation);
                     let b2_vertices = [b2_v1, b2_v2, b2_v3, b2_v4];
 
                     let mut collision_detected = true;
@@ -148,10 +127,10 @@ impl PhysicsContext {
                     }
                 } else if b1.shape == BodyShape::Circle && b2.shape == BodyShape::Box {
                     let b2_radius = b2.size.length() / 2.0;
-                    let b2_v1 = b2.position + b2_radius * Vec2::new(f32::cos(0.5 * consts::FRAC_PI_2 + b2.rotation), f32::sin(0.5 * consts::FRAC_PI_2 + b2.rotation));
-                    let b2_v2 = b2.position + b2_radius * Vec2::new(f32::cos(1.5 * consts::FRAC_PI_2 + b2.rotation), f32::sin(1.5 * consts::FRAC_PI_2 + b2.rotation));
-                    let b2_v3 = b2.position + b2_radius * Vec2::new(f32::cos(2.5 * consts::FRAC_PI_2 + b2.rotation), f32::sin(2.5 * consts::FRAC_PI_2 + b2.rotation));
-                    let b2_v4 = b2.position + b2_radius * Vec2::new(f32::cos(3.5 * consts::FRAC_PI_2 + b2.rotation), f32::sin(3.5 * consts::FRAC_PI_2 + b2.rotation));
+                    let b2_v1 = b2.position + b2_radius * Vec2::new_from_angle(0.5 * consts::FRAC_PI_2 + b2.rotation);
+                    let b2_v2 = b2.position + b2_radius * Vec2::new_from_angle(1.5 * consts::FRAC_PI_2 + b2.rotation);
+                    let b2_v3 = b2.position + b2_radius * Vec2::new_from_angle(2.5 * consts::FRAC_PI_2 + b2.rotation);
+                    let b2_v4 = b2.position + b2_radius * Vec2::new_from_angle(3.5 * consts::FRAC_PI_2 + b2.rotation);
                     let b2_vertices = [b2_v1, b2_v2, b2_v3, b2_v4];
 
                     let mut collision_detected = true;
@@ -217,6 +196,47 @@ impl PhysicsContext {
                         self.bodies.get_mut(i)?.position = b1_position;
                         self.bodies.get_mut(j)?.position = b2_position;
                     }
+                }
+            }
+        }
+
+        Ok(())
+    }
+
+    pub fn draw(&mut self, renderer: &mut RendererContext) -> Result<(), String> {
+        for body in self.bodies.iter() {
+            match body.shape {
+                BodyShape::Box => {
+                    self.debug_box.position = body.position * self.pixels_per_meter;
+                    self.debug_box.rotation = body.rotation;
+                    self.debug_box.size = body.size * self.pixels_per_meter;
+                    self.debug_box.anchor = Vec2::new(0.5, 0.5);
+                    self.debug_box.color = Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0));
+                    self.debug_box.update();
+
+                    self.debug_line.from = body.position * self.pixels_per_meter;
+                    self.debug_line.to = (body.position + (Vec2::new_from_angle(body.rotation) * body.size / 2.0)) * self.pixels_per_meter;
+                    self.debug_line.color = Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0));
+                    self.debug_line.update();
+
+                    renderer.draw(&mut self.debug_box)?;
+                    renderer.draw(&mut self.debug_line)?;
+                }
+                BodyShape::Circle => {
+                    self.debug_circle.position = body.position * self.pixels_per_meter;
+                    self.debug_circle.rotation = body.rotation;
+                    self.debug_circle.size = body.size * self.pixels_per_meter;
+                    self.debug_circle.anchor = Vec2::new(0.5, 0.5);
+                    self.debug_circle.color = Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0));
+                    self.debug_circle.update();
+
+                    self.debug_line.from = body.position * self.pixels_per_meter;
+                    self.debug_line.to = (body.position + (Vec2::new_from_angle(body.rotation) * body.size / 2.0)) * self.pixels_per_meter;
+                    self.debug_line.color = Color::SolidColor(SolidColor::new(1.0, 1.0, 1.0, 1.0));
+                    self.debug_line.update();
+
+                    renderer.draw(&mut self.debug_circle)?;
+                    renderer.draw(&mut self.debug_line)?;
                 }
             }
         }

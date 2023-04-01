@@ -49,7 +49,7 @@ impl Line {
     pub fn update(&mut self) {
         self.position = self.from;
         self.rotation = Vec2::new(0.0, 1.0).signed_angle(self.to - self.from);
-        self.size = Vec2::new(self.thickness, self.from.distance(self.to) + 1.0);
+        self.size = Vec2::new(self.thickness, self.from.distance(self.to));
     }
 }
 
