@@ -36,6 +36,14 @@ impl Vec2 {
         Vec2::new(self.x.abs(), self.y.abs())
     }
 
+    pub fn sign(&self) -> Self {
+        Vec2::new(self.x.signum(), self.y.signum())
+    }
+
+    pub fn dot(&self, rhs: Vec2) -> f32 {
+        self.x * rhs.x + self.y * rhs.y
+    }
+
     pub fn signed_angle(&self, rhs: Vec2) -> f32 {
         // https://stackoverflow.com/a/16544330
         // https://en.wikipedia.org/wiki/Atan2
