@@ -33,7 +33,7 @@ pub fn main() -> Result<(), String> {
     let mut ui = UiContext::new(&mut renderer)?;
     renderer.set_swap_interval(1);
 
-    let texture_id = renderer.textures.store(Texture::new(&renderer, &bmp::load("./cell/disc.bmp")?)?);
+    let texture_id = renderer.textures.store(Texture::new(&renderer, &bmp::load("./assets/disc.bmp")?)?);
     let font_id = renderer.fonts.store(Font::new(&renderer, &bff::load("./assets/inconsolata.bff")?)?);
 
     let mut sprite = renderer.create_rectangle()?;
