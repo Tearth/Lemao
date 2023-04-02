@@ -44,6 +44,15 @@ impl PhysicsStorage {
         }
     }
 
+    pub fn get_mut_2(&mut self, body1_id: usize, body2_id: usize) -> Result<(&mut Body, &mut Body), String> {
+        unsafe {
+            let body1 = self.get_mut(body1_id)? as *mut _ as *mut Body;
+            let body2 = self.get_mut(body2_id)? as *mut _ as *mut Body;
+
+            Ok((&mut *body1, &mut *body2))
+        }
+    }
+
     pub fn iter(&self) -> Iter<Body> {
         self.data.iter()
     }
