@@ -1,8 +1,10 @@
-use super::Collision;
 use crate::body::Body;
+use crate::collisions::Collision;
 use lemao_math::vec2::Vec2;
 
-pub fn process(box1: &Body, box2: &Body) -> Option<Collision> {
+use super::Contact;
+
+pub fn process(box1: &Body, box2: &Body, collision: &Collision) -> Vec<Contact> {
     let body1_v1 = Vec2::new(box1.size.x, box1.size.y) / 2.0;
     let body1_v2 = Vec2::new(-box1.size.x, box1.size.y) / 2.0;
     let body1_v3 = Vec2::new(-box1.size.x, -box1.size.y) / 2.0;
@@ -14,6 +16,7 @@ pub fn process(box1: &Body, box2: &Body) -> Option<Collision> {
     let body1_v3 = box1.position + Vec2::new(body1_v3.x * angle.x - body1_v3.y * angle.y, body1_v3.x * angle.y + body1_v3.y * angle.x);
     let body1_v4 = box1.position + Vec2::new(body1_v4.x * angle.x - body1_v4.y * angle.y, body1_v4.x * angle.y + body1_v4.y * angle.x);
     let body1_vertices = [body1_v1, body1_v2, body1_v3, body1_v4];
+    let body1_edges = [[body1_v1, body1_v2], [body1_v2, body1_v3], [body1_v3, body1_v4], [body1_v4, body1_v1]];
 
     let body2_v1 = Vec2::new(box2.size.x, box2.size.y) / 2.0;
     let body2_v2 = Vec2::new(-box2.size.x, box2.size.y) / 2.0;
@@ -26,57 +29,55 @@ pub fn process(box1: &Body, box2: &Body) -> Option<Collision> {
     let body2_v3 = box2.position + Vec2::new(body2_v3.x * angle.x - body2_v3.y * angle.y, body2_v3.x * angle.y + body2_v3.y * angle.x);
     let body2_v4 = box2.position + Vec2::new(body2_v4.x * angle.x - body2_v4.y * angle.y, body2_v4.x * angle.y + body2_v4.y * angle.x);
     let body2_vertices = [body2_v1, body2_v2, body2_v3, body2_v4];
+    let body2_edges = [[body2_v1, body2_v2], [body2_v2, body2_v3], [body2_v3, body2_v4], [body2_v4, body2_v1]];
 
-    let mut collision_detected = true;
-    let mut collision_depth = f32::MAX;
-    let mut collision_direction = Vec2::default();
+    let mut contacts = Vec::new();
 
-    let mut invert_depth = false;
-    for [v1, v2] in [[body1_v1, body1_v2], [body1_v2, body1_v3], [body2_v1, body2_v2], [body2_v2, body2_v3]] {
-        let edge = v2 - v1;
-        let axis = Vec2::new(-edge.y, edge.x).normalized();
+    for edge in body1_edges {
+        let edge_direction = (edge[1] - edge[0]).normalized();
+        let dot = edge_direction.dot(collision.direction).abs();
 
-        let mut body1_min = f32::MAX;
-        let mut body1_max = f32::MIN;
-
-        for v in body1_vertices {
-            let projection = v.dot(axis);
-            body1_min = body1_min.min(projection);
-            body1_max = body1_max.max(projection);
-        }
-
-        let mut body2_min = f32::MAX;
-        let mut body2_max = f32::MIN;
-
-        for v in body2_vertices {
-            let projection = v.dot(axis);
-            body2_min = body2_min.min(projection);
-            body2_max = body2_max.max(projection);
-        }
-
-        if body1_min >= body2_max || body2_min >= body1_max {
-            collision_detected = false;
-            break;
-        }
-
-        let d1 = body1_max - body2_min;
-        let d2 = body2_max - body1_min;
-        let axis_depth = d1.min(d2);
-
-        if axis_depth < collision_depth {
-            collision_depth = axis_depth;
-            collision_direction = axis;
-            invert_depth = d1 > d2;
+        if dot.abs() < 0.001 {
+            for v in body2_vertices {
+                if distance_to_edge(edge[0], edge[1], v).abs() < 0.001 {
+                    contacts.push(Contact::new(v));
+                }
+            }
         }
     }
 
-    if collision_detected {
-        if invert_depth {
-            collision_direction = -collision_direction;
-        }
+    for edge in body2_edges {
+        let edge_direction = (edge[1] - edge[0]).normalized();
+        let dot = edge_direction.dot(collision.direction).abs();
 
-        Some(Collision::new(collision_depth, collision_direction))
-    } else {
-        None
+        if dot.abs() < 0.001 {
+            for v in body1_vertices {
+                if distance_to_edge(edge[0], edge[1], v).abs() < 0.001 {
+                    contacts.push(Contact::new(v));
+                }
+            }
+        }
     }
+
+    if contacts.len() == 1 {
+        return contacts;
+    }
+
+    let mut dots = Vec::new();
+    let collision_normal = Vec2::new(-collision.direction.y, collision.direction.x);
+
+    for contact in contacts {
+        dots.push((contact, contact.position.dot(collision_normal)));
+    }
+
+    dots.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap());
+
+    vec![dots[1].0, dots[2].0]
+}
+
+fn distance_to_edge(start: Vec2, end: Vec2, point: Vec2) -> f32 {
+    let a = (((start.x - end.x) * (end.y - point.y)) - ((end.x - point.x) * (start.y - end.y))).abs();
+    let b = ((start.x - end.x).powi(2) + (start.y - end.y).powi(2)).sqrt();
+
+    a / b
 }

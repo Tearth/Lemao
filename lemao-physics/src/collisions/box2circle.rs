@@ -17,7 +17,7 @@ pub fn process(r#box: &Body, circle: &Body) -> Option<Collision> {
 
     let mut collision_detected = true;
     let mut collision_depth = f32::MAX;
-    let mut collision_normal = Vec2::default();
+    let mut collision_direction = Vec2::default();
 
     let mut axes = Vec::new();
 
@@ -66,17 +66,17 @@ pub fn process(r#box: &Body, circle: &Body) -> Option<Collision> {
 
         if axis_depth < collision_depth {
             collision_depth = axis_depth;
-            collision_normal = axis;
+            collision_direction = axis;
             invert_depth = d1 > d2;
         }
     }
 
     if collision_detected {
         if invert_depth {
-            collision_normal = -collision_normal;
+            collision_direction = -collision_direction;
         }
 
-        Some(Collision::new(collision_depth, collision_normal))
+        Some(Collision::new(collision_depth, collision_direction))
     } else {
         None
     }
