@@ -18,6 +18,8 @@ pub struct PhysicsContext {
     pub debug_rectangle: Rectangle,
     pub debug_line: Line,
     pub pixels_per_meter: f32,
+    pub gravity: Vec2,
+
     pub contacts: Vec<Contact>,
     pub bodies: PhysicsStorage,
 }
@@ -30,6 +32,8 @@ impl PhysicsContext {
             debug_rectangle: renderer.create_rectangle()?,
             debug_line: renderer.create_line()?,
             pixels_per_meter: 100.0,
+            gravity: Vec2::new(0.0, -9.81),
+
             contacts: Default::default(),
             bodies: Default::default(),
         };
@@ -39,6 +43,13 @@ impl PhysicsContext {
 
     pub fn update(&mut self, delta_time: f32) -> Result<(), String> {
         self.contacts.clear();
+
+        for body in self.bodies.iter_mut() {
+            if body.dynamic {
+                body.velocity_linear += self.gravity * delta_time;
+                body.position += body.velocity_linear * delta_time;
+            }
+        }
 
         for body1_id in 0..self.bodies.len() {
             for body2_id in 0..self.bodies.len() {
