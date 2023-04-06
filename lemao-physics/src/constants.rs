@@ -1,1 +1,1 @@
-pub const MIN_SEPARATION: f32 = 0.00001;
+pub const MIN_SEPARATION: f32 = 0.00000;

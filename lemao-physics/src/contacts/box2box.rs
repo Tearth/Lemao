@@ -37,9 +37,9 @@ pub fn process(box1: &Body, box2: &Body, collision: &Collision) -> Vec<Contact> 
         let edge_direction = (edge[1] - edge[0]).normalized();
         let dot = edge_direction.dot(collision.direction).abs();
 
-        if dot.abs() < 0.001 {
+        if dot.abs() < 0.00001 {
             for v in body2_vertices {
-                if distance_to_edge(edge[0], edge[1], v).abs() < 0.001 {
+                if distance_to_edge(edge[0], edge[1], v).abs() < 0.00001 {
                     contacts.push(Contact::new(v));
                 }
             }
@@ -50,9 +50,9 @@ pub fn process(box1: &Body, box2: &Body, collision: &Collision) -> Vec<Contact> 
         let edge_direction = (edge[1] - edge[0]).normalized();
         let dot = edge_direction.dot(collision.direction).abs();
 
-        if dot.abs() < 0.001 {
+        if dot.abs() < 0.00001 {
             for v in body1_vertices {
-                if distance_to_edge(edge[0], edge[1], v).abs() < 0.001 {
+                if distance_to_edge(edge[0], edge[1], v).abs() < 0.00001 {
                     contacts.push(Contact::new(v));
                 }
             }
@@ -72,7 +72,14 @@ pub fn process(box1: &Body, box2: &Body, collision: &Collision) -> Vec<Contact> 
 
     dots.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap());
 
-    vec![dots[1].0, dots[2].0]
+    println!("{}", dots.len());
+    if dots.len() == 2 {
+        vec![dots[0].0, dots[1].0]
+    } else if dots.len() == 3 {
+        vec![dots[1].0]
+    } else {
+        vec![dots[1].0, dots[2].0]
+    }
 }
 
 fn distance_to_edge(start: Vec2, end: Vec2, point: Vec2) -> f32 {

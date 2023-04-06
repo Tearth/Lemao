@@ -2,6 +2,7 @@ use crate::body::BodyShape;
 use crate::contacts::Contact;
 use crate::storage::PhysicsStorage;
 use crate::{collisions, contacts};
+use core::f32;
 use lemao_core::renderer::context::RendererContext;
 use lemao_core::renderer::drawable::circle::Circle;
 use lemao_core::renderer::drawable::frame::Frame;
@@ -41,13 +42,14 @@ impl PhysicsContext {
         Ok(physics)
     }
 
-    pub fn update(&mut self, delta_time: f32) -> Result<(), String> {
+    pub fn update(&mut self, mut delta_time: f32) -> Result<(), String> {
         self.contacts.clear();
 
         for body in self.bodies.iter_mut() {
             if body.dynamic {
                 body.velocity_linear += self.gravity * delta_time;
                 body.position += body.velocity_linear * delta_time;
+                body.rotation = (body.rotation + body.velocity_angular * delta_time) % (std::f32::consts::PI * 2.0);
             }
         }
 
@@ -89,6 +91,60 @@ impl PhysicsContext {
                     } else {
                         Vec::new()
                     };
+
+                    let body1_velocity_linear = body1.velocity_linear;
+                    let body2_velocity_linear = body2.velocity_linear;
+                    let body1_velocity_angular = body1.velocity_angular;
+                    let body2_velocity_angular = body2.velocity_angular;
+
+                    {
+                        let mut point_sum = Vec2::default();
+                        for point in &contacts {
+                            point_sum += point.position;
+                        }
+
+                        let point = point_sum / contacts.len() as f32;
+
+                        //for point in &contacts {
+                        let r1 = point - body1.position;
+                        let r2 = point - body2.position;
+                        let r1_perp = Vec2::new(-r1.y, r1.x).normalized();
+                        let r2_perp = Vec2::new(-r2.y, r2.x).normalized();
+                        let v1 = body1_velocity_linear + body1_velocity_angular * r1_perp;
+                        let v2 = body2_velocity_linear + body2_velocity_angular * r2_perp;
+                        let bounciness = body1.bounciness.min(body2.bounciness);
+                        let relative_velocity = v2 - v1;
+
+                        if relative_velocity.dot(collision.direction) <= 0.0 {
+                            let j = -(1.0 + bounciness) * relative_velocity.dot(collision.direction)
+                                / ((1.0 / body1.mass + 1.0 / body2.mass)
+                                    + (r1_perp.dot(collision.direction).powi(2) / body1.inertia)
+                                    + (r2_perp.dot(collision.direction).powi(2) / body2.inertia));
+
+                            if body1.dynamic {
+                                body1.velocity_angular -= (r1_perp.dot(j * collision.direction) / body1.inertia);
+                                body1.velocity_linear -= (j * collision.direction / body1.mass);
+                            }
+
+                            if body2.dynamic {
+                                body2.velocity_angular += (r2_perp.dot(j * collision.direction) / body2.inertia);
+                                body2.velocity_linear += (j * collision.direction / body2.mass);
+                            }
+                        }
+                    }
+                    //}
+
+                    {
+                        let relative_velocity = body2_velocity_linear - body1_velocity_linear;
+
+                        if relative_velocity.dot(collision.direction) <= 0.0 {
+                            let bounciness = body1.bounciness.min(body2.bounciness);
+                            let j = -(1.0 + bounciness) * relative_velocity.dot(collision.direction) / (1.0 / body1.mass + 1.0 / body2.mass);
+
+                            if body1.dynamic {}
+                            if body2.dynamic {}
+                        }
+                    }
 
                     self.contacts.extend(contacts);
                 }
