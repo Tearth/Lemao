@@ -23,10 +23,9 @@ pub fn solve(body1: &mut Body, body2: &mut Body, collision: &Collision, contact:
     let total_intertia = (r1_perp.dot(direction).powi(2) / body1.inertia) + (r2_perp.dot(direction).powi(2) / body2.inertia);
     let mut j = relative_velocity.dot(direction) / (total_mass + total_intertia);
 
-    if j.abs() <= (pressure * friction_static) {
-        j = j;
-    } else {
-        j = j * friction_dynamic;
+    // Check if dynamic friction should be applied
+    if j.abs() > (pressure * friction_static) {
+        j *= friction_dynamic;
     }
 
     if body1.dynamic {

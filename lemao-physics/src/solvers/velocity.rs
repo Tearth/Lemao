@@ -19,7 +19,7 @@ pub fn solve(body1: &mut Body, body2: &mut Body, collision: &Collision, contact:
     let relative_velocity = v2 - v1;
 
     if relative_velocity.dot(collision.direction) <= 0.0 {
-        let total_mass = (1.0 / body1.mass + 1.0 / body2.mass);
+        let total_mass = 1.0 / body1.mass + 1.0 / body2.mass;
         let total_intertia = (r1_perp.dot(collision.direction).powi(2) / body1.inertia) + (r2_perp.dot(collision.direction).powi(2) / body2.inertia);
         let j = -(1.0 + bounciness) * relative_velocity.dot(collision.direction) / (total_mass + total_intertia);
 

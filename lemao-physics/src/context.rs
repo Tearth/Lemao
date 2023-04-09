@@ -11,7 +11,6 @@ use lemao_core::renderer::drawable::rectangle::Rectangle;
 use lemao_core::renderer::drawable::Color;
 use lemao_math::color::SolidColor;
 use lemao_math::vec2::Vec2;
-use std::f32::consts;
 
 pub struct PhysicsContext {
     pub debug_circle: Circle,
