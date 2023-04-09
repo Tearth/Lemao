@@ -4,7 +4,7 @@ use lemao_math::vec2::Vec2;
 
 use super::Contact;
 
-pub fn process(box1: &Body, box2: &Body, collision: &Collision) -> Vec<Contact> {
+pub fn process(box1: &Body, box2: &Body, collision: &Collision) -> Contact {
     let body1_v1 = Vec2::new(box1.size.x, box1.size.y) / 2.0;
     let body1_v2 = Vec2::new(-box1.size.x, box1.size.y) / 2.0;
     let body1_v3 = Vec2::new(-box1.size.x, -box1.size.y) / 2.0;
@@ -37,9 +37,9 @@ pub fn process(box1: &Body, box2: &Body, collision: &Collision) -> Vec<Contact> 
         let edge_direction = (edge[1] - edge[0]).normalized();
         let dot = edge_direction.dot(collision.direction).abs();
 
-        if dot.abs() < 0.00001 {
+        if dot.abs() < 0.01 {
             for v in body2_vertices {
-                if distance_to_edge(edge[0], edge[1], v).abs() < 0.00001 {
+                if distance_to_edge(edge[0], edge[1], v).abs() < 0.01 {
                     contacts.push(Contact::new(v));
                 }
             }
@@ -50,9 +50,9 @@ pub fn process(box1: &Body, box2: &Body, collision: &Collision) -> Vec<Contact> 
         let edge_direction = (edge[1] - edge[0]).normalized();
         let dot = edge_direction.dot(collision.direction).abs();
 
-        if dot.abs() < 0.00001 {
+        if dot.abs() < 0.01 {
             for v in body1_vertices {
-                if distance_to_edge(edge[0], edge[1], v).abs() < 0.00001 {
+                if distance_to_edge(edge[0], edge[1], v).abs() < 0.01 {
                     contacts.push(Contact::new(v));
                 }
             }
@@ -60,7 +60,7 @@ pub fn process(box1: &Body, box2: &Body, collision: &Collision) -> Vec<Contact> 
     }
 
     if contacts.len() == 1 {
-        return contacts;
+        return contacts[0];
     }
 
     let mut dots = Vec::new();
@@ -72,13 +72,12 @@ pub fn process(box1: &Body, box2: &Body, collision: &Collision) -> Vec<Contact> 
 
     dots.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap());
 
-    println!("{}", dots.len());
     if dots.len() == 2 {
-        vec![dots[0].0, dots[1].0]
+        Contact::new((dots[0].0.position + dots[1].0.position) / 2.0)
     } else if dots.len() == 3 {
-        vec![dots[1].0]
+        dots[1].0
     } else {
-        vec![dots[1].0, dots[2].0]
+        Contact::new((dots[1].0.position + dots[2].0.position) / 2.0)
     }
 }
 

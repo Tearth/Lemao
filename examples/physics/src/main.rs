@@ -42,34 +42,14 @@ pub fn main() -> Result<(), String> {
     ui.components.get_mut(ui.main_canvas_id)?.add_child(description_text_id);
 
     let world_center = window_size / 2.0 / physics.pixels_per_meter;
-    physics.bodies.store(Body { id: 0, shape: BodyShape::Circle, position: world_center + Vec2::new(0.0, 1.0), rotation: 0.0, size: Vec2::new(1.0, 1.0), mass: 1.0 })?;
-    physics.bodies.store(Body { id: 0, shape: BodyShape::Circle, position: world_center + Vec2::new(-2.0, 1.0), rotation: 0.0, size: Vec2::new(1.0, 1.0), mass: 1.0 })?;
-    physics.bodies.store(Body { id: 0, shape: BodyShape::Box, position: Vec2::new(0.5, 0.5), rotation: 0.0, size: Vec2::new(1.0, 1.0), mass: 1.0 })?;
-    physics.bodies.store(Body { id: 0, shape: BodyShape::Circle, position: world_center + Vec2::new(2.0, 1.0), rotation: 0.0, size: Vec2::new(1.0, 1.0), mass: 1.0 })?;
-    physics.bodies.store(Body {
-        id: 0,
-        shape: BodyShape::Box,
-        position: world_center + Vec2::new(4.0, 1.0),
-        rotation: std::f32::consts::PI / 4.0,
-        size: Vec2::new(1.0, 1.0),
-        mass: 1.0,
-    })?;
-    physics.bodies.store(Body {
-        id: 0,
-        shape: BodyShape::Circle,
-        position: world_center + Vec2::new(-3.0, -1.0),
-        rotation: 0.0,
-        size: Vec2::new(2.0, 2.0),
-        mass: 10.0,
-    })?;
-    physics.bodies.store(Body {
-        id: 0,
-        shape: BodyShape::Circle,
-        position: world_center + Vec2::new(3.0, -1.0),
-        rotation: 0.0,
-        size: Vec2::new(2.0, 2.0),
-        mass: 10.0,
-    })?;
+    physics.bodies.store(Body::new(BodyShape::Box, Vec2::new(2.5, 2.5), 1.0, Vec2::new(1.0, 1.0), 1.0, false))?;
+    physics.bodies.store(Body::new(BodyShape::Circle, world_center + Vec2::new(0.0, 1.0), 0.0, Vec2::new(1.0, 1.0), 10.0, true))?;
+    physics.bodies.store(Body::new(BodyShape::Box, Vec2::new(4.5, 4.5), 2.0, Vec2::new(2.0, 1.0), 1.0, true))?;
+    physics.bodies.store(Body::new(BodyShape::Circle, world_center + Vec2::new(2.0, 1.0), 0.0, Vec2::new(1.0, 1.0), 1.0, true))?;
+    physics.bodies.store(Body::new(BodyShape::Box, world_center + Vec2::new(1.0, 1.0), 3.0, Vec2::new(1.0, 3.0), 1.0, true))?;
+    physics.bodies.store(Body::new(BodyShape::Circle, world_center + Vec2::new(-3.0, -1.0), 0.0, Vec2::new(2.0, 2.0), 10.0, true))?;
+    physics.bodies.store(Body::new(BodyShape::Circle, world_center + Vec2::new(3.0, -1.0), 0.0, Vec2::new(2.0, 2.0), 10.0, true))?;
+    physics.bodies.store(Body::new(BodyShape::Box, world_center + Vec2::new(0.0, -3.0), 0.0, Vec2::new(8.0, 1.0), f32::MAX, false))?;
 
     let mut is_running = true;
     let mut dt_timestamp = SystemTime::now();

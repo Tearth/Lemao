@@ -12,6 +12,8 @@ pub struct Body {
     pub velocity_linear: Vec2,
     pub velocity_angular: f32,
     pub bounciness: f32,
+    pub friction_static: f32,
+    pub friction_dynamic: f32,
     pub dynamic: bool,
 }
 
@@ -23,8 +25,21 @@ pub enum BodyShape {
 
 impl Body {
     pub fn new(shape: BodyShape, position: Vec2, rotation: f32, size: Vec2, mass: f32, dynamic: bool) -> Self {
-        let mut body =
-            Self { id: 0, shape, position, rotation, size, mass, inertia: 0.0, velocity_linear: Default::default(), velocity_angular: 0.0, bounciness: 0.3, dynamic };
+        let mut body = Self {
+            id: 0,
+            shape,
+            position,
+            rotation,
+            size,
+            mass,
+            inertia: 0.0,
+            velocity_linear: Default::default(),
+            velocity_angular: 0.0,
+            bounciness: 0.2,
+            friction_static: 0.9,
+            friction_dynamic: 0.8,
+            dynamic,
+        };
         body.update_intertia();
         body
     }

@@ -29,6 +29,10 @@ impl Vec2 {
 
     pub fn normalized(&self) -> Self {
         let length = self.length();
+        if length == 0.0 {
+            return Vec2::new(0.0, 0.0);
+        }
+
         Vec2::new(self.x / length, self.y / length)
     }
 
