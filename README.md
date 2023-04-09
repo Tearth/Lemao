@@ -12,9 +12,11 @@ This project is done entirely for fun and challenge, so it doesn't have a lot of
 Lemao components:
  - lemao-bindgen - [bindgen](https://github.com/rust-lang/rust-bindgen) fork with a custom change allowing to generate function pointers without Option wrapper
  - lemao-core - the main subsystem containing the renderer and coordinating the work of other components
+ - lemao-framework - entity-component-system framework with a set of other utilities
  - lemao-math - a set of math helpers (vectors, matrices, colors) with support for SIMD
  - lemao-openal - binding for OpenAL 
  - lemao-opengl - binding for OpenGL
+ - lemao-physics - basic physics engine with a support for boxes, circles, rotational responses and friction 
  - lemao-platforms
    - lemao-common-platforms - common interface implemented by all window subsystems
    - lemao-linux-x11 - window subsystem for Linux and X11
@@ -22,3 +24,5 @@ Lemao components:
  - lemao-ui - a set of UI components
 
 ![UI](./media/ui.jpg)
+![UI](./media/snake.jpg)
+![UI](./media/physics.jpg)
